@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.metrics import r2_score
+from scipy.stats import pearsonr
 import torch
 
 
@@ -139,7 +139,7 @@ class FUGW(BaseModel):
     def score(self, source_data, target_data):
         """
         Transport source contrast maps using fitted OT plan
-        and compute R^2 score with actual target contrast maps.
+        and compute correlation with actual target contrast maps.
 
         Parameters
         ----------
@@ -151,10 +151,10 @@ class FUGW(BaseModel):
         Returns
         -------
         score: float
-            R^2 of self.predict(source_data) with target_data
+            Correlation between self.transform(source_data) and target_data
         """
 
         transported_data = self.transform(source_data)
-        score = r2_score(transported_data, target_data)
+        score = pearsonr(transported_data, target_data)[0]
 
         return score
