@@ -10,7 +10,12 @@ Code adapted from: https://github.com/thibsej/unbalanced_gromov_wasserstein
 
 class FUGWSolver:
     def __init__(
-        self, nits=100, nits_sinkhorn=100, tol=1e-7, tol_sinkhorn=1e-7
+        self,
+        nits=100,
+        nits_sinkhorn=100,
+        tol=1e-7,
+        tol_sinkhorn=1e-7,
+        **kwargs
     ):
         self.nits = nits
         self.nits_sinkhorn = nits_sinkhorn
