@@ -14,6 +14,7 @@ class FUGW(BaseModel):
         eps=1e-4,
         alpha=0.95,
         mode="independent",
+        verbose=False,
         **kwargs,
     ):
         # Save model arguments
@@ -21,6 +22,7 @@ class FUGW(BaseModel):
         self.eps = eps
         self.alpha = alpha
         self.mode = mode
+        self.verbose = verbose
 
     def fit(
         self,
@@ -85,8 +87,8 @@ class FUGW(BaseModel):
             eps=self.eps,
             alpha=self.alpha,
             reg_mode=self.mode,
-            log=True,
-            verbose=True,
+            log=self.verbose,
+            verbose=self.verbose,
             save_freq=1,
         )
 
