@@ -79,7 +79,7 @@ class FUGW(BaseModel):
         )
 
         # Compute transport plan
-        pi, gamma, _, _ = model.solver(
+        res = model.solver(
             Gs,
             Gt,
             K,
@@ -91,6 +91,11 @@ class FUGW(BaseModel):
             verbose=self.verbose,
             save_freq=1,
         )
+
+        if self.verbose:
+            pi, gamma, _, _ = res
+        else:
+            pi, gamma = res
 
         self.pi = pi.detach().cpu().numpy()
 
