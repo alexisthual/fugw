@@ -158,10 +158,17 @@ class FUGW(BaseModel):
         Returns
         -------
         score: float
-            Correlation between self.transform(source_data) and target_data
+            Mean correlation across features of self.transform(source_data)
+            and target_data
         """
 
         transported_data = self.transform(source_data)
-        score = pearsonr(transported_data, target_data)[0]
+
+        score = np.mean(
+            [
+                pearsonr(transported_data[i, :], target_data[i, :])[0]
+                for i in range(transported_data.shape[0])
+            ]
+        )
 
         return score
