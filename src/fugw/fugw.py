@@ -109,6 +109,7 @@ class FUGW(BaseModel):
     def transform(self, source_data):
         """
         Transport source contrast map using fitted OT plan.
+        Use GPUs if available.
 
         Parameters
         ----------
@@ -120,28 +121,47 @@ class FUGW(BaseModel):
         transported_data: ndarray(n_samples, n2)
             Contrast map transported in target subject's space
         """
+        # Check cuda availability
+        use_cuda = torch.cuda.is_available()
+        dtype = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
+
         if self.pi is None:
             raise ("Model should be fitted before calling transform")
 
-        # source = torch.from_numpy(source_data.T).type(self.dtype)
-        transported_data = (self.pi.shape[1] * self.pi.T @ source_data.T).T
+        # Move data to GPU
+        pi_torch = torch.from_numpy(self.pi).type(dtype)
+        source_data_torch = torch.from_numpy(source_data).type(dtype)
+
+        transformed_data_torch = (
+            pi_torch.size(dim=1) * pi_torch.T @ source_data_torch.T
+        ).T
 
         # Normalized computed contrast map
-        if transported_data.ndim == 1:
-            transported_data = transported_data / np.linalg.norm(
-                transported_data
+        if transformed_data_torch.dim() == 1:
+            transformed_data_torch = (
+                transformed_data_torch
+                / torch.linalg.norm(transformed_data_torch)
             )
-        elif transported_data.ndim == 2:
-            transported_data = (
-                transported_data
-                / np.linalg.norm(transported_data, axis=1)[:, None]
+        elif transformed_data_torch.dim() == 2:
+            transformed_data_torch = (
+                transformed_data_torch
+                / torch.linalg.norm(transformed_data_torch, dim=1)[:, None]
             )
         else:
             raise ValueError(
-                f"source_data has too many dimensions: {source_data.ndims}"
+                "source_data has too many dimensions: "
+                f"{source_data.source_data_torch.dim()}"
             )
 
-        return transported_data
+        # Move transformed data back to CPU
+        transformed_data = transformed_data_torch.detach().cpu().numpy()
+
+        # Free allocated GPU memory
+        del pi_torch, source_data_torch
+        if use_cuda:
+            torch.cuda.empty_cache()
+
+        return transformed_data
 
     def score(self, source_data, target_data):
         """
