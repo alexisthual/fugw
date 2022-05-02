@@ -128,30 +128,19 @@ class FUGW(BaseModel):
         if self.pi is None:
             raise ("Model should be fitted before calling transform")
 
+        if source_data.ndim > 2:
+            raise ValueError(
+                "source_data has too many dimensions: " f"{source_data.ndim}"
+            )
+
         # Move data to GPU
         pi_torch = torch.from_numpy(self.pi).type(dtype)
         source_data_torch = torch.from_numpy(source_data).type(dtype)
 
+        # Transform data
         transformed_data_torch = (
             pi_torch.size(dim=1) * pi_torch.T @ source_data_torch.T
         ).T
-
-        # Normalized computed contrast map
-        if transformed_data_torch.dim() == 1:
-            transformed_data_torch = (
-                transformed_data_torch
-                / torch.linalg.norm(transformed_data_torch)
-            )
-        elif transformed_data_torch.dim() == 2:
-            transformed_data_torch = (
-                transformed_data_torch
-                / torch.linalg.norm(transformed_data_torch, dim=1)[:, None]
-            )
-        else:
-            raise ValueError(
-                "source_data has too many dimensions: "
-                f"{source_data.source_data_torch.dim()}"
-            )
 
         # Move transformed data back to CPU
         transformed_data = transformed_data_torch.detach().cpu().numpy()
