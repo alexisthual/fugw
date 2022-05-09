@@ -74,9 +74,7 @@ class FUGW(BaseModel):
         Gt = Gt / Gt.max()
 
         # Create model
-        model = FUGWSolver(
-            nits=3, nits_sinkhorn=1000, tol=1e-7, tol_sinkhorn=1e-7, **kwargs
-        )
+        model = FUGWSolver(**kwargs)
 
         # Compute transport plan
         res = model.solver(
