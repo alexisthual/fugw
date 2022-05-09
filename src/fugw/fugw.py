@@ -111,12 +111,12 @@ class FUGW(BaseModel):
 
         Parameters
         ----------
-        source_data: ndarray(n_samples, n1)
+        source_data: ndarray(n_samples, n1) or ndarray(n1)
             Contrast map for source subject
 
         Returns
         -------
-        transported_data: ndarray(n_samples, n2)
+        transported_data: ndarray(n_samples, n2) or ndarray(n2)
             Contrast map transported in target subject's space
         """
         # Check cuda availability
@@ -126,6 +126,10 @@ class FUGW(BaseModel):
         if self.pi is None:
             raise ("Model should be fitted before calling transform")
 
+        is_one_dimensional = False
+        if source_data.ndim == 1:
+            is_one_dimensional = True
+            source_data = source_data.reshape(1, -1)
         if source_data.ndim > 2:
             raise ValueError(
                 "source_data has too many dimensions: " f"{source_data.ndim}"
@@ -149,6 +153,9 @@ class FUGW(BaseModel):
         del pi_torch, source_data_torch
         if use_cuda:
             torch.cuda.empty_cache()
+
+        if transformed_data.ndim > 1 and is_one_dimensional:
+            transformed_data = transformed_data.flatten()
 
         return transformed_data
 
