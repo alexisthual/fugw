@@ -93,27 +93,29 @@ class FUGWSolver:
         a, b, ab = tuple_ab
         X_sqr, Y_sqr, X, Y, D = data_const
 
+        pi1, pi2 = pi.sum(1), pi.sum(0)
+
         cost = 0
         if self.reg_mode == "joint":
             cost = cost + eps * self.approx_kl(pi, ab)
 
         # avoid unnecessary calculation of UGW when alpha = 0
-        # or UOT when alpha = 1
         if alpha != 1 and D is not None:
             cost = cost + (1 - alpha) * D / 2
 
+        # or UOT when alpha = 1
         if alpha != 0:
-            pi1, pi2 = pi.sum(1), pi.sum(0)
             A = X_sqr @ pi1
             B = Y_sqr @ pi2
             gw_cost = A[:, None] + B[None, :] - 2 * X @ pi @ Y.T
 
-            if rho1 != np.inf and rho1 != 0 and rho3 != np.inf:
-                gw_cost = gw_cost + rho1 * self.approx_kl(pi1, a)
-            if rho2 != np.inf and rho2 != 0 and rho4 != np.inf:
-                gw_cost = gw_cost + rho2 * self.approx_kl(pi2, b)
-
             cost = cost + alpha * gw_cost
+
+        # or when cost is balanced
+        if rho1 != np.inf and rho1 != 0:
+            cost += rho1 * self.approx_kl(pi1, a)
+        if rho2 != np.inf and rho2 != 0:
+            cost += rho2 * self.approx_kl(pi2, b)
 
         return cost
 
@@ -131,33 +133,33 @@ class FUGWSolver:
 
         cost = 0
 
+        if alpha != 1:
+            uot_cost = 0
+            if D is not None:
+                uot_cost += (D * pi).sum() + (D * gamma).sum()
+            # if rho3 != np.inf and rho3 != 0:
+            #     uot_cost += rho3 * self.kl(pi1, a1) + rho3 * self.kl(
+            #         gamma1, a2
+            #     )
+            # if rho4 != np.inf and rho4 != 0:
+            #     uot_cost += rho4 * self.kl(pi2, b1) + rho4 * self.kl(
+            #         gamma2, b2
+            #     )
+
+            cost = cost + (1 - alpha) * uot_cost / 2
+
         if alpha != 0:
             A = (X_sqr @ gamma1).dot(pi1)
             B = (Y_sqr @ gamma2).dot(pi2)
             C = (X @ gamma @ Y.T) * pi
             gw_cost = A + B - 2 * C.sum()
 
-            if rho1 != np.inf and rho1 != 0:
-                gw_cost += rho1 * self.quad_kl(pi1, gamma1, a1, a2)
-            if rho2 != np.inf and rho2 != 0:
-                gw_cost += rho2 * self.quad_kl(pi2, gamma2, b1, b2)
-
             cost = cost + alpha * gw_cost
 
-        if alpha != 1:
-            uot_cost = 0
-            if D is not None:
-                uot_cost += (D * pi).sum() + (D * gamma).sum()
-            if rho3 != np.inf and rho3 != 0:
-                uot_cost += rho3 * self.kl(pi1, a1) + rho3 * self.kl(
-                    gamma1, a2
-                )
-            if rho4 != np.inf and rho4 != 0:
-                uot_cost += rho4 * self.kl(pi2, b1) + rho4 * self.kl(
-                    gamma2, b2
-                )
-
-            cost = cost + (1 - alpha) * uot_cost / 2
+        if rho1 != np.inf and rho1 != 0:
+            cost += rho1 * self.quad_kl(pi1, gamma1, a1, a2)
+        if rho2 != np.inf and rho2 != 0:
+            cost += rho2 * self.quad_kl(pi2, gamma2, b1, b2)
 
         if self.reg_mode == "joint":
             ent_cost = cost + eps * self.quad_kl(pi, gamma, ab1, ab2)
@@ -274,10 +276,12 @@ class FUGWSolver:
         rho = (rho1, rho2, rho3, rho4)
         hyperparams = (rho, eps, alpha)
 
-        const1 = alpha * rho1
-        const2 = alpha * rho2
-        const3 = (1 - alpha) * rho3 / 2
-        const4 = (1 - alpha) * rho4 / 2
+        # const1 = alpha * rho1
+        # const2 = alpha * rho2
+        const1 = rho1
+        const2 = rho2
+        # const3 = (1 - alpha) * rho3 / 2
+        # const4 = (1 - alpha) * rho4 / 2
 
         # measures on rows and columns
         a1, a2 = px
@@ -298,8 +302,8 @@ class FUGWSolver:
         tuple_ab2 = (a2, b2, ab2)
 
         # constant data variables
-        X_sqr = X ** 2
-        Y_sqr = Y ** 2
+        X_sqr = X**2
+        Y_sqr = Y**2
         data_const = (X_sqr, Y_sqr, X, Y, D)
         data_const_T = (X_sqr.T, Y_sqr.T, X.T, Y.T, D)
 
@@ -323,8 +327,10 @@ class FUGWSolver:
 
             # Update gamma (feature coupling)
             mp = pi.sum()
-            r13 = const1 * mp + const3
-            r24 = const2 * mp + const4
+            # r13 = const1 * mp + const3
+            # r24 = const2 * mp + const4
+            r13 = const1 * mp
+            r24 = const2 * mp
             new_eps = mp * eps if reg_mode == "joint" else eps
 
             Tg = self.compute_local_cost(
@@ -337,8 +343,10 @@ class FUGWSolver:
 
             # Update pi (sample coupling)
             mg = gamma.sum()
-            r13 = const1 * mg + const3
-            r24 = const2 * mg + const4
+            # r13 = const1 * mg + const3
+            # r24 = const2 * mg + const4
+            r13 = const1 * mg
+            r24 = const2 * mg
             new_eps = mp * eps if reg_mode == "joint" else eps
 
             Tp = self.compute_local_cost(
