@@ -11,8 +11,8 @@ Code adapted from: https://github.com/thibsej/unbalanced_gromov_wasserstein
 class FUGWSolver:
     def __init__(
         self,
-        nits=100,
-        nits_sinkhorn=100,
+        nits=50,
+        nits_sinkhorn=1000,
         tol=1e-7,
         tol_sinkhorn=1e-7,
         **kwargs
