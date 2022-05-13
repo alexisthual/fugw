@@ -143,7 +143,7 @@ class FUGW(BaseModel):
         transformed_data_torch = (
             pi_torch.T
             @ source_data_torch.T
-            / pi_torch.sum(dim=1).reshape(-1, 1)
+            / pi_torch.sum(dim=0).reshape(-1, 1)
         ).T
 
         # Move transformed data back to CPU
