@@ -1,103 +1,56 @@
 import torch
-import numpy as np
+from utils import *
+from functools import partial
 
+from ot.gromov import fused_gromov_wasserstein as fgw
+from ot.gromov import gromov_wasserstein as gw
+
+# require POT >= 0.8.2
 # require torch >= 1.9
 
 """
 Code adapted from: https://github.com/thibsej/unbalanced_gromov_wasserstein
+Solve
+    alpha * GW + (1 - alpha) * W + rho_1 * KL() + rho_2 * KL()
 """
-
 
 class FUGWSolver:
     def __init__(
         self,
-        nits=50,
-        nits_sinkhorn=1000,
-        tol=1e-7,
-        tol_sinkhorn=1e-7,
-        **kwargs
+        nits_bcd=50,
+        nits_uot=1000,
+        tol_bcd=1e-7,
+        tol_uot=1e-7,
+        eval_bcd=2,
+        eval_uot=10
     ):
-        self.nits = nits
-        self.nits_sinkhorn = nits_sinkhorn
-        self.tol = tol
-        self.tol_sinkhorn = tol_sinkhorn
-
-    def sinkhorn(self, T, u, v, tuple_ab, rho1, rho2, eps):
-
-        a, b, ab = tuple_ab
-        tau1 = 1 if torch.isinf(rho1) else rho1 / (rho1 + eps)
-        tau2 = 1 if torch.isinf(rho2) else rho2 / (rho2 + eps)
-
-        for _ in range(self.nits_sinkhorn):
-            u_prev = u.detach().clone()
-            if rho2 == 0:
-                v = torch.zeros_like(v)
-            else:
-                v = -tau2 * ((u + a.log())[:, None] - T / eps).logsumexp(dim=0)
-
-            if rho1 == 0:
-                u = torch.zeros_like(u)
-            else:
-                u = -tau1 * ((v + b.log())[None, :] - T / eps).logsumexp(dim=1)
-
-            if (u - u_prev).abs().max().item() < self.tol_sinkhorn:
-                break
-
-        pi = ab * (u[:, None] + v[None, :] - T / eps).exp()
-
-        return u, v, pi
-
-    def approx_kl(self, p, q):
-        # By convention: 0 log 0 = 0
-        return torch.nan_to_num(
-            p * (p / q).log(), nan=0.0, posinf=0.0, neginf=0.0
-        ).sum()
-
-    def kl(self, p, q):
-        return self.approx_kl(p, q) - p.sum() + q.sum()
-
-    def quad_kl(self, mu, nu, alpha, beta):
         """
-        Calculate the KL divergence between two product measures:
-        KL(mu otimes nu, alpha otimes beta) =
-        m_mu * KL(nu, beta)
-        + m_nu * KL(mu, alpha)
-        + (m_mu - m_alpha) * (m_nu - m_beta)
-
-        Parameters
-        ----------
-        mu: vector or matrix
-        nu: vector or matrix
-        alpha: vector or matrix with the same size as mu
-        beta: vector or matrix with the same size as nu
-
-        Returns
-        ----------
-        KL divergence between two product measures
+        write me
         """
 
-        m_mu = mu.sum()
-        m_nu = nu.sum()
-        m_alpha = alpha.sum()
-        m_beta = beta.sum()
-        const = (m_mu - m_alpha) * (m_nu - m_beta)
-        kl = m_nu * self.kl(mu, alpha) + m_mu * self.kl(nu, beta) + const
+        self.nits_bcd = nits_bcd
+        self.nits_uot = nits_uot
+        self.tol_bcd = tol_bcd
+        self.tol_uot = tol_uot
+        self.eval_bcd = eval_bcd
+        self.eval_uot = eval_uot
 
-        return kl
+    def local_cost(self, pi, transpose, data_const, tuple_p, hyperparams):
+        """ 
+        write me
+        """
 
-    def compute_local_cost(self, data_const, pi, tuple_ab, hyperparams):
-        """ """
-
-        rho, eps, alpha = hyperparams
-        rho1, rho2, rho3, rho4 = rho
-        a, b, ab = tuple_ab
+        rho_x, rho_y, eps, alpha, reg_mode = hyperparams
+        px, py, pxy = tuple_p
         X_sqr, Y_sqr, X, Y, D = data_const
+        if transpose:
+            X_sqr, Y_sqr, X, Y = X_sqr.T, Y_sqr.T, X.T, Y.T
 
         pi1, pi2 = pi.sum(1), pi.sum(0)
 
         cost = 0
-        if self.reg_mode == "joint":
-            cost = cost + eps * self.approx_kl(pi, ab)
+        if reg_mode == "joint":
+            cost = cost + eps * compute_approx_kl(pi, pxy)
 
         # avoid unnecessary calculation of UGW when alpha = 0
         if alpha != 1 and D is not None:
@@ -112,20 +65,20 @@ class FUGWSolver:
             cost = cost + alpha * gw_cost
 
         # or when cost is balanced
-        if rho1 != np.inf and rho1 != 0:
-            cost += rho1 * self.approx_kl(pi1, a)
-        if rho2 != np.inf and rho2 != 0:
-            cost += rho2 * self.approx_kl(pi2, b)
+        if rho_x != float("inf") and rho_x != 0:
+            cost = cost + rho_x * compute_approx_kl(pi1, px)
+        if rho_y != float("inf") and rho_y != 0:
+            cost = cost + rho_y * compute_approx_kl(pi2, py)
 
         return cost
 
-    def ucoot_cost(
-        self, data_const, tuple_ab1, tuple_ab2, pi, gamma, hyperparams
-    ):
-        rho, eps, alpha = hyperparams
-        rho1, rho2, rho3, rho4 = rho
-        a1, b1, ab1 = tuple_ab1
-        a2, b2, ab2 = tuple_ab2
+    def fugw_cost(self, pi, gamma, data_const, tuple_p, hyperparams):
+        """
+        Write me
+        """
+
+        rho_x, rho_y, eps, alpha, reg_mode = hyperparams
+        px, py, pxy = tuple_p
         X_sqr, Y_sqr, X, Y, D = data_const
 
         pi1, pi2 = pi.sum(1), pi.sum(0)
@@ -133,44 +86,32 @@ class FUGWSolver:
 
         cost = 0
 
-        if alpha != 1:
-            uot_cost = 0
-            if D is not None:
-                uot_cost += (D * pi).sum() + (D * gamma).sum()
-            # if rho3 != np.inf and rho3 != 0:
-            #     uot_cost += rho3 * self.kl(pi1, a1) + rho3 * self.kl(
-            #         gamma1, a2
-            #     )
-            # if rho4 != np.inf and rho4 != 0:
-            #     uot_cost += rho4 * self.kl(pi2, b1) + rho4 * self.kl(
-            #         gamma2, b2
-            #     )
-
-            cost = cost + (1 - alpha) * uot_cost / 2
+        if alpha != 1 and D is not None:
+            w_cost = (D * pi).sum() + (D * gamma).sum()
+            cost = cost + (1 - alpha) * w_cost / 2
 
         if alpha != 0:
             A = (X_sqr @ gamma1).dot(pi1)
             B = (Y_sqr @ gamma2).dot(pi2)
             C = (X @ gamma @ Y.T) * pi
             gw_cost = A + B - 2 * C.sum()
-
             cost = cost + alpha * gw_cost
 
-        if rho1 != np.inf and rho1 != 0:
-            cost += rho1 * self.quad_kl(pi1, gamma1, a1, a2)
-        if rho2 != np.inf and rho2 != 0:
-            cost += rho2 * self.quad_kl(pi2, gamma2, b1, b2)
+        if rho_x != float("inf") and rho_x != 0:
+            cost = cost + rho_x * compute_quad_kl(pi1, gamma1, px, px)
+        if rho_y != float("inf") and rho_y != 0:
+            cost = cost + rho_y * compute_quad_kl(pi2, gamma2, py, py)
 
-        if self.reg_mode == "joint":
-            ent_cost = cost + eps * self.quad_kl(pi, gamma, ab1, ab2)
-        elif self.reg_mode == "independent":
+        if reg_mode == "joint":
+            ent_cost = cost + eps * compute_quad_kl(pi, gamma, pxy, pxy)
+        elif reg_mode == "independent":
             ent_cost = (
-                cost + eps * self.kl(pi, ab1) + eps * self.kl(gamma, ab2)
+                cost + eps * compute_kl(pi, pxy) + eps * compute_kl(gamma, pxy)
             )
 
-        return cost, ent_cost
+        return cost.item(), ent_cost.item()
 
-    def get_barycentre(self, Xt, sample_coupling):
+    def get_barycentre(self, Xt, pi):
         """
         Calculate the barycentre by the following formula:
         diag(1 / P1_{n_2}) P Xt
@@ -180,52 +121,52 @@ class FUGWSolver:
         ----------
         Xt: target data of size n2 x d2,
             NOT to be confused with the target distance matrix.
-        sample_coupling: optimal plan of size n1 x n2.
+        pi: optimal plan of size n1 x n2.
 
         Returns
         -------
         Barycentre of size n1 x d2
         """
 
-        barycentre = (
-            sample_coupling @ Xt / sample_coupling.sum(1).reshape(-1, 1)
-        )
+        barycentre = pi @ Xt / pi.sum(1).reshape(-1, 1)
 
         return barycentre
 
-    def solver(
+    def solver_fugw(
         self,
         X,
         Y,
+        px=None,
+        py=None,
         D=None,
-        px=(None, None),
-        py=(None, None),
-        rho=(float("inf"), float("inf"), 0, 0),
-        eps=1e-2,
         alpha=1,
+        rho_x=float("inf"), 
+        rho_y=float("inf"),
+        eps=1e-2,
+        uot_mode="sinkhorn",
         reg_mode="joint",
-        init_n=None,
+        init_plan=None,
+        init_duals=None,
         log=False,
         verbose=False,
-        early_stopping_threshold=1e-6,
-        save_freq=10,
+        early_stopping_threshold=1e-6
     ):
         """
         Parameters for mode:
-        - Ent-LB-UGW: alpha = 1, mode = "joint", rho1 != infty, rho2 != infty.
+        - Ent-LB-UGW: alpha = 1, mode = "joint", rho_x != infty, rho_y != infty.
             No need to care about rho3 and rho4.
-        - EGW: alpha = 1, mode = "independent", rho1 = rho2 = infty.
+        - EGW: alpha = 1, mode = "independent", rho_x = rho_y = infty.
             No need to care about rho3 and rho4.
         - Ent-FGW: 0 < alpha < 1, D != None, mode = "independent",
-            rho1 = rho2 = infty (so rho3 = rho4 = infty)
+            rho_x = rho_y = infty (so rho3 = rho4 = infty)
         - Ent-semi-relaxed GW: alpha = 1, mode = "independent",
-            (rho1 = 0, rho2 = infty), or (rho1 = infty, rho2 = 0).
+            (rho_x = 0, rho_y = infty), or (rho_x = infty, rho_y = 0).
             No need to care about rho3 and rho4.
         - Ent-semi-relaxed FGW: 0 < alpha < 1, mode = "independent",
-            (rho1 = rho3 = 0, rho2 = rho4 = infty),
-            or (rho1 = rho3 = infty, rho2 = rho4 = 0).
+            (rho_x = rho3 = 0, rho_y = rho4 = infty),
+            or (rho_x = rho3 = infty, rho_y = rho4 = 0).
         - Ent-UOT: alpha = 0, mode = "independent", D != None,
-            rho1 != infty, rho2 != infty, rho3 != infty, rho4 != infty.
+            rho_x != infty, rho_y != infty, rho3 != infty, rho4 != infty.
 
         Parameters
         ----------
@@ -246,9 +187,6 @@ class FUGWSolver:
             Initialisation matrix for sample coupling.
         log: True if the loss is recorded, False otherwise.
         verbose: if True then print the recorded loss.
-        save_freq: The multiplier of iteration at which the loss is calculated.
-            For example, if save_freq = 10, then the
-            loss is calculated at iteration 10, 20, 30, etc...
 
         Returns
         -------
@@ -259,196 +197,236 @@ class FUGWSolver:
         log_ent_cost: if log is True, return a list of entropic loss.
         """
 
-        self.reg_mode = reg_mode
+        # sanity check
+        if uot_mode == "mm" and (rho_x == float("inf") or rho_y == float("inf")):
+            raise ValueError("Invalid rho. Cannot contain infinity for MM mode.")
+        if uot_mode == "sinkhorn" and eps == 0:
+            raise ValueError("Invalid epsilon. Cannot contain 0 for Sinkhorn mode.")
 
-        n1, d1 = X.shape
-        n2, d2 = Y.shape
+        nx, ny = X.shape[0], Y.shape[0]
         device, dtype = X.device, X.dtype
-
-        # hyper-parameters
-        rho1, rho2, rho3, rho4 = rho
-
-        if rho3 == np.inf or rho1 == np.inf:
-            rho1, rho3 = np.inf, np.inf
-        if rho4 == np.inf or rho2 == np.inf:
-            rho2, rho4 = np.inf, np.inf
-
-        rho = (rho1, rho2, rho3, rho4)
-        hyperparams = (rho, eps, alpha)
-
-        # const1 = alpha * rho1
-        # const2 = alpha * rho2
-        const1 = rho1
-        const2 = rho2
-        # const3 = (1 - alpha) * rho3 / 2
-        # const4 = (1 - alpha) * rho4 / 2
-
-        # measures on rows and columns
-        a1, a2 = px
-        b1, b2 = py
-
-        if a1 is None:
-            a1 = torch.ones(n1).to(device).to(dtype) / n1
-        if a2 is None:
-            a2 = torch.ones(d1).to(device).to(dtype) / d1
-        if b1 is None:
-            b1 = torch.ones(n2).to(device).to(dtype) / n2
-        if b2 is None:
-            b2 = torch.ones(d2).to(device).to(dtype) / d2
-        ab1 = a1[:, None] * b1[None, :]
-        ab2 = a2[:, None] * b2[None, :]
-
-        tuple_ab1 = (a1, b1, ab1)
-        tuple_ab2 = (a2, b2, ab2)
 
         # constant data variables
         X_sqr = X**2
         Y_sqr = Y**2
-        data_const = (X_sqr, Y_sqr, X, Y, D)
-        data_const_T = (X_sqr.T, Y_sqr.T, X.T, Y.T, D)
+
+        if alpha == 1 or D is None:
+            alpha, D = 1, None
+
+        # measures on rows and columns
+        if px is None:
+            px = torch.ones(nx).to(device).to(dtype) / nx
+        if py is None:
+            py = torch.ones(ny).to(device).to(dtype) / ny
+        pxy = px[:, None] * py[None, :]
 
         # initialise coupling and dual vectors
-        if init_n is None:
-            pi = a1[:, None] * b1[None, :]  # size n1 x n2
-        else:
-            pi = init_n
+        pi = pxy if init_plan is None else init_plan # size n1 x n2
+        gamma = pi
 
-        up, vp = torch.zeros_like(a1), torch.zeros_like(b1)  # shape n1, n2
-        ug, vg = torch.zeros_like(a2), torch.zeros_like(b2)  # shape d1, d2
+        if uot_mode == "sinkhorn":
+            if init_duals is None:
+                duals_p = (torch.zeros_like(px), torch.zeros_like(py))  # shape n1, n2
+            else:
+                duals_p = init_duals
+            duals_g = duals_p
+
+        elif uot_mode == "mm":
+            duals_p, duals_g = None, None
+
+        compute_local_cost = partial(self.local_cost, 
+            data_const = (X_sqr, Y_sqr, X, Y, D), 
+            tuple_p = (px, py, pxy), 
+            hyperparams = (rho_x, rho_y, eps, alpha, reg_mode))
+
+        compute_fugw_cost = partial(self.fugw_cost, 
+            data_const = (X_sqr, Y_sqr, X, Y, D), 
+            tuple_p = (px, py, pxy), 
+            hyperparams = (rho_x, rho_y, eps, alpha, reg_mode))
+
+        self_sinkhorn = partial(solver_scaling, 
+            tuple_ab = (px, py, pxy), 
+            train_params = (self.nits_uot, self.tol_uot, self.eval_uot))
+
+        self_uot_mm = partial(solver_mm, 
+            tuple_ab = (px, py),
+            train_params = (self.nits_uot, self.tol_uot, self.eval_uot))
 
         # initialise log
         log_cost = []
-        log_ent_cost = []
-        i = 1
-        err = self.tol + 1e-3
+        log_ent_cost = [float("inf")]
+        idx = 0
+        err = self.tol_bcd + 1e-3
 
-        while (err > self.tol) and (i <= self.nits):
+        while (err > self.tol_bcd) and (idx <= self.nits_bcd):
             pi_prev = pi.detach().clone()
 
             # Update gamma (feature coupling)
             mp = pi.sum()
-            # r13 = const1 * mp + const3
-            # r24 = const2 * mp + const4
-            r13 = const1 * mp
-            r24 = const2 * mp
+            new_rho_x = rho_x * mp
+            new_rho_y = rho_y * mp
             new_eps = mp * eps if reg_mode == "joint" else eps
+            uot_params = (new_rho_x, new_rho_y, new_eps)
 
-            Tg = self.compute_local_cost(
-                data_const_T, pi, tuple_ab1, hyperparams
-            )  # size d1 x d2
-            ug, vg, gamma = self.sinkhorn(
-                Tg, ug, vg, tuple_ab2, r13, r24, new_eps
-            )
+            Tg = compute_local_cost(pi, transpose=True)  # size d1 x d2
+            if uot_mode == "sinkhorn":
+                duals_g, gamma = self_sinkhorn(Tg, duals_g, uot_params)
+            elif uot_mode == "mm":
+                gamma = self_uot_mm(Tg, gamma, uot_params)
             gamma = (mp / gamma.sum()).sqrt() * gamma  # shape d1 x d2
 
             # Update pi (sample coupling)
             mg = gamma.sum()
-            # r13 = const1 * mg + const3
-            # r24 = const2 * mg + const4
-            r13 = const1 * mg
-            r24 = const2 * mg
+            new_rho_x = rho_x * mg
+            new_rho_y = rho_y * mg
             new_eps = mp * eps if reg_mode == "joint" else eps
+            uot_params = (new_rho_x, new_rho_y, new_eps)
 
-            Tp = self.compute_local_cost(
-                data_const, gamma, tuple_ab2, hyperparams
-            )  # size n1 x n2
-            up, vp, pi = self.sinkhorn(
-                Tp, up, vp, tuple_ab1, r13, r24, new_eps
-            )
+            Tp = compute_local_cost(gamma, transpose=False)  # size n1 x n2
+            if uot_mode == "sinkhorn":
+                duals_p, pi = self_sinkhorn(Tp, duals_p, uot_params)
+            elif uot_mode == "mm":
+                pi = self_uot_mm(Tp, pi, uot_params)
             pi = (mg / pi.sum()).sqrt() * pi  # shape n1 x n2
 
             # Update error
             err = (pi - pi_prev).abs().sum().item()
-            if log and (i % save_freq == 0):
-                cost, ent_cost = self.ucoot_cost(
-                    data_const, tuple_ab1, tuple_ab2, pi, gamma, hyperparams
-                )
+            if idx % self.eval_bcd == 0:
+                cost, ent_cost = compute_fugw_cost(pi, gamma)
 
-                log_cost.append(cost.item())
-                log_ent_cost.append(ent_cost.item())
-                if (
-                    len(log_ent_cost) >= 2
-                    and abs(log_ent_cost[-2] - log_ent_cost[-1])
-                    < early_stopping_threshold
-                ):
-                    break
+                log_cost.append(cost)
+                log_ent_cost.append(ent_cost)
 
                 if verbose:
-                    print("Cost at iteration {}: {}".format(i, cost.item()))
+                    print("Cost at iteration {}: {}".format(idx+1, ent_cost))
 
-            i += 1
+                if abs(log_ent_cost[-2] - log_ent_cost[-1]) < early_stopping_threshold:
+                    break
+
+            idx += 1
 
         if pi.isnan().any() or gamma.isnan().any():
             print("There is NaN in coupling")
 
         if log:
-            return pi, gamma, log_cost, log_ent_cost
+            return pi, gamma, duals_p, duals_g, log_cost, log_ent_cost
         else:
             return pi, gamma
 
-    def faster_solver(
+    def solver_fgw(
         self,
         X,
         Y,
+        px=None,
+        py=None,
         D=None,
-        px=(None, None),
-        py=(None, None),
-        rho=(1e-1, None, None, None),
-        eps=1e-2,
         alpha=1,
+        init_plan=None,
+        verbose=True,
+        **kwargs
+    ):
+        nx, ny = X.shape[0], Y.shape[0]
+        device, dtype = X.device, X.dtype
+
+        # measures on rows and columns
+        if px is None:
+            px = torch.ones(nx).to(device).to(dtype) / nx
+        if py is None:
+            py = torch.ones(ny).to(device).to(dtype) / ny
+
+        if alpha == 1 or D is None:
+            pi, dict_log = gw(C1=X, C2=Y, p=px, q=py, log=True, G0=init_plan, 
+                            verbose=verbose, **kwargs)
+            loss = dict_log["gw_dist"]
+        else:
+            pi, dict_log = fgw(M=D, C1=X, C2=Y, p=px, q=py, alpha=alpha, G0=init_plan, log=True, 
+                            verbose=verbose, **kwargs)
+            loss = dict_log["fgw_dist"]
+
+        duals = (dict_log["u"], dict_log["v"])
+
+        return pi, duals, loss
+
+    def solver(
+        self,
+        X,
+        Y,
+        px=None,
+        py=None,
+        D=None,
+        alpha=1,
+        rho_x=float("inf"), 
+        rho_y=float("inf"),
+        eps=1e-2,
+        uot_mode="sinkhorn",
         reg_mode="joint",
-        init_n=None,
+        init_plan=None,
+        init_duals=None,
         log=False,
         verbose=False,
         early_stopping_threshold=1e-6,
-        save_freq=10,
-        eps_step=10,
-        init_eps=1,
+        **gw_kwargs
     ):
-        """
-        Solver with warm start for small epsilon.
-        """
+        if rho_x == float("inf") and rho_y == float("inf") and eps == 0:
+            pi, duals, loss = self.solver_fgw(X, Y, px, py, D, alpha, init_plan, verbose, **gw_kwargs)
+            if log:
+                return pi, pi, duals, duals, loss, loss
+            else:
+                return pi, pi
 
-        if eps < init_eps:
+        elif eps == 0 and ((rho_x == 0 and rho_y == float("inf")) or (rho_x == 0 and rho_y == float("inf"))):
+            raise ValueError("Invalid rho and eps. Unregularized semi-relaxed GW is not supported.")
 
-            nits = self.nits
-            nits_sinkhorn = self.nits_sinkhorn
+        else:
+            return self.solver_fugw(X, Y, px, py, D, alpha, rho_x, rho_y, eps, uot_mode, 
+                                    reg_mode, init_plan, init_duals, log, verbose, 
+                                    early_stopping_threshold)
 
-            self.nits = 10
-            self.nits_sinkhorn = 10
 
-            while init_eps > eps:
-                init_n, _ = self.solver(
-                    X,
-                    Y,
-                    D,
-                    px,
-                    py,
-                    rho,
-                    init_eps,
-                    alpha,
-                    reg_mode,
-                    init_n,
-                    log=False,
-                )
-                init_eps /= eps_step
+if __name__ == "__main__":
 
-            self.nits = nits
-            self.nits_sinkhorn = nits_sinkhorn
+    use_cuda = torch.cuda.is_available()
+    device = torch.device("cuda:0" if use_cuda else "cpu")
+    torch.backends.cudnn.benchmark = True
 
-        return self.solver(
-            X,
-            Y,
-            D,
-            px,
-            py,
-            rho,
-            eps,
-            alpha,
-            reg_mode,
-            init_n,
-            log,
-            verbose,
-            early_stopping_threshold,
-            save_freq,
-        )
+    nx = 104
+    dx = 3
+    ny = 151
+    dy = 7
+
+    x = torch.rand(nx, dx).to(device)
+    y = torch.rand(ny, dy).to(device)
+
+    # # if test with permutation
+    # idx = torch.randperm(x.nelement())
+    # y = x.view(-1)[idx].view(x.size())
+    # ny = nx
+
+    Cx = torch.cdist(x, x)
+    Cy = torch.cdist(y, y)
+    D = torch.rand(nx, ny)
+
+    fugw = FUGWSolver(
+        nits_bcd=100,
+        nits_uot=1000,
+        tol_bcd=1e-7,
+        tol_uot=1e-7,
+        eval_bcd=2,
+        eval_uot=10
+    )
+
+    pi, gamma = fugw.solver(
+        X=Cx,
+        Y=Cy,
+        D=D,
+        alpha=0.8,
+        rho_x=2, 
+        rho_y=3,
+        eps=0.02,
+        uot_mode="mm",
+        reg_mode="independent",
+        init_plan=None,
+        log=False,
+        verbose=True,
+        early_stopping_threshold=1e-6
+    )

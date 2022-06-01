@@ -10,19 +10,33 @@ from fugw.utils import BaseModel
 class FUGW(BaseModel):
     def __init__(
         self,
-        rho=(10, 10, 1, 1),
-        eps=1e-4,
-        alpha=0.95,
-        mode="independent",
+        px=None,
+        py=None,
+        alpha=1,
+        rho_x=float("inf"), 
+        rho_y=float("inf"),
+        eps=1e-2,
+        uot_mode="sinkhorn",
+        reg_mode="joint",
+        init_plan=None,
+        init_duals=None,
         verbose=False,
+        early_stopping_threshold=1e-6,
         **kwargs,
     ):
         # Save model arguments
-        self.rho = rho
-        self.eps = eps
+        self.px = px
+        self.py = py
         self.alpha = alpha
-        self.mode = mode
+        self.rho_x = rho_x
+        self.rho_y = rho_y
+        self.eps = eps
+        self.uot_mode = uot_mode
+        self.reg_mode = reg_mode
+        self.init_plan = init_plan
+        self.init_duals = init_duals
         self.verbose = verbose
+        self.early_stopping_threshold = early_stopping_threshold
 
     def fit(
         self,
@@ -78,27 +92,28 @@ class FUGW(BaseModel):
 
         # Compute transport plan
         res = model.solver(
-            Gs,
-            Gt,
-            K,
-            rho=self.rho,
-            eps=self.eps,
+            X=Gs,
+            Y=Gt,
+            px=self.px,
+            py=self.py,
+            D=K,
             alpha=self.alpha,
-            reg_mode=self.mode,
-            log=self.verbose,
+            rho_x=self.rho_x,
+            rho_y=self.rho_y,
+            eps=self.eps,
+            uot_mode=self.uot_mode,
+            reg_mode=self.reg_mode,
+            init_plan=self.init_plan,
+            init_duals=self.init_duals,
+            log=False,
             verbose=self.verbose,
-            save_freq=1,
+            early_stopping_threshold=self.early_stopping_threshold,
         )
 
-        if self.verbose:
-            pi, gamma, _, _ = res
-        else:
-            pi, gamma = res
-
-        self.pi = pi.detach().cpu().numpy()
+        self.pi = res[0].detach().cpu().numpy()
 
         # Free allocated GPU memory
-        del Fs, Ft, K, Gs, Gt, gamma
+        del Fs, Ft, K, Gs, Gt
         if use_cuda:
             torch.cuda.empty_cache()
 
