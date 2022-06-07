@@ -263,11 +263,11 @@ class FUGWSolver:
             tuple_p = (px, py, pxy), 
             hyperparams = (rho_x, rho_y, eps, alpha, reg_mode))
 
-        self_scaling_solver = partial(solver_scaling, 
+        self_solver_scaling = partial(solver_scaling, 
             tuple_pxy = (px.log(), py.log(), pxy), 
             train_params = (self.nits_uot, self.tol_uot, self.eval_uot))
 
-        self_mm_solver = partial(solver_mm, 
+        self_solver_mm = partial(solver_mm, 
             tuple_pxy = (px, py),
             train_params = (self.nits_uot, self.tol_uot, self.eval_uot))
 
@@ -289,9 +289,9 @@ class FUGWSolver:
 
             Tg = compute_local_cost(pi, transpose=True)  # size d1 x d2
             if uot_solver == "sinkhorn":
-                duals_g, gamma = self_scaling_solver(Tg, duals_g, uot_params)
+                duals_g, gamma = self_solver_scaling(Tg, duals_g, uot_params)
             elif uot_solver == "mm":
-                gamma = self_mm_solver(Tg, gamma, uot_params)
+                gamma = self_solver_mm(Tg, gamma, uot_params)
             gamma = (mp / gamma.sum()).sqrt() * gamma  # shape d1 x d2
 
             # Update pi (sample coupling)
@@ -303,9 +303,9 @@ class FUGWSolver:
 
             Tp = compute_local_cost(gamma, transpose=False)  # size n1 x n2
             if uot_solver == "sinkhorn":
-                duals_p, pi = self_scaling_solver(Tp, duals_p, uot_params)
+                duals_p, pi = self_solver_scaling(Tp, duals_p, uot_params)
             elif uot_solver == "mm":
-                pi = self_mm_solver(Tp, pi, uot_params)
+                pi = self_solver_mm(Tp, pi, uot_params)
             pi = (mg / pi.sum()).sqrt() * pi  # shape n1 x n2
 
             # Update error
