@@ -1,5 +1,5 @@
 import torch
-from utils import *
+from .utils import *
 from functools import partial
 
 from ot.gromov import fused_gromov_wasserstein as fgw
@@ -111,26 +111,45 @@ class FUGWSolver:
 
         return cost.item(), ent_cost.item()
 
-    def get_barycentre(self, Xt, pi):
+    def project_on_target_domain(self, Xt, pi):
         """
-        Calculate the barycentre by the following formula:
-        diag(1 / P1_{n_2}) P Xt
-        (need to be typed in latex).
+        Project the SOURCE data on the TARGET space via the formula:
+        proj = diag(1 / P_{# 1}) P Xt (need to be typed in latex).
 
         Parameters
         ----------
-        Xt: target data of size n2 x d2,
+        Xt: target data of size nt x dt,
             NOT to be confused with the target distance matrix.
-        pi: optimal plan of size n1 x n2.
+        pi: optimal plan of size ns x nt.
 
         Returns
         -------
-        Barycentre of size n1 x d2
+        Projection of size ns x dt
         """
 
-        barycentre = pi @ Xt / pi.sum(1).reshape(-1, 1)
+        projection = pi @ Xt / pi.sum(1).reshape(-1, 1)
 
-        return barycentre
+        return projection
+
+    def project_on_source_domain(self, Xs, pi):
+        """
+        Project the TARGET data on the SOURCE space via the formula:
+        proj = diag(1 / P1_{# 2}) P.T Xs (need to be typed in latex).
+
+        Parameters
+        ----------
+        Xs: source data of size ns x ds,
+            NOT to be confused with the source distance matrix.
+        pi: optimal plan of size ns x nt.
+
+        Returns
+        -------
+        Projection of size nt x ds
+        """
+
+        projection = pi.T @ Xs / pi.sum(0).reshape(-1, 1)
+
+        return projection
 
     def solver_fugw(
         self,
@@ -143,7 +162,7 @@ class FUGWSolver:
         rho_x=float("inf"), 
         rho_y=float("inf"),
         eps=1e-2,
-        uot_mode="sinkhorn",
+        uot_solver="sinkhorn",
         reg_mode="joint",
         init_plan=None,
         init_duals=None,
@@ -198,9 +217,9 @@ class FUGWSolver:
         """
 
         # sanity check
-        if uot_mode == "mm" and (rho_x == float("inf") or rho_y == float("inf")):
+        if uot_solver == "mm" and (rho_x == float("inf") or rho_y == float("inf")):
             raise ValueError("Invalid rho. Cannot contain infinity for MM mode.")
-        if uot_mode == "sinkhorn" and eps == 0:
+        if uot_solver == "sinkhorn" and eps == 0:
             raise ValueError("Invalid epsilon. Cannot contain 0 for Sinkhorn mode.")
 
         nx, ny = X.shape[0], Y.shape[0]
@@ -224,14 +243,14 @@ class FUGWSolver:
         pi = pxy if init_plan is None else init_plan # size n1 x n2
         gamma = pi
 
-        if uot_mode == "sinkhorn":
+        if uot_solver == "sinkhorn":
             if init_duals is None:
                 duals_p = (torch.zeros_like(px), torch.zeros_like(py))  # shape n1, n2
             else:
                 duals_p = init_duals
             duals_g = duals_p
 
-        elif uot_mode == "mm":
+        elif uot_solver == "mm":
             duals_p, duals_g = None, None
 
         compute_local_cost = partial(self.local_cost, 
@@ -244,12 +263,12 @@ class FUGWSolver:
             tuple_p = (px, py, pxy), 
             hyperparams = (rho_x, rho_y, eps, alpha, reg_mode))
 
-        self_sinkhorn = partial(solver_scaling, 
-            tuple_ab = (px, py, pxy), 
+        self_scaling_solver = partial(solver_scaling, 
+            tuple_pxy = (px.log(), py.log(), pxy), 
             train_params = (self.nits_uot, self.tol_uot, self.eval_uot))
 
-        self_uot_mm = partial(solver_mm, 
-            tuple_ab = (px, py),
+        self_mm_solver = partial(solver_mm, 
+            tuple_pxy = (px, py),
             train_params = (self.nits_uot, self.tol_uot, self.eval_uot))
 
         # initialise log
@@ -269,10 +288,10 @@ class FUGWSolver:
             uot_params = (new_rho_x, new_rho_y, new_eps)
 
             Tg = compute_local_cost(pi, transpose=True)  # size d1 x d2
-            if uot_mode == "sinkhorn":
-                duals_g, gamma = self_sinkhorn(Tg, duals_g, uot_params)
-            elif uot_mode == "mm":
-                gamma = self_uot_mm(Tg, gamma, uot_params)
+            if uot_solver == "sinkhorn":
+                duals_g, gamma = self_scaling_solver(Tg, duals_g, uot_params)
+            elif uot_solver == "mm":
+                gamma = self_mm_solver(Tg, gamma, uot_params)
             gamma = (mp / gamma.sum()).sqrt() * gamma  # shape d1 x d2
 
             # Update pi (sample coupling)
@@ -283,10 +302,10 @@ class FUGWSolver:
             uot_params = (new_rho_x, new_rho_y, new_eps)
 
             Tp = compute_local_cost(gamma, transpose=False)  # size n1 x n2
-            if uot_mode == "sinkhorn":
-                duals_p, pi = self_sinkhorn(Tp, duals_p, uot_params)
-            elif uot_mode == "mm":
-                pi = self_uot_mm(Tp, pi, uot_params)
+            if uot_solver == "sinkhorn":
+                duals_p, pi = self_scaling_solver(Tp, duals_p, uot_params)
+            elif uot_solver == "mm":
+                pi = self_mm_solver(Tp, pi, uot_params)
             pi = (mg / pi.sum()).sqrt() * pi  # shape n1 x n2
 
             # Update error
@@ -358,7 +377,7 @@ class FUGWSolver:
         rho_x=float("inf"), 
         rho_y=float("inf"),
         eps=1e-2,
-        uot_mode="sinkhorn",
+        uot_solver="sinkhorn",
         reg_mode="joint",
         init_plan=None,
         init_duals=None,
@@ -378,55 +397,6 @@ class FUGWSolver:
             raise ValueError("Invalid rho and eps. Unregularized semi-relaxed GW is not supported.")
 
         else:
-            return self.solver_fugw(X, Y, px, py, D, alpha, rho_x, rho_y, eps, uot_mode, 
+            return self.solver_fugw(X, Y, px, py, D, alpha, rho_x, rho_y, eps, uot_solver, 
                                     reg_mode, init_plan, init_duals, log, verbose, 
                                     early_stopping_threshold)
-
-
-if __name__ == "__main__":
-
-    use_cuda = torch.cuda.is_available()
-    device = torch.device("cuda:0" if use_cuda else "cpu")
-    torch.backends.cudnn.benchmark = True
-
-    nx = 104
-    dx = 3
-    ny = 151
-    dy = 7
-
-    x = torch.rand(nx, dx).to(device)
-    y = torch.rand(ny, dy).to(device)
-
-    # # if test with permutation
-    # idx = torch.randperm(x.nelement())
-    # y = x.view(-1)[idx].view(x.size())
-    # ny = nx
-
-    Cx = torch.cdist(x, x)
-    Cy = torch.cdist(y, y)
-    D = torch.rand(nx, ny)
-
-    fugw = FUGWSolver(
-        nits_bcd=100,
-        nits_uot=1000,
-        tol_bcd=1e-7,
-        tol_uot=1e-7,
-        eval_bcd=2,
-        eval_uot=10
-    )
-
-    pi, gamma = fugw.solver(
-        X=Cx,
-        Y=Cy,
-        D=D,
-        alpha=0.8,
-        rho_x=2, 
-        rho_y=3,
-        eps=0.02,
-        uot_mode="mm",
-        reg_mode="independent",
-        init_plan=None,
-        log=False,
-        verbose=True,
-        early_stopping_threshold=1e-6
-    )

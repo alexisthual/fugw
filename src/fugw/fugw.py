@@ -13,10 +13,9 @@ class FUGW(BaseModel):
         px=None,
         py=None,
         alpha=1,
-        rho_x=float("inf"), 
-        rho_y=float("inf"),
+        rho=20, 
         eps=1e-2,
-        uot_mode="sinkhorn",
+        uot_solver="sinkhorn",
         reg_mode="joint",
         init_plan=None,
         init_duals=None,
@@ -28,10 +27,9 @@ class FUGW(BaseModel):
         self.px = px
         self.py = py
         self.alpha = alpha
-        self.rho_x = rho_x
-        self.rho_y = rho_y
+        self.rho = rho
         self.eps = eps
-        self.uot_mode = uot_mode
+        self.uot_solver = uot_solver
         self.reg_mode = reg_mode
         self.init_plan = init_plan
         self.init_duals = init_duals
@@ -76,6 +74,13 @@ class FUGW(BaseModel):
         use_cuda = torch.cuda.is_available()
         dtype = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
 
+        if isinstance(self.rho, float) or isinstance(self.rho, int):
+            rho_x, rho_y = self.rho
+        elif isinstance(self.rho, tuple) and len(self.rho) == 2:
+            rho_x, rho_y = self.rho
+        else:
+            raise ValueError("Invalid value of rho. Must be either a scalar or a tuple of two scalars.")
+
         Fs = torch.from_numpy(source_data.T).type(dtype)
         Ft = torch.from_numpy(target_data.T).type(dtype)
         K = torch.cdist(Fs, Ft, p=2)
@@ -98,10 +103,10 @@ class FUGW(BaseModel):
             py=self.py,
             D=K,
             alpha=self.alpha,
-            rho_x=self.rho_x,
-            rho_y=self.rho_y,
+            rho_x=rho_x,
+            rho_y=rho_y,
             eps=self.eps,
-            uot_mode=self.uot_mode,
+            uot_solver=self.uot_solver,
             reg_mode=self.reg_mode,
             init_plan=self.init_plan,
             init_duals=self.init_duals,
