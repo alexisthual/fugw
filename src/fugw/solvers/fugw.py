@@ -168,7 +168,8 @@ class FUGWSolver:
         init_duals=None,
         log=False,
         verbose=False,
-        early_stopping_threshold=1e-6
+        early_stopping_threshold=1e-6,
+        eps_base=1,
     ):
         """
         Parameters for mode:
@@ -218,9 +219,9 @@ class FUGWSolver:
 
         # sanity check
         if uot_solver == "mm" and (rho_x == float("inf") or rho_y == float("inf")):
-            raise ValueError("Invalid rho. Cannot contain infinity for MM mode.")
+            uot_solver = "dc"
         if uot_solver == "sinkhorn" and eps == 0:
-            raise ValueError("Invalid epsilon. Cannot contain 0 for Sinkhorn mode.")
+            uot_solver = "dc"
 
         nx, ny = X.shape[0], Y.shape[0]
         device, dtype = X.device, X.dtype
@@ -249,9 +250,14 @@ class FUGWSolver:
             else:
                 duals_p = init_duals
             duals_g = duals_p
-
         elif uot_solver == "mm":
             duals_p, duals_g = None, None
+        elif uot_solver == "dc":
+            if init_duals is None:
+                duals_p = (torch.ones_like(px), torch.ones_like(py))  # shape n1, n2
+            else:
+                duals_p = init_duals
+            duals_g = duals_p
 
         compute_local_cost = partial(self.local_cost, 
             data_const = (X_sqr, Y_sqr, X, Y, D), 
@@ -270,6 +276,11 @@ class FUGWSolver:
         self_solver_mm = partial(solver_mm, 
             tuple_pxy = (px, py),
             train_params = (self.nits_uot, self.tol_uot, self.eval_uot))
+
+        self_solver_dc = partial(solver_dc, 
+            tuple_pxy = (px, py, pxy),
+            train_params = (self.nits_uot, self.tol_uot, self.eval_uot), 
+            eps_base = eps_base, verbose = verbose)
 
         # initialise log
         log_cost = []
@@ -292,6 +303,8 @@ class FUGWSolver:
                 duals_g, gamma = self_solver_scaling(Tg, duals_g, uot_params)
             elif uot_solver == "mm":
                 gamma = self_solver_mm(Tg, gamma, uot_params)
+            if uot_solver == "dc":
+                duals_g, gamma = self_solver_dc(Tg, gamma, duals_g, uot_params)
             gamma = (mp / gamma.sum()).sqrt() * gamma  # shape d1 x d2
 
             # Update pi (sample coupling)
@@ -306,6 +319,8 @@ class FUGWSolver:
                 duals_p, pi = self_solver_scaling(Tp, duals_p, uot_params)
             elif uot_solver == "mm":
                 pi = self_solver_mm(Tp, pi, uot_params)
+            elif uot_solver == "dc":
+                duals_p, pi = self_solver_scaling(Tp, pi, duals_p, uot_params)
             pi = (mg / pi.sum()).sqrt() * pi  # shape n1 x n2
 
             # Update error

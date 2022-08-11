@@ -1,14 +1,14 @@
 import torch
-# require torch >= 1.9
+from tqdm import tqdm
 
-def solver_scaling(cost, init_duals, params, tuple_pxy, train_params):
+def solver_scaling(cost, init_duals, uot_params, tuple_pxy, train_params):
     """
     Scaling algorithm.
     """
 
     log_px, log_py, pxy = tuple_pxy
     vx, vy = init_duals
-    rho_x, rho_y, eps = params
+    rho_x, rho_y, eps = uot_params
     niters, tol, eval_freq = train_params
 
     tau_x = 1 if torch.isinf(rho_x) else rho_x / (rho_x + eps)
@@ -33,7 +33,7 @@ def solver_scaling(cost, init_duals, params, tuple_pxy, train_params):
 
     return (vx, vy), pi
 
-def solver_mm(cost, init_pi, params, tuple_pxy, train_params):
+def solver_mm(cost, init_pi, uot_params, tuple_pxy, train_params):
     """
     Solve (entropic) UOT using the majorization-minimization algorithm.
 
@@ -51,7 +51,7 @@ def solver_mm(cost, init_pi, params, tuple_pxy, train_params):
 
     niters, tol, eval_freq = train_params
     px, py = tuple_pxy
-    rho_x, rho_y, eps = params
+    rho_x, rho_y, eps = uot_params
 
     sum_param = rho_x + rho_y + eps
     tau_x, tau_y, r = rho_x / sum_param, rho_y / sum_param, eps / sum_param
@@ -68,6 +68,44 @@ def solver_mm(cost, init_pi, params, tuple_pxy, train_params):
             break
     
     return pi
+
+def solver_dc(cost, init_pi, init_duals, uot_params, tuple_pxy, train_params, eps_base=1, verbose=True):
+
+    niters, tol, eval_freq = train_params
+    rho1, rho2, eps = uot_params
+    px, py, pxy = tuple_pxy
+    u, v = init_duals
+    m1, pi = init_pi.sum(1), init_pi
+
+    sum_eps = eps_base + eps
+    tau1 = 1 if rho1 == float("inf") else rho1 / (rho1 + sum_eps)
+    tau2 = 1 if rho2 == float("inf") else rho2 / (rho2 + sum_eps)
+
+    K = torch.exp(-cost / sum_eps)
+    range_niters = tqdm(range(niters)) if verbose else range(niters) 
+
+    for idx in range_niters:
+        m1_prev = m1.detach().clone()
+
+        # IPOT
+        G = K * pi if (eps_base / sum_eps) == 1 else K * pi**(eps_base / sum_eps)
+        v = (G.T @ (u * px))**(-tau2) if rho2 != 0 else torch.ones_like(v)
+        u = (G @ (v * py))**(-tau1) if rho1 != 0 else torch.ones_like(u)
+        pi = u[:, None ] * G * v[None, :]
+
+        # Check stopping criterion
+        if idx % eval_freq == 0:
+            m1 = pi.sum(1)
+            if m1.isnan().any() or m1.isinf().any():
+                raise ValueError("There is NaN in coupling. Please increase eps_base.")
+
+            error = (m1 - m1_prev).abs().max().item()
+            if error < tol:
+                break
+
+    pi = pi * pxy # renormalize couplings
+
+    return (u, v), pi
 
 def compute_approx_kl(p, q):
     # By convention: 0 log 0 = 0
