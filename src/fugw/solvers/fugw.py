@@ -320,7 +320,7 @@ class FUGWSolver:
             elif uot_solver == "mm":
                 pi = self_solver_mm(Tp, pi, uot_params)
             elif uot_solver == "dc":
-                duals_p, pi = self_solver_scaling(Tp, pi, duals_p, uot_params)
+                duals_p, pi = self_solver_dc(Tp, pi, duals_p, uot_params)
             pi = (mg / pi.sum()).sqrt() * pi  # shape n1 x n2
 
             # Update error

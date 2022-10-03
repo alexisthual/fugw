@@ -1,6 +1,8 @@
 numpy
 pandas
+pot
+pytest
 scikit_learn
 scipy
 torch
-pytest
+tqdm

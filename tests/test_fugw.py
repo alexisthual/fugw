@@ -1,9 +1,6 @@
-from sklearn.metrics import pairwise_distances
-
-# from sklearn.utils.estimator_checks import check_estimator
-import numpy as np
-
 from fugw.fugw import FUGW
+import numpy as np
+from sklearn.metrics import pairwise_distances
 
 
 def test_fugw_alignment():
@@ -20,10 +17,13 @@ def test_fugw_alignment():
     source_kernel = pairwise_distances(source_embedding)
     target_kernel = pairwise_distances(target_embedding)
 
-    print(source_data_train.shape)
-    print(target_data_train.shape)
-    print(source_kernel.shape)
-    print(target_kernel.shape)
+    print(f"""Source and target data shapes:
+{source_data_train.shape}
+{target_data_train.shape}""")
+
+    print(f"""Source and target kernel shapes:
+{source_kernel.shape}
+{target_kernel.shape}""")
 
     fugw = FUGW()
     fugw.fit(

@@ -15,6 +15,7 @@ On top of running the usual install commands, install dev dependencies with:
 
 ```
 pip install -r requirements-dev.txt
+pip install -e '.[dev]'
 ```
 
 This will allow to run tests locally:

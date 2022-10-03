@@ -1,5 +1,7 @@
 numpy
 pandas
+pot
 scikit_learn
 scipy
 torch
+tqdm
