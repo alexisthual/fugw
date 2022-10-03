@@ -10,19 +10,31 @@ from fugw.utils import BaseModel
 class FUGW(BaseModel):
     def __init__(
         self,
-        rho=(10, 10, 1, 1),
-        eps=1e-4,
-        alpha=0.95,
-        mode="independent",
+        px=None,
+        py=None,
+        alpha=1,
+        rho=20, 
+        eps=1e-2,
+        uot_solver="sinkhorn",
+        reg_mode="joint",
+        init_plan=None,
+        init_duals=None,
         verbose=False,
+        early_stopping_threshold=1e-6,
         **kwargs,
     ):
         # Save model arguments
+        self.px = px
+        self.py = py
+        self.alpha = alpha
         self.rho = rho
         self.eps = eps
-        self.alpha = alpha
-        self.mode = mode
+        self.uot_solver = uot_solver
+        self.reg_mode = reg_mode
+        self.init_plan = init_plan
+        self.init_duals = init_duals
         self.verbose = verbose
+        self.early_stopping_threshold = early_stopping_threshold
 
     def fit(
         self,
@@ -62,6 +74,13 @@ class FUGW(BaseModel):
         use_cuda = torch.cuda.is_available()
         dtype = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
 
+        if isinstance(self.rho, float) or isinstance(self.rho, int):
+            rho_x, rho_y = self.rho
+        elif isinstance(self.rho, tuple) and len(self.rho) == 2:
+            rho_x, rho_y = self.rho
+        else:
+            raise ValueError("Invalid value of rho. Must be either a scalar or a tuple of two scalars.")
+
         Fs = torch.from_numpy(source_data.T).type(dtype)
         Ft = torch.from_numpy(target_data.T).type(dtype)
         K = torch.cdist(Fs, Ft, p=2)
@@ -78,27 +97,28 @@ class FUGW(BaseModel):
 
         # Compute transport plan
         res = model.solver(
-            Gs,
-            Gt,
-            K,
-            rho=self.rho,
-            eps=self.eps,
+            X=Gs,
+            Y=Gt,
+            px=self.px,
+            py=self.py,
+            D=K,
             alpha=self.alpha,
-            reg_mode=self.mode,
-            log=self.verbose,
+            rho_x=rho_x,
+            rho_y=rho_y,
+            eps=self.eps,
+            uot_solver=self.uot_solver,
+            reg_mode=self.reg_mode,
+            init_plan=self.init_plan,
+            init_duals=self.init_duals,
+            log=False,
             verbose=self.verbose,
-            save_freq=1,
+            early_stopping_threshold=self.early_stopping_threshold,
         )
 
-        if self.verbose:
-            pi, gamma, _, _ = res
-        else:
-            pi, gamma = res
-
-        self.pi = pi.detach().cpu().numpy()
+        self.pi = res[0].detach().cpu().numpy()
 
         # Free allocated GPU memory
-        del Fs, Ft, K, Gs, Gt, gamma
+        del Fs, Ft, K, Gs, Gt
         if use_cuda:
             torch.cuda.empty_cache()
 
