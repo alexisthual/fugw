@@ -14,6 +14,7 @@ Solve
     alpha * GW + (1 - alpha) * W + rho_1 * KL() + rho_2 * KL()
 """
 
+
 class FUGWSolver:
     def __init__(
         self,
@@ -22,7 +23,7 @@ class FUGWSolver:
         tol_bcd=1e-7,
         tol_uot=1e-7,
         eval_bcd=2,
-        eval_uot=10
+        eval_uot=10,
     ):
         """
         write me
@@ -36,7 +37,7 @@ class FUGWSolver:
         self.eval_uot = eval_uot
 
     def local_cost(self, pi, transpose, data_const, tuple_p, hyperparams):
-        """ 
+        """
         write me
         """
 
@@ -105,9 +106,7 @@ class FUGWSolver:
         if reg_mode == "joint":
             ent_cost = cost + eps * compute_quad_kl(pi, gamma, pxy, pxy)
         elif reg_mode == "independent":
-            ent_cost = (
-                cost + eps * compute_kl(pi, pxy) + eps * compute_kl(gamma, pxy)
-            )
+            ent_cost = cost + eps * compute_kl(pi, pxy) + eps * compute_kl(gamma, pxy)
 
         return cost.item(), ent_cost.item()
 
@@ -159,7 +158,7 @@ class FUGWSolver:
         py=None,
         D=None,
         alpha=1,
-        rho_x=float("inf"), 
+        rho_x=float("inf"),
         rho_y=float("inf"),
         eps=1e-2,
         uot_solver="sinkhorn",
@@ -241,7 +240,7 @@ class FUGWSolver:
         pxy = px[:, None] * py[None, :]
 
         # initialise coupling and dual vectors
-        pi = pxy if init_plan is None else init_plan # size n1 x n2
+        pi = pxy if init_plan is None else init_plan  # size n1 x n2
         gamma = pi
 
         if uot_solver == "sinkhorn":
@@ -259,28 +258,39 @@ class FUGWSolver:
                 duals_p = init_duals
             duals_g = duals_p
 
-        compute_local_cost = partial(self.local_cost, 
-            data_const = (X_sqr, Y_sqr, X, Y, D), 
-            tuple_p = (px, py, pxy), 
-            hyperparams = (rho_x, rho_y, eps, alpha, reg_mode))
+        compute_local_cost = partial(
+            self.local_cost,
+            data_const=(X_sqr, Y_sqr, X, Y, D),
+            tuple_p=(px, py, pxy),
+            hyperparams=(rho_x, rho_y, eps, alpha, reg_mode),
+        )
 
-        compute_fugw_cost = partial(self.fugw_cost, 
-            data_const = (X_sqr, Y_sqr, X, Y, D), 
-            tuple_p = (px, py, pxy), 
-            hyperparams = (rho_x, rho_y, eps, alpha, reg_mode))
+        compute_fugw_cost = partial(
+            self.fugw_cost,
+            data_const=(X_sqr, Y_sqr, X, Y, D),
+            tuple_p=(px, py, pxy),
+            hyperparams=(rho_x, rho_y, eps, alpha, reg_mode),
+        )
 
-        self_solver_scaling = partial(solver_scaling, 
-            tuple_pxy = (px.log(), py.log(), pxy), 
-            train_params = (self.nits_uot, self.tol_uot, self.eval_uot))
+        self_solver_scaling = partial(
+            solver_scaling,
+            tuple_pxy=(px.log(), py.log(), pxy),
+            train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+        )
 
-        self_solver_mm = partial(solver_mm, 
-            tuple_pxy = (px, py),
-            train_params = (self.nits_uot, self.tol_uot, self.eval_uot))
+        self_solver_mm = partial(
+            solver_mm,
+            tuple_pxy=(px, py),
+            train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+        )
 
-        self_solver_dc = partial(solver_dc, 
-            tuple_pxy = (px, py, pxy),
-            train_params = (self.nits_uot, self.tol_uot, self.eval_uot), 
-            eps_base = eps_base, verbose = verbose)
+        self_solver_dc = partial(
+            solver_dc,
+            tuple_pxy=(px, py, pxy),
+            train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+            eps_base=eps_base,
+            verbose=verbose,
+        )
 
         # initialise log
         log_cost = []
@@ -332,7 +342,7 @@ class FUGWSolver:
                 log_ent_cost.append(ent_cost)
 
                 if verbose:
-                    print("Cost at iteration {}: {}".format(idx+1, ent_cost))
+                    print("Cost at iteration {}: {}".format(idx + 1, ent_cost))
 
                 if abs(log_ent_cost[-2] - log_ent_cost[-1]) < early_stopping_threshold:
                     break
@@ -369,12 +379,30 @@ class FUGWSolver:
             py = torch.ones(ny).to(device).to(dtype) / ny
 
         if alpha == 1 or D is None:
-            pi, dict_log = gw(C1=X, C2=Y, p=px, q=py, log=True, G0=init_plan, 
-                            verbose=verbose, **kwargs)
+            pi, dict_log = gw(
+                C1=X,
+                C2=Y,
+                p=px,
+                q=py,
+                log=True,
+                G0=init_plan,
+                verbose=verbose,
+                **kwargs
+            )
             loss = dict_log["gw_dist"]
         else:
-            pi, dict_log = fgw(M=D, C1=X, C2=Y, p=px, q=py, alpha=alpha, G0=init_plan, log=True, 
-                            verbose=verbose, **kwargs)
+            pi, dict_log = fgw(
+                M=D,
+                C1=X,
+                C2=Y,
+                p=px,
+                q=py,
+                alpha=alpha,
+                G0=init_plan,
+                log=True,
+                verbose=verbose,
+                **kwargs
+            )
             loss = dict_log["fgw_dist"]
 
         duals = (dict_log["u"], dict_log["v"])
@@ -389,7 +417,7 @@ class FUGWSolver:
         py=None,
         D=None,
         alpha=1,
-        rho_x=float("inf"), 
+        rho_x=float("inf"),
         rho_y=float("inf"),
         eps=1e-2,
         uot_solver="sinkhorn",
@@ -402,16 +430,38 @@ class FUGWSolver:
         **gw_kwargs
     ):
         if rho_x == float("inf") and rho_y == float("inf") and eps == 0:
-            pi, duals, loss = self.solver_fgw(X, Y, px, py, D, alpha, init_plan, verbose, **gw_kwargs)
+            pi, duals, loss = self.solver_fgw(
+                X, Y, px, py, D, alpha, init_plan, verbose, **gw_kwargs
+            )
             if log:
                 return pi, pi, duals, duals, loss, loss
             else:
                 return pi, pi
 
-        elif eps == 0 and ((rho_x == 0 and rho_y == float("inf")) or (rho_x == 0 and rho_y == float("inf"))):
-            raise ValueError("Invalid rho and eps. Unregularized semi-relaxed GW is not supported.")
+        elif eps == 0 and (
+            (rho_x == 0 and rho_y == float("inf"))
+            or (rho_x == 0 and rho_y == float("inf"))
+        ):
+            raise ValueError(
+                "Invalid rho and eps. Unregularized semi-relaxed GW is not supported."
+            )
 
         else:
-            return self.solver_fugw(X, Y, px, py, D, alpha, rho_x, rho_y, eps, uot_solver, 
-                                    reg_mode, init_plan, init_duals, log, verbose, 
-                                    early_stopping_threshold)
+            return self.solver_fugw(
+                X,
+                Y,
+                px,
+                py,
+                D,
+                alpha,
+                rho_x,
+                rho_y,
+                eps,
+                uot_solver,
+                reg_mode,
+                init_plan,
+                init_duals,
+                log,
+                verbose,
+                early_stopping_threshold,
+            )

@@ -17,18 +17,20 @@ def test_fugw_alignment():
     source_kernel = pairwise_distances(source_embedding)
     target_kernel = pairwise_distances(target_embedding)
 
-    print(f"""Source and target data shapes:
+    print(
+        f"""Source and target data shapes:
 {source_data_train.shape}
-{target_data_train.shape}""")
+{target_data_train.shape}"""
+    )
 
-    print(f"""Source and target kernel shapes:
+    print(
+        f"""Source and target kernel shapes:
 {source_kernel.shape}
-{target_kernel.shape}""")
+{target_kernel.shape}"""
+    )
 
     fugw = FUGW()
-    fugw.fit(
-        source_data_train, target_data_train, source_kernel, target_kernel
-    )
+    fugw.fit(source_data_train, target_data_train, source_kernel, target_kernel)
 
     # Use trained model to transport data
     source_data_test = np.random.rand(n_test, n_voxels)

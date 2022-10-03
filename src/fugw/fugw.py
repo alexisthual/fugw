@@ -13,7 +13,7 @@ class FUGW(BaseModel):
         px=None,
         py=None,
         alpha=1,
-        rho=20, 
+        rho=20,
         eps=1e-2,
         uot_solver="sinkhorn",
         reg_mode="joint",
@@ -80,7 +80,9 @@ class FUGW(BaseModel):
         elif isinstance(self.rho, tuple) and len(self.rho) == 2:
             rho_x, rho_y = self.rho
         else:
-            raise ValueError("Invalid value of rho. Must be either a scalar or a tuple of two scalars.")
+            raise ValueError(
+                "Invalid value of rho. Must be either a scalar or a tuple of two scalars."
+            )
 
         Fs = torch.from_numpy(source_data.T).type(dtype)
         Ft = torch.from_numpy(target_data.T).type(dtype)
@@ -162,9 +164,7 @@ class FUGW(BaseModel):
 
         # Transform data
         transformed_data_torch = (
-            pi_torch.T
-            @ source_data_torch.T
-            / pi_torch.sum(dim=0).reshape(-1, 1)
+            pi_torch.T @ source_data_torch.T / pi_torch.sum(dim=0).reshape(-1, 1)
         ).T
 
         # Move transformed data back to CPU

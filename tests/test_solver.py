@@ -27,12 +27,7 @@ def test_solvers(uot_solver):
     D = torch.rand(nx, ny)
 
     fugw = FUGWSolver(
-        nits_bcd=100,
-        nits_uot=1000,
-        tol_bcd=1e-7,
-        tol_uot=1e-7,
-        eval_bcd=2,
-        eval_uot=10
+        nits_bcd=100, nits_uot=1000, tol_bcd=1e-7, tol_uot=1e-7, eval_bcd=2, eval_uot=10
     )
 
     pi, gamma = fugw.solver(
@@ -40,7 +35,7 @@ def test_solvers(uot_solver):
         Y=Cy,
         D=D,
         alpha=0.8,
-        rho_x=2, 
+        rho_x=2,
         rho_y=3,
         eps=0.02,
         uot_solver=uot_solver,
@@ -48,7 +43,7 @@ def test_solvers(uot_solver):
         init_plan=None,
         log=False,
         verbose=True,
-        early_stopping_threshold=1e-6
+        early_stopping_threshold=1e-6,
     )
 
     assert pi.shape == (nx, ny)
