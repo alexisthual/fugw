@@ -24,6 +24,7 @@ class FUGWSolver:
         tol_uot=1e-7,
         eval_bcd=2,
         eval_uot=10,
+        **kwargs,
     ):
         """
         write me
