@@ -49,14 +49,16 @@ def solver_mm(cost, init_pi, uot_params, tuple_pxy, train_params):
 
     Allow epsilon to be 0 but rho_x and rho_y can't be infinity.
 
-    Note that if the parameters are small so that numerically, the exponential of
-    negative cost will contain zeros and this serves as sparsification of the optimal plan.
+    Note that if the parameters are small so that numerically, the exponential
+    of negative cost will contain zeros and this serves as sparsification
+    of the optimal plan.
 
-    If the parameters are large, then the resulting optimal plan is more dense than the one
-    obtained from scaling algorithm.
-    But all parameters should not be too small, otherwise the kernel will contain too many zeros.
-    Consequently, the optimal plan will contain NaN (because the Kronecker sum of two marginals
-    will eventually contain zeros, and divided by zero will result in undesirable coupling).
+    If the parameters are large, then the resulting optimal plan is more dense
+    than the one obtained from scaling algorithm.
+    But all parameters should not be too small, otherwise the kernel will
+    contain too many zeros.  Consequently, the optimal plan will contain NaN
+    (because the Kronecker sum of two marginals will eventually contain zeros,
+    and divided by zero will result in undesirable coupling).
     """
 
     niters, tol, eval_freq = train_params
@@ -100,7 +102,6 @@ def solver_dc(
     eps_base=1,
     verbose=True,
 ):
-
     niters, tol, eval_freq = train_params
     rho1, rho2, eps = uot_params
     px, py, pxy = tuple_pxy

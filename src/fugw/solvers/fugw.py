@@ -239,8 +239,8 @@ class FUGWSolver:
         device, dtype = X.device, X.dtype
 
         # constant data variables
-        X_sqr = X ** 2
-        Y_sqr = Y ** 2
+        X_sqr = X**2
+        Y_sqr = Y**2
 
         if alpha == 1 or D is None:
             alpha, D = 1, None
