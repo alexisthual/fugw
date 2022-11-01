@@ -20,16 +20,21 @@ def solver_scaling(cost, init_duals, uot_params, tuple_pxy, train_params):
         if rho_y == 0:
             vy = torch.zeros_like(vy)
         else:
-            vy = -tau_y * ((vx + log_px)[:, None] - cost / eps).logsumexp(dim=0)
+            vy = -tau_y * ((vx + log_px)[:, None] - cost / eps).logsumexp(
+                dim=0
+            )
 
         if rho_x == 0:
             vx = torch.zeros_like(vx)
         else:
-            vx = -tau_x * ((vy + log_py)[None, :] - cost / eps).logsumexp(dim=1)
+            vx = -tau_x * ((vy + log_py)[None, :] - cost / eps).logsumexp(
+                dim=1
+            )
 
         if (
             idx % eval_freq == 0
-            and max((vx - vx_prev).abs().max(), (vy - vy_prev).abs().max()) < tol
+            and max((vx - vx_prev).abs().max(), (vy - vy_prev).abs().max())
+            < tol
         ):
             break
 
@@ -70,7 +75,11 @@ def solver_mm(cost, init_pi, uot_params, tuple_pxy, train_params):
 
     for idx in range(niters):
         pi1_old, pi2_old = pi1.detach().clone(), pi2.detach().clone()
-        pi = pi ** (tau_x + tau_y) / (pi1[:, None] ** tau_x * pi2[None, :] ** tau_y) * K
+        pi = (
+            pi ** (tau_x + tau_y)
+            / (pi1[:, None] ** tau_x * pi2[None, :] ** tau_y)
+            * K
+        )
         pi1, pi2 = pi.sum(1), pi.sum(0)
 
         if (idx % eval_freq == 0) and max(
@@ -109,7 +118,11 @@ def solver_dc(
         m1_prev = m1.detach().clone()
 
         # IPOT
-        G = K * pi if (eps_base / sum_eps) == 1 else K * pi ** (eps_base / sum_eps)
+        G = (
+            K * pi
+            if (eps_base / sum_eps) == 1
+            else K * pi ** (eps_base / sum_eps)
+        )
         v = (G.T @ (u * px)) ** (-tau2) if rho2 != 0 else torch.ones_like(v)
         u = (G @ (v * py)) ** (-tau1) if rho1 != 0 else torch.ones_like(u)
         pi = u[:, None] * G * v[None, :]
@@ -118,7 +131,9 @@ def solver_dc(
         if idx % eval_freq == 0:
             m1 = pi.sum(1)
             if m1.isnan().any() or m1.isinf().any():
-                raise ValueError("There is NaN in coupling. Please increase eps_base.")
+                raise ValueError(
+                    "There is NaN in coupling. Please increase eps_base."
+                )
 
             error = (m1 - m1_prev).abs().max().item()
             if error < tol:
@@ -131,7 +146,9 @@ def solver_dc(
 
 def compute_approx_kl(p, q):
     # By convention: 0 log 0 = 0
-    entropy = torch.nan_to_num(p * (p / q).log(), nan=0.0, posinf=0.0, neginf=0.0).sum()
+    entropy = torch.nan_to_num(
+        p * (p / q).log(), nan=0.0, posinf=0.0, neginf=0.0
+    ).sum()
     return entropy
 
 
