@@ -4,7 +4,7 @@ import torch
 
 
 from fugw.solvers.fugw import FUGWSolver
-from fugw.utils import BaseModel
+from fugw.utils import BaseModel, make_tensor
 
 
 class FUGW(BaseModel):
@@ -95,34 +95,38 @@ class FUGW(BaseModel):
 
         # Set weights if they were not set by user
         if source_weights is None:
-            source_weights = (
+            Ws = (
                 torch.ones(source_features.shape[1]).type(dtype)
                 / source_features.shape[1]
             )
+        else:
+            Ws = make_tensor(source_weights).type(dtype)
 
         if target_weights is None:
-            target_weights = (
+            Wt = (
                 torch.ones(target_features.shape[1]).type(dtype)
                 / target_features.shape[1]
             )
+        else:
+            Wt = make_tensor(target_weights).type(dtype)
 
         # Compute distance matrix between features
-        Fs = torch.from_numpy(source_features.T).type(dtype)
-        Ft = torch.from_numpy(target_features.T).type(dtype)
+        Fs = make_tensor(source_features.T).type(dtype)
+        Ft = make_tensor(target_features.T).type(dtype)
         K = torch.cdist(Fs, Ft, p=2)
 
         # Load anatomical kernels to GPU
         # and normalize them
-        Gs = torch.from_numpy(source_geometry).type(dtype)
-        Gt = torch.from_numpy(target_geometry).type(dtype)
+        Gs = make_tensor(source_geometry).type(dtype)
+        Gt = make_tensor(target_geometry).type(dtype)
 
         # Create model
         model = FUGWSolver(**kwargs)
 
         # Compute transport plan
         res = model.solver(
-            px=source_weights,
-            py=target_weights,
+            px=Ws,
+            py=Wt,
             D=K,
             X=Gs,
             Y=Gt,
