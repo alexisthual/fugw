@@ -113,9 +113,7 @@ class FUGW(BaseModel):
         # Load anatomical kernels to GPU
         # and normalize them
         Gs = torch.from_numpy(source_geometry).type(dtype)
-        Gs = Gs / Gs.max()
         Gt = torch.from_numpy(target_geometry).type(dtype)
-        Gt = Gt / Gt.max()
 
         # Create model
         model = FUGWSolver(**kwargs)
