@@ -1,6 +1,6 @@
-from fugw.solvers.fugw import FUGWSolver
 import pytest
 import torch
+from fugw.solvers.fugw import FUGWSolver
 
 
 @pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "dc"])
@@ -27,7 +27,12 @@ def test_solvers(uot_solver):
     D = torch.rand(nx, ny)
 
     fugw = FUGWSolver(
-        nits_bcd=100, nits_uot=1000, tol_bcd=1e-7, tol_uot=1e-7, eval_bcd=2, eval_uot=10
+        nits_bcd=100,
+        nits_uot=1000,
+        tol_bcd=1e-7,
+        tol_uot=1e-7,
+        eval_bcd=2,
+        eval_uot=10,
     )
 
     pi, gamma = fugw.solver(
