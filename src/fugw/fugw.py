@@ -10,8 +10,8 @@ from fugw.utils import BaseModel
 class FUGW(BaseModel):
     def __init__(
         self,
-        alpha=1,
-        rho=20,
+        alpha=0.5,
+        rho=1,
         eps=1e-2,
         uot_solver="sinkhorn",
         reg_mode="joint",
