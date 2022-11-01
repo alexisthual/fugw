@@ -35,7 +35,7 @@ def test_solvers(uot_solver):
         eval_uot=10,
     )
 
-    pi, gamma = fugw.solver(
+    pi, gamma, duals_pi, duals_gamma, loss, loss_ent = fugw.solver(
         X=Cx,
         Y=Cy,
         D=D,
@@ -46,7 +46,7 @@ def test_solvers(uot_solver):
         uot_solver=uot_solver,
         reg_mode="independent",
         init_plan=None,
-        log=False,
+        return_plans_only=False,
         verbose=True,
         early_stopping_threshold=1e-6,
     )

@@ -38,6 +38,7 @@ class FUGW(BaseModel):
         target_weights=None,
         init_plan=None,
         init_duals=None,
+        return_plans_only=True,
         **kwargs,
     ):
         """
@@ -134,7 +135,7 @@ class FUGW(BaseModel):
             early_stopping_threshold=self.early_stopping_threshold,
             init_plan=init_plan,
             init_duals=init_duals,
-            log=False,
+            return_plans_only=return_plans_only,
             verbose=self.verbose,
         )
 

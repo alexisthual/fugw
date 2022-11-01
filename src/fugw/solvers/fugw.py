@@ -176,7 +176,7 @@ class FUGWSolver:
         reg_mode="joint",
         init_plan=None,
         init_duals=None,
-        log=False,
+        return_plans_only=True,
         verbose=False,
         early_stopping_threshold=1e-6,
         eps_base=1,
@@ -215,7 +215,7 @@ class FUGWSolver:
             reg_mode = "independent": use COOT-like regularisation
         init_n: matrix of size n1 x n2 if not None.
             Initialisation matrix for sample coupling.
-        log: True if the loss is recorded, False otherwise.
+        return_plans_only: if False, return duals and loss as well.
         verbose: if True then print the recorded loss.
 
         Returns
@@ -374,10 +374,10 @@ class FUGWSolver:
         if pi.isnan().any() or gamma.isnan().any():
             print("There is NaN in coupling")
 
-        if log:
-            return pi, gamma, duals_p, duals_g, log_cost, log_ent_cost
-        else:
+        if return_plans_only:
             return pi, gamma
+        else:
+            return pi, gamma, duals_p, duals_g, log_cost, log_ent_cost
 
     def solver_fgw(
         self,
@@ -446,7 +446,7 @@ class FUGWSolver:
         reg_mode="joint",
         init_plan=None,
         init_duals=None,
-        log=False,
+        return_plans_only=True,
         verbose=False,
         early_stopping_threshold=1e-6,
         **gw_kwargs,
@@ -455,10 +455,10 @@ class FUGWSolver:
             pi, duals, loss = self.solver_fgw(
                 X, Y, px, py, D, alpha, init_plan, verbose, **gw_kwargs
             )
-            if log:
-                return pi, pi, duals, duals, loss, loss
-            else:
+            if return_plans_only:
                 return pi, pi
+            else:
+                return pi, pi, duals, duals, loss, loss
 
         elif eps == 0 and (
             (rho_x == 0 and rho_y == float("inf"))
@@ -484,7 +484,7 @@ class FUGWSolver:
                 reg_mode,
                 init_plan,
                 init_duals,
-                log,
+                return_plans_only,
                 verbose,
                 early_stopping_threshold,
             )
