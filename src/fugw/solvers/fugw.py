@@ -1,9 +1,17 @@
-import torch
-from .utils import *
 from functools import partial
 
+import torch
 from ot.gromov import fused_gromov_wasserstein as fgw
 from ot.gromov import gromov_wasserstein as gw
+
+from .utils import (
+    compute_kl,
+    compute_approx_kl,
+    compute_quad_kl,
+    solver_dc,
+    solver_mm,
+    solver_scaling,
+)
 
 # require POT >= 0.8.2
 # require torch >= 1.9
@@ -107,7 +115,9 @@ class FUGWSolver:
         if reg_mode == "joint":
             ent_cost = cost + eps * compute_quad_kl(pi, gamma, pxy, pxy)
         elif reg_mode == "independent":
-            ent_cost = cost + eps * compute_kl(pi, pxy) + eps * compute_kl(gamma, pxy)
+            ent_cost = (
+                cost + eps * compute_kl(pi, pxy) + eps * compute_kl(gamma, pxy)
+            )
 
         return cost.item(), ent_cost.item()
 
@@ -218,7 +228,9 @@ class FUGWSolver:
         """
 
         # sanity check
-        if uot_solver == "mm" and (rho_x == float("inf") or rho_y == float("inf")):
+        if uot_solver == "mm" and (
+            rho_x == float("inf") or rho_y == float("inf")
+        ):
             uot_solver = "dc"
         if uot_solver == "sinkhorn" and eps == 0:
             uot_solver = "dc"
@@ -246,7 +258,10 @@ class FUGWSolver:
 
         if uot_solver == "sinkhorn":
             if init_duals is None:
-                duals_p = (torch.zeros_like(px), torch.zeros_like(py))  # shape n1, n2
+                duals_p = (
+                    torch.zeros_like(px),
+                    torch.zeros_like(py),
+                )  # shape n1, n2
             else:
                 duals_p = init_duals
             duals_g = duals_p
@@ -254,7 +269,10 @@ class FUGWSolver:
             duals_p, duals_g = None, None
         elif uot_solver == "dc":
             if init_duals is None:
-                duals_p = (torch.ones_like(px), torch.ones_like(py))  # shape n1, n2
+                duals_p = (
+                    torch.ones_like(px),
+                    torch.ones_like(py),
+                )  # shape n1, n2
             else:
                 duals_p = init_duals
             duals_g = duals_p
@@ -345,7 +363,10 @@ class FUGWSolver:
                 if verbose:
                     print("Cost at iteration {}: {}".format(idx + 1, ent_cost))
 
-                if abs(log_ent_cost[-2] - log_ent_cost[-1]) < early_stopping_threshold:
+                if (
+                    abs(log_ent_cost[-2] - log_ent_cost[-1])
+                    < early_stopping_threshold
+                ):
                     break
 
             idx += 1
@@ -368,7 +389,7 @@ class FUGWSolver:
         alpha=1,
         init_plan=None,
         verbose=True,
-        **kwargs
+        **kwargs,
     ):
         nx, ny = X.shape[0], Y.shape[0]
         device, dtype = X.device, X.dtype
@@ -388,7 +409,7 @@ class FUGWSolver:
                 log=True,
                 G0=init_plan,
                 verbose=verbose,
-                **kwargs
+                **kwargs,
             )
             loss = dict_log["gw_dist"]
         else:
@@ -402,7 +423,7 @@ class FUGWSolver:
                 G0=init_plan,
                 log=True,
                 verbose=verbose,
-                **kwargs
+                **kwargs,
             )
             loss = dict_log["fgw_dist"]
 
@@ -428,7 +449,7 @@ class FUGWSolver:
         log=False,
         verbose=False,
         early_stopping_threshold=1e-6,
-        **gw_kwargs
+        **gw_kwargs,
     ):
         if rho_x == float("inf") and rho_y == float("inf") and eps == 0:
             pi, duals, loss = self.solver_fgw(
@@ -444,7 +465,8 @@ class FUGWSolver:
             or (rho_x == 0 and rho_y == float("inf"))
         ):
             raise ValueError(
-                "Invalid rho and eps. Unregularized semi-relaxed GW is not supported."
+                "Invalid rho and eps. Unregularized semi-relaxed GW is not"
+                " supported."
             )
 
         else:
