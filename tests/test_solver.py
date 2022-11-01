@@ -9,22 +9,22 @@ def test_solvers(uot_solver):
     device = torch.device("cuda:0" if use_cuda else "cpu")
     torch.backends.cudnn.benchmark = True
 
-    nx = 104
-    dx = 3
-    ny = 151
-    dy = 7
+    ns = 104
+    ds = 3
+    nt = 151
+    dt = 7
 
-    x = torch.rand(nx, dx).to(device)
-    y = torch.rand(ny, dy).to(device)
+    source_embeddings = torch.rand(ns, ds).to(device)
+    target_embeddings = torch.rand(nt, dt).to(device)
 
     # # if test with permutation
     # idx = torch.randperm(x.nelement())
     # y = x.view(-1)[idx].view(x.size())
     # ny = nx
 
-    Cx = torch.cdist(x, x)
-    Cy = torch.cdist(y, y)
-    D = torch.rand(nx, ny)
+    Gs = torch.cdist(source_embeddings, source_embeddings)
+    Gt = torch.cdist(target_embeddings, target_embeddings)
+    D = torch.rand(ns, nt)
 
     fugw = FUGWSolver(
         nits_bcd=100,
@@ -36,8 +36,8 @@ def test_solvers(uot_solver):
     )
 
     pi, gamma, duals_pi, duals_gamma, loss, loss_ent = fugw.solver(
-        X=Cx,
-        Y=Cy,
+        X=Gs,
+        Y=Gt,
         D=D,
         alpha=0.8,
         rho_x=2,
@@ -51,5 +51,18 @@ def test_solvers(uot_solver):
         early_stopping_threshold=1e-6,
     )
 
-    assert pi.shape == (nx, ny)
-    assert gamma.shape == (nx, ny)
+    assert pi.shape == (ns, nt)
+    assert gamma.shape == (ns, nt)
+
+    if uot_solver == "mm":
+        assert duals_pi is None
+        assert duals_gamma is None
+    else:
+        assert len(duals_pi) == 2
+        assert duals_pi[0].shape == (ns,)
+        assert duals_pi[1].shape == (nt,)
+        assert len(duals_gamma) == 2
+        assert duals_gamma[0].shape == (ns,)
+        assert duals_gamma[1].shape == (nt,)
+
+    assert len(loss) == len(loss_ent) - 1
