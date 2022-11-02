@@ -1,7 +1,7 @@
 import pytest
 import torch
 from fugw.solvers.sparse import FUGWSparseSolver
-from fugw.solvers.utils import low_rank_squared_l2
+from fugw.utils import low_rank_squared_l2
 
 
 @pytest.mark.parametrize("uot_solver", ["mm", "dc"])
