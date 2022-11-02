@@ -1,6 +1,6 @@
 import pytest
 import torch
-from fugw.solvers.fugw import FUGWSolver
+from fugw.solvers.dense import FUGWSolver
 
 
 @pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "dc"])

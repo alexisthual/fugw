@@ -3,7 +3,7 @@ from scipy.stats import pearsonr
 import torch
 
 
-from fugw.solvers.fugw import FUGWSolver
+from fugw.solvers.dense import FUGWSolver
 from fugw.utils import BaseModel, make_tensor
 
 

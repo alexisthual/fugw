@@ -47,7 +47,7 @@ class FUGWSolver:
 
     def local_cost(self, pi, transpose, data_const, tuple_p, hyperparams):
         """
-        write me
+        Returns local cost matrix.
         """
 
         rho_x, rho_y, eps, alpha, reg_mode = hyperparams
@@ -84,7 +84,7 @@ class FUGWSolver:
 
     def fugw_cost(self, pi, gamma, data_const, tuple_p, hyperparams):
         """
-        Write me
+        Returns scalar fugw cost.
         """
 
         rho_x, rho_y, eps, alpha, reg_mode = hyperparams
@@ -101,9 +101,9 @@ class FUGWSolver:
             cost = cost + (1 - alpha) * w_cost / 2
 
         if alpha != 0:
-            A = (X_sqr @ gamma1).dot(pi1)
-            B = (Y_sqr @ gamma2).dot(pi2)
-            C = (X @ gamma @ Y.T) * pi
+            A = (X_sqr @ gamma1).dot(pi1)  # sparse doable
+            B = (Y_sqr @ gamma2).dot(pi2)  # sparse doable
+            C = (X @ gamma @ Y.T) * pi  # sparse: doable
             gw_cost = A + B - 2 * C.sum()
             cost = cost + alpha * gw_cost
 
@@ -113,13 +113,13 @@ class FUGWSolver:
             cost = cost + rho_y * compute_quad_kl(pi2, gamma2, py, py)
 
         if reg_mode == "joint":
-            ent_cost = cost + eps * compute_quad_kl(pi, gamma, pxy, pxy)
+            entropic_cost = cost + eps * compute_quad_kl(pi, gamma, pxy, pxy)
         elif reg_mode == "independent":
-            ent_cost = (
+            entropic_cost = (
                 cost + eps * compute_kl(pi, pxy) + eps * compute_kl(gamma, pxy)
             )
 
-        return cost.item(), ent_cost.item()
+        return cost.item(), entropic_cost.item()
 
     def project_on_target_domain(self, Xt, pi):
         """
@@ -163,11 +163,11 @@ class FUGWSolver:
 
     def solver_fugw(
         self,
-        X,
-        Y,
+        Gs,
+        Gt,
         px=None,
         py=None,
-        D=None,
+        K=None,
         alpha=1,
         rho_x=float("inf"),
         rho_y=float("inf"),
@@ -183,26 +183,26 @@ class FUGWSolver:
     ):
         """
         Parameters for mode:
-        - Ent-LB-UGW: alpha = 1, mode = "joint", rho_x != infty, rho_y != infty.
+        - Ent-LB-UGW: alpha = 1, mode = "joint", rho_x != inf, rho_y != inf.
             No need to care about rho3 and rho4.
-        - EGW: alpha = 1, mode = "independent", rho_x = rho_y = infty.
+        - EGW: alpha = 1, mode = "independent", rho_x = rho_y = inf.
             No need to care about rho3 and rho4.
         - Ent-FGW: 0 < alpha < 1, D != None, mode = "independent",
-            rho_x = rho_y = infty (so rho3 = rho4 = infty)
+            rho_x = rho_y = inf (so rho3 = rho4 = inf)
         - Ent-semi-relaxed GW: alpha = 1, mode = "independent",
-            (rho_x = 0, rho_y = infty), or (rho_x = infty, rho_y = 0).
+            (rho_x = 0, rho_y = inf), or (rho_x = inf, rho_y = 0).
             No need to care about rho3 and rho4.
         - Ent-semi-relaxed FGW: 0 < alpha < 1, mode = "independent",
-            (rho_x = rho3 = 0, rho_y = rho4 = infty),
-            or (rho_x = rho3 = infty, rho_y = rho4 = 0).
+            (rho_x = rho3 = 0, rho_y = rho4 = inf),
+            or (rho_x = rho3 = inf, rho_y = rho4 = 0).
         - Ent-UOT: alpha = 0, mode = "independent", D != None,
-            rho_x != infty, rho_y != infty, rho3 != infty, rho4 != infty.
+            rho_x != inf, rho_y != inf, rho3 != inf, rho4 != inf.
 
         Parameters
         ----------
-        X: matrix of size n1 x d1
-        Y: matrix of size n2 x d2
-        D: matrix of size n1 x n2. Feature matrix, in case of fused GW
+        Gs: matrix of size n1 x n1
+        Gt: matrix of size n2 x n2
+        K: matrix of size n1 x n2. Feature matrix, in case of fused GW
         px: tuple of 2 vectors of length (n1, d1).
             Measures assigned on rows and columns of X.
         py: tuple of 2 vectors of length (n2, d2).
@@ -235,15 +235,15 @@ class FUGWSolver:
         if uot_solver == "sinkhorn" and eps == 0:
             uot_solver = "dc"
 
-        nx, ny = X.shape[0], Y.shape[0]
-        device, dtype = X.device, X.dtype
+        nx, ny = Gs.shape[0], Gt.shape[0]
+        device, dtype = Gs.device, Gs.dtype
 
         # constant data variables
-        X_sqr = X**2
-        Y_sqr = Y**2
+        Gs_sqr = Gs**2
+        Gt_sqr = Gt**2
 
-        if alpha == 1 or D is None:
-            alpha, D = 1, None
+        if alpha == 1 or K is None:
+            alpha, K = 1, None
 
         # measures on rows and columns
         if px is None:
@@ -279,14 +279,14 @@ class FUGWSolver:
 
         compute_local_cost = partial(
             self.local_cost,
-            data_const=(X_sqr, Y_sqr, X, Y, D),
+            data_const=(Gs_sqr, Gt_sqr, Gs, Gt, K),
             tuple_p=(px, py, pxy),
             hyperparams=(rho_x, rho_y, eps, alpha, reg_mode),
         )
 
         compute_fugw_cost = partial(
             self.fugw_cost,
-            data_const=(X_sqr, Y_sqr, X, Y, D),
+            data_const=(Gs_sqr, Gt_sqr, Gs, Gt, K),
             tuple_p=(px, py, pxy),
             hyperparams=(rho_x, rho_y, eps, alpha, reg_mode),
         )
@@ -433,11 +433,11 @@ class FUGWSolver:
 
     def solver(
         self,
-        X,
-        Y,
+        Gs,
+        Gt,
         px=None,
         py=None,
-        D=None,
+        K=None,
         alpha=1,
         rho_x=float("inf"),
         rho_y=float("inf"),
@@ -453,7 +453,7 @@ class FUGWSolver:
     ):
         if rho_x == float("inf") and rho_y == float("inf") and eps == 0:
             pi, duals, loss = self.solver_fgw(
-                X, Y, px, py, D, alpha, init_plan, verbose, **gw_kwargs
+                Gs, Gt, px, py, K, alpha, init_plan, verbose, **gw_kwargs
             )
             if return_plans_only:
                 return pi, pi
@@ -471,11 +471,11 @@ class FUGWSolver:
 
         else:
             return self.solver_fugw(
-                X,
-                Y,
+                Gs,
+                Gt,
                 px,
                 py,
-                D,
+                K,
                 alpha,
                 rho_x,
                 rho_y,
