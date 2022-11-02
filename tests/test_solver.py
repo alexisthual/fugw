@@ -5,6 +5,8 @@ from fugw.solvers.dense import FUGWSolver
 
 @pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "dc"])
 def test_solvers(uot_solver):
+    torch.manual_seed(100)
+
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
     torch.backends.cudnn.benchmark = True
@@ -13,7 +15,10 @@ def test_solvers(uot_solver):
     ds = 3
     nt = 151
     dt = 7
+    nf = 10
 
+    source_features = torch.rand(ns, nf).to(device)
+    target_features = torch.rand(nt, nf).to(device)
     source_embeddings = torch.rand(ns, ds).to(device)
     target_embeddings = torch.rand(nt, dt).to(device)
 
@@ -24,7 +29,7 @@ def test_solvers(uot_solver):
 
     Gs = torch.cdist(source_embeddings, source_embeddings)
     Gt = torch.cdist(target_embeddings, target_embeddings)
-    D = torch.rand(ns, nt)
+    K = torch.cdist(source_features, target_features)
 
     fugw = FUGWSolver(
         nits_bcd=100,
@@ -36,9 +41,9 @@ def test_solvers(uot_solver):
     )
 
     pi, gamma, duals_pi, duals_gamma, loss, loss_ent = fugw.solver(
-        X=Gs,
-        Y=Gt,
-        D=D,
+        Gs=Gs,
+        Gt=Gt,
+        K=K,
         alpha=0.8,
         rho_x=2,
         rho_y=3,

@@ -127,9 +127,9 @@ class FUGW(BaseModel):
         res = model.solver(
             px=Ws,
             py=Wt,
-            D=K,
-            X=Gs,
-            Y=Gt,
+            K=K,
+            Gs=Gs,
+            Gt=Gt,
             alpha=self.alpha,
             rho_x=rho_x,
             rho_y=rho_y,
