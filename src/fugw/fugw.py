@@ -113,7 +113,7 @@ class FUGW(BaseModel):
         # Compute distance matrix between features
         Fs = make_tensor(source_features.T).type(dtype)
         Ft = make_tensor(target_features.T).type(dtype)
-        K = torch.cdist(Fs, Ft, p=2)
+        K = torch.cdist(Fs, Ft, p=2) ** 2
 
         # Load anatomical kernels to GPU
         # and normalize them
