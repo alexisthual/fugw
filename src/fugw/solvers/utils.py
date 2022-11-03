@@ -172,10 +172,9 @@ def solver_dc(
     uot_params,
     tuple_pxy,
     train_params,
-    eps_base=1,
     verbose=True,
 ):
-    niters, tol, eval_freq = train_params
+    niters, nits_sinkhorn, eps_base, tol, eval_freq = train_params
     rho1, rho2, eps = uot_params
     px, py, pxy = tuple_pxy
     u, v = init_duals
@@ -197,8 +196,13 @@ def solver_dc(
             if (eps_base / sum_eps) == 1
             else K * pi ** (eps_base / sum_eps)
         )
-        v = (G.T @ (u * px)) ** (-tau2) if rho2 != 0 else torch.ones_like(v)
-        u = (G @ (v * py)) ** (-tau1) if rho1 != 0 else torch.ones_like(u)
+        for _ in range(nits_sinkhorn):
+            v = (
+                (G.T @ (u * px)) ** (-tau2)
+                if rho2 != 0
+                else torch.ones_like(v)
+            )
+            u = (G @ (v * py)) ** (-tau1) if rho1 != 0 else torch.ones_like(u)
         pi = u[:, None] * G * v[None, :]
 
         # Check stopping criterion
@@ -225,10 +229,9 @@ def solver_dc_sparse(
     uot_params,
     tuple_pxy,
     train_params,
-    eps_base=1,
     verbose=True,
 ):
-    niters, tol, eval_freq = train_params
+    niters, nits_sinkhorn, eps_base, tol, eval_freq = train_params
     rho1, rho2, eps = uot_params
     px, py, pxy = tuple_pxy
     u, v = init_duals
@@ -256,16 +259,21 @@ def solver_dc_sparse(
             K_values * pi._values() ** (eps_base / sum_eps),
             pi.size(),
         )
-        v = (
-            torch.sparse.mm(G.T, (u * px).reshape(-1, 1)).squeeze() ** (-tau2)
-            if rho2 != 0
-            else torch.ones_like(v)
-        )
-        u = (
-            torch.sparse.mm(G, (v * py).reshape(-1, 1)).squeeze() ** (-tau1)
-            if rho1 != 0
-            else torch.ones_like(u)
-        )
+        for _ in range(nits_sinkhorn):
+            v = (
+                torch.sparse.mm(
+                    G.transpose(1, 0), (u * px).reshape(-1, 1)
+                ).squeeze()
+                ** (-tau2)
+                if rho2 != 0
+                else torch.ones_like(v)
+            )
+            u = (
+                torch.sparse.mm(G, (v * py).reshape(-1, 1)).squeeze()
+                ** (-tau1)
+                if rho1 != 0
+                else torch.ones_like(u)
+            )
 
         # pi = u[:, None] * G * v[None, :]
         new_pi_values = u[rows] * v[cols] * G._values()
@@ -280,7 +288,7 @@ def solver_dc_sparse(
             m1 = torch.sparse.sum(pi, 1).to_dense()
             if m1.isnan().any() or m1.isinf().any():
                 raise ValueError(
-                    "There is NaN in coupling. Please increase eps_base."
+                    "There is NaN in coupling. Please increase dc_eps_base."
                 )
 
             error = (m1 - m1_prev).abs().max().item()

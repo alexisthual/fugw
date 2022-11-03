@@ -230,7 +230,8 @@ class FUGWSparseSolver:
         return_plans_only=True,
         verbose=False,
         early_stopping_threshold=1e-6,
-        eps_base=1,
+        dc_eps_base=1,
+        dc_nits_sinkhorn=1,
     ):
         """
         Parameters for mode:
@@ -380,8 +381,13 @@ class FUGWSparseSolver:
         self_solver_dc = partial(
             solver_dc_sparse,
             tuple_pxy=(px, py, pxy),
-            train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
-            eps_base=eps_base,
+            train_params=(
+                self.nits_uot,
+                dc_nits_sinkhorn,
+                dc_eps_base,
+                self.tol_uot,
+                self.eval_uot,
+            ),
             verbose=verbose,
         )
 
@@ -525,7 +531,8 @@ class FUGWSparseSolver:
         return_plans_only=True,
         verbose=False,
         early_stopping_threshold=1e-6,
-        eps_base=1,
+        dc_eps_base=1,
+        dc_nits_sinkhorn=1,
         **gw_kwargs,
     ):
         # if rho_x == float("inf") and rho_y == float("inf") and eps == 0:
@@ -558,7 +565,8 @@ class FUGWSparseSolver:
             uot_solver=uot_solver,
             reg_mode=reg_mode,
             early_stopping_threshold=early_stopping_threshold,
-            eps_base=eps_base,
+            dc_eps_base=dc_eps_base,
+            dc_nits_sinkhorn=dc_nits_sinkhorn,
             init_plan=init_plan,
             init_duals=init_duals,
             return_plans_only=return_plans_only,

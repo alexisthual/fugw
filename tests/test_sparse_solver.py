@@ -56,7 +56,8 @@ def test_solvers(uot_solver):
         return_plans_only=False,
         verbose=True,
         early_stopping_threshold=1e-6,
-        eps_base=1e4,
+        dc_eps_base=1e4,
+        dc_nits_sinkhorn=2,
     )
 
     print(pi)

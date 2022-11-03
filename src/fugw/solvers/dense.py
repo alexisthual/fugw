@@ -179,7 +179,8 @@ class FUGWSolver:
         return_plans_only=True,
         verbose=False,
         early_stopping_threshold=1e-6,
-        eps_base=1,
+        dc_eps_base=1,
+        dc_nits_sinkhorn=1,
     ):
         """
         Parameters for mode:
@@ -306,8 +307,13 @@ class FUGWSolver:
         self_solver_dc = partial(
             solver_dc,
             tuple_pxy=(px, py, pxy),
-            train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
-            eps_base=eps_base,
+            train_params=(
+                self.nits_uot,
+                dc_nits_sinkhorn,
+                dc_eps_base,
+                self.tol_uot,
+                self.eval_uot,
+            ),
             verbose=verbose,
         )
 
