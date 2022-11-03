@@ -188,7 +188,9 @@ class FUGWSparseSolver:
         Projection of size ns x dt
         """
 
-        projection = pi @ Xt / pi.sum(1).reshape(-1, 1)
+        projection = torch.sparse.mm(pi, Xt) / torch.sparse.sum(
+            pi, 1
+        ).to_dense().reshape(-1, 1)
 
         return projection
 
@@ -208,7 +210,9 @@ class FUGWSparseSolver:
         Projection of size nt x ds
         """
 
-        projection = pi.T @ Xs / pi.sum(0).reshape(-1, 1)
+        projection = torch.sparse.mm(
+            pi.transpose(1, 0), Xs
+        ) / torch.sparse.sum(pi, 0).to_dense().reshape(-1, 1)
 
         return projection
 
