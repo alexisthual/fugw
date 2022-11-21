@@ -1,3 +1,3 @@
-from .fugw import FUGW
-from .fugw_sparse import FUGWSparse
+from .dense import FUGW
+from .sparse import FUGWSparse
 from .barycenter import FUGWBarycenter

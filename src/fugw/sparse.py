@@ -115,15 +115,21 @@ class FUGWSparse(BaseModel):
         Ft = make_tensor(target_features.T).type(dtype)
         # K = torch.cdist(Fs, Ft, p=2)
         K1, K2 = low_rank_squared_l2(Fs, Ft)
+        K1 = make_tensor(K1).type(dtype)
+        K2 = make_tensor(K2).type(dtype)
 
         # Load anatomical kernels to GPU
         # and normalize them
         Gs1, Gs2 = low_rank_squared_l2(
             source_geometry_embedding, source_geometry_embedding
         )
+        Gs1 = make_tensor(Gs1).type(dtype)
+        Gs2 = make_tensor(Gs2).type(dtype)
         Gt1, Gt2 = low_rank_squared_l2(
             target_geometry_embedding, target_geometry_embedding
         )
+        Gt1 = make_tensor(Gt1).type(dtype)
+        Gt2 = make_tensor(Gt2).type(dtype)
         # Gs = make_tensor(source_geometry).type(dtype)
         # Gt = make_tensor(target_geometry).type(dtype)
 
