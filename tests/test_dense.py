@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from fugw import FUGW, FUGWSparse
+from fugw import FUGW
 from sklearn.metrics import pairwise_distances
 
 
@@ -13,18 +13,20 @@ def init_distribution(n_features, n_voxels):
     return weights, features, geometry, embeddings
 
 
+np.random.seed(100)
+n_voxels_source = 105
+n_voxels_target = 95
+n_features_train = 10
+n_features_test = 5
+
+
 def test_fugw():
     # Generate random training data for source and target
-    np.random.seed(100)
-    n_voxels = 100
-    n_features_train = 10
-    n_features_test = 50
-
     _, source_features_train, source_geometry, _ = init_distribution(
-        n_features_train, n_voxels
+        n_features_train, n_voxels_source
     )
     _, target_features_train, target_geometry, _ = init_distribution(
-        n_features_train, n_voxels
+        n_features_train, n_voxels_target
     )
 
     fugw = FUGW()
@@ -36,11 +38,11 @@ def test_fugw():
     )
 
     # Use trained model to transport new features
-    source_features_test = np.random.rand(n_features_test, n_voxels)
-    target_features_test = np.random.rand(n_features_test, n_voxels)
+    source_features_test = np.random.rand(n_features_test, n_voxels_source)
+    target_features_test = np.random.rand(n_features_test, n_voxels_target)
 
     transformed_data = fugw.transform(source_features_test)
-    assert transformed_data.shape == source_features_test.shape
+    assert transformed_data.shape == target_features_test.shape
 
     # Compute score
     s = fugw.score(source_features_test, target_features_test)
@@ -49,15 +51,11 @@ def test_fugw():
 
 def test_fugw_with_weights():
     # Generate random training data for source and target
-    np.random.seed(100)
-    n_voxels = 100
-    n_features = 10
-
     source_weights, source_features, source_geometry, _ = init_distribution(
-        n_features, n_voxels
+        n_features_train, n_voxels_source
     )
     target_weights, target_features, target_geometry, _ = init_distribution(
-        n_features, n_voxels
+        n_features_train, n_voxels_target
     )
 
     fugw = FUGW()
@@ -70,20 +68,27 @@ def test_fugw_with_weights():
         target_weights=target_weights,
     )
 
-    assert fugw.pi.shape == (n_voxels, n_voxels)
+    assert fugw.pi.shape == (n_voxels_source, n_voxels_target)
+
+    # Use trained model to transport new features
+    source_features_test = np.random.rand(n_features_test, n_voxels_source)
+    target_features_test = np.random.rand(n_features_test, n_voxels_target)
+
+    transformed_data = fugw.transform(source_features_test)
+    assert transformed_data.shape == target_features_test.shape
+
+    # Compute score
+    s = fugw.score(source_features_test, target_features_test)
+    assert isinstance(s, int) or isinstance(s, float)
 
 
 def test_fugw_with_torch_tensors():
     # Generate random training data for source and target
-    np.random.seed(100)
-    n_voxels = 100
-    n_features = 10
-
     source_weights, source_features, source_geometry, _ = init_distribution(
-        n_features, n_voxels
+        n_features_train, n_voxels_source
     )
     target_weights, target_features, target_geometry, _ = init_distribution(
-        n_features, n_voxels
+        n_features_train, n_voxels_target
     )
 
     source_weights = torch.tensor(source_weights)
@@ -100,37 +105,14 @@ def test_fugw_with_torch_tensors():
         target_weights=target_weights,
     )
 
-    assert fugw.pi.shape == (n_voxels, n_voxels)
-
-
-def test_fugw_sparse():
-    # Generate random training data for source and target
-    np.random.seed(100)
-    n_voxels = 100
-    n_features_train = 10
-    n_features_test = 50
-
-    _, source_features_train, _, source_embeddings = init_distribution(
-        n_features_train, n_voxels
-    )
-    _, target_features_train, _, target_embeddings = init_distribution(
-        n_features_train, n_voxels
-    )
-
-    fugw = FUGWSparse()
-    fugw.fit(
-        source_features_train,
-        target_features_train,
-        source_embeddings=source_embeddings,
-        target_embeddings=target_embeddings,
-    )
+    assert fugw.pi.shape == (n_voxels_source, n_voxels_target)
 
     # Use trained model to transport new features
-    source_features_test = np.random.rand(n_features_test, n_voxels)
-    target_features_test = np.random.rand(n_features_test, n_voxels)
+    source_features_test = np.random.rand(n_features_test, n_voxels_source)
+    target_features_test = np.random.rand(n_features_test, n_voxels_target)
 
     transformed_data = fugw.transform(source_features_test)
-    assert transformed_data.shape == source_features_test.shape
+    assert transformed_data.shape == target_features_test.shape
 
     # Compute score
     s = fugw.score(source_features_test, target_features_test)

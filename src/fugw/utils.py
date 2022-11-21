@@ -20,12 +20,31 @@ def make_tensor(x):
         raise Exception(f"Expected np.ndarray or torch.Tensor, got {type(x)}")
 
 
+def make_sparse_tensor(x, dtype):
+    if x is None:
+        return None
+    elif isinstance(x, torch.Tensor):
+        indices = make_tensor(x._indices()).type(dtype)
+        values = make_tensor(x._values()).type(dtype)
+        size = x.size()
+        return torch.sparse_coo_tensor(
+            indices, values, size
+        )
+    else:
+        raise Exception(f"Expected sparse torch.Tensor, got {type(x)}")
+
+
 def low_rank_squared_l2(X, Y):
     """
     Write square Euclidean distance matrix M as exact product
     of two low rank matrices A1 and A2: M = A1 A2^t
     """
+    if not (isinstance(X, torch.Tensor) and isinstance(Y, torch.Tensor)):
+        X = torch.Tensor(X)
+        Y = torch.Tensor(Y)
+
     device, dtype = X.device, X.dtype
+
     nx, ny = X.shape[0], Y.shape[0]
 
     Vx = (X**2).sum(1, keepdim=True)  # shape nx x 1

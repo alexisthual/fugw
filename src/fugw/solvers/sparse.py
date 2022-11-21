@@ -1,5 +1,6 @@
 from functools import partial
 
+import numpy as np
 import torch
 from ot.gromov import fused_gromov_wasserstein as fgw
 from ot.gromov import gromov_wasserstein as gw
@@ -326,8 +327,26 @@ class FUGWSparseSolver:
             alpha, K = 1, (None, None)
 
         # initialise coupling and dual vectors
-        pi = init_plan
-        gamma = pi
+        if init_plan is not None:
+            pi = init_plan
+            gamma = pi
+        else:
+            # TODO: Ending up here should raise a warning
+            # because computations are done using sparse matrices
+            # but they are actually dense
+            pi = torch.sparse_coo_tensor(
+                torch.from_numpy(
+                    np.array(
+                        [
+                            np.tile(np.arange(nx), ny),
+                            np.repeat(np.arange(ny), nx),
+                        ]
+                    )
+                ).type(dtype),
+                torch.from_numpy(np.ones(nx * ny) / (nx * ny)).type(dtype),
+                (nx, ny),
+            )
+            gamma = pi
 
         # measures on rows and columns
         if px is None:

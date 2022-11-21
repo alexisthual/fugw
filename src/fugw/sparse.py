@@ -4,7 +4,12 @@ import torch
 
 
 from fugw.solvers.sparse import FUGWSparseSolver
-from fugw.utils import BaseModel, make_tensor, low_rank_squared_l2
+from fugw.utils import (
+    BaseModel,
+    make_sparse_tensor,
+    make_tensor,
+    low_rank_squared_l2,
+)
 
 
 class FUGWSparse(BaseModel):
@@ -136,6 +141,9 @@ class FUGWSparse(BaseModel):
         # Create model
         model = FUGWSparseSolver(**kwargs)
 
+        # check that all init_plan is valid
+        init_plan = make_sparse_tensor(init_plan, dtype)
+
         # Compute transport plan
         res = model.solver(
             px=Ws,
@@ -156,7 +164,7 @@ class FUGWSparse(BaseModel):
             verbose=self.verbose,
         )
 
-        self.pi = res[0].detach().cpu().numpy()
+        self.pi = res[0]
 
         # Free allocated GPU memory
         del Fs, Ft, K1, K2, Gs1, Gs2, Gt1, Gt2
@@ -198,21 +206,19 @@ class FUGWSparse(BaseModel):
             )
 
         # Move data to GPU
-        pi_torch = torch.from_numpy(self.pi).type(dtype)
         source_features_torch = torch.from_numpy(source_features).type(dtype)
 
         # Transform data
         transformed_data_torch = (
-            pi_torch.T
-            @ source_features_torch.T
-            / pi_torch.sum(dim=0).reshape(-1, 1)
+            torch.sparse.mm(self.pi.T, source_features_torch.T).to_dense()
+            / torch.sparse.sum(self.pi, dim=0).to_dense().reshape(-1, 1)
         ).T
 
         # Move transformed data back to CPU
         transformed_data = transformed_data_torch.detach().cpu().numpy()
 
         # Free allocated GPU memory
-        del pi_torch, source_features_torch
+        del source_features_torch
         if use_cuda:
             torch.cuda.empty_cache()
 
