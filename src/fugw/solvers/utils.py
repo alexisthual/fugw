@@ -2,6 +2,52 @@ import torch
 from tqdm import tqdm
 
 
+def batch_elementwise_prod_and_sum(
+    X1, X2, idx_1, idx_2, axis=1, max_tensor_size=1e8, verbose=False
+):
+    """Batch computation of (X1[idx_1, :] * X2[idx_2, :]).sum(1)
+
+    Parameters
+    ----------
+    X1: torch.Tensor
+        shape(n, d)
+    X2: torch.Tensor
+        shape(n, d)
+    idx_1: torch.Tensor
+        shape(m,)
+    idx_2: torch.Tensor
+        shape(m,)
+
+    Returns
+    -------
+    result: torch.Tensor
+        shape(m,)
+    """
+
+    m, d = idx_1.shape[0], X1.shape[1]
+
+    if isinstance(max_tensor_size, (int, float)):
+        batch_size = min(int(max_tensor_size / d), m)
+    else:
+        raise Exception(
+            f"Invalid value for max_tensor_size: {max_tensor_size}"
+        )
+
+    rg = range(0, m, batch_size)
+    rg = tqdm(rg) if verbose else rg
+
+    res = torch.cat(
+        [
+            (
+                X1[idx_1[i : i + batch_size], :]
+                * X2[idx_2[i : i + batch_size], :]
+            ).sum(axis)
+            for i in rg
+        ]
+    )
+    return res
+
+
 def solver_scaling(cost, init_duals, uot_params, tuple_pxy, train_params):
     """
     Scaling algorithm.
@@ -322,7 +368,8 @@ def elementwise_prod_sparse(p, q):
 def elementwise_prod_fact_sparse(a, b, p):
     """Compute (AB * pi) without exceeding memory capacity."""
     rows, cols = p._indices()
-    values = (a[rows, :] * b[cols, :]).sum(1)
+    # values = (a[rows, :] * b[cols, :]).sum(1)
+    values = batch_elementwise_prod_and_sum(a, b, rows, cols, 1)
     values = values * p._values()
     return torch.sparse_coo_tensor(p._indices(), values, p.size())
 
