@@ -60,9 +60,6 @@ def test_solvers(uot_solver):
         dc_nits_sinkhorn=2,
     )
 
-    print(pi)
-    print(gamma)
-
     assert pi.size() == (ns, nt)
     assert gamma.size() == (ns, nt)
 

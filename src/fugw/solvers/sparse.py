@@ -5,6 +5,7 @@ from ot.gromov import fused_gromov_wasserstein as fgw
 from ot.gromov import gromov_wasserstein as gw
 
 from .utils import (
+    batch_elementwise_prod_and_sum,
     compute_kl_sparse,
     compute_approx_kl,
     compute_approx_kl_sparse,
@@ -90,7 +91,8 @@ class FUGWSparseSolver:
         cost_values = torch.zeros_like(pi._values())
         if alpha != 1 and K1 is not None and K2 is not None:
             # cost = cost + (1 - alpha) * D / 2
-            cost_values = (K1[rows, :] * K2[cols, :]).sum(1)
+            # cost_values = (K1[rows, :] * K2[cols, :]).sum(1)
+            cost_values = batch_elementwise_prod_and_sum(K1, K2, rows, cols, 1)
             cost_values *= (1 - alpha) / 2
 
         # or UOT when alpha = 1
@@ -103,7 +105,10 @@ class FUGWSparseSolver:
             C1, C2 = Gs1, ((Gs2.T @ torch.sparse.mm(pi, Gt2)) @ Gt1.T).T
 
             gw_cost_values = A[rows] + B[cols]
-            gw_cost_values -= 2 * (C1[rows, :] * C2[cols, :]).sum(1)
+            # gw_cost_values -= 2 * (C1[rows, :] * C2[cols, :]).sum(1)
+            gw_cost_values -= 2 * batch_elementwise_prod_and_sum(
+                C1, C2, rows, cols, 1
+            )
 
             cost_values += alpha * gw_cost_values
 

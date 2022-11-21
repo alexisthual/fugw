@@ -17,7 +17,7 @@ def make_tensor(x):
     elif isinstance(x, torch.Tensor):
         return x
     else:
-        raise Exception(f"Expected np.array or torch.tensor, got {type(x)}")
+        raise Exception(f"Expected np.ndarray or torch.Tensor, got {type(x)}")
 
 
 def low_rank_squared_l2(X, Y):
