@@ -1,7 +1,15 @@
 import numpy as np
-import torch
-from fugw import FUGW
 from sklearn.metrics import pairwise_distances
+import torch
+
+from fugw import FUGW
+
+
+np.random.seed(100)
+n_voxels_source = 105
+n_voxels_target = 95
+n_features_train = 10
+n_features_test = 5
 
 
 def init_distribution(n_features, n_voxels):
@@ -11,13 +19,6 @@ def init_distribution(n_features, n_voxels):
     geometry = pairwise_distances(embeddings)
 
     return weights, features, geometry, embeddings
-
-
-np.random.seed(100)
-n_voxels_source = 105
-n_voxels_target = 95
-n_features_train = 10
-n_features_test = 5
 
 
 def test_fugw():

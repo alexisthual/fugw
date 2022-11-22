@@ -1,5 +1,6 @@
 import pytest
 import torch
+
 from fugw.solvers.dense import FUGWSolver
 
 

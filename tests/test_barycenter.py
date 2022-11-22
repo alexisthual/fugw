@@ -1,6 +1,7 @@
 import numpy as np
-from fugw import FUGWBarycenter
 from sklearn.metrics import pairwise_distances
+
+from fugw import FUGWBarycenter
 
 
 def test_fugw_barycenter():

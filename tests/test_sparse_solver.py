@@ -1,5 +1,6 @@
 import pytest
 import torch
+
 from fugw.solvers.sparse import FUGWSparseSolver
 from fugw.utils import low_rank_squared_l2
 
