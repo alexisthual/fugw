@@ -141,15 +141,14 @@ TODO
 
 If this package was useful to you, please cite it in your work:
 
-```latex
-@misc{https://doi.org/10.48550/arxiv.2206.09398,
-  doi = {10.48550/ARXIV.2206.09398},
-  url = {https://arxiv.org/abs/2206.09398},
-  author = {Thual, Alexis and Tran, Huy and Zemskova, Tatiana and Courty, Nicolas and Flamary, Rémi and Dehaene, Stanislas and Thirion, Bertrand},
-  keywords = {Neurons and Cognition (q-bio.NC), Machine Learning (stat.ML), FOS: Biological sciences, FOS: Biological sciences, FOS: Computer and information sciences, FOS: Computer and information sciences},
-  title = {Aligning individual brains with Fused Unbalanced Gromov-Wasserstein},
-  publisher = {arXiv},
-  year = {2022},
-  copyright = {Creative Commons Attribution 4.0 International}
+```bibtex
+@article{Thual-2022-fugw,
+  title={Aligning individual brains with Fused Unbalanced Gromov-Wasserstein},
+  author={Thual, Alexis and Tran, Huy and Zemskova, Tatiana and Courty, Nicolas and Flamary, Rémi and Dehaene, Stanislas and Thirion, Bertrand},
+  publisher={arXiv},
+  doi={10.48550/ARXIV.2206.09398},
+  url={https://arxiv.org/abs/2206.09398},
+  year={2022},
+  copyright={Creative Commons Attribution 4.0 International}
 }
 ```
