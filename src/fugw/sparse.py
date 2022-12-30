@@ -211,7 +211,9 @@ class FUGWSparse(BaseModel):
 
         # Transform data
         transformed_data_torch = (
-            torch.sparse.mm(self.pi.T, source_features_torch.T).to_dense()
+            torch.sparse.mm(
+                self.pi.transpose(0, 1), source_features_torch.T
+            ).to_dense()
             / torch.sparse.sum(self.pi, dim=0).to_dense().reshape(-1, 1)
         ).T
 

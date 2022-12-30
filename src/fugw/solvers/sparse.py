@@ -208,7 +208,7 @@ class FUGWSparseSolver:
         """
 
         projection = torch.sparse.mm(
-            pi.transpose(1, 0), Xs
+            pi.transpose(0, 1), Xs
         ) / torch.sparse.sum(pi, 0).to_dense().reshape(-1, 1)
 
         return projection
