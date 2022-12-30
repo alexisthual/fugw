@@ -63,12 +63,14 @@ class FUGWSparse(BaseModel):
             target graph.
         target_features: ndarray(n_features, n2)
             Feature maps for target subject.
-        source_geometry: ndarray(n1, n1)
-            Kernel matrix of anatomical distances
-            between nodes of source mesh
-        target_geometry: ndarray(n2, n2)
-            Kernel matrix of anatomical distances
-            between nodes of target mesh
+        source_geometry_embedding: ndarray(n1, d), optional
+            Embedding X such that norm(X_i - X_j) approximates
+            the anatomical distance between vertices i and j
+            of the source mesh
+        target_geometry_embedding: ndarray(n2, d), optional
+            Embedding X such that norm(X_i - X_j) approximates
+            the anatomical distance between vertices i and j
+            of the target mesh
         source_weights: ndarray(n1) or None
             Distribution weights of source nodes.
             Should sum to 1. If None, eahc node's weight
