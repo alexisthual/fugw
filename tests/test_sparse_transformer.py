@@ -5,7 +5,6 @@ from fugw import FUGWSparse
 
 from .test_dense_transformer import init_distribution
 
-
 np.random.seed(100)
 n_voxels_source = 105
 n_voxels_target = 95

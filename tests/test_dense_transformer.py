@@ -1,9 +1,8 @@
 import numpy as np
-from sklearn.metrics import pairwise_distances
 import torch
+from sklearn.metrics import pairwise_distances
 
 from fugw import FUGW
-
 
 np.random.seed(100)
 n_voxels_source = 105

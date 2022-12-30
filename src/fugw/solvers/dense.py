@@ -5,8 +5,8 @@ from ot.gromov import fused_gromov_wasserstein as fgw
 from ot.gromov import gromov_wasserstein as gw
 
 from .utils import (
-    compute_kl,
     compute_approx_kl,
+    compute_kl,
     compute_quad_kl,
     solver_dc,
     solver_mm,

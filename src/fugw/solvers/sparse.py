@@ -7,9 +7,9 @@ from ot.gromov import gromov_wasserstein as gw
 
 from .utils import (
     batch_elementwise_prod_and_sum,
-    compute_kl_sparse,
     compute_approx_kl,
     compute_approx_kl_sparse,
+    compute_kl_sparse,
     compute_quad_kl,
     compute_quad_kl_sparse,
     elementwise_prod_fact_sparse,

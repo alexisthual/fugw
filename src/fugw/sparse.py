@@ -1,14 +1,13 @@
 import numpy as np
-from scipy.stats import pearsonr
 import torch
-
+from scipy.stats import pearsonr
 
 from fugw.solvers.sparse import FUGWSparseSolver
 from fugw.utils import (
     BaseModel,
+    low_rank_squared_l2,
     make_sparse_tensor,
     make_tensor,
-    low_rank_squared_l2,
 )
 
 
