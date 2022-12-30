@@ -51,6 +51,7 @@ def batch_elementwise_prod_and_sum(
 def solver_scaling(cost, init_duals, uot_params, tuple_pxy, train_params):
     """
     Scaling algorithm.
+    Code adapted from: https://github.com/thibsej/unbalanced_gromov_wasserstein.
     """
 
     log_px, log_py, pxy = tuple_pxy

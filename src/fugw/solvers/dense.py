@@ -13,15 +13,6 @@ from .utils import (
     solver_scaling,
 )
 
-# require POT >= 0.8.2
-# require torch >= 1.9
-
-"""
-Code adapted from: https://github.com/thibsej/unbalanced_gromov_wasserstein
-Solve
-    alpha * GW + (1 - alpha) * W + rho_1 * KL() + rho_2 * KL()
-"""
-
 
 class FUGWSolver:
     def __init__(
