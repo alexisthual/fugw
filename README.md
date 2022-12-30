@@ -126,7 +126,7 @@ the size of $P$ grows quadratically with the number of vertices.
 
 In order to be able to store such a matrix on GPU for high values of $n$, $m$, a sparse
 solver is available. It leverages example 2 to compute a dense transport plan between
-sub-samples of $s$ and $t, and uses it to define a sparsity mask of the solution
+sub-samples of $s$ and $t$, and uses it to define a sparsity mask of the solution
 that will be computed by the sparse solver.
 
 TODO
