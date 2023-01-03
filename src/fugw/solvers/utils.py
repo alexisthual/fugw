@@ -53,7 +53,9 @@ def batch_elementwise_prod_and_sum(
     return res
 
 
-def solver_scaling(cost, init_duals, uot_params, tuple_pxy, train_params):
+def solver_scaling(
+    cost, init_duals, uot_params, tuple_pxy, train_params, verbose=True
+):
     """
     Scaling algorithm (ie Sinkhorn algorithm).
     Code adapted from Séjourné et al 2020:
@@ -102,7 +104,9 @@ def solver_scaling(cost, init_duals, uot_params, tuple_pxy, train_params):
     return (vx, vy), pi
 
 
-def solver_mm(cost, init_pi, uot_params, tuple_pxy, train_params):
+def solver_mm(
+    cost, init_pi, uot_params, tuple_pxy, train_params, verbose=True
+):
     """
     Solve (entropic) UOT using the majorization-minimization algorithm.
 
@@ -157,7 +161,9 @@ def solver_mm(cost, init_pi, uot_params, tuple_pxy, train_params):
     return pi
 
 
-def solver_mm_sparse(cost, init_pi, uot_params, tuple_pxy, train_params):
+def solver_mm_sparse(
+    cost, init_pi, uot_params, tuple_pxy, train_params, verbose=True
+):
     """
     Solve (entropic) UOT using the majorization-minimization algorithm.
 
