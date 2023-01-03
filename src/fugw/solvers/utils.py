@@ -34,7 +34,11 @@ def batch_elementwise_prod_and_sum(
         )
 
     rg = range(0, m, batch_size)
-    rg = tqdm(rg) if verbose else rg
+    rg = (
+        tqdm(rg, desc="Element-wise prod and sum (batch)", leave=False)
+        if verbose
+        else rg
+    )
 
     res = torch.cat(
         [
@@ -45,6 +49,7 @@ def batch_elementwise_prod_and_sum(
             for i in rg
         ]
     )
+
     return res
 
 
@@ -63,7 +68,13 @@ def solver_scaling(cost, init_duals, uot_params, tuple_pxy, train_params):
     tau_x = 1 if torch.isinf(rho_x) else rho_x / (rho_x + eps)
     tau_y = 1 if torch.isinf(rho_y) else rho_y / (rho_y + eps)
 
-    for idx in range(niters):
+    range_niters = (
+        tqdm(range(niters), desc="Sinkhorn iteration", leave=False)
+        if verbose
+        else range(niters)
+    )
+
+    for idx in range_niters:
         vx_prev, vy_prev = vx.detach().clone(), vy.detach().clone()
         if rho_y == 0:
             vy = torch.zeros_like(vy)
@@ -123,7 +134,13 @@ def solver_mm(cost, init_pi, uot_params, tuple_pxy, train_params):
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    for idx in range(niters):
+    range_niters = (
+        tqdm(range(niters), desc="MM iteration", leave=False)
+        if verbose
+        else range(niters)
+    )
+
+    for idx in range_niters:
         pi1_old, pi2_old = pi1.detach().clone(), pi2.detach().clone()
         pi = (
             pi ** (tau_x + tau_y)
@@ -171,24 +188,20 @@ def solver_mm_sparse(cost, init_pi, uot_params, tuple_pxy, train_params):
 
     sum_param = rho_x + rho_y + eps
     tau_x, tau_y, r = rho_x / sum_param, rho_y / sum_param, eps / sum_param
-    # K = (
-    #     px[:, None] ** (tau_x + r)
-    #     * py[None, :] ** (tau_y + r)
-    #     * (-cost / sum_param).exp()
-    # )
     K_values = (
         px[rows] ** (tau_x + r)
         * py[cols] ** (tau_y + r)
         * (-cost._values() / sum_param).exp()
     )
 
-    for idx in range(niters):
+    range_niters = (
+        tqdm(range(niters), desc="MM iteration", leave=False)
+        if verbose
+        else range(niters)
+    )
+
+    for idx in range_niters:
         pi1_old, pi2_old = pi1.detach().clone(), pi2.detach().clone()
-        # pi = (
-        #     pi ** (tau_x + tau_y)
-        #     / (pi1[:, None] ** tau_x * pi2[None, :] ** tau_y)
-        #     * K
-        # )
         new_pi_values = (
             pi._values() ** (tau_x + tau_y)
             / (pi1[rows] ** tau_x * pi2[cols] ** tau_y)
@@ -233,7 +246,11 @@ def solver_dc(
     tau2 = 1 if rho2 == float("inf") else rho2 / (rho2 + sum_eps)
 
     K = torch.exp(-cost / sum_eps)
-    range_niters = tqdm(range(niters)) if verbose else range(niters)
+    range_niters = (
+        tqdm(range(niters), desc="DC iteration", leave=False)
+        if verbose
+        else range(niters)
+    )
 
     for idx in range_niters:
         m1_prev = m1.detach().clone()
@@ -265,7 +282,8 @@ def solver_dc(
             if error < tol:
                 break
 
-    pi = pi * pxy  # renormalize couplings
+    # renormalize couplings
+    pi = pi * pxy
 
     return (u, v), pi
 
@@ -292,16 +310,16 @@ def solver_dc_sparse(
 
     K_values = torch.exp(-cost._values() / sum_eps)
 
-    range_niters = tqdm(range(niters)) if verbose else range(niters)
+    range_niters = (
+        tqdm(range(niters), desc="DC iteration", leave=False)
+        if verbose
+        else range(niters)
+    )
+
     for idx in range_niters:
         m1_prev = m1.detach().clone()
 
         # IPOT
-        # G = (
-        #     K * pi
-        #     if (eps_base / sum_eps) == 1
-        #     else K * pi ** (eps_base / sum_eps)
-        # )
         G = torch.sparse_coo_tensor(
             pi._indices(),
             K_values * pi._values() ** (eps_base / sum_eps),
@@ -323,7 +341,6 @@ def solver_dc_sparse(
                 else torch.ones_like(u)
             )
 
-        # pi = u[:, None] * G * v[None, :]
         new_pi_values = u[rows] * v[cols] * G._values()
         pi = torch.sparse_coo_tensor(
             pi._indices(),
@@ -343,7 +360,7 @@ def solver_dc_sparse(
             if error < tol:
                 break
 
-    # pi = pi * pxy  # renormalize couplings
+    # renormalize couplings
     pi = torch.sparse_coo_tensor(
         pi._indices(),
         pi._values() * pxy._values(),

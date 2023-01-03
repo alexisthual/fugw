@@ -118,13 +118,11 @@ class FUGWSparse(BaseModel):
         # Compute distance matrix between features
         Fs = make_tensor(source_features.T).type(dtype)
         Ft = make_tensor(target_features.T).type(dtype)
-        # K = torch.cdist(Fs, Ft, p=2)
         K1, K2 = low_rank_squared_l2(Fs, Ft)
         K1 = make_tensor(K1).type(dtype)
         K2 = make_tensor(K2).type(dtype)
 
         # Load anatomical kernels to GPU
-        # and normalize them
         Gs1, Gs2 = low_rank_squared_l2(
             source_geometry_embedding, source_geometry_embedding
         )
@@ -135,13 +133,11 @@ class FUGWSparse(BaseModel):
         )
         Gt1 = make_tensor(Gt1).type(dtype)
         Gt2 = make_tensor(Gt2).type(dtype)
-        # Gs = make_tensor(source_geometry).type(dtype)
-        # Gt = make_tensor(target_geometry).type(dtype)
 
         # Create model
         model = FUGWSparseSolver(**kwargs)
 
-        # check that all init_plan is valid
+        # Check that all init_plan is valid
         init_plan = make_sparse_tensor(init_plan, dtype)
 
         # Compute transport plan
