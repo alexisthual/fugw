@@ -3,6 +3,9 @@
 This package features multiple GPU-compatible PyTorch implementations
 to solve Fused Unbalanced Gromov-Wasserstein problems.
 
+**This package is under active development. There is no guarantee that the API and solvers
+won't change in the near future.**
+
 ## Introduction
 
 In short, this code computes a matrix $P$ that matches points of two distributions $s$ and $t$.
