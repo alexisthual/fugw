@@ -41,7 +41,7 @@ def test_solvers(uot_solver):
         eval_uot=10,
     )
 
-    pi, gamma, duals_pi, duals_gamma, loss, loss_ent = fugw.solver(
+    pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solver(
         Gs=Gs,
         Gt=Gt,
         K=K,
@@ -52,7 +52,6 @@ def test_solvers(uot_solver):
         uot_solver=uot_solver,
         reg_mode="independent",
         init_plan=None,
-        return_plans_only=False,
         verbose=True,
         early_stopping_threshold=1e-6,
     )
@@ -71,4 +70,6 @@ def test_solvers(uot_solver):
         assert duals_gamma[0].shape == (ns,)
         assert duals_gamma[1].shape == (nt,)
 
-    assert len(loss) == len(loss_ent) - 1
+    assert len(loss_steps) <= nits_bcd // eval_bcd + 1
+    assert len(loss_steps) == len(loss)
+    assert len(loss) == len(loss_ent)

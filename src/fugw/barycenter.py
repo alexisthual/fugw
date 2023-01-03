@@ -153,7 +153,15 @@ class FUGWBarycenter:
                 early_stopping_threshold=self.early_stopping_threshold,
             )
 
-            pi, gamma, dual_pi, dual_gamma, loss, loss_ent = fugw.fit(
+            (
+                pi,
+                gamma,
+                dual_pi,
+                dual_gamma,
+                loss_steps,
+                loss,
+                loss_ent,
+            ) = fugw.fit(
                 features,
                 barycenter_features,
                 source_geometry=G,
@@ -164,7 +172,6 @@ class FUGWBarycenter:
                 # in following line
                 init_plan=plans_[i][0] if plans_ is not None else None,
                 init_duals=duals_[i][0] if duals_ is not None else None,
-                return_plans_only=False,
             )
 
             new_plans_.append((pi, gamma))
@@ -182,13 +189,10 @@ class FUGWBarycenter:
         init_barycenter_weights=None,
         init_barycenter_features=None,
         init_barycenter_geometry=None,
-        return_barycenter_only=True,
     ):
         # Check cuda availability
         use_cuda = torch.cuda.is_available()
         dtype = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
-
-        log_cost = []
 
         if barycenter_size is None:
             barycenter_size = weights_[0].shape[0]
@@ -223,8 +227,7 @@ class FUGWBarycenter:
 
         plans_ = None
         duals_ = None
-        # TODO: store and return cost
-        # costs_ = None
+        log_costs_ = []
 
         for step in range(self.nits_barycenter):
             # Transport all elements
@@ -238,6 +241,13 @@ class FUGWBarycenter:
                 barycenter_features,
                 barycenter_geometry,
             )
+
+            log_costs_this_step = [[costs[0]] for costs in costs_]
+            if log_costs_ == []:
+                log_costs_ = log_costs_this_step
+            else:
+                for individual in range(len(log_costs_this_step)):
+                    log_costs_[individual] += log_costs_this_step[individual]
 
             # Update barycenter features and geometry
             barycenter_features = self.update_barycenter_features(
@@ -261,7 +271,4 @@ class FUGWBarycenter:
             # if abs(log_cost[-2] - log_cost[-1]) < self.tol_bary:
             #     break
 
-        if return_barycenter_only:
-            return barycenter_features, barycenter_geometry
-        else:
-            return (barycenter_features, barycenter_geometry, plans_, log_cost)
+        return (barycenter_features, barycenter_geometry, plans_, log_costs_)

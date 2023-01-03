@@ -37,7 +37,6 @@ class FUGW(BaseModel):
         target_weights=None,
         init_plan=None,
         init_duals=None,
-        return_plans_only=True,
         **kwargs,
     ):
         """
@@ -115,7 +114,6 @@ class FUGW(BaseModel):
         K = torch.cdist(Fs, Ft, p=2) ** 2
 
         # Load anatomical kernels to GPU
-        # and normalize them
         Gs = make_tensor(source_geometry).type(dtype)
         Gt = make_tensor(target_geometry).type(dtype)
 
@@ -123,7 +121,15 @@ class FUGW(BaseModel):
         model = FUGWSolver(**kwargs)
 
         # Compute transport plan
-        res = model.solver(
+        (
+            pi,
+            gamma,
+            duals_pi,
+            duals_gamma,
+            loss_steps,
+            loss_,
+            loss_ent_,
+        ) = model.solver(
             px=Ws,
             py=Wt,
             K=K,
@@ -138,18 +144,21 @@ class FUGW(BaseModel):
             early_stopping_threshold=self.early_stopping_threshold,
             init_plan=init_plan,
             init_duals=init_duals,
-            return_plans_only=return_plans_only,
             verbose=self.verbose,
         )
 
-        self.pi = res[0].detach().cpu().numpy()
+        # Store variables of interest in model
+        self.pi = pi.detach().cpu().numpy()
+        self.loss_steps = loss_steps
+        self.loss_ = loss_
+        self.loss_ent = loss_ent_
 
         # Free allocated GPU memory
         del Fs, Ft, K, Gs, Gt
         if use_cuda:
             torch.cuda.empty_cache()
 
-        return res
+        return (pi, gamma, duals_pi, duals_gamma, loss_steps, loss_, loss_ent_)
 
     def transform(self, source_features):
         """

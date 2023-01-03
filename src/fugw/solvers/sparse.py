@@ -109,7 +109,7 @@ class FUGWSparseSolver:
         )
         return cost
 
-    def fugw_cost(self, pi, gamma, data_const, tuple_p, hyperparams):
+    def fugw_loss(self, pi, gamma, data_const, tuple_p, hyperparams):
         """
         Returns scalar fugw cost.
         """
@@ -228,7 +228,6 @@ class FUGWSparseSolver:
         reg_mode="joint",
         init_plan=None,
         init_duals=None,
-        return_plans_only=True,
         verbose=False,
         early_stopping_threshold=1e-6,
         dc_eps_base=1,
@@ -268,7 +267,6 @@ class FUGWSparseSolver:
             reg_mode = "independent": use COOT-like regularisation
         init_n: matrix of size n1 x n2 if not None.
             Initialisation matrix for sample coupling.
-        return_plans_only: if False, return duals and loss as well.
         verbose: if True then print the recorded loss.
 
         Returns
@@ -378,8 +376,8 @@ class FUGWSparseSolver:
             hyperparams=(rho_x, rho_y, eps, alpha, reg_mode),
         )
 
-        compute_fugw_cost = partial(
-            self.fugw_cost,
+        compute_fugw_loss = partial(
+            self.fugw_loss,
             data_const=(Gs_sqr, Gt_sqr, Gs, Gt, K),
             tuple_p=(px, py, pxy),
             hyperparams=(rho_x, rho_y, eps, alpha, reg_mode),
@@ -410,9 +408,10 @@ class FUGWSparseSolver:
             verbose=verbose,
         )
 
-        # initialise log
-        log_cost = []
-        log_ent_cost = [float("inf")]
+        # Initialise loss
+        loss_steps = []
+        loss_ = []
+        loss_ent_ = []
         idx = 0
         err = self.tol_bcd + 1e-3
 
@@ -456,16 +455,20 @@ class FUGWSparseSolver:
             # Update error
             err = (pi._values() - pi_prev._values()).abs().sum().item()
             if idx % self.eval_bcd == 0:
-                cost, ent_cost = compute_fugw_cost(pi, gamma)
+                loss, loss_ent = compute_fugw_loss(pi, gamma)
 
-                log_cost.append(cost)
-                log_ent_cost.append(ent_cost)
+                loss_steps.append(idx)
+                loss_.append(loss)
+                loss_ent_.append(loss_ent)
 
                 if verbose:
-                    print("Cost at iteration {}: {}".format(idx + 1, ent_cost))
+                    print(
+                        "FUGW loss at BCD step {}:\t{}".format(idx, loss_ent)
+                    )
 
                 if (
-                    abs(log_ent_cost[-2] - log_ent_cost[-1])
+                    len(loss_ent_) >= 2
+                    and abs(loss_ent_[-2] - loss_ent_[-1])
                     < early_stopping_threshold
                 ):
                     break
@@ -475,62 +478,7 @@ class FUGWSparseSolver:
         if pi.isnan().any() or gamma.isnan().any():
             print("There is NaN in coupling")
 
-        if return_plans_only:
-            return pi, gamma
-        else:
-            return pi, gamma, duals_p, duals_g, log_cost, log_ent_cost
-
-    def solver_fgw(
-        self,
-        X,
-        Y,
-        px=None,
-        py=None,
-        D=None,
-        alpha=1,
-        init_plan=None,
-        verbose=True,
-        **kwargs,
-    ):
-        nx, ny = X.shape[0], Y.shape[0]
-        device, dtype = X.device, X.dtype
-
-        # measures on rows and columns
-        if px is None:
-            px = torch.ones(nx).to(device).to(dtype) / nx
-        if py is None:
-            py = torch.ones(ny).to(device).to(dtype) / ny
-
-        if alpha == 1 or D is None:
-            pi, dict_log = gw(
-                C1=X,
-                C2=Y,
-                p=px,
-                q=py,
-                log=True,
-                G0=init_plan,
-                verbose=verbose,
-                **kwargs,
-            )
-            loss = dict_log["gw_dist"]
-        else:
-            pi, dict_log = fgw(
-                M=D,
-                C1=X,
-                C2=Y,
-                p=px,
-                q=py,
-                alpha=alpha,
-                G0=init_plan,
-                log=True,
-                verbose=verbose,
-                **kwargs,
-            )
-            loss = dict_log["fgw_dist"]
-
-        duals = (dict_log["u"], dict_log["v"])
-
-        return pi, duals, loss
+        return pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_
 
     def solver(
         self,
@@ -547,30 +495,12 @@ class FUGWSparseSolver:
         reg_mode="joint",
         init_plan=None,
         init_duals=None,
-        return_plans_only=True,
         verbose=False,
         early_stopping_threshold=1e-6,
         dc_eps_base=1,
         dc_nits_sinkhorn=1,
         **gw_kwargs,
     ):
-        # if rho_x == float("inf") and rho_y == float("inf") and eps == 0:
-        #     pi, duals, loss = self.solver_fgw(
-        #         X, Y, px, py, D, alpha, init_plan, verbose, **gw_kwargs
-        #     )
-        #     if return_plans_only:
-        #         return pi, pi
-        #     else:
-        #         return pi, pi, duals, duals, loss, loss
-        # elif eps == 0 and (
-        #     (rho_x == 0 and rho_y == float("inf"))
-        #     or (rho_x == 0 and rho_y == float("inf"))
-        # ):
-        #     raise ValueError(
-        #         "Invalid rho and eps. Unregularized semi-relaxed GW is not"
-        #         " supported."
-        #     )
-        # else:
         return self.solver_fugw(
             Gs,
             Gt,
@@ -588,6 +518,5 @@ class FUGWSparseSolver:
             dc_nits_sinkhorn=dc_nits_sinkhorn,
             init_plan=init_plan,
             init_duals=init_duals,
-            return_plans_only=return_plans_only,
             verbose=verbose,
         )

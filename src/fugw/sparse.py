@@ -42,7 +42,6 @@ class FUGWSparse(BaseModel):
         target_weights=None,
         init_plan=None,
         init_duals=None,
-        return_plans_only=True,
         **kwargs,
     ):
         """
@@ -146,7 +145,15 @@ class FUGWSparse(BaseModel):
         init_plan = make_sparse_tensor(init_plan, dtype)
 
         # Compute transport plan
-        res = model.solver(
+        (
+            pi,
+            gamma,
+            duals_p,
+            duals_g,
+            loss_steps,
+            loss_,
+            loss_ent_,
+        ) = model.solver(
             px=Ws,
             py=Wt,
             K=(K1, K2),
@@ -161,18 +168,20 @@ class FUGWSparse(BaseModel):
             early_stopping_threshold=self.early_stopping_threshold,
             init_plan=init_plan,
             init_duals=init_duals,
-            return_plans_only=return_plans_only,
             verbose=self.verbose,
         )
 
-        self.pi = res[0]
+        self.pi = pi
+        self.loss_steps = loss_steps
+        self.loss_ = loss_
+        self.loss_ent_ = loss_ent_
 
         # Free allocated GPU memory
         del Fs, Ft, K1, K2, Gs1, Gs2, Gt1, Gt2
         if use_cuda:
             torch.cuda.empty_cache()
 
-        return res
+        return (pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_)
 
     def transform(self, source_features):
         """
