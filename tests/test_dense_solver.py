@@ -32,12 +32,14 @@ def test_solvers(uot_solver):
     Gt = torch.cdist(target_embeddings, target_embeddings)
     K = torch.cdist(source_features, target_features)
 
+    nits_bcd = 100
+    eval_bcd = 2
     fugw = FUGWSolver(
-        nits_bcd=100,
+        nits_bcd=nits_bcd,
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
-        eval_bcd=2,
+        eval_bcd=eval_bcd,
         eval_uot=10,
     )
 

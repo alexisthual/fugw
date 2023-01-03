@@ -34,12 +34,14 @@ def test_solvers(uot_solver):
 
     init_plan = torch.rand(ns, nt).to_sparse()
 
+    nits_bcd = 100
+    eval_bcd = 2
     fugw = FUGWSparseSolver(
-        nits_bcd=100,
+        nits_bcd=nits_bcd,
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
-        eval_bcd=2,
+        eval_bcd=eval_bcd,
         eval_uot=10,
     )
 
@@ -63,16 +65,13 @@ def test_solvers(uot_solver):
     assert pi.size() == (ns, nt)
     assert gamma.size() == (ns, nt)
 
-    # if uot_solver == "mm":
-    #     assert duals_pi is None
-    #     assert duals_gamma is None
-    # else:
-    #     assert len(duals_pi) == 2
-    #     assert duals_pi[0].shape == (ns,)
-    #     assert duals_pi[1].shape == (nt,)
-    #     assert len(duals_gamma) == 2
-    #     assert duals_gamma[0].shape == (ns,)
-    #     assert duals_gamma[1].shape == (nt,)
+    if uot_solver == "mm":
+        assert duals_pi is None
+        assert duals_gamma is None
+    elif uot_solver == "dc":
+        assert len(duals_pi) == 2
+        assert duals_pi[0].shape == (ns,)
+        assert duals_pi[1].shape == (nt,)
 
     assert len(loss_steps) <= nits_bcd // eval_bcd + 1
     assert len(loss_steps) == len(loss)
