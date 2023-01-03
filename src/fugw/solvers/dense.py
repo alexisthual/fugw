@@ -21,7 +21,7 @@ class FUGWSolver:
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
-        eval_bcd=2,
+        eval_bcd=1,
         eval_uot=10,
         **kwargs,
     ):
@@ -38,7 +38,13 @@ class FUGWSolver:
 
     def local_cost(self, pi, transpose, data_const, tuple_p, hyperparams):
         """
-        Returns local cost matrix.
+        Before each block coordinate descent (BCD) step,
+        the local cost matrix is updated.
+        This local cost is a matrix of size (n1, n2)
+        which evaluates the cost between every pair of points
+        of the source and target distributions.
+        Then, we run a BCD (sinkhorn, dc or mm) step
+        which makes use of this cost to update the transport plans.
         """
 
         rho_x, rho_y, eps, alpha, reg_mode = hyperparams
@@ -49,33 +55,44 @@ class FUGWSolver:
 
         pi1, pi2 = pi.sum(1), pi.sum(0)
 
-        cost = 0
-        if reg_mode == "joint":
-            cost = cost + eps * compute_approx_kl(pi, pxy)
+        cost = torch.zeros_like(D)
 
-        # avoid unnecessary calculation of UGW when alpha = 0
+        # Avoid unnecessary calculation of UGW when alpha = 0
         if alpha != 1 and D is not None:
-            cost = cost + (1 - alpha) * D / 2
+            wasserstein_cost = D
+            cost += (1 - alpha) / 2 * wasserstein_cost
 
         # or UOT when alpha = 1
         if alpha != 0:
             A = X_sqr @ pi1
             B = Y_sqr @ pi2
-            gw_cost = A[:, None] + B[None, :] - 2 * X @ pi @ Y.T
+            gromov_wasserstein_cost = (
+                A[:, None] + B[None, :] - 2 * X @ pi @ Y.T
+            )
 
-            cost = cost + alpha * gw_cost
+            cost += alpha * gromov_wasserstein_cost
 
         # or when cost is balanced
         if rho_x != float("inf") and rho_x != 0:
-            cost = cost + rho_x * compute_approx_kl(pi1, px)
+            marginal_cost_dim1 = compute_approx_kl(pi1, px)
+            cost += rho_x * marginal_cost_dim1
         if rho_y != float("inf") and rho_y != 0:
-            cost = cost + rho_y * compute_approx_kl(pi2, py)
+            marginal_cost_dim2 = compute_approx_kl(pi2, py)
+            cost += rho_y * marginal_cost_dim2
+
+        if reg_mode == "joint":
+            entropic_cost = compute_approx_kl(pi, pxy)
+            cost += eps * entropic_cost
 
         return cost
 
     def fugw_loss(self, pi, gamma, data_const, tuple_p, hyperparams):
         """
-        Returns scalar fugw cost.
+        Returns scalar fugw loss, which is a combination of:
+        - a Wasserstein loss on features
+        - a Gromow-Wasserstein loss on geometries
+        - marginal constraints on the computed OT plan
+        - an entropic regularization
         """
 
         rho_x, rho_y, eps, alpha, reg_mode = hyperparams
@@ -85,32 +102,36 @@ class FUGWSolver:
         pi1, pi2 = pi.sum(1), pi.sum(0)
         gamma1, gamma2 = gamma.sum(1), gamma.sum(0)
 
-        cost = 0
+        loss = 0
 
         if alpha != 1 and D is not None:
-            w_cost = (D * pi).sum() + (D * gamma).sum()
-            cost = cost + (1 - alpha) * w_cost / 2
+            wasserstein_loss = (D * pi).sum() + (D * gamma).sum()
+            loss += (1 - alpha) / 2 * wasserstein_loss
 
         if alpha != 0:
-            A = (X_sqr @ gamma1).dot(pi1)  # sparse doable
-            B = (Y_sqr @ gamma2).dot(pi2)  # sparse doable
-            C = (X @ gamma @ Y.T) * pi  # sparse: doable
-            gw_cost = A + B - 2 * C.sum()
-            cost = cost + alpha * gw_cost
+            A = (X_sqr @ gamma1).dot(pi1)
+            B = (Y_sqr @ gamma2).dot(pi2)
+            C = (X @ gamma @ Y.T) * pi
+            gromov_wasserstein_loss = A + B - 2 * C.sum()
+            loss += alpha * gromov_wasserstein_loss
 
         if rho_x != float("inf") and rho_x != 0:
-            cost = cost + rho_x * compute_quad_kl(pi1, gamma1, px, px)
+            marginal_constraint_dim1 = compute_quad_kl(pi1, gamma1, px, px)
+            loss += rho_x * marginal_constraint_dim1
         if rho_y != float("inf") and rho_y != 0:
-            cost = cost + rho_y * compute_quad_kl(pi2, gamma2, py, py)
+            marginal_constraint_dim2 = compute_quad_kl(pi2, gamma2, py, py)
+            loss += rho_y * marginal_constraint_dim2
 
         if reg_mode == "joint":
-            entropic_cost = cost + eps * compute_quad_kl(pi, gamma, pxy, pxy)
+            entropic_regularization = compute_quad_kl(pi, gamma, pxy, pxy)
         elif reg_mode == "independent":
-            entropic_cost = (
-                cost + eps * compute_kl(pi, pxy) + eps * compute_kl(gamma, pxy)
+            entropic_regularization = compute_kl(pi, pxy) + compute_kl(
+                gamma, pxy
             )
 
-        return cost.item(), entropic_cost.item()
+        entropic_loss = loss + eps * entropic_regularization
+
+        return loss.item(), entropic_loss.item()
 
     def project_on_target_domain(self, Xt, pi):
         """
@@ -451,7 +472,7 @@ class FUGWSolver:
             pi, duals, loss = self.solver_fgw(
                 Gs, Gt, px, py, K, alpha, init_plan, verbose, **gw_kwargs
             )
-                return pi, pi, duals, duals, loss, loss
+            return pi, pi, duals, duals, loss, loss
 
         elif eps == 0 and (
             (rho_x == 0 and rho_y == float("inf"))
