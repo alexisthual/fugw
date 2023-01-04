@@ -51,7 +51,6 @@ class FUGWSparseSolver:
 
         rho_x, rho_y, eps, alpha, reg_mode = hyperparams
         px, py, pxy = tuple_p
-        # X_sqr, Y_sqr, X, Y, D = data_const
         (
             (Gs_sqr_1, Gs_sqr_2),
             (Gt_sqr_1, Gt_sqr_2),
@@ -60,7 +59,6 @@ class FUGWSparseSolver:
             (K1, K2),
         ) = data_const
         if transpose:
-            # X_sqr, Y_sqr, X, Y = X_sqr.T, Y_sqr.T, X.T, Y.T
             Gs_sqr_1, Gs_sqr_2 = Gs_sqr_2, Gs_sqr_1
             Gt_sqr_1, Gt_sqr_2 = Gt_sqr_2, Gt_sqr_1
             Gs1, Gs2 = Gs2, Gs1
@@ -350,20 +348,10 @@ class FUGWSparseSolver:
         if py is None:
             py = torch.ones(ny).to(device).to(dtype) / ny
 
-        # pxy = px[:, None] * py[None, :]
         rows, cols = pi._indices()
         pxy_values = px[rows] * py[cols]
         pxy = torch.sparse_coo_tensor(pi._indices(), pxy_values, pi.size())
 
-        # if uot_solver == "sinkhorn":
-        #     if init_duals is None:
-        #         duals_p = (
-        #             torch.zeros_like(px),
-        #             torch.zeros_like(py),
-        #         )  # shape n1, n2
-        #     else:
-        #         duals_p = init_duals
-        #     duals_g = duals_p
         if uot_solver == "mm":
             duals_p, duals_g = None, None
         elif uot_solver == "dc":
@@ -389,12 +377,6 @@ class FUGWSparseSolver:
             tuple_p=(px, py, pxy),
             hyperparams=(rho_x, rho_y, eps, alpha, reg_mode),
         )
-
-        # self_solver_scaling = partial(
-        #     solver_scaling,
-        #     tuple_pxy=(px.log(), py.log(), pxy),
-        #     train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
-        # )
 
         self_solver_mm = partial(
             solver_mm_sparse,
@@ -433,8 +415,6 @@ class FUGWSparseSolver:
             uot_params = (new_rho_x, new_rho_y, new_eps)
 
             Tg = compute_local_cost(pi, transpose=True)  # size d1 x d2
-            # if uot_solver == "sinkhorn":
-            #     duals_g, gamma = self_solver_scaling(Tg, duals_g, uot_params)
             if uot_solver == "mm":
                 gamma = self_solver_mm(Tg, gamma, uot_params)
             if uot_solver == "dc":
@@ -451,8 +431,6 @@ class FUGWSparseSolver:
             uot_params = (new_rho_x, new_rho_y, new_eps)
 
             Tp = compute_local_cost(gamma, transpose=False)  # size n1 x n2
-            # if uot_solver == "sinkhorn":
-            #     duals_p, pi = self_solver_scaling(Tp, duals_p, uot_params)
             if uot_solver == "mm":
                 pi = self_solver_mm(Tp, pi, uot_params)
             elif uot_solver == "dc":
