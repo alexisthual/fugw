@@ -135,7 +135,7 @@ class FUGWBarycenter:
     ):
         new_plans_ = []
         new_duals_ = []
-        new_costs_ = []
+        new_losses_ = []
 
         for i, (features, weights) in enumerate(zip(features_, weights_)):
             if len(geometry_) == 1 and len(weights_) > 1:
@@ -176,9 +176,9 @@ class FUGWBarycenter:
 
             new_plans_.append((pi, gamma))
             new_duals_.append((dual_pi, dual_gamma))
-            new_costs_.append((loss[-1], loss_ent[-1]))
+            new_losses_.append((loss_steps, loss, loss_ent))
 
-        return new_plans_, new_duals_, new_costs_
+        return new_plans_, new_duals_, new_losses_
 
     def fit(
         self,
@@ -190,6 +190,39 @@ class FUGWBarycenter:
         init_barycenter_features=None,
         init_barycenter_geometry=None,
     ):
+        """Compute barycentric features and geometry
+        minimizing FUGW loss to list of distributions given as input.
+        In this documentation, we refer to a single distribution as
+        an a subject's or an individual's distribution.
+
+        Args:
+            weights_ (list of np.array): List of weights. Different individuals
+                can have weights with different sizes.
+            features_ (list of np.array): List of features. Individuals should
+                have the same number of features n_features.
+            geometry_ (list of np.array or np.array): List of kernel matrices
+                or just one kernel matrix if it's shared across individuals
+                barycenter_size (int, optional): Size of computed
+                barycentric features and geometry. Defaults to None.
+            init_barycenter_weights (np.array, optional): Distribution weights
+                of barycentric points. If None, points will have uniform
+                weights. Defaults to None.
+            init_barycenter_features (np.array, optional): np.array of size
+                (barycenter_size, n_features). Defaults to None.
+            init_barycenter_geometry (np.array, optional): np.array of size
+                (barycenter_size, barycenter_size). Defaults to None.
+
+        Returns:
+            barycenter_weights: np.array of size (barycenter_size)
+            barycenter_features: np.array of size (barycenter_size, n_features)
+            barycenter_geometry: np.array of size
+                (barycenter_size, barycenter_size)
+            plans_: list of (np.array, np.array)
+            duals_: list of (np.array, np.array)
+            losses_each_bar_step: list such that l[s][i]
+                is a tuple containing (loss_steps, loss, loss_ent)
+                for individual i at barycenter computation step s
+        """
         # Check cuda availability
         use_cuda = torch.cuda.is_available()
         dtype = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
@@ -231,11 +264,11 @@ class FUGWBarycenter:
 
         plans_ = None
         duals_ = None
-        log_costs_ = []
+        losses_each_bar_step = []
 
         for _ in range(self.nits_barycenter):
             # Transport all elements
-            plans_, duals_, costs_ = self.compute_all_ot_plans(
+            plans_, duals_, losses_ = self.compute_all_ot_plans(
                 plans_,
                 duals_,
                 weights_,
@@ -246,12 +279,7 @@ class FUGWBarycenter:
                 barycenter_geometry,
             )
 
-            log_costs_this_step = [[costs[0]] for costs in costs_]
-            if log_costs_ == []:
-                log_costs_ = log_costs_this_step
-            else:
-                for individual in range(len(log_costs_this_step)):
-                    log_costs_[individual] += log_costs_this_step[individual]
+            losses_each_bar_step.append(losses_)
 
             # Update barycenter features and geometry
             barycenter_features = self.update_barycenter_features(
@@ -262,17 +290,11 @@ class FUGWBarycenter:
                     plans_, weights_, geometry_, self.force_psd
                 )
 
-            # Compute cost
-            # print(costs_)
-            # cost = sum(costs[0] * w for (costs, w) in zip(costs_, weights_))
-            # print(cost)
-
-            # if self.verbose:
-            #     print(f"Cost at iteration {step+1} = {cost}")
-
-            # log_cost.append(cost)
-            # print(log_cost)
-            # if abs(log_cost[-2] - log_cost[-1]) < self.tol_bary:
-            #     break
-
-        return (barycenter_features, barycenter_geometry, plans_, log_costs_)
+        return (
+            barycenter_weights,
+            barycenter_features,
+            barycenter_geometry,
+            plans_,
+            duals_,
+            losses_each_bar_step,
+        )
