@@ -24,18 +24,22 @@ def test_solvers(uot_solver):
     source_embeddings = torch.rand(ns, ds).to(device)
     target_embeddings = torch.rand(nt, dt).to(device)
 
-    # Gs = torch.cdist(source_embeddings, source_embeddings)
-    # Gt = torch.cdist(target_embeddings, target_embeddings)
-    # K = torch.rand(ns, nt)
-
     Gs = low_rank_squared_l2(source_embeddings, source_embeddings)
     Gt = low_rank_squared_l2(target_embeddings, target_embeddings)
     K = low_rank_squared_l2(source_features, target_features)
 
-    init_plan = torch.rand(ns, nt).to_sparse()
+    Gs_norm = (Gs[0] @ Gs[1].T).max()
+    Gt_norm = (Gt[0] @ Gt[1].T).max()
+    K_norm = (K[0] @ K[1].T).max()
+
+    Gs_normalized = (Gs[0] / Gs_norm, Gs[1] / Gs_norm)
+    Gt_normalized = (Gt[0] / Gt_norm, Gt[1] / Gt_norm)
+    K_normalized = (K[0] / K_norm, K[1] / K_norm)
+
+    init_plan = torch.ones(ns, nt).to_sparse() / ns
 
     nits_bcd = 100
-    eval_bcd = 2
+    eval_bcd = 1
     fugw = FUGWSparseSolver(
         nits_bcd=nits_bcd,
         nits_uot=1000,
@@ -46,10 +50,10 @@ def test_solvers(uot_solver):
     )
 
     pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solver(
-        Gs=Gs,
-        Gt=Gt,
-        K=K,
-        alpha=0.8,
+        Gs=Gs_normalized,
+        Gt=Gt_normalized,
+        K=K_normalized,
+        alpha=0.2,
         rho_x=2,
         rho_y=3,
         eps=0.02,
@@ -57,9 +61,10 @@ def test_solvers(uot_solver):
         reg_mode="independent",
         init_plan=init_plan,
         verbose=True,
-        early_stopping_threshold=1e-6,
-        dc_eps_base=1e4,
-        dc_nits_sinkhorn=2,
+        early_stopping_threshold=1e-5,
+        # Set a high value of dc, otherwise nans appear in coupling.
+        # This will generally increase the computed fugw loss.
+        dc_eps_base=1e2,
     )
 
     assert pi.size() == (ns, nt)

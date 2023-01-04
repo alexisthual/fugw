@@ -32,6 +32,10 @@ def test_solvers(uot_solver):
     Gt = torch.cdist(target_embeddings, target_embeddings)
     K = torch.cdist(source_features, target_features)
 
+    Gs_normalized = Gs / Gs.max()
+    Gt_normalized = Gt / Gt.max()
+    K_normalized = K / K.max()
+
     nits_bcd = 100
     eval_bcd = 2
     fugw = FUGWSolver(
@@ -44,9 +48,9 @@ def test_solvers(uot_solver):
     )
 
     pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solver(
-        Gs=Gs,
-        Gt=Gt,
-        K=K,
+        Gs=Gs_normalized,
+        Gt=Gt_normalized,
+        K=K_normalized,
         alpha=0.8,
         rho_x=2,
         rho_y=3,
@@ -55,7 +59,8 @@ def test_solvers(uot_solver):
         reg_mode="independent",
         init_plan=None,
         verbose=True,
-        early_stopping_threshold=1e-6,
+        early_stopping_threshold=1e-5,
+        dc_eps_base=1e2,
     )
 
     assert pi.shape == (ns, nt)
