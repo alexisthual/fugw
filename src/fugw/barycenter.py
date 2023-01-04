@@ -211,15 +211,19 @@ class FUGWBarycenter:
             barycenter_features = torch.ones(
                 (features_[0].shape[0], barycenter_size)
             ).type(dtype)
+            barycenter_features = barycenter_features / torch.norm(
+                barycenter_features, dim=1
+            ).reshape(-1, 1)
         else:
             barycenter_features = make_tensor(init_barycenter_features).type(
                 dtype
             )
 
         if init_barycenter_geometry is None:
-            barycenter_geometry = torch.ones(
-                (barycenter_size, barycenter_size)
-            ).type(dtype)
+            barycenter_geometry = (
+                torch.ones((barycenter_size, barycenter_size)).type(dtype)
+                / barycenter_size
+            )
         else:
             barycenter_geometry = make_tensor(init_barycenter_geometry).type(
                 dtype
@@ -229,7 +233,7 @@ class FUGWBarycenter:
         duals_ = None
         log_costs_ = []
 
-        for step in range(self.nits_barycenter):
+        for _ in range(self.nits_barycenter):
             # Transport all elements
             plans_, duals_, costs_ = self.compute_all_ot_plans(
                 plans_,
