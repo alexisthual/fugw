@@ -61,8 +61,8 @@ def test_fugw_sparse_with_init():
     init_plan = torch.sparse_coo_tensor(
         np.array([rows, cols]),
         np.ones(len(rows)) / len(rows),
-        (n_voxels_source, n_voxels_target),
-    )
+        size=(n_voxels_source, n_voxels_target),
+    ).to_sparse_csr()
 
     fugw = FUGWSparse()
     fugw.fit(

@@ -10,6 +10,8 @@ from .utils import (
     compute_kl_sparse,
     compute_quad_kl,
     compute_quad_kl_sparse,
+    crow_indices_to_row_indices,
+    csr_sum,
     elementwise_prod_fact_sparse,
     solver_dc_sparse,
     solver_mm_sparse,
@@ -65,17 +67,19 @@ class FUGWSparseSolver:
             Gt1, Gt2 = Gt2, Gt1
 
         pi1, pi2 = (
-            torch.sparse.sum(pi, 1).to_dense(),
-            torch.sparse.sum(pi, 0).to_dense(),
+            csr_sum(pi, dim=1),
+            csr_sum(pi, dim=0),
         )
 
         # Avoid unnecessary calculation of UGW when alpha = 0
-        rows, cols = pi._indices()
-        cost_values = torch.zeros_like(pi._values())
+        # row_indices, col_indices = pi._indices()
+        crow_indices, col_indices = pi.crow_indices(), pi.col_indices()
+        row_indices = crow_indices_to_row_indices(crow_indices)
+        cost_values = torch.zeros_like(pi.values())
 
         if alpha != 1 and K1 is not None and K2 is not None:
             wasserstein_cost_values = batch_elementwise_prod_and_sum(
-                K1, K2, rows, cols, 1
+                K1, K2, row_indices, col_indices, 1
             )
             cost_values += (1 - alpha) / 2 * wasserstein_cost_values
 
@@ -86,9 +90,12 @@ class FUGWSparseSolver:
             C1, C2 = Gs1, ((Gs2.T @ torch.sparse.mm(pi, Gt2)) @ Gt1.T).T
 
             gromov_wasserstein_cost_values = (
-                A[rows]
-                + B[cols]
-                - 2 * batch_elementwise_prod_and_sum(C1, C2, rows, cols, 1)
+                A[row_indices]
+                + B[col_indices]
+                - 2
+                * batch_elementwise_prod_and_sum(
+                    C1, C2, row_indices, col_indices, 1
+                )
             )
 
             cost_values += alpha * gromov_wasserstein_cost_values
@@ -104,7 +111,9 @@ class FUGWSparseSolver:
         if reg_mode == "joint":
             cost_values += eps * compute_approx_kl_sparse(pi, pxy)
 
-        cost = torch.sparse_coo_tensor(pi._indices(), cost_values, pi.size())
+        cost = torch.sparse_csr_tensor(
+            crow_indices, col_indices, cost_values, size=pi.size()
+        )
 
         return cost
 
@@ -129,18 +138,23 @@ class FUGWSparseSolver:
         ) = data_const
 
         pi1, pi2 = (
-            torch.sparse.sum(pi, 1).to_dense(),
-            torch.sparse.sum(pi, 0).to_dense(),
+            csr_sum(pi, dim=1),
+            csr_sum(pi, dim=0),
         )
         gamma1, gamma2 = (
-            torch.sparse.sum(gamma, 1).to_dense(),
-            torch.sparse.sum(gamma, 0).to_dense(),
+            csr_sum(gamma, dim=1),
+            csr_sum(gamma, dim=0),
         )
 
         loss = 0
 
         if alpha != 1 and K1 is not None and K2 is not None:
-            wasserstein_loss = torch.sparse.sum(
+            # TODO: warning, torch sparse transforms LongTensor
+            # into IntTensor for crow and col indices
+            # when adding 2 CSR matrices together.
+            # This could become problematic for sparse matrices
+            # with more non-null elements than an int can store.
+            wasserstein_loss = csr_sum(
                 elementwise_prod_fact_sparse(K1, K2, pi + gamma)
             )
             loss += (1 - alpha) / 2 * wasserstein_loss
@@ -151,7 +165,7 @@ class FUGWSparseSolver:
             C = elementwise_prod_fact_sparse(
                 Gs1, ((Gs2.T @ torch.sparse.mm(gamma, Gt2)) @ Gt1.T).T, pi
             )
-            gromov_wasserstein_loss = A + B - 2 * torch.sparse.sum(C)
+            gromov_wasserstein_loss = A + B - 2 * csr_sum(C)
             loss += alpha * gromov_wasserstein_loss
 
         if rho_x != float("inf") and rho_x != 0:
@@ -190,9 +204,9 @@ class FUGWSparseSolver:
         Projection of size ns x dt
         """
 
-        projection = torch.sparse.mm(pi, Xt) / torch.sparse.sum(
-            pi, 1
-        ).to_dense().reshape(-1, 1)
+        projection = torch.sparse.mm(pi, Xt) / csr_sum(pi, dim=1).reshape(
+            -1, 1
+        )
 
         return projection
 
@@ -212,9 +226,9 @@ class FUGWSparseSolver:
         Projection of size nt x ds
         """
 
-        projection = torch.sparse.mm(
-            pi.transpose(0, 1), Xs
-        ) / torch.sparse.sum(pi, 0).to_dense().reshape(-1, 1)
+        projection = torch.sparse.mm(pi.transpose(0, 1), Xs) / csr_sum(
+            pi, dim=0
+        ).reshape(-1, 1)
 
         return projection
 
@@ -339,7 +353,7 @@ class FUGWSparseSolver:
                 ).type(dtype),
                 torch.from_numpy(np.ones(nx * ny) / (nx * ny)).type(dtype),
                 (nx, ny),
-            )
+            ).to_sparse_csr()
             gamma = pi
 
         # measures on rows and columns
@@ -348,9 +362,12 @@ class FUGWSparseSolver:
         if py is None:
             py = torch.ones(ny).to(device).to(dtype) / ny
 
-        rows, cols = pi._indices()
-        pxy_values = px[rows] * py[cols]
-        pxy = torch.sparse_coo_tensor(pi._indices(), pxy_values, pi.size())
+        crow_indices, col_indices = pi.crow_indices(), pi.col_indices()
+        row_indices = crow_indices_to_row_indices(crow_indices)
+        pxy_values = px[row_indices] * py[col_indices]
+        pxy = torch.sparse_csr_tensor(
+            crow_indices, col_indices, pxy_values, size=pi.size()
+        )
 
         if uot_solver == "mm":
             duals_p, duals_g = None, None
@@ -408,7 +425,7 @@ class FUGWSparseSolver:
             pi_prev = pi.detach().clone()
 
             # Update gamma (feature coupling)
-            mp = torch.sparse.sum(pi)
+            mp = csr_sum(pi)
             new_rho_x = rho_x * mp
             new_rho_y = rho_y * mp
             new_eps = mp * eps if reg_mode == "joint" else eps
@@ -419,12 +436,17 @@ class FUGWSparseSolver:
                 gamma = self_solver_mm(Tg, gamma, uot_params)
             if uot_solver == "dc":
                 duals_g, gamma = self_solver_dc(Tg, gamma, duals_g, uot_params)
-            gamma = (
-                mp / torch.sparse.sum(gamma)
-            ).sqrt() * gamma  # shape d1 x d2
+
+            gamma_scaling_factor = (mp / csr_sum(gamma)).sqrt()
+            gamma = torch.sparse_csr_tensor(
+                gamma.crow_indices(),
+                gamma.col_indices(),
+                gamma.values() * gamma_scaling_factor,
+                size=gamma.size(),
+            )
 
             # Update pi (sample coupling)
-            mg = torch.sparse.sum(gamma)
+            mg = csr_sum(gamma)
             new_rho_x = rho_x * mg
             new_rho_y = rho_y * mg
             new_eps = mp * eps if reg_mode == "joint" else eps
@@ -435,10 +457,17 @@ class FUGWSparseSolver:
                 pi = self_solver_mm(Tp, pi, uot_params)
             elif uot_solver == "dc":
                 duals_p, pi = self_solver_dc(Tp, pi, duals_p, uot_params)
-            pi = (mg / torch.sparse.sum(pi)).sqrt() * pi  # shape n1 x n2
+
+            pi_scaling_factor = (mg / csr_sum(pi)).sqrt()
+            pi = torch.sparse_csr_tensor(
+                pi.crow_indices(),
+                pi.col_indices(),
+                pi.values() * pi_scaling_factor,
+                size=pi.size(),
+            )
 
             # Update error
-            err = (pi._values() - pi_prev._values()).abs().sum().item()
+            err = (pi.values() - pi_prev.values()).abs().sum().item()
             if idx % self.eval_bcd == 0:
                 loss, loss_ent = compute_fugw_loss(pi, gamma)
 
@@ -460,7 +489,7 @@ class FUGWSparseSolver:
 
             idx += 1
 
-        if pi.isnan().any() or gamma.isnan().any():
+        if pi.values().isnan().any() or gamma.values().isnan().any():
             print("There is NaN in coupling")
 
         return pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_

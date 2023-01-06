@@ -24,11 +24,12 @@ def make_sparse_tensor(x, dtype):
     if x is None:
         return None
     elif isinstance(x, torch.Tensor):
-        indices = make_tensor(x._indices()).type(dtype)
-        values = make_tensor(x._values()).type(dtype)
+        crow_indices = make_tensor(x.crow_indices()).type(dtype)
+        col_indices = make_tensor(x.col_indices()).type(dtype)
+        values = make_tensor(x.values()).type(dtype)
         size = x.size()
-        return torch.sparse_coo_tensor(
-            indices, values, size
+        return torch.sparse_csr_tensor(
+            crow_indices, col_indices, values, size=size
         )
     else:
         raise Exception(f"Expected sparse torch.Tensor, got {type(x)}")

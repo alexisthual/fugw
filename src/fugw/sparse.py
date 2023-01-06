@@ -3,6 +3,7 @@ import torch
 from scipy.stats import pearsonr
 
 from fugw.solvers.sparse import FUGWSparseSolver
+from fugw.solvers.utils import csr_sum
 from fugw.utils import (
     BaseModel,
     low_rank_squared_l2,
@@ -219,7 +220,7 @@ class FUGWSparse(BaseModel):
             torch.sparse.mm(
                 self.pi.transpose(0, 1), source_features_torch.T
             ).to_dense()
-            / torch.sparse.sum(self.pi, dim=0).to_dense().reshape(-1, 1)
+            / csr_sum(self.pi, dim=0).reshape(-1, 1)
         ).T
 
         # Move transformed data back to CPU

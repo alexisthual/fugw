@@ -36,7 +36,7 @@ def test_solvers(uot_solver):
     Gt_normalized = (Gt[0] / Gt_norm, Gt[1] / Gt_norm)
     K_normalized = (K[0] / K_norm, K[1] / K_norm)
 
-    init_plan = torch.ones(ns, nt).to_sparse() / ns
+    init_plan = (torch.ones(ns, nt) / ns).to_sparse_csr()
 
     nits_bcd = 100
     eval_bcd = 1
