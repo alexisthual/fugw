@@ -3,6 +3,7 @@ from functools import partial
 import numpy as np
 import torch
 
+from ..utils import make_csr_matrix
 from .utils import (
     batch_elementwise_prod_and_sum,
     compute_approx_kl,
@@ -53,6 +54,8 @@ class FUGWSparseSolver:
 
         rho_x, rho_y, eps, alpha, reg_mode = hyperparams
         px, py, pxy = tuple_p
+        device = px.device
+
         (
             (Gs_sqr_1, Gs_sqr_2),
             (Gt_sqr_1, Gt_sqr_2),
@@ -73,9 +76,12 @@ class FUGWSparseSolver:
 
         # Avoid unnecessary calculation of UGW when alpha = 0
         # row_indices, col_indices = pi._indices()
-        crow_indices, col_indices = pi.crow_indices(), pi.col_indices()
+        crow_indices, col_indices = (
+            pi.crow_indices(),
+            pi.col_indices(),
+        )
         row_indices = crow_indices_to_row_indices(crow_indices)
-        cost_values = torch.zeros_like(pi.values())
+        cost_values = torch.zeros_like(pi.values()).to(device)
 
         if alpha != 1 and K1 is not None and K2 is not None:
             wasserstein_cost_values = batch_elementwise_prod_and_sum(
@@ -365,8 +371,9 @@ class FUGWSparseSolver:
         crow_indices, col_indices = pi.crow_indices(), pi.col_indices()
         row_indices = crow_indices_to_row_indices(crow_indices)
         pxy_values = px[row_indices] * py[col_indices]
-        pxy = torch.sparse_csr_tensor(
-            crow_indices, col_indices, pxy_values, size=pi.size()
+
+        pxy = make_csr_matrix(
+            crow_indices, col_indices, pxy_values, pi.size(), device
         )
 
         if uot_solver == "mm":

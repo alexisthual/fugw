@@ -35,6 +35,15 @@ def make_sparse_tensor(x, dtype):
         raise Exception(f"Expected sparse torch.Tensor, got {type(x)}")
 
 
+def make_csr_matrix(crow_indices, col_indices, values, size, device):
+    return torch.sparse_csr_tensor(
+        crow_indices.to(device),
+        col_indices.to(device),
+        values.to(device),
+        size=size,
+    )
+
+
 def low_rank_squared_l2(X, Y):
     """
     Write square Euclidean distance matrix M as exact product

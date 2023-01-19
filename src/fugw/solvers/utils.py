@@ -2,30 +2,31 @@ import torch
 from tqdm import tqdm
 
 
-def csr_dim_sum(inputs, group_indices, n_groups):
+def csr_dim_sum(values, group_indices, n_groups):
     """In a given tensor, computes sum of elements belonging to the same group.
     Taken from https://discuss.pytorch.org/t/sum-over-various-subsets-of-a-tensor/31881/8
 
     Args:
-        inputs: torch.Tensor of size (n, ) whose values will be summed
+        values: torch.Tensor of size (n, ) whose values will be summed
         group_indices: torch.Tensor of size (n, )
         n_groups: int, total number of groups
 
     Returns:
         sums: torch.Tensor of size (n_groups)
     """
-    n_inputs = inputs.size(0)
+    device = values.device
+    n_values = values.size(0)
     indices = torch.stack(
         (
             group_indices,
-            torch.arange(n_inputs, device=group_indices.device),
+            torch.arange(n_values).to(device),
         )
     )
-    values = torch.ones_like(group_indices, dtype=torch.float)
+    ones = torch.ones_like(group_indices).type(torch.float32).to(device)
     one_hot = torch.sparse_coo_tensor(
-        indices, values, size=(n_groups, n_inputs)
+        indices, ones, size=(n_groups, n_values)
     )
-    return torch.sparse.mm(one_hot, inputs.reshape(-1, 1)).to_dense().flatten()
+    return torch.sparse.mm(one_hot, values.reshape(-1, 1)).to_dense().flatten()
 
 
 def csr_sum(csr_matrix, dim=None):
@@ -50,8 +51,9 @@ def crow_indices_to_row_indices(crow_indices):
     Computes a row indices tensor
     from a CSR indptr tensor (ie crow indices tensor)
     """
+    device = crow_indices.device
     n_elements_per_row = crow_indices[1:] - crow_indices[:-1]
-    arange = torch.arange(crow_indices.shape[0] - 1)
+    arange = torch.arange(crow_indices.shape[0] - 1).to(device)
     row_indices = torch.repeat_interleave(arange, n_elements_per_row)
     return row_indices
 
@@ -389,10 +391,20 @@ def solver_dc_sparse(
             K_values * pi.values() ** (eps_base / sum_eps),
             size=pi.size(),
         )
+        G_transpose = torch.sparse_coo_tensor(
+            torch.stack([
+                row_indices,
+                col_indices
+            ]),
+            K_values * pi.values() ** (eps_base / sum_eps),
+            size=pi.size(),
+        ).to_sparse_csc().transpose(1, 0)
+
         for _ in range(nits_sinkhorn):
             v = (
                 torch.sparse.mm(
-                    G.transpose(1, 0), (u * px).reshape(-1, 1)
+                    # G.transpose(1, 0), (u * px).reshape(-1, 1)
+                    G_transpose, (u * px).reshape(-1, 1)
                 ).squeeze()
                 ** (-tau2)
                 if rho2 != 0
