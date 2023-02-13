@@ -3,11 +3,10 @@ import torch
 from scipy.stats import pearsonr
 
 from fugw.solvers.sparse import FUGWSparseSolver
-from fugw.solvers.utils import csr_sum
 from fugw.utils import (
     BaseModel,
     low_rank_squared_l2,
-    make_sparse_tensor,
+    make_sparse_csr_tensor,
     make_tensor,
 )
 
@@ -89,7 +88,12 @@ class FUGWSparse(BaseModel):
 
         Returns
         -------
-        self: FUGW class object
+        self: FUGWSparse class object
+            It comes with the following attributes:
+            - pi: a fitted transport plan stored on CPU as a torch COO matrix
+            - loss_steps: BCD steps at which the FUGW loss was evaluated
+            - loss_: values of FUGW loss
+            - loss_ent_: values of FUGW loss with entropy
         """
         if device == "auto":
             if torch.cuda.is_available():
@@ -185,7 +189,7 @@ class FUGWSparse(BaseModel):
             verbose=self.verbose,
         )
 
-        self.pi = pi
+        self.pi = pi.to_sparse_coo().detach().cpu()
         self.loss_steps = loss_steps
         self.loss_ = loss_
         self.loss_ent_ = loss_ent_
@@ -238,18 +242,24 @@ class FUGWSparse(BaseModel):
             )
 
         # Transform data
-        transformed_data_torch = (
+        transformed_data_tensor = (
             torch.sparse.mm(
                 self.pi.to(device).transpose(0, 1), source_features_tensor.T
             ).to_dense()
-            / csr_sum(self.pi, dim=0).reshape(-1, 1)
+            / (
+                torch.sparse.sum(self.pi.to(device), dim=0)
+                .to_dense()
+                .reshape(-1, 1)
+                # Add very small value to handle null rows
+                + 1e-16
+            )
         ).T
 
         # Move transformed data back to CPU
-        transformed_data = transformed_data_torch.detach().cpu().numpy()
+        transformed_data = transformed_data_tensor.detach().cpu().numpy()
 
         # Free allocated GPU memory
-        del source_features_torch
+        del source_features_tensor
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
