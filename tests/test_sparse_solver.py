@@ -44,10 +44,7 @@ def test_solvers(uot_solver, device):
     K_normalized = (K[0] / K_norm, K[1] / K_norm)
 
     init_plan = (
-        (torch.ones(ns, nt) / ns)
-        .to_sparse_coo()
-        .to(device)
-        .to_sparse_csr()
+        (torch.ones(ns, nt) / ns).to_sparse_coo().to(device).to_sparse_csr()
     )
 
     nits_bcd = 100

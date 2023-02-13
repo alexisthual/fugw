@@ -78,11 +78,15 @@ def test_fugw_sparse_with_init(device, sparse_layout):
             size=(n_voxels_source, n_voxels_target),
         ).to(device)
     elif sparse_layout == "csr":
-        init_plan = torch.sparse_coo_tensor(
-            np.array([rows, cols]),
-            np.ones(len(rows)) / len(rows),
-            size=(n_voxels_source, n_voxels_target),
-        ).to(device).to_sparse_csr()
+        init_plan = (
+            torch.sparse_coo_tensor(
+                np.array([rows, cols]),
+                np.ones(len(rows)) / len(rows),
+                size=(n_voxels_source, n_voxels_target),
+            )
+            .to(device)
+            .to_sparse_csr()
+        )
 
     fugw = FUGWSparse()
     fugw.fit(

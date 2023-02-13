@@ -345,18 +345,22 @@ class FUGWSparseSolver:
             pi = init_plan
             gamma = pi
         else:
-            pi = torch.sparse_coo_tensor(
-                torch.from_numpy(
-                    np.array(
-                        [
-                            np.tile(np.arange(nx), ny),
-                            np.repeat(np.arange(ny), nx),
-                        ]
-                    )
-                ).type(dtype),
-                torch.from_numpy(np.ones(nx * ny) / (nx * ny)).type(dtype),
-                (nx, ny),
-            ).to(device).to_sparse_csr()
+            pi = (
+                torch.sparse_coo_tensor(
+                    torch.from_numpy(
+                        np.array(
+                            [
+                                np.tile(np.arange(nx), ny),
+                                np.repeat(np.arange(ny), nx),
+                            ]
+                        )
+                    ).type(dtype),
+                    torch.from_numpy(np.ones(nx * ny) / (nx * ny)).type(dtype),
+                    (nx, ny),
+                )
+                .to(device)
+                .to_sparse_csr()
+            )
             gamma = pi
 
         # measures on rows and columns
