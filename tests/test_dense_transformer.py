@@ -81,10 +81,6 @@ def test_fugw_with_torch_tensors():
         n_features_train, n_voxels_target
     )
 
-    source_weights = torch.tensor(source_weights)
-    source_features = torch.tensor(source_features)
-    source_geometry = torch.tensor(source_geometry)
-
     fugw = FUGW()
     fugw.fit(
         source_features,

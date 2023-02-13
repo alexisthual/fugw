@@ -1,19 +1,18 @@
-import numpy as np
-from sklearn.metrics import pairwise_distances
+import torch
 
 
 def init_distribution(n_features, n_voxels, should_normalize=True):
-    weights = np.ones(n_voxels) / n_voxels
-    features = np.random.rand(n_features, n_voxels)
-    embeddings = np.random.rand(n_voxels, 3)
-    geometry = pairwise_distances(embeddings)
+    weights = torch.ones(n_voxels) / n_voxels
+    features = torch.rand(n_features, n_voxels)
+    embeddings = torch.rand(n_voxels, 3)
+    geometry = torch.cdist(embeddings, embeddings)
 
     # Normalize outputs if need be
-    features_normalized = features / np.linalg.norm(features, axis=1).reshape(
-        -1, 1
-    )
-    geometry_normalized = geometry / np.max(geometry)
-    embeddings_normalized = embeddings / np.max(geometry)
+    features_normalized = features / torch.linalg.norm(
+        features, dim=1
+    ).reshape(-1, 1)
+    geometry_normalized = geometry / geometry.max()
+    embeddings_normalized = embeddings / geometry.max()
 
     if should_normalize:
         return (
@@ -23,4 +22,9 @@ def init_distribution(n_features, n_voxels, should_normalize=True):
             embeddings_normalized,
         )
     else:
-        return weights, features, geometry, embeddings
+        return (
+            weights.numpy(),
+            features.numpy(),
+            geometry.numpy(),
+            embeddings.numpy(),
+        )
