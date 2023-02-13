@@ -1,11 +1,18 @@
 import numpy as np
+import pytest
+import torch
 
 from fugw import FUGWBarycenter
 
 from .utils import init_distribution
 
+devices = [torch.device("cpu")]
+if torch.cuda.is_available():
+    devices.append(torch.device("cuda:0"))
 
-def test_fugw_barycenter():
+
+@pytest.mark.parametrize("device", devices)
+def test_fugw_barycenter(device):
     np.random.seed(100)
     n_subjects = 4
     n_voxels = 100
@@ -25,4 +32,4 @@ def test_fugw_barycenter():
         geometry_.append(geometry)
 
     fugw_barycenter = FUGWBarycenter()
-    fugw_barycenter.fit(weights_, features_, geometry_)
+    fugw_barycenter.fit(weights_, features_, geometry_, device=device)

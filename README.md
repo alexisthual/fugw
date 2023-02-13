@@ -1,12 +1,14 @@
 # Fused unbalanced Gromov-Wasserstein for Python
 
-This package features multiple GPU-compatible PyTorch implementations
-to solve Fused Unbalanced Gromov-Wasserstein problems.
+This package implements multiple GPU-compatible PyTorch solvers
+to the Fused Unbalanced Gromov-Wasserstein optimization problem.
 
 **This package is under active development. There is no guarantee that the API and solvers
 won't change in the near future.**
 
 ## Introduction
+
+### Optimization problem
 
 In short, this code computes a matrix $P$ that matches points of two distributions $s$ and $t$.
 
@@ -31,7 +33,10 @@ In this case, we match areas of the cortex based on similarity of their function
 
 ![Introduction to FUGW](assets/fugw_intro.png)
 
-## Install
+
+## Installation
+
+### Install from source
 
 In a dedicated Python env, run:
 
@@ -40,13 +45,13 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-## Dev install
+### Install from source with development dependencies
 
 On top of running the usual install commands, install dev dependencies with:
 
 ```bash
 pip install -r requirements-dev.txt
-pip install -e '.[dev]'
+pip install -e '.'
 ```
 
 This will allow to run tests locally:

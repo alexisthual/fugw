@@ -11,27 +11,47 @@ class BaseModel(BaseEstimator, TransformerMixin):
         return None
 
 
-def make_tensor(x):
+def make_tensor(x, device=None, dtype=torch.float32):
     if isinstance(x, np.ndarray):
-        return torch.tensor(x)
+        return torch.tensor(x).to(device, dtype)
     elif isinstance(x, torch.Tensor):
-        return x
+        return x.to(device, dtype)
     else:
         raise Exception(f"Expected np.ndarray or torch.Tensor, got {type(x)}")
 
 
-def make_sparse_tensor(x, dtype):
+def make_sparse_csr_tensor(x, device=None, dtype=torch.float32):
     if x is None:
         return None
     elif isinstance(x, torch.Tensor):
-        indices = make_tensor(x._indices()).type(dtype)
-        values = make_tensor(x._values()).type(dtype)
-        size = x.size()
-        return torch.sparse_coo_tensor(
-            indices, values, size
-        )
+        if hasattr(x, "layout"):
+            if x.layout == torch.sparse_coo:
+                return x.to(device, dtype).to_sparse_csr()
+            elif x.layout == torch.sparse_csr:
+                # TODO: See https://github.com/pytorch/pytorch/issues/94679
+                # Convert to COO to move to device, then convert back to CSR
+                return x.to_sparse_coo().to(device, dtype).to_sparse_csr()
+            else:
+                raise Exception(
+                    f"Matrix's sparse layout is {x.layout}, "
+                    "but expected sparse_coo or sparse_csr"
+                )
+        else:
+            raise Exception(
+                "Expected a torch sparse matrix, "
+                "but attribute 'layout' is missing."
+            )
     else:
         raise Exception(f"Expected sparse torch.Tensor, got {type(x)}")
+
+
+def make_csr_matrix(crow_indices, col_indices, values, size, device):
+    return torch.sparse_csr_tensor(
+        crow_indices.to(device),
+        col_indices.to(device),
+        values.to(device),
+        size=size,
+    )
 
 
 def low_rank_squared_l2(X, Y):

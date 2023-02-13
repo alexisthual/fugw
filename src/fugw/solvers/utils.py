@@ -2,6 +2,74 @@ import torch
 from tqdm import tqdm
 
 
+def csr_dim_sum(values, group_indices, n_groups):
+    """
+    In a given tensor V, computes sum of elements belonging to the same group.
+    It creates a sparse matrix A of size (m, n) where
+    m is the number of groups and n the size of V
+    such that A_{i,j} equals
+    1 if the jth element of V belongs to group i,
+    0 otherwise.
+    Then it performs an efficient matrix product between A and V.
+    Taken from https://discuss.pytorch.org/t/sum-over-various-subsets-of-a-tensor/31881/8
+
+    Args:
+        values: torch.Tensor of size (n, ) whose values will be summed
+        group_indices: torch.Tensor of size (n, )
+        n_groups: int, total number of groups
+
+    Returns:
+        sums: torch.Tensor of size (n_groups)
+    """
+    device = values.device
+    n_values = values.size(0)
+
+    # sparse matrix indices (rows, columns)
+    indices = torch.stack(
+        (
+            group_indices,
+            torch.arange(n_values).to(device),
+        )
+    )
+
+    A = torch.sparse_coo_tensor(
+        indices,
+        torch.ones_like(group_indices).type(torch.float32).to(device),
+        size=(n_groups, n_values),
+    )
+
+    return torch.sparse.mm(A, values.reshape(-1, 1)).to_dense().flatten()
+
+
+def csr_sum(csr_matrix, dim=None):
+    """Computes sum of a CSR torch matrix along a given dimension."""
+    if dim is None:
+        return csr_matrix.values().sum()
+    elif dim == 0:
+        return csr_dim_sum(
+            csr_matrix.values(), csr_matrix.col_indices(), csr_matrix.shape[1]
+        )
+    elif dim == 1:
+        row_indices = crow_indices_to_row_indices(csr_matrix.crow_indices())
+        return csr_dim_sum(
+            csr_matrix.values(), row_indices, csr_matrix.shape[0]
+        )
+    else:
+        raise ValueError(f"Wrong dim: {dim}")
+
+
+def crow_indices_to_row_indices(crow_indices):
+    """
+    Computes a row indices tensor
+    from a CSR indptr tensor (ie crow indices tensor)
+    """
+    device = crow_indices.device
+    n_elements_per_row = crow_indices[1:] - crow_indices[:-1]
+    arange = torch.arange(crow_indices.shape[0] - 1).to(device)
+    row_indices = torch.repeat_interleave(arange, n_elements_per_row)
+    return row_indices
+
+
 def batch_elementwise_prod_and_sum(
     X1, X2, idx_1, idx_2, axis=1, max_tensor_size=1e8, verbose=False
 ):
@@ -43,8 +111,8 @@ def batch_elementwise_prod_and_sum(
     res = torch.cat(
         [
             (
-                X1[idx_1[i : i + batch_size], :]
-                * X2[idx_2[i : i + batch_size], :]
+                X1[idx_1[i : i + batch_size].type(torch.LongTensor), :]
+                * X2[idx_2[i : i + batch_size].type(torch.LongTensor), :]
             ).sum(axis)
             for i in rg
         ]
@@ -186,18 +254,20 @@ def solver_mm_sparse(
     rho_x, rho_y, eps = uot_params
 
     pi1, pi2, pi = (
-        torch.sparse.sum(init_pi, 1).to_dense(),
-        torch.sparse.sum(init_pi, 0).to_dense(),
+        csr_sum(init_pi, dim=1),
+        csr_sum(init_pi, dim=0),
         init_pi,
     )
-    rows, cols = pi._indices()
+    crow_indices, col_indices = pi.crow_indices(), pi.col_indices()
+    row_indices = crow_indices_to_row_indices(crow_indices)
+    pi_values = pi.values()
 
     sum_param = rho_x + rho_y + eps
     tau_x, tau_y, r = rho_x / sum_param, rho_y / sum_param, eps / sum_param
     K_values = (
-        px[rows] ** (tau_x + r)
-        * py[cols] ** (tau_y + r)
-        * (-cost._values() / sum_param).exp()
+        px[row_indices] ** (tau_x + r)
+        * py[col_indices] ** (tau_y + r)
+        * (-cost.values() / sum_param).exp()
     )
 
     range_niters = (
@@ -206,30 +276,77 @@ def solver_mm_sparse(
         else range(niters)
     )
 
+    # Define sparse matrices row_one_hot_indices and col_one_hot_indices
+    # which are useful for computing row / column sums efficiently.
+    # values, group_indices, n_groups
+    device = pi_values.device
+    n_rows = init_pi.shape[0]
+    n_cols = init_pi.shape[1]
+    n_pi_values = pi_values.size(0)
+    # Sparse matrix to sum on rows
+    row_one_hot_indices = torch.stack(
+        (
+            row_indices,
+            torch.arange(n_pi_values).to(device),
+        )
+    )
+    row_one_hot = torch.sparse_coo_tensor(
+        row_one_hot_indices,
+        torch.ones_like(row_indices).type(torch.float32).to(device),
+        size=(n_rows, n_pi_values),
+    ).to_sparse_csr()
+    # Sparse matrix to sum on columns
+    col_one_hot_indices = torch.stack(
+        (
+            col_indices,
+            torch.arange(n_pi_values).to(device),
+        )
+    )
+    col_one_hot = torch.sparse_coo_tensor(
+        col_one_hot_indices,
+        torch.ones_like(col_indices).type(torch.float32).to(device),
+        size=(n_cols, n_pi_values),
+    ).to_sparse_csr()
+
     for idx in range_niters:
-        pi1_old, pi2_old = pi1.detach().clone(), pi2.detach().clone()
-        new_pi_values = (
-            pi._values() ** (tau_x + tau_y)
-            / (pi1[rows] ** tau_x * pi2[cols] ** tau_y)
+        pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
+
+        pi_values = (
+            pi_values ** (tau_x + tau_y)
+            / (pi1[row_indices] ** tau_x * pi2[col_indices] ** tau_y)
             * K_values
         )
-        pi = torch.sparse_coo_tensor(
-            pi._indices(),
-            new_pi_values,
-            pi.size(),
+
+        # Efficiently compute sum on rows
+        pi1 = (
+            torch.sparse.mm(row_one_hot, pi_values.reshape(-1, 1))
+            .to_dense()
+            .flatten()
         )
 
-        pi1, pi2 = (
-            torch.sparse.sum(pi, 1).to_dense(),
-            torch.sparse.sum(pi, 0).to_dense(),
+        # Efficiently compute sum on columns
+        pi2 = (
+            torch.sparse.mm(col_one_hot, pi_values.reshape(-1, 1))
+            .to_dense()
+            .flatten()
         )
 
-        if (idx % eval_freq == 0) and max(
-            (pi1 - pi1_old).abs().max(), (pi2 - pi2_old).abs().max()
-        ) < tol:
-            break
+        if idx % eval_freq == 0:
+            pi1_error = (pi1 - pi1_prev).abs().max()
+            pi2_error = (pi2 - pi2_prev).abs().max()
+            if max(pi1_error, pi2_error) < tol:
+                print(
+                    f"Reached tolereance threshold: {pi1_error}, {pi2_error}"
+                )
+                break
 
-    return pi
+    return torch.sparse_csr_tensor(
+        crow_indices,
+        col_indices,
+        pi_values,
+        size=pi.size(),
+        device=device,
+    )
 
 
 def solver_dc(
@@ -307,14 +424,16 @@ def solver_dc_sparse(
     rho1, rho2, eps = uot_params
     px, py, pxy = tuple_pxy
     u, v = init_duals
-    m1, pi = torch.sparse.sum(init_pi, 1).to_dense(), init_pi
-    rows, cols = pi._indices()
+    m1, pi = csr_sum(init_pi, dim=1), init_pi
+    device = pi.device
+    crow_indices, col_indices = pi.crow_indices(), pi.col_indices()
+    row_indices = crow_indices_to_row_indices(crow_indices)
 
     sum_eps = eps_base + eps
     tau1 = 1 if rho1 == float("inf") else rho1 / (rho1 + sum_eps)
     tau2 = 1 if rho2 == float("inf") else rho2 / (rho2 + sum_eps)
 
-    K_values = torch.exp(-cost._values() / sum_eps)
+    K_values = torch.exp(-cost.values() / sum_eps)
 
     range_niters = (
         tqdm(range(niters), desc="DC iteration", leave=False)
@@ -322,19 +441,53 @@ def solver_dc_sparse(
         else range(niters)
     )
 
+    # This solver computes matrix multiplications with a
+    # sparse matrix G and it's transpose.
+    # To speed-up computation, we compute csr_values_to_transpose_values,
+    # a torch array indicating how the values of a CSR matrix A
+    # should be reordered so as to form a CSR matrix representing A.transpose()
+    T = (
+        torch.sparse_csr_tensor(
+            crow_indices,
+            col_indices,
+            # Add 1 to arange so that first coefficient is not 0
+            torch.arange(pi.values().shape[0]) + 1,
+            size=pi.size(),
+            device=device,
+        )
+        # Need to convert back and forth to be on correct device
+        # see https://github.com/pytorch/pytorch/issues/94679
+        .to_sparse_coo()
+        .to_sparse_csc()
+        .transpose(1, 0)
+    )
+    # Remove previously added 1
+    csr_values_to_transpose_values = T.values() - 1
+
     for idx in range_niters:
         m1_prev = m1.detach().clone()
 
-        # IPOT
-        G = torch.sparse_coo_tensor(
-            pi._indices(),
-            K_values * pi._values() ** (eps_base / sum_eps),
-            pi.size(),
+        new_G_values = K_values * pi.values() ** (eps_base / sum_eps)
+        G = torch.sparse_csr_tensor(
+            crow_indices,
+            col_indices,
+            new_G_values,
+            size=pi.size(),
+            device=device,
         )
+        G_transpose = torch.sparse_csr_tensor(
+            T.crow_indices(),
+            T.col_indices(),
+            new_G_values[csr_values_to_transpose_values],
+            size=(pi.size()[1], pi.size()[0]),
+            device=device,
+        )
+
         for _ in range(nits_sinkhorn):
             v = (
                 torch.sparse.mm(
-                    G.transpose(1, 0), (u * px).reshape(-1, 1)
+                    G_transpose,
+                    (u * px).reshape(-1, 1),
                 ).squeeze()
                 ** (-tau2)
                 if rho2 != 0
@@ -347,16 +500,17 @@ def solver_dc_sparse(
                 else torch.ones_like(u)
             )
 
-        new_pi_values = u[rows] * v[cols] * G._values()
-        pi = torch.sparse_coo_tensor(
-            pi._indices(),
+        new_pi_values = u[row_indices] * v[col_indices] * G.values()
+        pi = torch.sparse_csr_tensor(
+            crow_indices,
+            col_indices,
             new_pi_values,
-            pi.size(),
+            size=pi.size(),
         )
 
         # Check stopping criterion
         if idx % eval_freq == 0:
-            m1 = torch.sparse.sum(pi, 1).to_dense()
+            m1 = csr_sum(pi, dim=1)
             if m1.isnan().any() or m1.isinf().any():
                 raise ValueError(
                     "There is NaN in coupling. Please increase dc_eps_base."
@@ -367,10 +521,11 @@ def solver_dc_sparse(
                 break
 
     # renormalize couplings
-    pi = torch.sparse_coo_tensor(
-        pi._indices(),
-        pi._values() * pxy._values(),
-        pi.size(),
+    pi = torch.sparse_csr_tensor(
+        crow_indices,
+        col_indices,
+        pi.values() * pxy.values(),
+        size=pi.size(),
     )
 
     return (u, v), pi
@@ -385,22 +540,27 @@ def compute_approx_kl(p, q):
 
 
 def elementwise_prod_sparse(p, q):
-    # assert p.values().size() == q.values().size()
-    values = p._values() * q._values()
-    return torch.sparse_coo_tensor(p._indices(), values, p.size())
+    """Element-wise product between 2 sparse CSR matrices
+    which have the same sparcity indices."""
+    values = p.values() * q.values()
+    return torch.sparse_csr_tensor(
+        p.crow_indices(), p.col_indices(), values, size=p.size()
+    )
 
 
 def elementwise_prod_fact_sparse(a, b, p):
     """Compute (AB * pi) without exceeding memory capacity."""
-    rows, cols = p._indices()
-    # values = (a[rows, :] * b[cols, :]).sum(1)
-    values = batch_elementwise_prod_and_sum(a, b, rows, cols, 1)
-    values = values * p._values()
-    return torch.sparse_coo_tensor(p._indices(), values, p.size())
+    crow_indices, col_indices = p.crow_indices(), p.col_indices()
+    row_indices = crow_indices_to_row_indices(crow_indices)
+    values = batch_elementwise_prod_and_sum(a, b, row_indices, col_indices, 1)
+    values = values * p.values()
+    return torch.sparse_csr_tensor(
+        crow_indices, col_indices, values, size=p.size()
+    )
 
 
 def compute_approx_kl_sparse(p, q):
-    return compute_approx_kl(p._values(), q._values())
+    return compute_approx_kl(p.values(), q.values())
 
 
 def compute_kl(p, q):
@@ -408,11 +568,7 @@ def compute_kl(p, q):
 
 
 def compute_kl_sparse(p, q):
-    return (
-        compute_approx_kl_sparse(p, q)
-        - torch.sparse.sum(p)
-        + torch.sparse.sum(q)
-    )
+    return compute_approx_kl_sparse(p, q) - csr_sum(p) + csr_sum(q)
 
 
 def compute_quad_kl(mu, nu, alpha, beta):
@@ -446,10 +602,10 @@ def compute_quad_kl(mu, nu, alpha, beta):
 
 
 def compute_quad_kl_sparse(mu, nu, alpha, beta):
-    m_mu = torch.sparse.sum(mu)
-    m_nu = torch.sparse.sum(nu)
-    m_alpha = torch.sparse.sum(alpha)
-    m_beta = torch.sparse.sum(beta)
+    m_mu = csr_sum(mu)
+    m_nu = csr_sum(nu)
+    m_alpha = csr_sum(alpha)
+    m_beta = csr_sum(beta)
     const = (m_mu - m_alpha) * (m_nu - m_beta)
     kl = (
         m_nu * compute_kl_sparse(mu, alpha)
