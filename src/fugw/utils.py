@@ -1,9 +1,12 @@
 import numpy as np
 import torch
-from sklearn.base import BaseEstimator, TransformerMixin
+
+from rich.console import Console
+
+console = Console()
 
 
-class BaseModel(BaseEstimator, TransformerMixin):
+class BaseModel():
     def fit(self, source_data, target_data):
         return None
 

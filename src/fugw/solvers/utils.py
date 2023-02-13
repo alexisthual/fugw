@@ -1,5 +1,8 @@
 import torch
-from tqdm import tqdm
+
+from rich.progress import Progress
+
+from fugw.utils import console
 
 
 def csr_dim_sum(values, group_indices, n_groups):
@@ -11,7 +14,8 @@ def csr_dim_sum(values, group_indices, n_groups):
     1 if the jth element of V belongs to group i,
     0 otherwise.
     Then it performs an efficient matrix product between A and V.
-    Taken from https://discuss.pytorch.org/t/sum-over-various-subsets-of-a-tensor/31881/8
+    See the following discussion for more insights:
+    https://discuss.pytorch.org/t/sum-over-various-subsets-of-a-tensor/31881/8
 
     Args:
         values: torch.Tensor of size (n, ) whose values will be summed
@@ -71,7 +75,7 @@ def crow_indices_to_row_indices(crow_indices):
 
 
 def batch_elementwise_prod_and_sum(
-    X1, X2, idx_1, idx_2, axis=1, max_tensor_size=1e8, verbose=False
+    X1, X2, idx_1, idx_2, axis=1, max_tensor_size=1e8
 ):
     """Batch computation of (X1[idx_1, :] * X2[idx_2, :]).sum(1)
 
@@ -101,20 +105,13 @@ def batch_elementwise_prod_and_sum(
             f"Invalid value for max_tensor_size: {max_tensor_size}"
         )
 
-    rg = range(0, m, batch_size)
-    rg = (
-        tqdm(rg, desc="Element-wise prod and sum (batch)", leave=False)
-        if verbose
-        else rg
-    )
-
     res = torch.cat(
         [
             (
                 X1[idx_1[i : i + batch_size].type(torch.LongTensor), :]
                 * X2[idx_2[i : i + batch_size].type(torch.LongTensor), :]
             ).sum(axis)
-            for i in rg
+            for i in range(0, m, batch_size)
         ]
     )
 
@@ -138,34 +135,35 @@ def solver_scaling(
     tau_x = 1 if torch.isinf(rho_x) else rho_x / (rho_x + eps)
     tau_y = 1 if torch.isinf(rho_y) else rho_y / (rho_y + eps)
 
-    range_niters = (
-        tqdm(range(niters), desc="Sinkhorn iteration", leave=False)
-        if verbose
-        else range(niters)
-    )
+    with Progress() as progress:
+        if verbose:
+            task = progress.add_task("Sinkhorn iterations", total=niters)
 
-    for idx in range_niters:
-        vx_prev, vy_prev = vx.detach().clone(), vy.detach().clone()
-        if rho_y == 0:
-            vy = torch.zeros_like(vy)
-        else:
-            vy = -tau_y * ((vx + log_px)[:, None] - cost / eps).logsumexp(
-                dim=0
-            )
+        for idx in range(niters):
+            vx_prev, vy_prev = vx.detach().clone(), vy.detach().clone()
+            if rho_y == 0:
+                vy = torch.zeros_like(vy)
+            else:
+                vy = -tau_y * ((vx + log_px)[:, None] - cost / eps).logsumexp(
+                    dim=0
+                )
 
-        if rho_x == 0:
-            vx = torch.zeros_like(vx)
-        else:
-            vx = -tau_x * ((vy + log_py)[None, :] - cost / eps).logsumexp(
-                dim=1
-            )
+            if rho_x == 0:
+                vx = torch.zeros_like(vx)
+            else:
+                vx = -tau_x * ((vy + log_py)[None, :] - cost / eps).logsumexp(
+                    dim=1
+                )
 
-        if (
-            idx % eval_freq == 0
-            and max((vx - vx_prev).abs().max(), (vy - vy_prev).abs().max())
-            < tol
-        ):
-            break
+            if verbose:
+                progress.update(task, advance=1)
+
+            if (
+                idx % eval_freq == 0
+                and max((vx - vx_prev).abs().max(), (vy - vy_prev).abs().max())
+                < tol
+            ):
+                break
 
     pi = pxy * (vx[:, None] + vy[None, :] - cost / eps).exp()
 
@@ -206,25 +204,26 @@ def solver_mm(
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    range_niters = (
-        tqdm(range(niters), desc="MM iteration", leave=False)
-        if verbose
-        else range(niters)
-    )
+    with Progress() as progress:
+        if verbose:
+            task = progress.add_task("MM iterations", total=niters)
 
-    for idx in range_niters:
-        pi1_old, pi2_old = pi1.detach().clone(), pi2.detach().clone()
-        pi = (
-            pi ** (tau_x + tau_y)
-            / (pi1[:, None] ** tau_x * pi2[None, :] ** tau_y)
-            * K
-        )
-        pi1, pi2 = pi.sum(1), pi.sum(0)
+        for idx in range(niters):
+            pi1_old, pi2_old = pi1.detach().clone(), pi2.detach().clone()
+            pi = (
+                pi ** (tau_x + tau_y)
+                / (pi1[:, None] ** tau_x * pi2[None, :] ** tau_y)
+                * K
+            )
+            pi1, pi2 = pi.sum(1), pi.sum(0)
 
-        if (idx % eval_freq == 0) and max(
-            (pi1 - pi1_old).abs().max(), (pi2 - pi2_old).abs().max()
-        ) < tol:
-            break
+            if verbose:
+                progress.update(task, advance=1)
+
+            if (idx % eval_freq == 0) and max(
+                (pi1 - pi1_old).abs().max(), (pi2 - pi2_old).abs().max()
+            ) < tol:
+                break
 
     return pi
 
@@ -270,12 +269,6 @@ def solver_mm_sparse(
         * (-cost.values() / sum_param).exp()
     )
 
-    range_niters = (
-        tqdm(range(niters), desc="MM iteration", leave=False)
-        if verbose
-        else range(niters)
-    )
-
     # Define sparse matrices row_one_hot_indices and col_one_hot_indices
     # which are useful for computing row / column sums efficiently.
     # values, group_indices, n_groups
@@ -308,37 +301,45 @@ def solver_mm_sparse(
         size=(n_cols, n_pi_values),
     ).to_sparse_csr()
 
-    for idx in range_niters:
-        pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
+    with Progress() as progress:
+        if verbose:
+            task = progress.add_task("MM iterations", total=niters)
 
-        pi_values = (
-            pi_values ** (tau_x + tau_y)
-            / (pi1[row_indices] ** tau_x * pi2[col_indices] ** tau_y)
-            * K_values
-        )
+        for idx in range(niters):
+            pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
 
-        # Efficiently compute sum on rows
-        pi1 = (
-            torch.sparse.mm(row_one_hot, pi_values.reshape(-1, 1))
-            .to_dense()
-            .flatten()
-        )
+            pi_values = (
+                pi_values ** (tau_x + tau_y)
+                / (pi1[row_indices] ** tau_x * pi2[col_indices] ** tau_y)
+                * K_values
+            )
 
-        # Efficiently compute sum on columns
-        pi2 = (
-            torch.sparse.mm(col_one_hot, pi_values.reshape(-1, 1))
-            .to_dense()
-            .flatten()
-        )
+            # Efficiently compute sum on rows
+            pi1 = (
+                torch.sparse.mm(row_one_hot, pi_values.reshape(-1, 1))
+                .to_dense()
+                .flatten()
+            )
 
-        if idx % eval_freq == 0:
-            pi1_error = (pi1 - pi1_prev).abs().max()
-            pi2_error = (pi2 - pi2_prev).abs().max()
-            if max(pi1_error, pi2_error) < tol:
-                print(
-                    f"Reached tolereance threshold: {pi1_error}, {pi2_error}"
-                )
-                break
+            # Efficiently compute sum on columns
+            pi2 = (
+                torch.sparse.mm(col_one_hot, pi_values.reshape(-1, 1))
+                .to_dense()
+                .flatten()
+            )
+
+            if verbose:
+                progress.update(task, advance=1)
+
+            if idx % eval_freq == 0:
+                pi1_error = (pi1 - pi1_prev).abs().max()
+                pi2_error = (pi2 - pi2_prev).abs().max()
+                if max(pi1_error, pi2_error) < tol:
+                    console.log(
+                        "Reached tolereance threshold: "
+                        f"{pi1_error}, {pi2_error}"
+                    )
+                    break
 
     return torch.sparse_csr_tensor(
         crow_indices,
@@ -369,41 +370,43 @@ def solver_dc(
     tau2 = 1 if rho2 == float("inf") else rho2 / (rho2 + sum_eps)
 
     K = torch.exp(-cost / sum_eps)
-    range_niters = (
-        tqdm(range(niters), desc="DC iteration", leave=False)
-        if verbose
-        else range(niters)
-    )
 
-    for idx in range_niters:
-        m1_prev = m1.detach().clone()
+    with Progress() as progress:
+        if verbose:
+            task = progress.add_task("DC iterations", total=niters)
 
-        # IPOT
-        G = (
-            K * pi
-            if (eps_base / sum_eps) == 1
-            else K * pi ** (eps_base / sum_eps)
-        )
-        for _ in range(nits_sinkhorn):
-            v = (
-                (G.T @ (u * px)) ** (-tau2)
-                if rho2 != 0
-                else torch.ones_like(v)
+        for idx in range(niters):
+            m1_prev = m1.detach().clone()
+
+            # IPOT
+            G = (
+                K * pi
+                if (eps_base / sum_eps) == 1
+                else K * pi ** (eps_base / sum_eps)
             )
-            u = (G @ (v * py)) ** (-tau1) if rho1 != 0 else torch.ones_like(u)
-        pi = u[:, None] * G * v[None, :]
-
-        # Check stopping criterion
-        if idx % eval_freq == 0:
-            m1 = pi.sum(1)
-            if m1.isnan().any() or m1.isinf().any():
-                raise ValueError(
-                    "There is NaN in coupling. Please increase eps_base."
+            for _ in range(nits_sinkhorn):
+                v = (
+                    (G.T @ (u * px)) ** (-tau2)
+                    if rho2 != 0
+                    else torch.ones_like(v)
                 )
+                u = (G @ (v * py)) ** (-tau1) if rho1 != 0 else torch.ones_like(u)
+            pi = u[:, None] * G * v[None, :]
 
-            error = (m1 - m1_prev).abs().max().item()
-            if error < tol:
-                break
+            if verbose:
+                progress.update(task, advance=1)
+
+            # Check stopping criterion
+            if idx % eval_freq == 0:
+                m1 = pi.sum(1)
+                if m1.isnan().any() or m1.isinf().any():
+                    raise ValueError(
+                        "There is NaN in coupling. Please increase eps_base."
+                    )
+
+                error = (m1 - m1_prev).abs().max().item()
+                if error < tol:
+                    break
 
     # renormalize couplings
     pi = pi * pxy
@@ -435,12 +438,6 @@ def solver_dc_sparse(
 
     K_values = torch.exp(-cost.values() / sum_eps)
 
-    range_niters = (
-        tqdm(range(niters), desc="DC iteration", leave=False)
-        if verbose
-        else range(niters)
-    )
-
     # This solver computes matrix multiplications with a
     # sparse matrix G and it's transpose.
     # To speed-up computation, we compute csr_values_to_transpose_values,
@@ -464,61 +461,68 @@ def solver_dc_sparse(
     # Remove previously added 1
     csr_values_to_transpose_values = T.values() - 1
 
-    for idx in range_niters:
-        m1_prev = m1.detach().clone()
+    with Progress() as progress:
+        if verbose:
+            task = progress.add_task("DC iterations", total=niters)
 
-        new_G_values = K_values * pi.values() ** (eps_base / sum_eps)
-        G = torch.sparse_csr_tensor(
-            crow_indices,
-            col_indices,
-            new_G_values,
-            size=pi.size(),
-            device=device,
-        )
-        G_transpose = torch.sparse_csr_tensor(
-            T.crow_indices(),
-            T.col_indices(),
-            new_G_values[csr_values_to_transpose_values],
-            size=(pi.size()[1], pi.size()[0]),
-            device=device,
-        )
+        for idx in range(niters):
+            m1_prev = m1.detach().clone()
 
-        for _ in range(nits_sinkhorn):
-            v = (
-                torch.sparse.mm(
-                    G_transpose,
-                    (u * px).reshape(-1, 1),
-                ).squeeze()
-                ** (-tau2)
-                if rho2 != 0
-                else torch.ones_like(v)
+            new_G_values = K_values * pi.values() ** (eps_base / sum_eps)
+            G = torch.sparse_csr_tensor(
+                crow_indices,
+                col_indices,
+                new_G_values,
+                size=pi.size(),
+                device=device,
             )
-            u = (
-                torch.sparse.mm(G, (v * py).reshape(-1, 1)).squeeze()
-                ** (-tau1)
-                if rho1 != 0
-                else torch.ones_like(u)
+            G_transpose = torch.sparse_csr_tensor(
+                T.crow_indices(),
+                T.col_indices(),
+                new_G_values[csr_values_to_transpose_values],
+                size=(pi.size()[1], pi.size()[0]),
+                device=device,
             )
 
-        new_pi_values = u[row_indices] * v[col_indices] * G.values()
-        pi = torch.sparse_csr_tensor(
-            crow_indices,
-            col_indices,
-            new_pi_values,
-            size=pi.size(),
-        )
-
-        # Check stopping criterion
-        if idx % eval_freq == 0:
-            m1 = csr_sum(pi, dim=1)
-            if m1.isnan().any() or m1.isinf().any():
-                raise ValueError(
-                    "There is NaN in coupling. Please increase dc_eps_base."
+            for _ in range(nits_sinkhorn):
+                v = (
+                    torch.sparse.mm(
+                        G_transpose,
+                        (u * px).reshape(-1, 1),
+                    ).squeeze()
+                    ** (-tau2)
+                    if rho2 != 0
+                    else torch.ones_like(v)
+                )
+                u = (
+                    torch.sparse.mm(G, (v * py).reshape(-1, 1)).squeeze()
+                    ** (-tau1)
+                    if rho1 != 0
+                    else torch.ones_like(u)
                 )
 
-            error = (m1 - m1_prev).abs().max().item()
-            if error < tol:
-                break
+            new_pi_values = u[row_indices] * v[col_indices] * G.values()
+            pi = torch.sparse_csr_tensor(
+                crow_indices,
+                col_indices,
+                new_pi_values,
+                size=pi.size(),
+            )
+
+            if verbose:
+                progress.update(task, advance=1)
+
+            # Check stopping criterion
+            if idx % eval_freq == 0:
+                m1 = csr_sum(pi, dim=1)
+                if m1.isnan().any() or m1.isinf().any():
+                    raise ValueError(
+                        "There is NaN in coupling. Please increase dc_eps_base."
+                    )
+
+                error = (m1 - m1_prev).abs().max().item()
+                if error < tol:
+                    break
 
     # renormalize couplings
     pi = torch.sparse_csr_tensor(

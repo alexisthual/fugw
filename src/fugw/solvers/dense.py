@@ -4,6 +4,8 @@ import torch
 
 
 
+from fugw.utils import console
+
 from .utils import (
     compute_approx_kl,
     compute_kl,
@@ -379,9 +381,7 @@ class FUGWSolver:
                 loss_ent_.append(loss_ent)
 
                 if verbose:
-                    print(
-                        "FUGW loss at BCD step {}:\t{}".format(idx, loss_ent)
-                    )
+                    console.log(f"FUGW loss at BCD step {idx}:\t{loss_ent}")
 
                 if (
                     len(loss_ent_) >= 2
@@ -393,7 +393,7 @@ class FUGWSolver:
             idx += 1
 
         if pi.isnan().any() or gamma.isnan().any():
-            print("There is NaN in coupling")
+            console.log("There is NaN in coupling")
 
         return pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_
 

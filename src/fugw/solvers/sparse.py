@@ -3,7 +3,7 @@ from functools import partial
 import numpy as np
 import torch
 
-from ..utils import make_csr_matrix
+from fugw.utils import console, make_csr_matrix
 from .utils import (
     batch_elementwise_prod_and_sum,
     compute_approx_kl,
@@ -486,8 +486,8 @@ class FUGWSparseSolver:
                 loss_ent_.append(loss_ent)
 
                 if verbose:
-                    print(
-                        "FUGW loss at BCD step {}:\t{}".format(idx, loss_ent)
+                    console.log(
+                        f"FUGW loss at BCD step {idx}:\t{loss}\t{loss_ent}"
                     )
 
                 if (
@@ -500,7 +500,7 @@ class FUGWSparseSolver:
             idx += 1
 
         if pi.values().isnan().any() or gamma.values().isnan().any():
-            print("There is NaN in coupling")
+            console.log("There is NaN in coupling")
 
         return pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_
 
