@@ -345,9 +345,6 @@ class FUGWSparseSolver:
             pi = init_plan
             gamma = pi
         else:
-            # TODO: Ending up here should raise a warning
-            # because computations are done using sparse matrices
-            # but they are actually dense
             pi = torch.sparse_coo_tensor(
                 torch.from_numpy(
                     np.array(
@@ -359,7 +356,7 @@ class FUGWSparseSolver:
                 ).type(dtype),
                 torch.from_numpy(np.ones(nx * ny) / (nx * ny)).type(dtype),
                 (nx, ny),
-            ).to_sparse_csr()
+            ).to(device).to_sparse_csr()
             gamma = pi
 
         # measures on rows and columns
@@ -450,6 +447,7 @@ class FUGWSparseSolver:
                 gamma.col_indices(),
                 gamma.values() * gamma_scaling_factor,
                 size=gamma.size(),
+                device=device,
             )
 
             # Update pi (sample coupling)
@@ -471,6 +469,7 @@ class FUGWSparseSolver:
                 pi.col_indices(),
                 pi.values() * pi_scaling_factor,
                 size=pi.size(),
+                device=device,
             )
 
             # Update error

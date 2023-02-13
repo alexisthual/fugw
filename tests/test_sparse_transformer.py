@@ -1,4 +1,7 @@
+from itertools import product
+
 import numpy as np
+import pytest
 import torch
 
 from fugw import FUGWSparse
@@ -10,6 +13,12 @@ n_voxels_source = 105
 n_voxels_target = 95
 n_features_train = 10
 n_features_test = 5
+
+sparse_layouts = ["coo", "csr"]
+
+devices = [torch.device("cpu")]
+if torch.cuda.is_available():
+    devices.append(torch.device("cuda:0"))
 
 
 def test_fugw_sparse():
@@ -41,7 +50,11 @@ def test_fugw_sparse():
     assert isinstance(s, int) or isinstance(s, float)
 
 
-def test_fugw_sparse_with_init():
+@pytest.mark.parametrize(
+    "device,sparse_layout",
+    product(devices, sparse_layouts),
+)
+def test_fugw_sparse_with_init(device, sparse_layout):
     # Generate random training data for source and target
     _, source_features_train, _, source_embeddings = init_distribution(
         n_features_train, n_voxels_source
@@ -58,11 +71,18 @@ def test_fugw_sparse_with_init():
             rows.append(i)
         cols.extend(np.random.permutation(n_voxels_target)[:items_per_row])
 
-    init_plan = torch.sparse_coo_tensor(
-        np.array([rows, cols]),
-        np.ones(len(rows)) / len(rows),
-        size=(n_voxels_source, n_voxels_target),
-    ).to_sparse_csr()
+    if sparse_layout == "coo":
+        init_plan = torch.sparse_coo_tensor(
+            np.array([rows, cols]),
+            np.ones(len(rows)) / len(rows),
+            size=(n_voxels_source, n_voxels_target),
+        ).to(device)
+    elif sparse_layout == "csr":
+        init_plan = torch.sparse_coo_tensor(
+            np.array([rows, cols]),
+            np.ones(len(rows)) / len(rows),
+            size=(n_voxels_source, n_voxels_target),
+        ).to(device).to_sparse_csr()
 
     fugw = FUGWSparse()
     fugw.fit(
@@ -71,13 +91,14 @@ def test_fugw_sparse_with_init():
         source_geometry_embedding=source_embeddings,
         target_geometry_embedding=target_embeddings,
         init_plan=init_plan,
+        device=device,
     )
 
     # Use trained model to transport new features
     source_features_test = np.random.rand(n_features_test, n_voxels_source)
     target_features_test = np.random.rand(n_features_test, n_voxels_target)
 
-    transformed_data = fugw.transform(source_features_test)
+    transformed_data = fugw.transform(source_features_test, device=device)
     assert transformed_data.shape == target_features_test.shape
 
     # Compute score

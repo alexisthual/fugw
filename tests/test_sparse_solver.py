@@ -1,3 +1,5 @@
+from itertools import product
+
 import pytest
 import torch
 
@@ -5,12 +7,17 @@ from fugw.solvers.sparse import FUGWSparseSolver
 from fugw.utils import low_rank_squared_l2
 
 
-@pytest.mark.parametrize("uot_solver", ["mm", "dc"])
-def test_solvers(uot_solver):
-    torch.manual_seed(100)
+devices = [torch.device("cpu")]
+if torch.cuda.is_available():
+    devices.append(torch.device("cuda:0"))
 
-    use_cuda = torch.cuda.is_available()
-    device = torch.device("cuda:0" if use_cuda else "cpu")
+
+@pytest.mark.parametrize(
+    "uot_solver,device",
+    product(["mm", "dc"], devices),
+)
+def test_solvers(uot_solver, device):
+    torch.manual_seed(100)
     torch.backends.cudnn.benchmark = True
 
     ns = 104
@@ -36,7 +43,12 @@ def test_solvers(uot_solver):
     Gt_normalized = (Gt[0] / Gt_norm, Gt[1] / Gt_norm)
     K_normalized = (K[0] / K_norm, K[1] / K_norm)
 
-    init_plan = (torch.ones(ns, nt) / ns).to_sparse_csr().to(device)
+    init_plan = (
+        (torch.ones(ns, nt) / ns)
+        .to_sparse_coo()
+        .to(device)
+        .to_sparse_csr()
+    )
 
     nits_bcd = 100
     eval_bcd = 1

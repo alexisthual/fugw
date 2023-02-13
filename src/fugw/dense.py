@@ -37,6 +37,7 @@ class FUGW(BaseModel):
         target_weights=None,
         init_plan=None,
         init_duals=None,
+        device="auto",
         **kwargs,
     ):
         """
@@ -71,14 +72,19 @@ class FUGW(BaseModel):
             Distribution weights of target nodes.
             Should sum to 1. If None, eahc node's weight
             will be set to 1 / n2.
+        device: "auto" or torch.device
+            if "auto": use first available gpu if it's available,
+            cpu otherwise.
 
         Returns
         -------
         self: FUGW class object
         """
-        # Check cuda availability
-        use_cuda = torch.cuda.is_available()
-        dtype = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
+        if device == "auto":
+            if torch.cuda.is_available():
+                device = torch.device("cuda", 0)
+            else:
+                device = torch.device("cpu")
 
         if isinstance(self.rho, float) or isinstance(self.rho, int):
             rho_x = self.rho
@@ -94,28 +100,28 @@ class FUGW(BaseModel):
         # Set weights if they were not set by user
         if source_weights is None:
             Ws = (
-                torch.ones(source_features.shape[1]).type(dtype)
+                torch.ones(source_features.shape[1], device=device)
                 / source_features.shape[1]
             )
         else:
-            Ws = make_tensor(source_weights).type(dtype)
+            Ws = make_tensor(source_weights, device=device)
 
         if target_weights is None:
             Wt = (
-                torch.ones(target_features.shape[1]).type(dtype)
+                torch.ones(target_features.shape[1], device=device)
                 / target_features.shape[1]
             )
         else:
-            Wt = make_tensor(target_weights).type(dtype)
+            Wt = make_tensor(target_weights, device=device)
 
         # Compute distance matrix between features
-        Fs = make_tensor(source_features.T).type(dtype)
-        Ft = make_tensor(target_features.T).type(dtype)
+        Fs = make_tensor(source_features.T, device=device)
+        Ft = make_tensor(target_features.T, device=device)
         K = torch.cdist(Fs, Ft, p=2) ** 2
 
         # Load anatomical kernels to GPU
-        Gs = make_tensor(source_geometry).type(dtype)
-        Gt = make_tensor(target_geometry).type(dtype)
+        Gs = make_tensor(source_geometry, device=device)
+        Gt = make_tensor(target_geometry, device=device)
 
         # Create model
         model = FUGWSolver(**kwargs)
@@ -155,14 +161,14 @@ class FUGW(BaseModel):
 
         # Free allocated GPU memory
         del Fs, Ft, K, Gs, Gt
-        if use_cuda:
+        if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
         return (pi, gamma, duals_pi, duals_gamma, loss_steps, loss_, loss_ent_)
 
     def transform(self, source_features):
         """
-        Transport source contrast map using fitted OT plan.
+        Transport source feature maps using fitted OT plan.
         Use GPUs if available.
 
         Parameters
