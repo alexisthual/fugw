@@ -1,8 +1,8 @@
 from functools import partial
 
 import torch
-from ot.gromov import fused_gromov_wasserstein as fgw
-from ot.gromov import gromov_wasserstein as gw
+
+
 
 from .utils import (
     compute_approx_kl,
@@ -397,58 +397,6 @@ class FUGWSolver:
 
         return pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_
 
-    def solver_fgw(
-        self,
-        X,
-        Y,
-        px=None,
-        py=None,
-        D=None,
-        alpha=1,
-        init_plan=None,
-        verbose=True,
-        **kwargs,
-    ):
-        nx, ny = X.shape[0], Y.shape[0]
-        device, dtype = X.device, X.dtype
-
-        # measures on rows and columns
-        if px is None:
-            px = torch.ones(nx).to(device).to(dtype) / nx
-        if py is None:
-            py = torch.ones(ny).to(device).to(dtype) / ny
-
-        if alpha == 1 or D is None:
-            pi, dict_log = gw(
-                C1=X,
-                C2=Y,
-                p=px,
-                q=py,
-                log=True,
-                G0=init_plan,
-                verbose=verbose,
-                **kwargs,
-            )
-            loss = dict_log["gw_dist"]
-        else:
-            pi, dict_log = fgw(
-                M=D,
-                C1=X,
-                C2=Y,
-                p=px,
-                q=py,
-                alpha=alpha,
-                G0=init_plan,
-                log=True,
-                verbose=verbose,
-                **kwargs,
-            )
-            loss = dict_log["fgw_dist"]
-
-        duals = (dict_log["u"], dict_log["v"])
-
-        return pi, duals, loss
-
     def solver(
         self,
         Gs,
@@ -469,18 +417,21 @@ class FUGWSolver:
         **gw_kwargs,
     ):
         if rho_x == float("inf") and rho_y == float("inf") and eps == 0:
-            pi, duals, loss = self.solver_fgw(
-                Gs, Gt, px, py, K, alpha, init_plan, verbose, **gw_kwargs
+            raise ValueError(
+                "This package does not handle balanced cases "
+                "(ie infinite values of rho). "
+                "You should have a look at POT (https://pythonot.github.io) "
+                "and in particular at ot.gromov.fused_gromov_wasserstein "
+                "(https://pythonot.github.io/gen_modules/ot.gromov.html"
+                "#ot.gromov.fused_gromov_wasserstein)"
             )
-            return pi, pi, duals, duals, loss, loss
-
         elif eps == 0 and (
             (rho_x == 0 and rho_y == float("inf"))
             or (rho_x == 0 and rho_y == float("inf"))
         ):
             raise ValueError(
-                "Invalid rho and eps. Unregularized semi-relaxed GW is not"
-                " supported."
+                "Invalid rho and eps. Unregularized semi-relaxed GW is not "
+                "supported."
             )
         else:
             return self.solver_fugw(
