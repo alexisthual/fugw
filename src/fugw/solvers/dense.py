@@ -381,7 +381,10 @@ class FUGWSolver:
                 loss_ent_.append(loss_ent)
 
                 if verbose:
-                    console.log(f"FUGW loss at BCD step {idx}:\t{loss_ent}")
+                    console.log(
+                        f"BCD step {idx}\t"
+                        f"FUGW loss:\t{loss} (base)\t{loss_ent} (entropic)"
+                    )
 
                 if (
                     len(loss_ent_) >= 2

@@ -135,7 +135,7 @@ def solver_scaling(
     tau_x = 1 if torch.isinf(rho_x) else rho_x / (rho_x + eps)
     tau_y = 1 if torch.isinf(rho_y) else rho_y / (rho_y + eps)
 
-    with Progress() as progress:
+    with Progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -204,7 +204,7 @@ def solver_mm(
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    with Progress() as progress:
+    with Progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("MM iterations", total=niters)
 
@@ -301,7 +301,7 @@ def solver_mm_sparse(
         size=(n_cols, n_pi_values),
     ).to_sparse_csr()
 
-    with Progress() as progress:
+    with Progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("MM iterations", total=niters)
 
@@ -371,7 +371,7 @@ def solver_dc(
 
     K = torch.exp(-cost / sum_eps)
 
-    with Progress() as progress:
+    with Progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
@@ -461,7 +461,7 @@ def solver_dc_sparse(
     # Remove previously added 1
     csr_values_to_transpose_values = T.values() - 1
 
-    with Progress() as progress:
+    with Progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 

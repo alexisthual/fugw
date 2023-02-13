@@ -487,7 +487,8 @@ class FUGWSparseSolver:
 
                 if verbose:
                     console.log(
-                        f"FUGW loss at BCD step {idx}:\t{loss}\t{loss_ent}"
+                        f"BCD step {idx}\t"
+                        f"FUGW loss:\t{loss} (base)\t{loss_ent} (entropic)"
                     )
 
                 if (
