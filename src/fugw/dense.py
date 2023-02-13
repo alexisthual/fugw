@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-from scipy.stats import pearsonr
 
 from fugw.solvers.dense import FUGWSolver
 from fugw.utils import BaseModel, make_tensor
@@ -166,7 +165,7 @@ class FUGW(BaseModel):
 
         return (pi, gamma, duals_pi, duals_gamma, loss_steps, loss_, loss_ent_)
 
-    def transform(self, source_features):
+    def transform(self, source_features, device="auto"):
         """
         Transport source feature maps using fitted OT plan.
         Use GPUs if available.
@@ -175,18 +174,23 @@ class FUGW(BaseModel):
         ----------
         source_features: ndarray(n_samples, n1) or ndarray(n1)
             Contrast map for source subject
+        device: "auto" or torch.device
+            If "auto": use first available GPU if it's available,
+            CPU otherwise.
 
         Returns
         -------
         transported_data: ndarray(n_samples, n2) or ndarray(n2)
             Contrast map transported in target subject's space
         """
-        # Check cuda availability
-        use_cuda = torch.cuda.is_available()
-        dtype = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
+        if device == "auto":
+            if torch.cuda.is_available():
+                device = torch.device("cuda", 0)
+            else:
+                device = torch.device("cpu")
 
         if self.pi is None:
-            raise ("Model should be fitted before calling transform")
+            raise Exception("Model should be fitted before calling transform")
 
         is_one_dimensional = False
         if source_features.ndim == 1:
@@ -199,55 +203,27 @@ class FUGW(BaseModel):
             )
 
         # Move data to GPU
-        pi_torch = torch.from_numpy(self.pi).type(dtype)
-        source_features_torch = torch.from_numpy(source_features).type(dtype)
+        pi = make_tensor(self.pi, device=device)
+        source_features_tensor = make_tensor(source_features, device=device)
 
         # Transform data
-        transformed_data_torch = (
-            pi_torch.T
-            @ source_features_torch.T
-            / pi_torch.sum(dim=0).reshape(-1, 1)
-        ).T
-
-        # Move transformed data back to CPU
-        transformed_data = transformed_data_torch.detach().cpu().numpy()
+        transformed_data = (
+            (pi.T @ source_features_tensor.T / pi.sum(dim=0).reshape(-1, 1))
+            .T.detach()
+            .cpu()
+        )
 
         # Free allocated GPU memory
-        del pi_torch, source_features_torch
-        if use_cuda:
+        del pi, source_features_tensor
+        if torch.cuda.is_available():
             torch.cuda.empty_cache()
+
+        # Modify returned tensor so that it matches
+        # source_features's type and shape
+        if isinstance(source_features, np.ndarray):
+            transformed_data = transformed_data.numpy()
 
         if transformed_data.ndim > 1 and is_one_dimensional:
             transformed_data = transformed_data.flatten()
 
         return transformed_data
-
-    def score(self, source_features, target_features):
-        """
-        Transport source contrast maps using fitted OT plan
-        and compute correlation with actual target contrast maps.
-
-        Parameters
-        ----------
-        source_features: ndarray(n_samples, n1)
-            Contrast maps for source subject
-        target_features: ndarray(n_samples, n2)
-            Contrast maps for target subject
-
-        Returns
-        -------
-        score: float
-            Mean correlation across features of self.transform(source_features)
-            and target_features
-        """
-
-        transported_data = self.transform(source_features)
-
-        score = np.mean(
-            [
-                pearsonr(transported_data[i, :], target_features[i, :])[0]
-                for i in range(transported_data.shape[0])
-            ]
-        )
-
-        return score

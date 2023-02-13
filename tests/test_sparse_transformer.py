@@ -39,15 +39,31 @@ def test_fugw_sparse():
     )
 
     # Use trained model to transport new features
+    # 1. with numpy arrays
     source_features_test = np.random.rand(n_features_test, n_voxels_source)
     target_features_test = np.random.rand(n_features_test, n_voxels_target)
-
     transformed_data = fugw.transform(source_features_test)
     assert transformed_data.shape == target_features_test.shape
+    assert isinstance(transformed_data, np.ndarray)
 
-    # Compute score
-    s = fugw.score(source_features_test, target_features_test)
-    assert isinstance(s, int) or isinstance(s, float)
+    source_features_test = np.random.rand(n_voxels_source)
+    target_features_test = np.random.rand(n_voxels_target)
+    transformed_data = fugw.transform(source_features_test)
+    assert transformed_data.shape == target_features_test.shape
+    assert isinstance(transformed_data, np.ndarray)
+
+    # 2. with torch tensors
+    source_features_test = torch.rand(n_features_test, n_voxels_source)
+    target_features_test = torch.rand(n_features_test, n_voxels_target)
+    transformed_data = fugw.transform(source_features_test)
+    assert transformed_data.shape == target_features_test.shape
+    assert isinstance(transformed_data, torch.Tensor)
+
+    source_features_test = torch.rand(n_voxels_source)
+    target_features_test = torch.rand(n_voxels_target)
+    transformed_data = fugw.transform(source_features_test)
+    assert transformed_data.shape == target_features_test.shape
+    assert isinstance(transformed_data, torch.Tensor)
 
 
 @pytest.mark.parametrize(
@@ -104,14 +120,3 @@ def test_fugw_sparse_with_init(device, sparse_layout):
 
     transformed_data = fugw.transform(source_features_test, device=device)
     assert transformed_data.shape == target_features_test.shape
-
-    # Compute score
-    # s = fugw.score(source_features_test, target_features_test)
-    # assert isinstance(s, int) or isinstance(s, float)
-
-
-# TODO: at some point, it would be nice that this test
-# passes so that our model really is a Scikit learn transformer
-# def test_fugw_sklearn_transform_api():
-#     fugw = FUGW()
-#     check_estimator(fugw)

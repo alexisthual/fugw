@@ -36,10 +36,6 @@ def test_fugw():
     transformed_data = fugw.transform(source_features_test)
     assert transformed_data.shape == target_features_test.shape
 
-    # Compute score
-    s = fugw.score(source_features_test, target_features_test)
-    assert isinstance(s, int) or isinstance(s, float)
-
 
 def test_fugw_with_weights():
     # Generate random training data for source and target
@@ -65,13 +61,15 @@ def test_fugw_with_weights():
     # Use trained model to transport new features
     source_features_test = np.random.rand(n_features_test, n_voxels_source)
     target_features_test = np.random.rand(n_features_test, n_voxels_target)
-
     transformed_data = fugw.transform(source_features_test)
     assert transformed_data.shape == target_features_test.shape
+    assert isinstance(transformed_data, np.ndarray)
 
-    # Compute score
-    s = fugw.score(source_features_test, target_features_test)
-    assert isinstance(s, int) or isinstance(s, float)
+    source_features_test = np.random.rand(n_voxels_source)
+    target_features_test = np.random.rand(n_voxels_target)
+    transformed_data = fugw.transform(source_features_test)
+    assert transformed_data.shape == target_features_test.shape
+    assert isinstance(transformed_data, np.ndarray)
 
 
 def test_fugw_with_torch_tensors():
@@ -100,19 +98,14 @@ def test_fugw_with_torch_tensors():
     assert fugw.pi.shape == (n_voxels_source, n_voxels_target)
 
     # Use trained model to transport new features
-    source_features_test = np.random.rand(n_features_test, n_voxels_source)
-    target_features_test = np.random.rand(n_features_test, n_voxels_target)
-
+    source_features_test = torch.rand(n_features_test, n_voxels_source)
+    target_features_test = torch.rand(n_features_test, n_voxels_target)
     transformed_data = fugw.transform(source_features_test)
     assert transformed_data.shape == target_features_test.shape
+    assert isinstance(transformed_data, torch.Tensor)
 
-    # Compute score
-    s = fugw.score(source_features_test, target_features_test)
-    assert isinstance(s, int) or isinstance(s, float)
-
-
-# TODO: at some point, it would be nice that this test
-# passes so that our model really is a Scikit learn transformer
-# def test_fugw_sklearn_transform_api():
-#     fugw = FUGW()
-#     check_estimator(fugw)
+    source_features_test = torch.rand(n_voxels_source)
+    target_features_test = torch.rand(n_voxels_target)
+    transformed_data = fugw.transform(source_features_test)
+    assert transformed_data.shape == target_features_test.shape
+    assert isinstance(transformed_data, torch.Tensor)

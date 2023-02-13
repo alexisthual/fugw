@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from scipy.stats import pearsonr
+import warnings
 
 from fugw.solvers.sparse import FUGWSparseSolver
 from fugw.utils import (
@@ -153,7 +153,7 @@ class FUGWSparse(BaseModel):
 
         # Check that all init_plan is valid
         if init_plan is None:
-            print(
+            warnings.warn(
                 "Warning: init_plan is None, so this solver "
                 "will compute a dense solution. However, "
                 "dense solutions are much more efficiently computed "
@@ -226,7 +226,7 @@ class FUGWSparse(BaseModel):
                 device = torch.device("cpu")
 
         if self.pi is None:
-            raise ("Model should be fitted before calling transform")
+            raise Exception("Model should be fitted before calling transform")
 
         # Set correct type and device
         source_features_tensor = make_tensor(source_features, device=device)
@@ -242,58 +242,35 @@ class FUGWSparse(BaseModel):
             )
 
         # Transform data
-        transformed_data_tensor = (
-            torch.sparse.mm(
-                self.pi.to(device).transpose(0, 1), source_features_tensor.T
-            ).to_dense()
-            / (
-                torch.sparse.sum(self.pi.to(device), dim=0)
-                .to_dense()
-                .reshape(-1, 1)
-                # Add very small value to handle null rows
-                + 1e-16
+        transformed_data = (
+            (
+                torch.sparse.mm(
+                    self.pi.to(device).transpose(0, 1),
+                    source_features_tensor.T,
+                ).to_dense()
+                / (
+                    torch.sparse.sum(self.pi.to(device), dim=0)
+                    .to_dense()
+                    .reshape(-1, 1)
+                    # Add very small value to handle null rows
+                    + 1e-16
+                )
             )
-        ).T
-
-        # Move transformed data back to CPU
-        transformed_data = transformed_data_tensor.detach().cpu().numpy()
+            .T.detach()
+            .cpu()
+        )
 
         # Free allocated GPU memory
         del source_features_tensor
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
+        # Modify returned tensor so that it matches
+        # source_features's type and shape
+        if isinstance(source_features, np.ndarray):
+            transformed_data = transformed_data.numpy()
+
         if transformed_data.ndim > 1 and is_one_dimensional:
             transformed_data = transformed_data.flatten()
 
         return transformed_data
-
-    def score(self, source_features, target_features):
-        """
-        Transport source contrast maps using fitted OT plan
-        and compute correlation with actual target contrast maps.
-
-        Parameters
-        ----------
-        source_features: ndarray(n_samples, n1)
-            Contrast maps for source subject
-        target_features: ndarray(n_samples, n2)
-            Contrast maps for target subject
-
-        Returns
-        -------
-        score: float
-            Mean correlation across features of self.transform(source_features)
-            and target_features
-        """
-
-        transported_data = self.transform(source_features)
-
-        score = np.mean(
-            [
-                pearsonr(transported_data[i, :], target_features[i, :])[0]
-                for i in range(transported_data.shape[0])
-            ]
-        )
-
-        return score
