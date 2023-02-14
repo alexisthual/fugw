@@ -274,3 +274,77 @@ class FUGWSparse(BaseModel):
             transformed_data = transformed_data.flatten()
 
         return transformed_data
+
+    def inverse_transform(self, target_features, device="auto"):
+        """
+        Transport target feature maps using fitted OT plan.
+        Use GPUs if available.
+
+        Parameters
+        ----------
+        target_features: ndarray(n_samples, n2) or ndarray(n2)
+            Contrast map for target subject
+        device: "auto" or torch.device
+            If "auto": use first available GPU if it's available,
+            CPU otherwise.
+
+        Returns
+        -------
+        transported_data: ndarray(n_samples, n1) or ndarray(n1)
+            Contrast map transported in target subject's space
+        """
+        if device == "auto":
+            if torch.cuda.is_available():
+                device = torch.device("cuda", 0)
+            else:
+                device = torch.device("cpu")
+
+        if self.pi is None:
+            raise Exception("Model should be fitted before calling transform")
+
+        # Set correct type and device
+        target_features_tensor = make_tensor(target_features, device=device)
+
+        is_one_dimensional = False
+        if target_features_tensor.ndim == 1:
+            is_one_dimensional = True
+            target_features_tensor = target_features_tensor.reshape(1, -1)
+        if target_features_tensor.ndim > 2:
+            raise ValueError(
+                "target_features has too many dimensions:"
+                f" {target_features_tensor.ndim}"
+            )
+
+        # Transform data
+        transformed_data = (
+            (
+                torch.sparse.mm(
+                    self.pi.to(device),
+                    target_features_tensor.T,
+                ).to_dense()
+                / (
+                    torch.sparse.sum(self.pi.to(device), dim=1)
+                    .to_dense()
+                    .reshape(-1, 1)
+                    # Add very small value to handle null rows
+                    + 1e-16
+                )
+            )
+            .T.detach()
+            .cpu()
+        )
+
+        # Free allocated GPU memory
+        del target_features_tensor
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+        # Modify returned tensor so that it matches
+        # target_features's type and shape
+        if isinstance(target_features, np.ndarray):
+            transformed_data = transformed_data.numpy()
+
+        if transformed_data.ndim > 1 and is_one_dimensional:
+            transformed_data = transformed_data.flatten()
+
+        return transformed_data

@@ -32,9 +32,10 @@ def test_fugw():
     # Use trained model to transport new features
     source_features_test = np.random.rand(n_features_test, n_voxels_source)
     target_features_test = np.random.rand(n_features_test, n_voxels_target)
-
-    transformed_data = fugw.transform(source_features_test)
-    assert transformed_data.shape == target_features_test.shape
+    source_features_on_target = fugw.transform(source_features_test)
+    assert source_features_on_target.shape == target_features_test.shape
+    target_features_on_source = fugw.inverse_transform(target_features_test)
+    assert target_features_on_source.shape == source_features_test.shape
 
 
 def test_fugw_with_weights():
@@ -61,15 +62,21 @@ def test_fugw_with_weights():
     # Use trained model to transport new features
     source_features_test = np.random.rand(n_features_test, n_voxels_source)
     target_features_test = np.random.rand(n_features_test, n_voxels_target)
-    transformed_data = fugw.transform(source_features_test)
-    assert transformed_data.shape == target_features_test.shape
-    assert isinstance(transformed_data, np.ndarray)
+    source_features_on_target = fugw.transform(source_features_test)
+    assert source_features_on_target.shape == target_features_test.shape
+    assert isinstance(source_features_on_target, np.ndarray)
+    target_features_on_source = fugw.inverse_transform(target_features_test)
+    assert target_features_on_source.shape == source_features_test.shape
+    assert isinstance(target_features_on_source, np.ndarray)
 
     source_features_test = np.random.rand(n_voxels_source)
     target_features_test = np.random.rand(n_voxels_target)
-    transformed_data = fugw.transform(source_features_test)
-    assert transformed_data.shape == target_features_test.shape
-    assert isinstance(transformed_data, np.ndarray)
+    source_features_on_target = fugw.transform(source_features_test)
+    assert source_features_on_target.shape == target_features_test.shape
+    assert isinstance(source_features_on_target, np.ndarray)
+    target_features_on_source = fugw.inverse_transform(target_features_test)
+    assert target_features_on_source.shape == source_features_test.shape
+    assert isinstance(target_features_on_source, np.ndarray)
 
 
 def test_fugw_with_torch_tensors():
@@ -96,12 +103,18 @@ def test_fugw_with_torch_tensors():
     # Use trained model to transport new features
     source_features_test = torch.rand(n_features_test, n_voxels_source)
     target_features_test = torch.rand(n_features_test, n_voxels_target)
-    transformed_data = fugw.transform(source_features_test)
-    assert transformed_data.shape == target_features_test.shape
-    assert isinstance(transformed_data, torch.Tensor)
+    source_features_on_target = fugw.transform(source_features_test)
+    assert source_features_on_target.shape == target_features_test.shape
+    assert isinstance(source_features_on_target, torch.Tensor)
+    target_features_on_source = fugw.inverse_transform(target_features_test)
+    assert target_features_on_source.shape == source_features_test.shape
+    assert isinstance(target_features_on_source, torch.Tensor)
 
     source_features_test = torch.rand(n_voxels_source)
     target_features_test = torch.rand(n_voxels_target)
-    transformed_data = fugw.transform(source_features_test)
-    assert transformed_data.shape == target_features_test.shape
-    assert isinstance(transformed_data, torch.Tensor)
+    source_features_on_target = fugw.transform(source_features_test)
+    assert source_features_on_target.shape == target_features_test.shape
+    assert isinstance(source_features_on_target, torch.Tensor)
+    target_features_on_source = fugw.inverse_transform(target_features_test)
+    assert target_features_on_source.shape == source_features_test.shape
+    assert isinstance(target_features_on_source, torch.Tensor)

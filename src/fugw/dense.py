@@ -202,7 +202,7 @@ class FUGW(BaseModel):
                 f" {source_features.ndim}"
             )
 
-        # Move data to GPU
+        # Move data to device if need be
         pi = make_tensor(self.pi, device=device)
         source_features_tensor = make_tensor(source_features, device=device)
 
@@ -219,8 +219,71 @@ class FUGW(BaseModel):
             torch.cuda.empty_cache()
 
         # Modify returned tensor so that it matches
-        # source_features's type and shape
+        # source_features's shape and python type
         if isinstance(source_features, np.ndarray):
+            transformed_data = transformed_data.numpy()
+
+        if transformed_data.ndim > 1 and is_one_dimensional:
+            transformed_data = transformed_data.flatten()
+
+        return transformed_data
+
+    def inverse_transform(self, target_features, device="auto"):
+        """
+        Transport target feature maps using fitted OT plan.
+        Use GPUs if available.
+
+        Parameters
+        ----------
+        target_features: ndarray(n_samples, n2) or ndarray(n2)
+            Contrast map for target subject
+        device: "auto" or torch.device
+            If "auto": use first available GPU if it's available,
+            CPU otherwise.
+
+        Returns
+        -------
+        transported_data: ndarray(n_samples, n1) or ndarray(n1)
+            Contrast map transported in source subject's space
+        """
+        if device == "auto":
+            if torch.cuda.is_available():
+                device = torch.device("cuda", 0)
+            else:
+                device = torch.device("cpu")
+
+        if self.pi is None:
+            raise Exception("Model should be fitted before calling transform")
+
+        is_one_dimensional = False
+        if target_features.ndim == 1:
+            is_one_dimensional = True
+            target_features = target_features.reshape(1, -1)
+        if target_features.ndim > 2:
+            raise ValueError(
+                "target_features has too many dimensions:"
+                f" {target_features.ndim}"
+            )
+
+        # Move data to device if need be
+        pi = make_tensor(self.pi, device=device)
+        target_features_tensor = make_tensor(target_features, device=device)
+
+        # Transform data
+        transformed_data = (
+            (pi @ target_features_tensor.T / pi.sum(dim=1).reshape(-1, 1))
+            .T.detach()
+            .cpu()
+        )
+
+        # Free allocated GPU memory
+        del pi, target_features_tensor
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+        # Modify returned tensor so that it matches
+        # target_features's  shape and python type
+        if isinstance(target_features, np.ndarray):
             transformed_data = transformed_data.numpy()
 
         if transformed_data.ndim > 1 and is_one_dimensional:
