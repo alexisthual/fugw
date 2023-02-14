@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fugw"
-version = "0.1.0"
 authors = [
   {name = "Alexis Thual", email = "alexisthual@gmail.com"},
   {name = "Huy Tran",  email = "quang-huy.tran@univ-ubs.fr"},
@@ -17,6 +16,7 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
+dynamic = ["version"]
 requires-python = ">=3.7"
 dependencies = [
   "numpy>=1.20",
@@ -32,3 +32,6 @@ dev = [
 [project.urls]
 homepage = "https://github.com/alexisthual/fugw"
 repository = "https://github.com/alexisthual/fugw.git"
+
+[tool.setuptools.dynamic]
+version = {attr = "fugw.__version__"}
