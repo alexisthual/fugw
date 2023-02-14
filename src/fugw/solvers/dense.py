@@ -382,7 +382,7 @@ class FUGWSolver:
 
                 if verbose:
                     console.log(
-                        f"BCD step {idx}\t"
+                        f"BCD step {idx}/{self.nits_bcd}\t"
                         f"FUGW loss:\t{loss} (base)\t{loss_ent} (entropic)"
                     )
 
