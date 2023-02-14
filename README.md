@@ -33,7 +33,6 @@ In this case, we match areas of the cortex based on similarity of their function
 
 ![Introduction to FUGW](assets/fugw_intro.png)
 
-
 ## Installation
 
 ### Install from source
@@ -41,17 +40,15 @@ In this case, we match areas of the cortex based on similarity of their function
 In a dedicated Python env, run:
 
 ```bash
-pip install -r requirements.txt
 pip install -e .
 ```
 
 ### Install from source with development dependencies
 
-On top of running the usual install commands, install dev dependencies with:
+In order to also install development dependencies, run:
 
 ```bash
-pip install -r requirements-dev.txt
-pip install -e '.'
+pip install -e '.[dev]'
 ```
 
 This will allow to run tests locally:
@@ -62,8 +59,8 @@ pytest
 
 ## Usage and examples
 
-This repo contains multiple solvers to FUGW optimization problems,
-as well as scikit-learn transformers wrapping these solvers.
+This repo contains multiple solvers to FUGW optimization problems.
+These solvers are wrapped in classes with `.fit()` and `.transform()` methods.
 Functions implemented in `./tests` can be useful to understand how to use the solvers and the associated transformers.
 
 ### 1 - Transporting distributions that have less than 10k points
@@ -72,7 +69,6 @@ The following example is taken from `./tests/test_dense.py`:
 
 ```python
 import numpy as np
-from sklearn.metrics import pairwise_distances
 import torch
 
 from fugw import FUGW
@@ -85,13 +81,19 @@ n_features_train = 10
 n_features_test = 5
 
 
-def init_distribution(n_features, n_vertices):
-    weights = np.ones(n_vertices) / n_vertices
-    features = np.random.rand(n_features, n_vertices)
-    embeddings = np.random.rand(n_vertices, 3)
-    geometry = pairwise_distances(embeddings)
+def init_distribution(n_features, n_voxels, should_normalize=True):
+    weights = torch.ones(n_voxels) / n_voxels
+    features = torch.rand(n_features, n_voxels)
+    embeddings = torch.rand(n_voxels, 3)
+    geometry = torch.cdist(embeddings)
 
-    return weights, features, geometry, embeddings
+    return (
+        weights.numpy(),
+        features.numpy(),
+        geometry.numpy(),
+        embeddings.numpy(),
+    )
+
 
 
 if __name__ == "__main__":
@@ -117,10 +119,6 @@ if __name__ == "__main__":
 
     transformed_data = fugw.transform(source_features_test)
     assert transformed_data.shape == target_features_test.shape
-
-    # Compute score
-    s = fugw.score(source_features_test, target_features_test)
-    assert isinstance(s, int) or isinstance(s, float)
 ```
 
 ### 2 - Transporting samples of the source and target distributions
