@@ -5,7 +5,9 @@ from fugw import FUGW
 
 from .utils import init_distribution
 
-np.random.seed(100)
+np.random.seed(0)
+torch.manual_seed(0)
+
 n_voxels_source = 105
 n_voxels_target = 95
 n_features_train = 10

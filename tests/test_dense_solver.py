@@ -6,7 +6,7 @@ from fugw.solvers.dense import FUGWSolver
 
 @pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "dc"])
 def test_solvers(uot_solver):
-    torch.manual_seed(100)
+    torch.manual_seed(0)
 
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")

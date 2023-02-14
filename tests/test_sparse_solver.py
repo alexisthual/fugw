@@ -17,7 +17,7 @@ if torch.cuda.is_available():
     product(["mm", "dc"], devices),
 )
 def test_solvers(uot_solver, device):
-    torch.manual_seed(100)
+    torch.manual_seed(0)
     torch.backends.cudnn.benchmark = True
 
     ns = 104
