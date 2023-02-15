@@ -284,7 +284,7 @@ class FUGWSolver(BaseSolver):
         idx = 0
         err = None
 
-        while (err is None or err > self.tol_bcd) and (idx <= self.nits_bcd):
+        while (err is None or err > self.tol_bcd) and (idx < self.nits_bcd):
             pi_prev = pi.detach().clone()
 
             # Update gamma

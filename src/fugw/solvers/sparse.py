@@ -370,7 +370,7 @@ class FUGWSparseSolver(BaseSolver):
         idx = 0
         err = self.tol_bcd + 1e-3
 
-        while (err > self.tol_bcd) and (idx <= self.nits_bcd):
+        while (err > self.tol_bcd) and (idx < self.nits_bcd):
             pi_prev = pi.detach().clone()
 
             # Update gamma
