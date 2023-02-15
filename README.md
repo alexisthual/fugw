@@ -64,6 +64,109 @@ Namely, we provide:
 * `mm`: a majorize-minimization algorithm described in [(Chapel et al. 2021) [4]](#4)
 * `dc`: a proximal-point approach described in [(Xie et al. 2020) [5]](#5)
 
+## Installation
+
+In a dedicated Python env, run:
+
+```bash
+pip install fugw
+```
+
+If you need to call functions within `fugw.scripts`, you should also run
+
+```bash
+pip install "fugw[scripts]"
+```
+
+### Install from source
+
+```bash
+git clone https://github.com/alexisthual/fugw.git
+cd fugw
+```
+
+In a dedicated Python env, run:
+
+```bash
+pip install -e .
+```
+
+Development tests run on CPU and GPU, depending on the configuration of your machine.
+To run them, install development dependencies with:
+
+```bash
+pip install -e ".[dev]"
+```
+
+```bash
+pytest
+```
+
+## Usage and examples
+
+Check examples given in `./examples` to see tested scripts
+tackling real-cases.
+Moreover, functions implemented in `./tests` yield some more examples
+illustrating how to use this package.
+
+### 1 - Transporting distributions containing less than 10k points
+
+This is the simplest use case, in which $D^s$ and $D^t$ fit in memory.
+We use `fugw.FUGW` to compute dense solutions to our problem.
+
+**See [`./examples/1_dense.py`](./examples/1_dense.py)**
+
+### 2 - Transporting distributions containing more than 10k points
+
+Because FUGW computes a matrix $P$ of shape $n \times m$,
+the size of $P$ grows quadratically with the number of vertices,
+and rapidly won't fit on GPUs.
+
+To circumvent this issue, we pre-implemented the following
+coarse-to-fine approach:
+
+1. compute a coarse FUGW solution between sub-samples
+of the source and target distributions
+which fit on GPUs
+2. select good pairs of matched vertices $i$, $j$
+according to the transport plan computed at the coarse step
+3. define a sparsity mask such all pairs of vertices $k$, $l$
+within a neighbour of $i$ and $j$ respectively
+apprear in the mask. The neighbourhood of vertices is
+defined according to a given radius, for instance vertices $k$
+which are within a 5mm-range of $i$.
+4. compute a fine-scale FUGW solution using a sparse solver
+initialised with a transport plan using previous sparsity mask
+
+#### Generate embeddings from mesh
+
+Similarly to $P$, $D^s$ and $D^t$ can't be stored on GPUs.
+Since, in our applications, $D^s$ are low-rank kernel matrices
+or can be approximated as such, we derive an embedding $X^s$ of size `(n, k)`
+such that $D^s_{i,j} = ||X^s_{i} - X^s_{j}||^2_{2}$
+and store $X^s$ instead of $D^s$.
+
+We leverage an approach described in [(Platt 2005) [6]](#6)
+to derive an LMDS embedding approximating the geodesic distance on a given mesh.
+
+We use `fugw.scripts.lmds` to compute these embeddings.
+
+**See [`./examples/2_1_lmds.py`](./examples/2_1_lmds.py)**
+
+#### Deriving a high-rank sparse solution
+
+We then apply the coarse-to-fine approach described above to compute a plan.
+In particular, we use `fugw.scripts.coarse_to_fine` to handle the whole routine.
+This routine uses `fugw.FUGWSparse` to derive sparse solutions to our optimisation problem.
+
+**See [`./examples/2_2_coarse_to_fine.py`](./examples/2_2_coarse_to_fine.py)**
+
+### 3 - Computing a FUGW barycenter from multiple distributions
+
+Currently implemented for dense solvers only.
+
+See `./tests/test_barycenter.py`.
+
 ## API references
 
 This repo contains 2 main classes, `fugw.FUGW` and `fugw.FUGWSparse`.
@@ -143,132 +246,40 @@ except for `.fit()`.
 **Parameters are the same as for `fugw.FUGW.fit()` except that `source_geometry`
 (resp. `target_geometry`) is replaced by `source_geometry_embedding`
 (resp. `source_geometry`).**
-Indeed, a `source_geometry` array (ie $D^s$) of size `(n, n)` will cause memory overflows
-for high values of `n`. Since, in our applications, $D^s$ are low-rank kernel matrices
-or can be approximated as such, we store an embedding $X^s$ of size `(n, k)`
-such that $D^s_{i,j} = ||X^s_{i} - X^s_{j}||^2_{2}$.
 
 * `source_geometry_embedding`: array of size `(n, k)`, $X^s$,
 embedding used to store $D^s$ for high values of `n`
 * `target_geometry_embedding`: array of size `(m, k)`, $X^t$,
 embedding used to store $D^t$ for high values of `m`
 
-## Installation
+### Method `fugw.scripts.coarse_to_fine.fit()` parameters
 
-### Install from source
+* `coarse_model`: fugw.FUGW, Coarse model to fit
+* `coarse_model_fit_params`: dict, Parameters to give to the `.fit()` method of the coarse model
+* `coarse_pairs_selection_method`: "topk" or "quantile", Method used to select pairs of source and target features whose neighbourhoods will be used to define the sparsity mask of the solution
+* `source_selection_radius`: float, Radius used to determine the neighbourhood of source vertices when defining sparsity mask for fine-scale solution
+* `target_selection_radius`: float, Radius used to determine the neighbourhood of target vertices when defining sparsity mask for fine-scale solution
+* `fine_model`: fugw.FUGWSparse, Fine-scale model to fit
+* `fine_model_fit_params`: dict, Parameters to give to the `.fit()` method of the fine-scale model
+* `source_sample_size`: int, Number of vertices to sample from source for coarse step
+* `target_sample_size`: int, Number of vertices to sample from target for coarse step
+* `source_features`: ndarray(n_features, n), Feature maps for source subject.  n_features is the number of contrast maps, it should be the same for source and target data.  n is the number of nodes on the source graph, it can be different from m, the number of nodes on the target graph.
+* `target_features`: ndarray(n_features, m), Feature maps for target subject.
+* `source_geometry_embeddings`: array(n, k), Embedding approximating the distance matrix between source vertices
+* `target_geometry_embeddings`: array(m, k), Embedding approximating the distance matrix between target vertices
+* `source_weights`: ndarray(n) or None, Distribution weights of source nodes.  Should sum to 1. If None, eahc node's weight will be set to 1 / n.
+* `target_weights`: ndarray(n) or None, Distribution weights of target nodes.  Should sum to 1. If None, eahc node's weight will be set to 1 / m.
+* `device`: "auto" or torch.device, if "auto": use first available gpu if it's available, cpu otherwise.
+* `verbose`: bool, optional, defaults to False, Log solving process.
 
-```bash
-git clone https://github.com/alexisthual/fugw.git
-cd fugw
-```
+### Method `fugw.scripts.lmds.compute_lmds()` parameters
 
-In a dedicated Python env, run:
-
-```bash
-pip install -e .
-```
-
-Development tests run on CPU and GPU, depending on the configuration of your machine.
-To run them, install development dependencies with:
-
-```bash
-pip install -e '.[dev]'
-```
-
-```bash
-pytest
-```
-
-## Usage and examples
-
-Functions implemented in `./tests` yield a few examples illustrating how to use this package.
-
-### 1 - Transporting distributions that have less than 10k points
-
-The following example is taken from `./tests/test_dense.py`:
-
-```python
-import torch
-
-from fugw import FUGW
-
-
-np.random.seed(0)
-n_vertices_source = 105
-n_vertices_target = 95
-n_features_train = 10
-n_features_test = 5
-
-
-# Util function to generate random data
-def init_distribution(n_features, n_voxels, should_normalize=True):
-    weights = torch.ones(n_voxels) / n_voxels
-    features = torch.rand(n_features, n_voxels)
-    embeddings = torch.rand(n_voxels, 3)
-    geometry = torch.cdist(embeddings)
-
-    return (
-        weights.numpy(),
-        features.numpy(),
-        geometry.numpy(),
-        embeddings.numpy(),
-    )
-
-
-if __name__ == "__main__":
-    # Generate random training data for source and target distributions
-    _, source_features_train, source_geometry, _ = init_distribution(
-        n_features_train, n_vertices_source
-    )
-    _, target_features_train, target_geometry, _ = init_distribution(
-        n_features_train, n_vertices_target
-    )
-
-    # Define the optimization problem to solve
-    fugw = FUGW(alpha=0.5)
-
-    # Fit transport plan between source and target distributions
-    # with sinkhorn solver
-    fugw.fit(
-        source_features_train,
-        target_features_train,
-        source_geometry=source_geometry,
-        target_geometry=target_geometry,
-        uot_solver="sinkhorn", 
-    )
-
-    # The transport plan can be accessed after the model has been fitted
-    print(f"Transport plan's total mass: {fugw.pi.sum()}")
-
-    # Finally, the fitted model can transport unseen data
-    # between source and target
-    source_features_test = torch.rand(n_features_test, n_vertices_source)
-    target_features_test = torch.rand(n_features_test, n_vertices_target)
-    transformed_data = fugw.transform(source_features_test)
-    assert transformed_data.shape == target_features_test.shape
-```
-
-### 2 - Transporting samples of the source and target distributions
-
-TODO
-
-### 3 - Transporting distributions that have more than 10k points
-
-Because FUGW computes a matrix $P$ of shape $n \times m$,
-the size of $P$ grows quadratically with the number of vertices.
-
-In order to be able to store such a matrix on GPU for high values of $n$, $m$, a sparse
-solver is available. It leverages example 2 to compute a dense transport plan between
-sub-samples of $s$ and $t$, and uses it to define a sparsity mask of the solution
-that will be computed by the sparse solver.
-
-TODO
-
-### 4 - Computing a FUGW barycenter from multiple distributions
-
-See `./tests/test_barycenter.py`.
-
-TODO
+* `coordinates`: array of size (n, 3), Coordinates of vertices
+* `triangles`: array of size (t, 3), Triplets of indices indicating faces
+* `n_landmarks`: Number of vertices to sample on mesh to approximate embedding
+* `k`: Dimension of embedding
+* `n_jobs`: Number of CPUs to use to parallelise computation
+* `verbose`: Log solving process
 
 ## References
 
@@ -281,6 +292,8 @@ TODO
 <a id="4">[4]</a> Chapel, Laetitia, Rémi Flamary, Haoran Wu, Cédric Févotte, and Gilles Gasso. ‘Unbalanced Optimal Transport through Non-Negative Penalized Linear Regression’. In Advances in Neural Information Processing Systems, 34:23270–82. Curran Associates, Inc., 2021. <https://proceedings.neurips.cc/paper/2021/hash/c3c617a9b80b3ae1ebd868b0017cc349-Abstract.html>.
 
 <a id="5">[5]</a> Xie, Yujia, Xiangfeng Wang, Ruijia Wang, and Hongyuan Zha. ‘A Fast Proximal Point Method for Computing Exact Wasserstein Distance’. In Proceedings of The 35th Uncertainty in Artificial Intelligence Conference, 433–53. PMLR, 2020. <https://proceedings.mlr.press/v115/xie20b.html>.
+
+<a id="6">[6]</a> Platt, John. ‘FastMap, MetricMap, and Landmark MDS Are All Nystrom Algorithms’, 1 January 2005. https://www.microsoft.com/en-us/research/publication/fastmap-metricmap-and-landmark-mds-are-all-nystrom-algorithms/.
 
 ## Citing this work
 
