@@ -90,7 +90,7 @@ you can use to fit such model.
 * `alpha`: value in ]0, 1[, controls the relative importance of the Wasserstein and the Gromov-Wasserstein losses in the FUGW loss (see equation)
 * `rho`: value in ]0, +inf[, controls the relative importance of the marginal constraints. High values force the mass of each point to be transported ; low values allow for some mass loss
 * `eps`: value in ]0, +inf[, controls the relative importance of the entropy loss
-* `reg_mode`: `"joint"` or `"independent"` ; controls how marginals of $P$ and $Q$ are penalized in the marginal constraints (for instance, either $\text{KL}(P_{\# 1} \otimes Q_{\# 1}, w^s \otimes w^s)$ or $\text{KL}(P_{\# 1}, w^s) + \text{KL}(Q_{\# 1}, w^s)$ for the marginal constraints relative to the source)
+* `reg_mode`: `"joint"` or `"independent"` ; controls how marginals of $P$ and $Q$ are penalized in the marginal constraints (for instance, either $\text{KL}(P_{\verb|#1|} \otimes Q_{\verb|#1|}, w^s \otimes w^s)$ or $\text{KL}(P_{\verb|#1|}, w^s) + \text{KL}(Q_{\verb|#1|}, w^s)$ for the marginal constraints relative to the source)
 
 ### Method `fugw.FUGW.fit()` parameters
 
