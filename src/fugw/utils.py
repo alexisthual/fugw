@@ -2,8 +2,34 @@ import numpy as np
 import torch
 
 from rich.console import Console
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    SpinnerColumn,
+    TaskProgressColumn,
+    TextColumn,
+    TimeElapsedColumn,
+    TimeRemainingColumn,
+)
 
+# `rich` console used throuout the codebase
 console = Console()
+
+
+# `rich` progress bar used trhouout the codebase
+def get_progress(**kwargs):
+    return Progress(
+        SpinnerColumn(),
+        TaskProgressColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TimeElapsedColumn(),
+        "<",
+        TimeRemainingColumn(),
+        **kwargs,
+    )
 
 
 class BaseTransformer:

@@ -1,8 +1,6 @@
 import torch
 
-from rich.progress import Progress
-
-from fugw.utils import console
+from fugw.utils import console, get_progress
 
 
 def csr_dim_sum(values, group_indices, n_groups):
@@ -137,7 +135,7 @@ def solver_sinkhorn(
     tau_s = 1 if torch.isinf(rho_s) else rho_s / (rho_s + eps)
     tau_t = 1 if torch.isinf(rho_t) else rho_t / (rho_t + eps)
 
-    with Progress(transient=True) as progress:
+    with get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -206,7 +204,7 @@ def solver_mm(
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    with Progress(transient=True) as progress:
+    with get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("MM iterations", total=niters)
 
@@ -222,10 +220,15 @@ def solver_mm(
             if verbose:
                 progress.update(task, advance=1)
 
-            if (idx % eval_freq == 0) and max(
-                (pi1 - pi1_prev).abs().max(), (pi2 - pi2_prev).abs().max()
-            ) < tol:
-                break
+            if idx % eval_freq == 0:
+                pi1_error = (pi1 - pi1_prev).abs().max()
+                pi2_error = (pi2 - pi2_prev).abs().max()
+                if max(pi1_error, pi2_error) < tol:
+                    console.log(
+                        "Reached tol_uot threshold: "
+                        f"{pi1_error}, {pi2_error}"
+                    )
+                    break
 
     return pi
 
@@ -303,7 +306,7 @@ def solver_mm_sparse(
         size=(n_cols, n_pi_values),
     ).to_sparse_csr()
 
-    with Progress(transient=True) as progress:
+    with get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("MM iterations", total=niters)
 
@@ -338,7 +341,7 @@ def solver_mm_sparse(
                 pi2_error = (pi2 - pi2_prev).abs().max()
                 if max(pi1_error, pi2_error) < tol:
                     console.log(
-                        "Reached tolereance threshold: "
+                        "Reached tol_uot threshold: "
                         f"{pi1_error}, {pi2_error}"
                     )
                     break
@@ -373,7 +376,7 @@ def solver_dc(
 
     K = torch.exp(-cost / sum_eps)
 
-    with Progress(transient=True) as progress:
+    with get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
@@ -412,6 +415,7 @@ def solver_dc(
 
                 error = (m1 - m1_prev).abs().max().item()
                 if error < tol:
+                    console.log(f"Reached tol_uot threshold: {error}")
                     break
 
     # renormalize couplings
@@ -467,7 +471,7 @@ def solver_dc_sparse(
     # Remove previously added 1
     csr_values_to_transpose_values = T.values() - 1
 
-    with Progress(transient=True) as progress:
+    with get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
@@ -529,6 +533,7 @@ def solver_dc_sparse(
 
                 error = (m1 - m1_prev).abs().max().item()
                 if error < tol:
+                    console.log(f"Reached tol_uot threshold: {error}")
                     break
 
     # renormalize couplings
