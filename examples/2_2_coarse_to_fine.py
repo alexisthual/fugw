@@ -6,10 +6,10 @@ from fugw.utils import init_mock_distribution
 
 torch.manual_seed(0)
 
-n_voxels_source = 105
-n_samples_source = 50
-n_voxels_target = 95
-n_samples_target = 45
+n_voxels_source = 300
+n_samples_source = 150
+n_voxels_target = 300
+n_samples_target = 150
 n_features_train = 10
 n_features_test = 5
 
@@ -22,16 +22,19 @@ _, target_features, _, target_embeddings = init_mock_distribution(
 )
 
 # Define the optimization problem to solve
-coarse_model = FUGW(alpha=0.2)
+coarse_model = FUGW(alpha=0.5)
 fine_model = FUGWSparse(alpha=0.5)
 
 # Specify which solvers to use at each step
 coarse_model_fit_params = {
     "uot_solver": "mm",
+    "tol_uot": 1e-10,
+    "nits_uot": 100,
 }
 
 fine_model_fit_params = {
     "uot_solver": "mm",
+    "tol_uot": 1e-10,
 }
 
 # Fit transport plans
@@ -49,6 +52,7 @@ coarse_to_fine.fit(
     target_features=target_features,
     source_geometry_embeddings=source_embeddings,
     target_geometry_embeddings=target_embeddings,
+    verbose=True,
 )
 
 # Both the coarse and fine-scale transport plans can be accessed

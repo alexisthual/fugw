@@ -3,7 +3,7 @@ from itertools import product
 import numpy as np
 import torch
 
-from fugw.utils import make_tensor
+from fugw.utils import make_tensor, get_progress
 
 
 def random_normalizing(X, repeats=10, sample_size=100):
@@ -204,15 +204,21 @@ def fit(
     # Store pairs of source and target indices which are allowed to be matched
     sparsity_mask = []
 
-    for i, j in list(zip(rows, cols)):
-        sparsity_mask.extend(
-            block(
-                i,
-                j,
-                source_radius=source_selection_radius,
-                target_radius=target_selection_radius,
+    with get_progress() as progress:
+        pairs = list(zip(rows, cols))
+        if verbose:
+            task = progress.add_task("Sparsity mask", total=len(pairs))
+        for i, j in pairs:
+            sparsity_mask.extend(
+                block(
+                    i,
+                    j,
+                    source_radius=source_selection_radius,
+                    target_radius=target_selection_radius,
+                )
             )
-        )
+            if verbose:
+                progress.update(task, advance=1)
 
     sparsity_mask = np.array(sparsity_mask, dtype=np.int32)
 
