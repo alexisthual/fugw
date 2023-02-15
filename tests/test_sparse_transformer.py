@@ -15,6 +15,7 @@ n_voxels_target = 95
 n_features_train = 10
 n_features_test = 5
 
+return_numpys = [True, False]
 sparse_layouts = ["coo", "csr"]
 
 devices = [torch.device("cpu")]
@@ -22,13 +23,16 @@ if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
 
-def test_fugw_sparse():
+@pytest.mark.parametrize(
+    "device,return_numpy", product(devices, return_numpys)
+)
+def test_fugw_sparse(device, return_numpy):
     # Generate random training data for source and target
-    _, source_features_train, _, source_embeddings = init_distribution(
-        n_features_train, n_voxels_source
+    _, source_features_train, _, source_embeddings = init_mock_distribution(
+        n_features_train, n_voxels_source, return_numpy=return_numpy
     )
-    _, target_features_train, _, target_embeddings = init_distribution(
-        n_features_train, n_voxels_target
+    _, target_features_train, _, target_embeddings = init_mock_distribution(
+        n_features_train, n_voxels_target, return_numpy=return_numpy
     )
 
     fugw = FUGWSparse()
@@ -37,6 +41,7 @@ def test_fugw_sparse():
         target_features_train,
         source_geometry_embedding=source_embeddings,
         target_geometry_embedding=target_embeddings,
+        device=device,
     )
 
     # Use trained model to transport new features
@@ -80,16 +85,16 @@ def test_fugw_sparse():
 
 
 @pytest.mark.parametrize(
-    "device,sparse_layout",
-    product(devices, sparse_layouts),
+    "device,sparse_layout,return_numpy",
+    product(devices, sparse_layouts, return_numpys),
 )
-def test_fugw_sparse_with_init(device, sparse_layout):
+def test_fugw_sparse_with_init(device, sparse_layout, return_numpy):
     # Generate random training data for source and target
-    _, source_features_train, _, source_embeddings = init_distribution(
-        n_features_train, n_voxels_source
+    _, source_features_train, _, source_embeddings = init_mock_distribution(
+        n_features_train, n_voxels_source, return_numpy=return_numpy
     )
-    _, target_features_train, _, target_embeddings = init_distribution(
-        n_features_train, n_voxels_target
+    _, target_features_train, _, target_embeddings = init_mock_distribution(
+        n_features_train, n_voxels_target, return_numpy=return_numpy
     )
 
     rows = []
