@@ -25,7 +25,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+scripts = [
+  "joblib>=1.2.0",
+  "tvb-gdist>=2.1.1",
+]
 dev = [
+  "fugw[scripts]",
+  "meshzoo>=0.9.20",
   "pytest>=7.2",
 ]
 
