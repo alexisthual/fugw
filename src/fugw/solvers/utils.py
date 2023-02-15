@@ -224,10 +224,11 @@ def solver_mm(
                 pi1_error = (pi1 - pi1_prev).abs().max()
                 pi2_error = (pi2 - pi2_prev).abs().max()
                 if max(pi1_error, pi2_error) < tol:
-                    console.log(
-                        "Reached tol_uot threshold: "
-                        f"{pi1_error}, {pi2_error}"
-                    )
+                    if verbose:
+                        progress.console.log(
+                            "Reached tol_uot threshold: "
+                            f"{pi1_error}, {pi2_error}"
+                        )
                     break
 
     return pi
@@ -340,10 +341,11 @@ def solver_mm_sparse(
                 pi1_error = (pi1 - pi1_prev).abs().max()
                 pi2_error = (pi2 - pi2_prev).abs().max()
                 if max(pi1_error, pi2_error) < tol:
-                    console.log(
-                        "Reached tol_uot threshold: "
-                        f"{pi1_error}, {pi2_error}"
-                    )
+                    if verbose:
+                        progress.console.log(
+                            "Reached tol_uot threshold: "
+                            f"{pi1_error}, {pi2_error}"
+                        )
                     break
 
     return torch.sparse_csr_tensor(
@@ -415,7 +417,8 @@ def solver_dc(
 
                 error = (m1 - m1_prev).abs().max().item()
                 if error < tol:
-                    console.log(f"Reached tol_uot threshold: {error}")
+                    if verbose:
+                        progress.console.log(f"Reached tol_uot threshold: {error}")
                     break
 
     # renormalize couplings
@@ -533,7 +536,8 @@ def solver_dc_sparse(
 
                 error = (m1 - m1_prev).abs().max().item()
                 if error < tol:
-                    console.log(f"Reached tol_uot threshold: {error}")
+                    if verbose:
+                        progress.console.log(f"Reached tol_uot threshold: {error}")
                     break
 
     # renormalize couplings
