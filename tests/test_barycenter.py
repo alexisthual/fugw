@@ -12,7 +12,7 @@ if torch.cuda.is_available():
 
 @pytest.mark.parametrize("device", devices)
 def test_fugw_barycenter(device):
-    np.random.seed(100)
+    np.random.seed(0)
     n_subjects = 4
     n_voxels = 100
     n_features = 10
@@ -23,7 +23,7 @@ def test_fugw_barycenter(device):
     weights_ = []
 
     for _ in range(n_subjects):
-        weights, features, geometry, _ = init_distribution(
+        weights, features, geometry, _ = init_mock_distribution(
             n_features, n_voxels
         )
         weights_.append(weights)
