@@ -2,8 +2,7 @@ from functools import partial
 
 import torch
 
-from fugw.utils import BaseSolver, console
-from .utils import (
+from fugw.solvers.utils import (
     compute_approx_kl,
     compute_kl,
     compute_quad_kl,
@@ -11,6 +10,7 @@ from .utils import (
     solver_mm,
     solver_sinkhorn,
 )
+from fugw.utils import BaseSolver, console
 
 
 class FUGWSolver(BaseSolver):

@@ -3,8 +3,7 @@ from functools import partial
 import numpy as np
 import torch
 
-from fugw.utils import BaseSolver, console, make_csr_matrix
-from .utils import (
+from fugw.solvers.utils import (
     batch_elementwise_prod_and_sum,
     compute_approx_kl,
     compute_approx_kl_sparse,
@@ -17,6 +16,7 @@ from .utils import (
     solver_dc_sparse,
     solver_mm_sparse,
 )
+from fugw.utils import BaseSolver, console, make_csr_matrix
 
 
 class FUGWSparseSolver(BaseSolver):
