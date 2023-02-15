@@ -10,26 +10,17 @@ class FUGWBarycenter:
         alpha=0.5,
         rho=1,
         eps=1e-2,
-        uot_solver="sinkhorn",
         reg_mode="joint",
-        early_stopping_threshold=1e-6,
-        nits_barycenter=5,
         force_psd=False,
         learn_geometry=False,
-        verbose=False,
-        **kwargs,
     ):
         # Save model arguments
         self.alpha = alpha
         self.rho = rho
         self.eps = eps
-        self.uot_solver = uot_solver
         self.reg_mode = reg_mode
-        self.early_stopping_threshold = early_stopping_threshold
-        self.nits_barycenter = nits_barycenter
         self.force_psd = force_psd
         self.learn_geometry = learn_geometry
-        self.verbose = verbose
 
     @staticmethod
     def update_barycenter_geometry(
@@ -128,7 +119,10 @@ class FUGWBarycenter:
         barycenter_weights,
         barycenter_features,
         barycenter_geometry,
+        uot_solver,
+        early_stopping_threshold,
         device,
+        verbose,
     ):
         new_plans_ = []
         new_duals_ = []
@@ -144,10 +138,7 @@ class FUGWBarycenter:
                 alpha=self.alpha,
                 rho=self.rho,
                 eps=self.eps,
-                uot_solver=self.uot_solver,
                 reg_mode=self.reg_mode,
-                verbose=self.verbose,
-                early_stopping_threshold=self.early_stopping_threshold,
             )
 
             (
@@ -165,10 +156,13 @@ class FUGWBarycenter:
                 target_geometry=barycenter_geometry,
                 source_weights=weights,
                 target_weights=barycenter_weights,
+                uot_solver=uot_solver,
                 # TODO: check if 2 plans couldn't be used instead of just one
                 init_plan=plans_[i][0] if plans_ is not None else None,
                 init_duals=duals_[i][0] if duals_ is not None else None,
+                early_stopping_threshold=early_stopping_threshold,
                 device=device,
+                verbose=verbose,
             )
 
             new_plans_.append((pi, gamma))
@@ -186,43 +180,49 @@ class FUGWBarycenter:
         init_barycenter_weights=None,
         init_barycenter_features=None,
         init_barycenter_geometry=None,
+        uot_solver="sinkhorn",
+        nits_barycenter=5,
+        early_stopping_threshold=1e-6,
         device="auto",
+        verbose=False,
     ):
         """Compute barycentric features and geometry
         minimizing FUGW loss to list of distributions given as input.
         In this documentation, we refer to a single distribution as
         an a subject's or an individual's distribution.
 
-        Args:
-            weights_ (list of np.array): List of weights. Different individuals
-                can have weights with different sizes.
-            features_ (list of np.array): List of features. Individuals should
-                have the same number of features n_features.
-            geometry_ (list of np.array or np.array): List of kernel matrices
-                or just one kernel matrix if it's shared across individuals
-                barycenter_size (int, optional): Size of computed
-                barycentric features and geometry. Defaults to None.
-            init_barycenter_weights (np.array, optional): Distribution weights
-                of barycentric points. If None, points will have uniform
-                weights. Defaults to None.
-            init_barycenter_features (np.array, optional): np.array of size
-                (barycenter_size, n_features). Defaults to None.
-            init_barycenter_geometry (np.array, optional): np.array of size
-                (barycenter_size, barycenter_size). Defaults to None.
-            device: "auto" or torch.device
-                if "auto": use first available gpu if it's available,
-                cpu otherwise.
+        Parameters
+        ----------
+        weights_ (list of np.array): List of weights. Different individuals
+            can have weights with different sizes.
+        features_ (list of np.array): List of features. Individuals should
+            have the same number of features n_features.
+        geometry_ (list of np.array or np.array): List of kernel matrices
+            or just one kernel matrix if it's shared across individuals
+            barycenter_size (int, optional): Size of computed
+            barycentric features and geometry. Defaults to None.
+        init_barycenter_weights (np.array, optional): Distribution weights
+            of barycentric points. If None, points will have uniform
+            weights. Defaults to None.
+        init_barycenter_features (np.array, optional): np.array of size
+            (barycenter_size, n_features). Defaults to None.
+        init_barycenter_geometry (np.array, optional): np.array of size
+            (barycenter_size, barycenter_size). Defaults to None.
+        device: "auto" or torch.device
+            if "auto": use first available gpu if it's available,
+            cpu otherwise.
 
-        Returns:
-            barycenter_weights: np.array of size (barycenter_size)
-            barycenter_features: np.array of size (barycenter_size, n_features)
-            barycenter_geometry: np.array of size
-                (barycenter_size, barycenter_size)
-            plans_: list of (np.array, np.array)
-            duals_: list of (np.array, np.array)
-            losses_each_bar_step: list such that l[s][i]
-                is a tuple containing (loss_steps, loss, loss_ent)
-                for individual i at barycenter computation step s
+        Returns
+        -------
+        barycenter_weights: np.array of size (barycenter_size)
+        barycenter_features: np.array of size (barycenter_size, n_features)
+        barycenter_geometry: np.array of size
+            (barycenter_size, barycenter_size)
+        plans_: list of (np.array, np.array)
+        duals_: list of (np.array, np.array)
+        losses_each_bar_step: list such that l[s][i]
+            is a tuple containing (loss_steps, loss, loss_ent)
+            for individual i at barycenter computation step s
         """
         if device == "auto":
             if torch.cuda.is_available():
@@ -269,7 +269,7 @@ class FUGWBarycenter:
         duals_ = None
         losses_each_bar_step = []
 
-        for _ in range(self.nits_barycenter):
+        for _ in range(nits_barycenter):
             # Transport all elements
             plans_, duals_, losses_ = self.compute_all_ot_plans(
                 plans_,
@@ -280,7 +280,10 @@ class FUGWBarycenter:
                 barycenter_weights,
                 barycenter_features,
                 barycenter_geometry,
+                uot_solver,
+                early_stopping_threshold,
                 device,
+                verbose,
             )
 
             losses_each_bar_step.append(losses_)

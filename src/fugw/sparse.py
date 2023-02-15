@@ -4,34 +4,14 @@ import warnings
 
 from fugw.solvers.sparse import FUGWSparseSolver
 from fugw.utils import (
-    BaseModel,
+    BaseTransformer,
     low_rank_squared_l2,
     make_sparse_csr_tensor,
     make_tensor,
 )
 
 
-class FUGWSparse(BaseModel):
-    def __init__(
-        self,
-        alpha=0.5,
-        rho=1,
-        eps=1e-2,
-        uot_solver="dc",
-        reg_mode="joint",
-        verbose=False,
-        early_stopping_threshold=1e-6,
-        **kwargs,
-    ):
-        # Save model arguments
-        self.alpha = alpha
-        self.rho = rho
-        self.eps = eps
-        self.uot_solver = uot_solver
-        self.reg_mode = reg_mode
-        self.verbose = verbose
-        self.early_stopping_threshold = early_stopping_threshold
-
+class FUGWSparse(BaseTransformer):
     def fit(
         self,
         source_features,
@@ -42,7 +22,9 @@ class FUGWSparse(BaseModel):
         target_weights=None,
         init_plan=None,
         init_duals=None,
+        uot_solver="mm",
         device="auto",
+        verbose=False,
         **kwargs,
     ):
         """
@@ -54,37 +36,41 @@ class FUGWSparse(BaseModel):
 
         Parameters
         ----------
-        source_features: ndarray(n_features, n1)
+        source_features: ndarray(n_features, n)
             Feature maps for source subject.
             n_features is the number of contrast maps, it should
             be the same for source and target data.
-            n1 is the number of nodes on the source graph, it
-            can be different from n2, the number of nodes on the
+            n is the number of nodes on the source graph, it
+            can be different from m, the number of nodes on the
             target graph.
-        target_features: ndarray(n_features, n2)
+        target_features: ndarray(n_features, m)
             Feature maps for target subject.
-        source_geometry_embedding: ndarray(n1, d), optional
+        source_geometry_embedding: ndarray(n, k), optional
             Embedding X such that norm(X_i - X_j) approximates
             the anatomical distance between vertices i and j
             of the source mesh
-        target_geometry_embedding: ndarray(n2, d), optional
+        target_geometry_embedding: ndarray(m, k), optional
             Embedding X such that norm(X_i - X_j) approximates
             the anatomical distance between vertices i and j
             of the target mesh
-        source_weights: ndarray(n1) or None
+        source_weights: ndarray(n) or None
             Distribution weights of source nodes.
-            Should sum to 1. If None, eahc node's weight
-            will be set to 1 / n1.
-        target_weights: ndarray(n1) or None
+            Should sum to 1. If None, each node's weight
+            will be set to 1 / n.
+        target_weights: ndarray(n) or None
             Distribution weights of target nodes.
-            Should sum to 1. If None, eahc node's weight
-            will be set to 1 / n2.
+            Should sum to 1. If None, each node's weight
+            will be set to 1 / m.
         init_plan: torch.sparse COO or CSR matrix or None
             Torch sparse matrix whose sparsity mask will
             be that of the transport plan computed by this solver.
+        uot_solver: "mm" or "dc"
+            Solver to use.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
+        verbose: bool, optional, defaults to False
+            Log solving process.
 
         Returns
         -------
@@ -102,10 +88,10 @@ class FUGWSparse(BaseModel):
                 device = torch.device("cpu")
 
         if isinstance(self.rho, float) or isinstance(self.rho, int):
-            rho_x = self.rho
-            rho_y = self.rho
+            rho_s = self.rho
+            rho_t = self.rho
         elif isinstance(self.rho, tuple) and len(self.rho) == 2:
-            rho_x, rho_y = self.rho
+            rho_s, rho_t = self.rho
         else:
             raise ValueError(
                 "Invalid value of rho. Must be either a scalar or a tuple of"
@@ -114,42 +100,39 @@ class FUGWSparse(BaseModel):
 
         # Set weights if they were not set by user
         if source_weights is None:
-            Ws = (
+            ws = (
                 torch.ones(source_features.shape[1], device=device)
                 / source_features.shape[1]
             )
         else:
-            Ws = make_tensor(source_weights, device=device)
+            ws = make_tensor(source_weights, device=device)
 
         if target_weights is None:
-            Wt = (
+            wt = (
                 torch.ones(target_features.shape[1], device=device)
                 / target_features.shape[1]
             )
         else:
-            Wt = make_tensor(target_weights, device=device)
+            wt = make_tensor(target_weights, device=device)
 
         # Compute distance matrix between features
         Fs = make_tensor(source_features.T, device=device)
         Ft = make_tensor(target_features.T, device=device)
-        K1, K2 = low_rank_squared_l2(Fs, Ft)
-        K1 = make_tensor(K1, device=device)
-        K2 = make_tensor(K2, device=device)
+        F1, F2 = low_rank_squared_l2(Fs, Ft)
+        F1 = make_tensor(F1, device=device)
+        F2 = make_tensor(F2, device=device)
 
         # Load anatomical kernels to GPU
-        Gs1, Gs2 = low_rank_squared_l2(
+        Ds1, Ds2 = low_rank_squared_l2(
             source_geometry_embedding, source_geometry_embedding
         )
-        Gs1 = make_tensor(Gs1, device=device)
-        Gs2 = make_tensor(Gs2, device=device)
-        Gt1, Gt2 = low_rank_squared_l2(
+        Ds1 = make_tensor(Ds1, device=device)
+        Ds2 = make_tensor(Ds2, device=device)
+        Dt1, Dt2 = low_rank_squared_l2(
             target_geometry_embedding, target_geometry_embedding
         )
-        Gt1 = make_tensor(Gt1, device=device)
-        Gt2 = make_tensor(Gt2, device=device)
-
-        # Create model
-        model = FUGWSparseSolver(**kwargs)
+        Dt1 = make_tensor(Dt1, device=device)
+        Dt2 = make_tensor(Dt2, device=device)
 
         # Check that all init_plan is valid
         if init_plan is None:
@@ -162,6 +145,9 @@ class FUGWSparse(BaseModel):
         else:
             init_plan = make_sparse_csr_tensor(init_plan, device=device)
 
+        # Create model
+        model = FUGWSparseSolver(**kwargs)
+
         # Compute transport plan
         (
             pi,
@@ -171,22 +157,21 @@ class FUGWSparse(BaseModel):
             loss_steps,
             loss_,
             loss_ent_,
-        ) = model.solver(
-            px=Ws,
-            py=Wt,
-            K=(K1, K2),
-            Gs=(Gs1, Gs2),
-            Gt=(Gt1, Gt2),
+        ) = model.solve(
             alpha=self.alpha,
-            rho_x=rho_x,
-            rho_y=rho_y,
+            rho_s=rho_s,
+            rho_t=rho_t,
             eps=self.eps,
-            uot_solver=self.uot_solver,
             reg_mode=self.reg_mode,
-            early_stopping_threshold=self.early_stopping_threshold,
+            F=(F1, F2),
+            Ds=(Ds1, Ds2),
+            Dt=(Dt1, Dt2),
+            ws=ws,
+            wt=wt,
             init_plan=init_plan,
             init_duals=init_duals,
-            verbose=self.verbose,
+            uot_solver=uot_solver,
+            verbose=verbose,
         )
 
         self.pi = pi.to_sparse_coo().detach().cpu()
@@ -195,7 +180,7 @@ class FUGWSparse(BaseModel):
         self.loss_ent_ = loss_ent_
 
         # Free allocated GPU memory
-        del Fs, Ft, K1, K2, Gs1, Gs2, Gt1, Gt2
+        del Fs, Ft, F1, F2, Ds1, Ds2, Dt1, Dt2
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
@@ -208,7 +193,7 @@ class FUGWSparse(BaseModel):
 
         Parameters
         ----------
-        source_features: ndarray(n_samples, n1) or ndarray(n1)
+        source_features: ndarray(n_samples, n) or ndarray(n)
             Contrast map for source subject
         device: "auto" or torch.device
             If "auto": use first available GPU if it's available,
@@ -216,7 +201,7 @@ class FUGWSparse(BaseModel):
 
         Returns
         -------
-        transported_data: ndarray(n_samples, n2) or ndarray(n2)
+        transported_data: ndarray(n_samples, m) or ndarray(m)
             Contrast map transported in target subject's space
         """
         if device == "auto":
@@ -282,7 +267,7 @@ class FUGWSparse(BaseModel):
 
         Parameters
         ----------
-        target_features: ndarray(n_samples, n2) or ndarray(n2)
+        target_features: ndarray(n_samples, m) or ndarray(m)
             Contrast map for target subject
         device: "auto" or torch.device
             If "auto": use first available GPU if it's available,
@@ -290,7 +275,7 @@ class FUGWSparse(BaseModel):
 
         Returns
         -------
-        transported_data: ndarray(n_samples, n1) or ndarray(n1)
+        transported_data: ndarray(n_samples, n) or ndarray(n)
             Contrast map transported in target subject's space
         """
         if device == "auto":

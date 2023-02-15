@@ -118,8 +118,8 @@ def batch_elementwise_prod_and_sum(
     return res
 
 
-def solver_scaling(
-    cost, init_duals, uot_params, tuple_pxy, train_params, verbose=True
+def solver_sinkhorn(
+    cost, init_duals, uot_params, tuple_weights, train_params, verbose=True
 ):
     """
     Scaling algorithm (ie Sinkhorn algorithm).
@@ -127,31 +127,33 @@ def solver_scaling(
     https://github.com/thibsej/unbalanced_gromov_wasserstein.
     """
 
-    log_px, log_py, pxy = tuple_pxy
-    vx, vy = init_duals
-    rho_x, rho_y, eps = uot_params
+    ws, wt, ws_dot_wt = tuple_weights
+    log_ws = ws.log()
+    log_wt = wt.log()
+    u, v = init_duals
+    rho_s, rho_t, eps = uot_params
     niters, tol, eval_freq = train_params
 
-    tau_x = 1 if torch.isinf(rho_x) else rho_x / (rho_x + eps)
-    tau_y = 1 if torch.isinf(rho_y) else rho_y / (rho_y + eps)
+    tau_s = 1 if torch.isinf(rho_s) else rho_s / (rho_s + eps)
+    tau_t = 1 if torch.isinf(rho_t) else rho_t / (rho_t + eps)
 
     with Progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
         for idx in range(niters):
-            vx_prev, vy_prev = vx.detach().clone(), vy.detach().clone()
-            if rho_y == 0:
-                vy = torch.zeros_like(vy)
+            u_prev, v_prev = u.detach().clone(), v.detach().clone()
+            if rho_t == 0:
+                v = torch.zeros_like(v)
             else:
-                vy = -tau_y * ((vx + log_px)[:, None] - cost / eps).logsumexp(
+                v = -tau_t * ((u + log_ws)[:, None] - cost / eps).logsumexp(
                     dim=0
                 )
 
-            if rho_x == 0:
-                vx = torch.zeros_like(vx)
+            if rho_s == 0:
+                u = torch.zeros_like(u)
             else:
-                vx = -tau_x * ((vy + log_py)[None, :] - cost / eps).logsumexp(
+                u = -tau_s * ((v + log_wt)[None, :] - cost / eps).logsumexp(
                     dim=1
                 )
 
@@ -160,45 +162,45 @@ def solver_scaling(
 
             if (
                 idx % eval_freq == 0
-                and max((vx - vx_prev).abs().max(), (vy - vy_prev).abs().max())
+                and max((u - u_prev).abs().max(), (v - v_prev).abs().max())
                 < tol
             ):
                 break
 
-    pi = pxy * (vx[:, None] + vy[None, :] - cost / eps).exp()
+    pi = ws_dot_wt * (u[:, None] + v[None, :] - cost / eps).exp()
 
-    return (vx, vy), pi
+    return (u, v), pi
 
 
 def solver_mm(
-    cost, init_pi, uot_params, tuple_pxy, train_params, verbose=True
+    cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
 ):
     """
     Solve (entropic) UOT using the majorization-minimization algorithm.
 
-    Allow epsilon to be 0 but rho_x and rho_y can't be infinity.
+    Allow epsilon to be 0 but rho_s and rho_t can't be infinity.
 
     Note that if the parameters are small so that numerically, the exponential
     of negative cost will contain zeros and this serves as sparsification
     of the optimal plan.
 
     If the parameters are large, then the resulting optimal plan is more dense
-    than the one obtained from scaling algorithm.
+    than the one obtained from sinkhorn algorithm.
     But all parameters should not be too small, otherwise the kernel will
-    contain too many zeros.  Consequently, the optimal plan will contain NaN
+    contain too many zeros. Consequently, the optimal plan will contain NaN
     (because the Kronecker sum of two marginals will eventually contain zeros,
     and divided by zero will result in undesirable coupling).
     """
 
     niters, tol, eval_freq = train_params
-    px, py = tuple_pxy
-    rho_x, rho_y, eps = uot_params
+    ws, wt = tuple_weights
+    rho_s, rho_t, eps = uot_params
 
-    sum_param = rho_x + rho_y + eps
-    tau_x, tau_y, r = rho_x / sum_param, rho_y / sum_param, eps / sum_param
+    sum_param = rho_s + rho_t + eps
+    tau_s, tau_t, r = rho_s / sum_param, rho_t / sum_param, eps / sum_param
     K = (
-        px[:, None] ** (tau_x + r)
-        * py[None, :] ** (tau_y + r)
+        ws[:, None] ** (tau_s + r)
+        * wt[None, :] ** (tau_t + r)
         * (-cost / sum_param).exp()
     )
 
@@ -209,10 +211,10 @@ def solver_mm(
             task = progress.add_task("MM iterations", total=niters)
 
         for idx in range(niters):
-            pi1_old, pi2_old = pi1.detach().clone(), pi2.detach().clone()
+            pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
             pi = (
-                pi ** (tau_x + tau_y)
-                / (pi1[:, None] ** tau_x * pi2[None, :] ** tau_y)
+                pi ** (tau_s + tau_t)
+                / (pi1[:, None] ** tau_s * pi2[None, :] ** tau_t)
                 * K
             )
             pi1, pi2 = pi.sum(1), pi.sum(0)
@@ -221,7 +223,7 @@ def solver_mm(
                 progress.update(task, advance=1)
 
             if (idx % eval_freq == 0) and max(
-                (pi1 - pi1_old).abs().max(), (pi2 - pi2_old).abs().max()
+                (pi1 - pi1_prev).abs().max(), (pi2 - pi2_prev).abs().max()
             ) < tol:
                 break
 
@@ -229,28 +231,28 @@ def solver_mm(
 
 
 def solver_mm_sparse(
-    cost, init_pi, uot_params, tuple_pxy, train_params, verbose=True
+    cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
 ):
     """
     Solve (entropic) UOT using the majorization-minimization algorithm.
 
-    Allow epsilon to be 0 but rho_x and rho_y can't be infinity.
+    Allow epsilon to be 0 but rho_s and rho_t can't be infinity.
 
     Note that if the parameters are small so that numerically, the exponential
     of negative cost will contain zeros and this serves as sparsification
     of the optimal plan.
 
     If the parameters are large, then the resulting optimal plan is more dense
-    than the one obtained from scaling algorithm.
+    than the one obtained from sinkhorn algorithm.
     But all parameters should not be too small, otherwise the kernel will
-    contain too many zeros.  Consequently, the optimal plan will contain NaN
+    contain too many zeros. Consequently, the optimal plan will contain NaN
     (because the Kronecker sum of two marginals will eventually contain zeros,
     and divided by zero will result in undesirable coupling).
     """
 
     niters, tol, eval_freq = train_params
-    px, py = tuple_pxy
-    rho_x, rho_y, eps = uot_params
+    ws, wt = tuple_weights
+    rho_s, rho_t, eps = uot_params
 
     pi1, pi2, pi = (
         csr_sum(init_pi, dim=1),
@@ -261,11 +263,11 @@ def solver_mm_sparse(
     row_indices = crow_indices_to_row_indices(crow_indices)
     pi_values = pi.values()
 
-    sum_param = rho_x + rho_y + eps
-    tau_x, tau_y, r = rho_x / sum_param, rho_y / sum_param, eps / sum_param
+    sum_param = rho_s + rho_t + eps
+    tau_s, tau_t, r = rho_s / sum_param, rho_t / sum_param, eps / sum_param
     K_values = (
-        px[row_indices] ** (tau_x + r)
-        * py[col_indices] ** (tau_y + r)
+        ws[row_indices] ** (tau_s + r)
+        * wt[col_indices] ** (tau_t + r)
         * (-cost.values() / sum_param).exp()
     )
 
@@ -309,8 +311,8 @@ def solver_mm_sparse(
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
 
             pi_values = (
-                pi_values ** (tau_x + tau_y)
-                / (pi1[row_indices] ** tau_x * pi2[col_indices] ** tau_y)
+                pi_values ** (tau_s + tau_t)
+                / (pi1[row_indices] ** tau_s * pi2[col_indices] ** tau_t)
                 * K_values
             )
 
@@ -355,19 +357,19 @@ def solver_dc(
     init_pi,
     init_duals,
     uot_params,
-    tuple_pxy,
+    tuple_weights,
     train_params,
     verbose=True,
 ):
     niters, nits_sinkhorn, eps_base, tol, eval_freq = train_params
-    rho1, rho2, eps = uot_params
-    px, py, pxy = tuple_pxy
+    rho_s, rho_t, eps = uot_params
+    ws, wt, ws_dot_wt = tuple_weights
     u, v = init_duals
     m1, pi = init_pi.sum(1), init_pi
 
     sum_eps = eps_base + eps
-    tau1 = 1 if rho1 == float("inf") else rho1 / (rho1 + sum_eps)
-    tau2 = 1 if rho2 == float("inf") else rho2 / (rho2 + sum_eps)
+    tau_s = 1 if rho_s == float("inf") else rho_s / (rho_s + sum_eps)
+    tau_t = 1 if rho_t == float("inf") else rho_t / (rho_t + sum_eps)
 
     K = torch.exp(-cost / sum_eps)
 
@@ -386,11 +388,15 @@ def solver_dc(
             )
             for _ in range(nits_sinkhorn):
                 v = (
-                    (G.T @ (u * px)) ** (-tau2)
-                    if rho2 != 0
+                    (G.T @ (u * ws)) ** (-tau_t)
+                    if rho_t != 0
                     else torch.ones_like(v)
                 )
-                u = (G @ (v * py)) ** (-tau1) if rho1 != 0 else torch.ones_like(u)
+                u = (
+                    (G @ (v * wt)) ** (-tau_s)
+                    if rho_s != 0
+                    else torch.ones_like(u)
+                )
             pi = u[:, None] * G * v[None, :]
 
             if verbose:
@@ -409,7 +415,7 @@ def solver_dc(
                     break
 
     # renormalize couplings
-    pi = pi * pxy
+    pi = pi * ws_dot_wt
 
     return (u, v), pi
 
@@ -419,13 +425,13 @@ def solver_dc_sparse(
     init_pi,
     init_duals,
     uot_params,
-    tuple_pxy,
+    tuple_weights,
     train_params,
     verbose=True,
 ):
     niters, nits_sinkhorn, eps_base, tol, eval_freq = train_params
-    rho1, rho2, eps = uot_params
-    px, py, pxy = tuple_pxy
+    rho_s, rho_t, eps = uot_params
+    ws, wt, ws_dot_wt = tuple_weights
     u, v = init_duals
     m1, pi = csr_sum(init_pi, dim=1), init_pi
     device = pi.device
@@ -433,8 +439,8 @@ def solver_dc_sparse(
     row_indices = crow_indices_to_row_indices(crow_indices)
 
     sum_eps = eps_base + eps
-    tau1 = 1 if rho1 == float("inf") else rho1 / (rho1 + sum_eps)
-    tau2 = 1 if rho2 == float("inf") else rho2 / (rho2 + sum_eps)
+    tau_s = 1 if rho_s == float("inf") else rho_s / (rho_s + sum_eps)
+    tau_t = 1 if rho_t == float("inf") else rho_t / (rho_t + sum_eps)
 
     K_values = torch.exp(-cost.values() / sum_eps)
 
@@ -488,16 +494,16 @@ def solver_dc_sparse(
                 v = (
                     torch.sparse.mm(
                         G_transpose,
-                        (u * px).reshape(-1, 1),
+                        (u * ws).reshape(-1, 1),
                     ).squeeze()
-                    ** (-tau2)
-                    if rho2 != 0
+                    ** (-tau_t)
+                    if rho_t != 0
                     else torch.ones_like(v)
                 )
                 u = (
-                    torch.sparse.mm(G, (v * py).reshape(-1, 1)).squeeze()
-                    ** (-tau1)
-                    if rho1 != 0
+                    torch.sparse.mm(G, (v * wt).reshape(-1, 1)).squeeze()
+                    ** (-tau_s)
+                    if rho_s != 0
                     else torch.ones_like(u)
                 )
 
@@ -517,7 +523,8 @@ def solver_dc_sparse(
                 m1 = csr_sum(pi, dim=1)
                 if m1.isnan().any() or m1.isinf().any():
                     raise ValueError(
-                        "There is NaN in coupling. Please increase dc_eps_base."
+                        "There is NaN in coupling. "
+                        "Please increase dc_eps_base."
                     )
 
                 error = (m1 - m1_prev).abs().max().item()
@@ -528,7 +535,7 @@ def solver_dc_sparse(
     pi = torch.sparse_csr_tensor(
         crow_indices,
         col_indices,
-        pi.values() * pxy.values(),
+        pi.values() * ws_dot_wt.values(),
         size=pi.size(),
     )
 

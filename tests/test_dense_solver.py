@@ -23,18 +23,13 @@ def test_solvers(uot_solver):
     source_embeddings = torch.rand(ns, ds).to(device)
     target_embeddings = torch.rand(nt, dt).to(device)
 
-    # # if test with permutation
-    # idx = torch.randperm(x.nelement())
-    # y = x.view(-1)[idx].view(x.size())
-    # ny = nx
+    F = torch.cdist(source_features, target_features)
+    Ds = torch.cdist(source_embeddings, source_embeddings)
+    Dt = torch.cdist(target_embeddings, target_embeddings)
 
-    Gs = torch.cdist(source_embeddings, source_embeddings)
-    Gt = torch.cdist(target_embeddings, target_embeddings)
-    K = torch.cdist(source_features, target_features)
-
-    Gs_normalized = Gs / Gs.max()
-    Gt_normalized = Gt / Gt.max()
-    K_normalized = K / K.max()
+    Ds_normalized = Ds / Ds.max()
+    Dt_normalized = Dt / Dt.max()
+    F_normalized = F / F.max()
 
     nits_bcd = 100
     eval_bcd = 2
@@ -43,24 +38,24 @@ def test_solvers(uot_solver):
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
+        early_stopping_threshold=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
+        dc_eps_base=1e2,
     )
 
-    pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solver(
-        Gs=Gs_normalized,
-        Gt=Gt_normalized,
-        K=K_normalized,
+    pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solve(
         alpha=0.8,
-        rho_x=2,
-        rho_y=3,
+        rho_s=2,
+        rho_t=3,
         eps=0.02,
-        uot_solver=uot_solver,
         reg_mode="independent",
+        F=F_normalized,
+        Ds=Ds_normalized,
+        Dt=Dt_normalized,
         init_plan=None,
+        uot_solver=uot_solver,
         verbose=True,
-        early_stopping_threshold=1e-5,
-        dc_eps_base=1e2,
     )
 
     assert pi.shape == (ns, nt)

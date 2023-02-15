@@ -31,17 +31,17 @@ def test_solvers(uot_solver, device):
     source_embeddings = torch.rand(ns, ds).to(device)
     target_embeddings = torch.rand(nt, dt).to(device)
 
-    Gs = low_rank_squared_l2(source_embeddings, source_embeddings)
-    Gt = low_rank_squared_l2(target_embeddings, target_embeddings)
-    K = low_rank_squared_l2(source_features, target_features)
+    F = low_rank_squared_l2(source_features, target_features)
+    Ds = low_rank_squared_l2(source_embeddings, source_embeddings)
+    Dt = low_rank_squared_l2(target_embeddings, target_embeddings)
 
-    Gs_norm = (Gs[0] @ Gs[1].T).max()
-    Gt_norm = (Gt[0] @ Gt[1].T).max()
-    K_norm = (K[0] @ K[1].T).max()
+    F_norm = (F[0] @ F[1].T).max()
+    Ds_norm = (Ds[0] @ Ds[1].T).max()
+    Dt_norm = (Dt[0] @ Dt[1].T).max()
 
-    Gs_normalized = (Gs[0] / Gs_norm, Gs[1] / Gs_norm)
-    Gt_normalized = (Gt[0] / Gt_norm, Gt[1] / Gt_norm)
-    K_normalized = (K[0] / K_norm, K[1] / K_norm)
+    F_normalized = (F[0] / F_norm, F[1] / F_norm)
+    Ds_normalized = (Ds[0] / Ds_norm, Ds[1] / Ds_norm)
+    Dt_normalized = (Dt[0] / Dt_norm, Dt[1] / Dt_norm)
 
     init_plan = (
         (torch.ones(ns, nt) / ns).to_sparse_coo().to(device).to_sparse_csr()
@@ -54,26 +54,26 @@ def test_solvers(uot_solver, device):
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
+        early_stopping_threshold=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
-    )
-
-    pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solver(
-        Gs=Gs_normalized,
-        Gt=Gt_normalized,
-        K=K_normalized,
-        alpha=0.2,
-        rho_x=2,
-        rho_y=3,
-        eps=0.02,
-        uot_solver=uot_solver,
-        reg_mode="independent",
-        init_plan=init_plan,
-        verbose=True,
-        early_stopping_threshold=1e-5,
         # Set a high value of dc, otherwise nans appear in coupling.
         # This will generally increase the computed fugw loss.
         dc_eps_base=1e2,
+    )
+
+    pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solve(
+        alpha=0.2,
+        rho_s=2,
+        rho_t=3,
+        eps=0.02,
+        reg_mode="independent",
+        F=F_normalized,
+        Ds=Ds_normalized,
+        Dt=Dt_normalized,
+        init_plan=init_plan,
+        uot_solver=uot_solver,
+        verbose=True,
     )
 
     assert pi.size() == (ns, nt)
