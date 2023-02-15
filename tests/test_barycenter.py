@@ -3,8 +3,7 @@ import pytest
 import torch
 
 from fugw import FUGWBarycenter
-
-from .utils import init_distribution
+from fugw.utils import init_mock_distribution
 
 devices = [torch.device("cpu")]
 if torch.cuda.is_available():

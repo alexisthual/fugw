@@ -5,8 +5,7 @@ import pytest
 import torch
 
 from fugw import FUGWSparse
-
-from .utils import init_distribution
+from fugw.utils import init_mock_distribution
 
 np.random.seed(0)
 torch.manual_seed(0)

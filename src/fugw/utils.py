@@ -182,3 +182,30 @@ def low_rank_squared_l2(X, Y):
     A2 = torch.cat([ones_y, norms_y, 2**0.5 * Y], dim=1)
 
     return (A1, A2)
+
+
+def init_mock_distribution(
+    n_features, n_voxels, should_normalize=True, return_numpy=True
+):
+    weights = torch.ones(n_voxels) / n_voxels
+    features = torch.rand(n_features, n_voxels)
+    embeddings = torch.rand(n_voxels, 3)
+    geometry = torch.cdist(embeddings, embeddings)
+
+    # Normalize outputs if need be
+    if should_normalize:
+        features = features / torch.linalg.norm(features, dim=1).reshape(-1, 1)
+        geometry = geometry / geometry.max()
+        embeddings = embeddings / geometry.max()
+
+    distribution = (
+        weights,
+        features,
+        geometry,
+        embeddings,
+    )
+
+    if return_numpy:
+        return tuple(map(lambda x: x.numpy(), distribution))
+    else:
+        return distribution

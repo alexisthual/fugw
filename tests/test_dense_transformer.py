@@ -2,8 +2,7 @@ import numpy as np
 import torch
 
 from fugw import FUGW
-
-from .utils import init_distribution
+from fugw.utils import init_mock_distribution
 
 np.random.seed(0)
 torch.manual_seed(0)
