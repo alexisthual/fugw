@@ -64,7 +64,7 @@ class FUGWSparse(BaseTransformer):
         init_plan: torch.sparse COO or CSR matrix or None
             Torch sparse matrix whose sparsity mask will
             be that of the transport plan computed by this solver.
-        uot_solver: "mm" or "dc"
+        uot_solver: "mm" or "ibpp"
             Solver to use.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,

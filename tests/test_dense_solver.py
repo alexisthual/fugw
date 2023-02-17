@@ -5,7 +5,7 @@ import torch
 from fugw.solvers.dense import FUGWSolver
 
 
-@pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "dc"])
+@pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "ibpp"])
 def test_solvers(uot_solver):
     torch.manual_seed(0)
 
@@ -42,7 +42,7 @@ def test_solvers(uot_solver):
         early_stopping_threshold=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
-        dc_eps_base=1e2,
+        ibpp_eps_base=1e2,
     )
 
     pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solve(

@@ -14,7 +14,7 @@ from fugw.solvers.utils import (
     csr_sum,
     elementwise_prod_fact_sparse,
     solver_sinkhorn_sparse,
-    solver_dc_sparse,
+    solver_ibpp_sparse,
     solver_mm_sparse,
 )
 from fugw.utils import BaseSolver, console, make_csr_matrix
@@ -30,7 +30,7 @@ class FUGWSparseSolver(BaseSolver):
         This local cost is a matrix of size (n, m)
         which evaluates the cost between every pair of points
         of the source and target distributions.
-        Then, we run a BCD (sinkhorn, dc or mm) step
+        Then, we run a BCD (sinkhorn, ibpp or mm) step
         which makes use of this cost to update the transport plans.
         """
 
@@ -190,7 +190,7 @@ class FUGWSparseSolver(BaseSolver):
         wt=None,
         init_plan=None,
         init_duals=None,
-        uot_solver="dc",
+        uot_solver="ibpp",
         verbose=False,
     ):
         """
@@ -214,7 +214,7 @@ class FUGWSparseSolver(BaseSolver):
             Initialisation matrix for sample coupling.
         init_duals: torch.tensor sparse, None
             Initialisation matrix for sample coupling.
-        uot_solver: "sinkhorn", "mm", "dc"
+        uot_solver: "sinkhorn", "mm", "ibpp"
             Solver to use.
         verbose: bool, optional, defaults to False
             Log solving process.
@@ -250,9 +250,9 @@ class FUGWSparseSolver(BaseSolver):
         if uot_solver == "mm" and (
             rho_s == float("inf") or rho_t == float("inf")
         ):
-            uot_solver = "dc"
+            uot_solver = "ibpp"
         if uot_solver == "sinkhorn" and eps == 0:
-            uot_solver = "dc"
+            uot_solver = "ibpp"
 
         n, m = Ds[0].shape[0], Dt[0].shape[0]
         device, dtype = Ds[0].device, Ds[0].dtype
@@ -330,7 +330,7 @@ class FUGWSparseSolver(BaseSolver):
             duals_g = duals_p
         elif uot_solver == "mm":
             duals_p, duals_g = None, None
-        elif uot_solver == "dc":
+        elif uot_solver == "ibpp":
             if init_duals is None:
                 duals_p = (
                     torch.ones_like(ws),
@@ -366,13 +366,13 @@ class FUGWSparseSolver(BaseSolver):
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
         )
 
-        self_solver_dc = partial(
-            solver_dc_sparse,
+        self_solver_ibpp = partial(
+            solver_ibpp_sparse,
             tuple_weights=(ws, wt, ws_dot_wt),
             train_params=(
                 self.nits_uot,
-                self.dc_nits_sinkhorn,
-                self.dc_eps_base,
+                self.ibpp_nits_sinkhorn,
+                self.ibpp_eps_base,
                 self.tol_uot,
                 self.eval_uot,
             ),
@@ -403,8 +403,8 @@ class FUGWSparseSolver(BaseSolver):
                 )
             elif uot_solver == "mm":
                 gamma = self_solver_mm(cost_gamma, gamma, uot_params)
-            if uot_solver == "dc":
-                duals_g, gamma = self_solver_dc(
+            if uot_solver == "ibpp":
+                duals_g, gamma = self_solver_ibpp(
                     cost_gamma, gamma, duals_g, uot_params
                 )
 
@@ -431,8 +431,8 @@ class FUGWSparseSolver(BaseSolver):
                 )
             elif uot_solver == "mm":
                 pi = self_solver_mm(cost_pi, pi, uot_params)
-            elif uot_solver == "dc":
-                duals_p, pi = self_solver_dc(cost_pi, pi, duals_p, uot_params)
+            elif uot_solver == "ibpp":
+                duals_p, pi = self_solver_ibpp(cost_pi, pi, duals_p, uot_params)
 
             pi_scaling_factor = (mg / csr_sum(pi)).sqrt()
             pi = torch.sparse_csr_tensor(

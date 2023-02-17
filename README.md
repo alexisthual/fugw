@@ -62,7 +62,7 @@ Namely, we provide:
 
 * `sinkhorn`: the classical Sinkhorn procedure described in [(Cuturi 2013) [2]](#2)
 * `mm`: a majorize-minimization algorithm described in [(Chapel et al. 2021) [4]](#4)
-* `dc`: a proximal-point approach described in [(Xie et al. 2020) [5]](#5)
+* `ibpp`: an inexact-bregman-proximal-point algorithm described in [(Xie et al. 2020) [5]](#5)
 
 ## Installation
 
@@ -174,7 +174,7 @@ As a rule of thumb, they are respectively suited for problems with less or more 
 Each of these classes implement `.fit()`, `.transform()`
 and `inverse_transform()` methods.
 `fugw.FUGW` and `fugw.FUGWSparse` both come with implementations for
-`"sinkhorn"`, `"mm"` and `"dc"`.
+`"sinkhorn"`, `"mm"` and `"ibpp"`.
 
 ### Class `fugw.FUGW` parameters, **for 10k points or less**
 
@@ -208,7 +208,7 @@ Usually, in neuroscience applications, this is a uniform vector
 * `target_weights`: array of size `(m)`, $w^t$, weight (or mass) of each target vertex
 * `init_plan`: array of size `(n, m)`
 * `init_duals`: tuple of arrays of size `(n)` and `(m)` respectively
-* `uot_solver`: `"sinkhorn"` or `"mm"` or `"dc"`
+* `uot_solver`: `"sinkhorn"` or `"mm"` or `"ibpp"`
 * `nits_bcd`: number of BCD iterations to run
 * `nits_uot`: number of solver iterations to run within each BCD iteration
 * `tol_bcd`: Stop the BCD procedure early if the absolute difference between two consecutive transport plans under this threshold
@@ -216,8 +216,8 @@ Usually, in neuroscience applications, this is a uniform vector
 * `early_stopping_threshold`: Stop the BCD procedure early if the FUGW loss falls under this threshold
 * `eval_bcd`: During .fit(), at every eval_bcd step: 1. compute the FUGW loss and store it in an array 2. consider stopping early
 * `eval_uot`: During .fit(), at every eval_uot step: 1. consider stopping early
-* `dc_eps_base`: Regularization parameter specific to the dc solver
-* `dc_nits_sinkhorn`: Number of sinkhorn iterations to run within each uot iteration of the dc solver
+* `ibpp_eps_base`: Regularization parameter specific to the ibpp solver
+* `ibpp_nits_sinkhorn`: Number of sinkhorn iterations to run within each uot iteration of the ibpp solver
 * `device`: `torch.device` on which computation should happen
 * `verbose`: boolean, log training information
 

@@ -15,7 +15,7 @@ if torch.cuda.is_available():
 
 @pytest.mark.parametrize(
     "uot_solver,device",
-    product(["sinkhorn", "mm", "dc"], devices),
+    product(["sinkhorn", "mm", "ibpp"], devices),
 )
 def test_solvers(uot_solver, device):
     torch.manual_seed(0)
@@ -58,9 +58,9 @@ def test_solvers(uot_solver, device):
         early_stopping_threshold=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
-        # Set a high value of dc, otherwise nans appear in coupling.
+        # Set a high value of ibpp, otherwise nans appear in coupling.
         # This will generally increase the computed fugw loss.
-        dc_eps_base=1e2,
+        ibpp_eps_base=1e2,
     )
 
     pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solve(
@@ -83,7 +83,7 @@ def test_solvers(uot_solver, device):
     if uot_solver == "mm":
         assert duals_pi is None
         assert duals_gamma is None
-    elif uot_solver == "dc":
+    elif uot_solver == "ibpp":
         assert len(duals_pi) == 2
         assert duals_pi[0].shape == (ns,)
         assert duals_pi[1].shape == (nt,)

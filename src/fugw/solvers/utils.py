@@ -482,7 +482,7 @@ def solver_mm_sparse(
     )
 
 
-def solver_dc(
+def solver_ibpp(
     cost,
     init_pi,
     init_duals,
@@ -552,7 +552,7 @@ def solver_dc(
     return (u, v), pi
 
 
-def solver_dc_sparse(
+def solver_ibpp_sparse(
     cost,
     init_pi,
     init_duals,
@@ -653,7 +653,7 @@ def solver_dc_sparse(
                 if m1.isnan().any() or m1.isinf().any():
                     raise ValueError(
                         "There is NaN in coupling. "
-                        "Please increase dc_eps_base."
+                        "Please increase ibpp_eps_base."
                     )
 
                 error = (m1 - m1_prev).abs().max().item()
