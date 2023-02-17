@@ -432,7 +432,9 @@ class FUGWSparseSolver(BaseSolver):
             elif uot_solver == "mm":
                 pi = self_solver_mm(cost_pi, pi, uot_params)
             elif uot_solver == "ibpp":
-                duals_p, pi = self_solver_ibpp(cost_pi, pi, duals_p, uot_params)
+                duals_p, pi = self_solver_ibpp(
+                    cost_pi, pi, duals_p, uot_params
+                )
 
             pi_scaling_factor = (mg / csr_sum(pi)).sqrt()
             pi = torch.sparse_csr_tensor(

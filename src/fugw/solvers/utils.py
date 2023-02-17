@@ -77,7 +77,9 @@ def fill_csr_matrix_rows(rows, crow_indices):
     Returns values of a CSR matrix M
     such that for all i and j, M[i, j] = rows[i].
     """
-    new_values = torch.repeat_interleave(rows, crow_indices[1:] - crow_indices[:-1])
+    new_values = torch.repeat_interleave(
+        rows, crow_indices[1:] - crow_indices[:-1]
+    )
 
     return new_values
 
@@ -87,7 +89,9 @@ def fill_csr_matrix_cols(cols, ccol_indices, csc_to_csr):
     Returns values of a CSR matrix M
     such that for all i and j, M[i, j] = cols[j].
     """
-    new_values = torch.repeat_interleave(cols, ccol_indices[1:] - ccol_indices[:-1])
+    new_values = torch.repeat_interleave(
+        cols, ccol_indices[1:] - ccol_indices[:-1]
+    )
 
     return new_values[csc_to_csr]
 
@@ -219,17 +223,14 @@ def solver_sinkhorn_sparse(
     # 2 tensors which allow us to quickly generate such values.
     cost_csc = cost.to_sparse_csc()
     ccol_indices = cost_csc.ccol_indices()
-    T = (
-        torch.sparse_csc_tensor(
-            cost_csc.ccol_indices(),
-            cost_csc.row_indices(),
-            # Add 1 to arange so that first coefficient is not 0
-            torch.arange(cost_csc.values().shape[0]) + 1,
-            size=cost_csc.size(),
-            device=cost_csc.device,
-        )
-        .to_sparse_csr()
-    )
+    T = torch.sparse_csc_tensor(
+        cost_csc.ccol_indices(),
+        cost_csc.row_indices(),
+        # Add 1 to arange so that first coefficient is not 0
+        torch.arange(cost_csc.values().shape[0]) + 1,
+        size=cost_csc.size(),
+        device=cost_csc.device,
+    ).to_sparse_csr()
     csc_to_csr = T.values() - 1
 
     with get_progress(transient=True) as progress:
@@ -259,11 +260,15 @@ def solver_sinkhorn_sparse(
             else:
                 # ((v + log_wt)[None, :] - cost / eps).logsumexp(dim=1)
                 cols = v + log_wt
-                new_values = fill_csr_matrix_cols(cols, ccol_indices, csc_to_csr)
+                new_values = fill_csr_matrix_cols(
+                    cols, ccol_indices, csc_to_csr
+                )
                 new_values = (new_values - (cost.values() / eps)).log()
-                new_values = csr_dim_sum(
-                    new_values, row_indices, cost.shape[0]
-                ).to_dense().exp()
+                new_values = (
+                    csr_dim_sum(new_values, row_indices, cost.shape[0])
+                    .to_dense()
+                    .exp()
+                )
                 u = -tau_s * new_values
 
             if verbose:
@@ -278,7 +283,8 @@ def solver_sinkhorn_sparse(
 
     # pi = ws_dot_wt * (u[:, None] + v[None, :] - cost / eps).exp()
     new_values_pi = (
-        ws_dot_wt.values() * (
+        ws_dot_wt.values()
+        * (
             fill_csr_matrix_rows(u, crow_indices)
             + fill_csr_matrix_cols(v, ccol_indices, csc_to_csr)
             - (cost.values() / eps)
@@ -543,7 +549,9 @@ def solver_ibpp(
                 error = (m1 - m1_prev).abs().max().item()
                 if error < tol:
                     if verbose:
-                        progress.console.log(f"Reached tol_uot threshold: {error}")
+                        progress.console.log(
+                            f"Reached tol_uot threshold: {error}"
+                        )
                     break
 
     # renormalize couplings
@@ -659,7 +667,9 @@ def solver_ibpp_sparse(
                 error = (m1 - m1_prev).abs().max().item()
                 if error < tol:
                     if verbose:
-                        progress.console.log(f"Reached tol_uot threshold: {error}")
+                        progress.console.log(
+                            f"Reached tol_uot threshold: {error}"
+                        )
                     break
 
     # renormalize couplings

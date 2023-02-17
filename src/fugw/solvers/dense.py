@@ -322,7 +322,9 @@ class FUGWSolver(BaseSolver):
             elif uot_solver == "mm":
                 pi = self_solver_mm(cost_pi, pi, uot_params)
             elif uot_solver == "ibpp":
-                duals_p, pi = self_solver_ibpp(cost_pi, pi, duals_p, uot_params)
+                duals_p, pi = self_solver_ibpp(
+                    cost_pi, pi, duals_p, uot_params
+                )
             pi = (mg / pi.sum()).sqrt() * pi
 
             # Update error
