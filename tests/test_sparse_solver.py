@@ -1,5 +1,6 @@
 from itertools import product
 
+import numpy as np
 import pytest
 import torch
 
@@ -90,3 +91,5 @@ def test_solvers(uot_solver, device):
     assert len(loss_steps) <= nits_bcd // eval_bcd + 1
     assert len(loss_steps) == len(loss)
     assert len(loss) == len(loss_ent)
+    # Loss should decrease
+    assert np.all(np.sign(np.array(loss[1:]) - np.array(loss[:-1])) == -1)
