@@ -244,12 +244,14 @@ except for `.fit()`.
 
 **Parameters are the same as for `fugw.FUGW.fit()` except that `source_geometry`
 (resp. `target_geometry`) is replaced by `source_geometry_embedding`
-(resp. `source_geometry`).**
+(resp. `source_geometry`).** Moreover, `init_plan` is required
+and takes a sparse torch tensor.
 
 * `source_geometry_embedding`: array of size `(n, k)`, $X^s$,
 embedding used to store $D^s$ for high values of `n`
 * `target_geometry_embedding`: array of size `(m, k)`, $X^t$,
 embedding used to store $D^t$ for high values of `m`
+* `init_plan`: sparse torch.Tensor of size `(n, m)`, either COO or CSR, initialization of the transport plan with a sparse matrix whose sparsity mask will be that of the final solution
 
 ### Method `fugw.scripts.coarse_to_fine.fit()` parameters
 
