@@ -173,9 +173,8 @@ This repo contains 2 main classes, `fugw.FUGW` and `fugw.FUGWSparse`.
 As a rule of thumb, they are respectively suited for problems with less or more than 10k.
 Each of these classes implement `.fit()`, `.transform()`
 and `inverse_transform()` methods.
-`fugw.FUGW` comes with implements for `"sinkhorn"`, `"mm"` and `"dc"`.
-`fugw.FUGWSparse` only implements `"mm"` and `"dc"`, because `logsumexp` is not stable
-in this setup.
+`fugw.FUGW` and `fugw.FUGWSparse` both come with implementations for
+`"sinkhorn"`, `"mm"` and `"dc"`.
 
 ### Class `fugw.FUGW` parameters, **for 10k points or less**
 

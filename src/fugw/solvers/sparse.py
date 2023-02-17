@@ -13,6 +13,7 @@ from fugw.solvers.utils import (
     crow_indices_to_row_indices,
     csr_sum,
     elementwise_prod_fact_sparse,
+    solver_sinkhorn_sparse,
     solver_dc_sparse,
     solver_mm_sparse,
 )
@@ -318,7 +319,16 @@ class FUGWSparseSolver(BaseSolver):
             crow_indices, col_indices, ws_dot_wt_values, pi.size(), device
         )
 
-        if uot_solver == "mm":
+        if uot_solver == "sinkhorn":
+            if init_duals is None:
+                duals_p = (
+                    torch.zeros_like(ws),
+                    torch.zeros_like(wt),
+                )
+            else:
+                duals_p = init_duals
+            duals_g = duals_p
+        elif uot_solver == "mm":
             duals_p, duals_g = None, None
         elif uot_solver == "dc":
             if init_duals is None:
@@ -342,6 +352,12 @@ class FUGWSparseSolver(BaseSolver):
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
             hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+        )
+
+        self_solver_sinkhorn = partial(
+            solver_sinkhorn_sparse,
+            tuple_weights=(ws, wt, ws_dot_wt),
+            train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
         )
 
         self_solver_mm = partial(
@@ -381,7 +397,11 @@ class FUGWSparseSolver(BaseSolver):
             uot_params = (new_rho_s, new_rho_t, new_eps)
 
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
-            if uot_solver == "mm":
+            if uot_solver == "sinkhorn":
+                duals_g, gamma = self_solver_sinkhorn(
+                    cost_gamma, duals_g, uot_params
+                )
+            elif uot_solver == "mm":
                 gamma = self_solver_mm(cost_gamma, gamma, uot_params)
             if uot_solver == "dc":
                 duals_g, gamma = self_solver_dc(
@@ -405,7 +425,11 @@ class FUGWSparseSolver(BaseSolver):
             uot_params = (new_rho_s, new_rho_t, new_eps)
 
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
-            if uot_solver == "mm":
+            if uot_solver == "sinkhorn":
+                duals_p, pi = self_solver_sinkhorn(
+                    cost_pi, duals_p, uot_params
+                )
+            elif uot_solver == "mm":
                 pi = self_solver_mm(cost_pi, pi, uot_params)
             elif uot_solver == "dc":
                 duals_p, pi = self_solver_dc(cost_pi, pi, duals_p, uot_params)

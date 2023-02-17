@@ -14,7 +14,7 @@ if torch.cuda.is_available():
 
 @pytest.mark.parametrize(
     "uot_solver,device",
-    product(["mm", "dc"], devices),
+    product(["sinkhorn", "mm", "dc"], devices),
 )
 def test_solvers(uot_solver, device):
     torch.manual_seed(0)

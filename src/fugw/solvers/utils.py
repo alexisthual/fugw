@@ -72,6 +72,26 @@ def crow_indices_to_row_indices(crow_indices):
     return row_indices
 
 
+def fill_csr_matrix_rows(rows, crow_indices):
+    """
+    Returns values of a CSR matrix M
+    such that for all i and j, M[i, j] = rows[i].
+    """
+    new_values = torch.repeat_interleave(rows, crow_indices[1:] - crow_indices[:-1])
+
+    return new_values
+
+
+def fill_csr_matrix_cols(cols, ccol_indices, csc_to_csr):
+    """
+    Returns values of a CSR matrix M
+    such that for all i and j, M[i, j] = cols[j].
+    """
+    new_values = torch.repeat_interleave(cols, ccol_indices[1:] - ccol_indices[:-1])
+
+    return new_values[csc_to_csr]
+
+
 def batch_elementwise_prod_and_sum(
     X1, X2, idx_1, idx_2, axis=1, max_tensor_size=1e8
 ):
@@ -166,6 +186,111 @@ def solver_sinkhorn(
                 break
 
     pi = ws_dot_wt * (u[:, None] + v[None, :] - cost / eps).exp()
+
+    return (u, v), pi
+
+
+def solver_sinkhorn_sparse(
+    cost, init_duals, uot_params, tuple_weights, train_params, verbose=True
+):
+    """
+    Scaling algorithm (ie Sinkhorn algorithm).
+    Code adapted from Séjourné et al 2020:
+    https://github.com/thibsej/unbalanced_gromov_wasserstein.
+    """
+
+    ws, wt, ws_dot_wt = tuple_weights
+    log_ws = ws.log()
+    log_wt = wt.log()
+    u, v = init_duals
+    rho_s, rho_t, eps = uot_params
+    niters, tol, eval_freq = train_params
+
+    tau_s = 1 if torch.isinf(rho_s) else rho_s / (rho_s + eps)
+    tau_t = 1 if torch.isinf(rho_t) else rho_t / (rho_t + eps)
+
+    crow_indices = cost.crow_indices()
+    row_indices = crow_indices_to_row_indices(crow_indices)
+
+    # This solver computes sparse matrices with the same
+    # sparsity mask as cost
+    # whose rows (resp. cols) are constant.
+    # To speed-up computations, we pre-compute ccol_indices and csc_to_csr,
+    # 2 tensors which allow us to quickly generate such values.
+    cost_csc = cost.to_sparse_csc()
+    ccol_indices = cost_csc.ccol_indices()
+    T = (
+        torch.sparse_csc_tensor(
+            cost_csc.ccol_indices(),
+            cost_csc.row_indices(),
+            # Add 1 to arange so that first coefficient is not 0
+            torch.arange(cost_csc.values().shape[0]) + 1,
+            size=cost_csc.size(),
+            device=cost_csc.device,
+        )
+        .to_sparse_csr()
+    )
+    csc_to_csr = T.values() - 1
+
+    with get_progress(transient=True) as progress:
+        if verbose:
+            task = progress.add_task("Sinkhorn iterations", total=niters)
+
+        for idx in range(niters):
+            u_prev, v_prev = u.detach().clone(), v.detach().clone()
+            if rho_t == 0:
+                v = torch.zeros_like(v)
+            else:
+                # ((u + log_ws)[:, None] - cost / eps).logsumexp(dim=0)
+                rows = u + log_ws
+                new_values = fill_csr_matrix_rows(rows, crow_indices)
+                new_values = (new_values - (cost.values() / eps)).log()
+                csr = torch.sparse_csr_tensor(
+                    cost.crow_indices(),
+                    cost.col_indices(),
+                    new_values,
+                    size=cost.size(),
+                    device=cost.device,
+                )
+                v = -tau_t * csr_sum(csr, dim=0).to_dense().exp()
+
+            if rho_s == 0:
+                u = torch.zeros_like(u)
+            else:
+                # ((v + log_wt)[None, :] - cost / eps).logsumexp(dim=1)
+                cols = v + log_wt
+                new_values = fill_csr_matrix_cols(cols, ccol_indices, csc_to_csr)
+                new_values = (new_values - (cost.values() / eps)).log()
+                new_values = csr_dim_sum(
+                    new_values, row_indices, cost.shape[0]
+                ).to_dense().exp()
+                u = -tau_s * new_values
+
+            if verbose:
+                progress.update(task, advance=1)
+
+            if (
+                idx % eval_freq == 0
+                and max((u - u_prev).abs().max(), (v - v_prev).abs().max())
+                < tol
+            ):
+                break
+
+    # pi = ws_dot_wt * (u[:, None] + v[None, :] - cost / eps).exp()
+    new_values_pi = (
+        ws_dot_wt.values() * (
+            fill_csr_matrix_rows(u, crow_indices)
+            + fill_csr_matrix_cols(v, ccol_indices, csc_to_csr)
+            - (cost.values() / eps)
+        ).exp()
+    )
+
+    pi = torch.sparse_csr_tensor(
+        cost.crow_indices(),
+        cost.col_indices(),
+        new_values_pi,
+        size=cost.size(),
+    )
 
     return (u, v), pi
 
@@ -465,9 +590,6 @@ def solver_dc_sparse(
             size=pi.size(),
             device=device,
         )
-        # Need to convert back and forth to be on correct device
-        # see https://github.com/pytorch/pytorch/issues/94679
-        .to_sparse_coo()
         .to_sparse_csc()
         .transpose(1, 0)
     )
