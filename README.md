@@ -60,9 +60,9 @@ In this work, we adapt the previous approach to approximate solutions
 to FUGW losses. Moreover, we provide multiple solvers to run inside the BCD algorithm.
 Namely, we provide:
 
-* `sinkhorn`: the classical Sinkhorn procedure described in [(Cuturi 2013) [2]](#2)
-* `mm`: a majorize-minimization algorithm described in [(Chapel et al. 2021) [4]](#4)
-* `dc`: a proximal-point approach described in [(Xie et al. 2020) [5]](#5)
+* `sinkhorn`: extension of Sinkhorn algorithm, called "scaling algorithm" in [(Chizat et al. 2016) [2]](#2)
+* `mm`: majorization-minimization algorithm in [(Chapel et al. 2021) [4]](#4)
+* `dc`: unbalanced extension of inexact Bregman proximal point algorithm in [(Xie et al. 2020) [5]](#5)
 
 ## Installation
 
@@ -207,19 +207,22 @@ between vertices $i$ and $j$ on the cortical sheet
 * `source_weights`: array of size `(n)`, $w^s$, weight (or mass) of each source vertex.
 Usually, in neuroscience applications, this is a uniform vector
 * `target_weights`: array of size `(m)`, $w^t$, weight (or mass) of each target vertex
-* `init_plan`: array of size `(n, m)`
-* `init_duals`: tuple of arrays of size `(n)` and `(m)` respectively
-* `uot_solver`: `"sinkhorn"` or `"mm"` or `"dc"`
-* `nits_bcd`: number of BCD iterations to run
-* `nits_uot`: number of solver iterations to run within each BCD iteration
-* `tol_bcd`: Stop the BCD procedure early if the absolute difference between two consecutive transport plans under this threshold
-* `tol_uot`: Stop the BCD procedure early if the absolute difference between two consecutive transport plans under this threshold
-* `early_stopping_threshold`: Stop the BCD procedure early if the FUGW loss falls under this threshold
-* `eval_bcd`: During .fit(), at every eval_bcd step: 1. compute the FUGW loss and store it in an array 2. consider stopping early
-* `eval_uot`: During .fit(), at every eval_uot step: 1. consider stopping early
-* `dc_eps_base`: Regularization parameter specific to the dc solver
-* `dc_nits_sinkhorn`: Number of sinkhorn iterations to run within each uot iteration of the dc solver
-* `device`: `torch.device` on which computation should happen
+* `init_plan`: array of size `(n, m)`, initialization of the transport plan
+* `init_duals`: tuple of arrays of size `(n)` and `(m)` respectively, initialization of dual vectors
+* `uot_solver`: `"sinkhorn"` or `"mm"` or `"dc"`. FUGW uses block coordinate descent (BCD) algorithm and each BCD iteration requires solving two unbalanced optimal transport problems (UOT) using one of the three following algorithms:
+    + `sinkhorn`: extension of Sinkhorn algorithm, called "scaling algorithm" in [(Chizat et al. 2016) [2]](#2)
+    + `mm`: majorization-minimization algorithm in [(Chapel et al. 2021) [4]](#4)
+    + `dc`: unbalanced extension of inexact Bregman proximal point algorithm in [(Xie et al. 2020) [5]](#5)
+* `nits_bcd`: integer, number of BCD iterations to run
+* `nits_uot`: integer, number of iterations to solve the unbalanced optimal transport problems within each BCD iteration
+* `tol_bcd`: float, stop the BCD procedure if the absolute difference between two consecutive transport plans is under this threshold
+* `tol_uot`: float, stop the UOT procedure in each BCD iteration if the absolute difference between two consecutive dual vectors or marginal distributions (depending on the solver) is under this threshold
+* `early_stopping_threshold`: float, stop the BCD procedure early if the FUGW loss falls under this threshold
+* `eval_bcd`: integer. During .fit(), evaluate the FUGW cost at the multipliers of iteration. For example, if `eval_bcd=7`, then the FUGW cost is calculated at iterations 7, 14, 21, 28, etc...
+* `eval_uot`: integer. During .fit(), evaluate the absolute difference between two consecutive dual vectors or marginal distributions (depending on the solver) at the multipliers of iteration. For example, if `eval_uot=7`, then the evaluation happens at iterations 7, 14, 21, 28, etc...
+* `dc_eps_base`: float, Regularization parameter specific to the `"dc"` solver. It is recommended that it should not be neither too small nor too large.
+* `dc_nits_sinkhorn`: integer, Number of Sinkhorn iterations to run within each iteration of the `"dc"` solver
+* `device`: string, `torch.device` on which computation should happen
 * `verbose`: boolean, log training information
 
 ### Method `fugw.FUGW.transform()` parameters
@@ -285,7 +288,7 @@ embedding used to store $D^t$ for high values of `m`
 
 <a id="1">[1]</a> Thual, Alexis, Huy Tran, Tatiana Zemskova, Nicolas Courty, Rémi Flamary, Stanislas Dehaene, and Bertrand Thirion. ‘Aligning Individual Brains with Fused Unbalanced Gromov-Wasserstein’. arXiv, 19 June 2022. <https://doi.org/10.48550/arXiv.2206.09398>.
 
-<a id="2">[2]</a> Cuturi, Marco. ‘Sinkhorn Distances: Lightspeed Computation of Optimal Transport’. Advances in Neural Information Processing Systems 26 (2013). <https://doi.org/10.48550/arXiv.1306.0895>.
+<a id="2">[2]</a> Chizat, Lenaic, Gabriel Peyré, Bernhard Schmitzer, and François-Xavier Vialard. ‘Scaling Algorithms for Unbalanced Transport Problems’. arXiv, 22 May 2017. <https://arxiv.org/abs/1607.05816>.
 
 <a id="3">[3]</a> Sejourne, Thibault, Francois-Xavier Vialard, and Gabriel Peyré. ‘The Unbalanced Gromov Wasserstein Distance: Conic Formulation and Relaxation’. In Advances in Neural Information Processing Systems, 34:8766–79. Curran Associates, Inc., 2021. <https://proceedings.neurips.cc/paper/2021/hash/4990974d150d0de5e6e15a1454fe6b0f-Abstract.html>.
 
