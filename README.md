@@ -60,9 +60,9 @@ In this work, we adapt the previous approach to approximate solutions
 to FUGW losses. Moreover, we provide multiple solvers to run inside the BCD algorithm.
 Namely, we provide:
 
-* `sinkhorn`: extension of Sinkhorn algorithm, called "scaling algorithm" in [(Chizat et al. 2016) [2]](#2)
-* `mm`: majorization-minimization algorithm in [(Chapel et al. 2021) [4]](#4)
-* `dc`: unbalanced extension of inexact Bregman proximal point algorithm in [(Xie et al. 2020) [5]](#5)
+* `sinkhorn`: the classical Sinkhorn procedure described in [(Cuturi 2013) [2]](#2)
+* `mm`: a majorize-minimization algorithm described in [(Chapel et al. 2021) [4]](#4)
+* `ibpp`: an inexact-bregman-proximal-point algorithm described in [(Xie et al. 2020) [5]](#5)
 
 ## Installation
 
@@ -173,9 +173,8 @@ This repo contains 2 main classes, `fugw.FUGW` and `fugw.FUGWSparse`.
 As a rule of thumb, they are respectively suited for problems with less or more than 10k.
 Each of these classes implement `.fit()`, `.transform()`
 and `inverse_transform()` methods.
-`fugw.FUGW` comes with implements for `"sinkhorn"`, `"mm"` and `"dc"`.
-`fugw.FUGWSparse` only implements `"mm"` and `"dc"`, because `logsumexp` is not stable
-in this setup.
+`fugw.FUGW` and `fugw.FUGWSparse` both come with implementations for
+`"sinkhorn"`, `"mm"` and `"ibpp"`.
 
 ### Class `fugw.FUGW` parameters, **for 10k points or less**
 
@@ -207,22 +206,19 @@ between vertices $i$ and $j$ on the cortical sheet
 * `source_weights`: array of size `(n)`, $w^s$, weight (or mass) of each source vertex.
 Usually, in neuroscience applications, this is a uniform vector
 * `target_weights`: array of size `(m)`, $w^t$, weight (or mass) of each target vertex
-* `init_plan`: array of size `(n, m)`, initialization of the transport plan
-* `init_duals`: tuple of arrays of size `(n)` and `(m)` respectively, initialization of dual vectors
-* `uot_solver`: `"sinkhorn"` or `"mm"` or `"dc"`. FUGW uses block coordinate descent (BCD) algorithm and each BCD iteration requires solving two unbalanced optimal transport problems (UOT) using one of the three following algorithms:
-    + `sinkhorn`: extension of Sinkhorn algorithm, called "scaling algorithm" in [(Chizat et al. 2016) [2]](#2)
-    + `mm`: majorization-minimization algorithm in [(Chapel et al. 2021) [4]](#4)
-    + `dc`: unbalanced extension of inexact Bregman proximal point algorithm in [(Xie et al. 2020) [5]](#5)
-* `nits_bcd`: integer, number of BCD iterations to run
-* `nits_uot`: integer, number of iterations to solve the unbalanced optimal transport problems within each BCD iteration
-* `tol_bcd`: float, stop the BCD procedure if the absolute difference between two consecutive transport plans is under this threshold
-* `tol_uot`: float, stop the UOT procedure in each BCD iteration if the absolute difference between two consecutive dual vectors or marginal distributions (depending on the solver) is under this threshold
-* `early_stopping_threshold`: float, stop the BCD procedure early if the FUGW loss falls under this threshold
-* `eval_bcd`: integer. During .fit(), evaluate the FUGW cost at the multipliers of iteration. For example, if `eval_bcd=7`, then the FUGW cost is calculated at iterations 7, 14, 21, 28, etc...
-* `eval_uot`: integer. During .fit(), evaluate the absolute difference between two consecutive dual vectors or marginal distributions (depending on the solver) at the multipliers of iteration. For example, if `eval_uot=7`, then the evaluation happens at iterations 7, 14, 21, 28, etc...
-* `dc_eps_base`: float, Regularization parameter specific to the `"dc"` solver. It is recommended that it should not be neither too small nor too large.
-* `dc_nits_sinkhorn`: integer, Number of Sinkhorn iterations to run within each iteration of the `"dc"` solver
-* `device`: string, `torch.device` on which computation should happen
+* `init_plan`: array of size `(n, m)`
+* `init_duals`: tuple of arrays of size `(n)` and `(m)` respectively
+* `uot_solver`: `"sinkhorn"` or `"mm"` or `"ibpp"`
+* `nits_bcd`: number of BCD iterations to run
+* `nits_uot`: number of solver iterations to run within each BCD iteration
+* `tol_bcd`: Stop the BCD procedure early if the absolute difference between two consecutive transport plans under this threshold
+* `tol_uot`: Stop the BCD procedure early if the absolute difference between two consecutive transport plans under this threshold
+* `early_stopping_threshold`: Stop the BCD procedure early if the FUGW loss falls under this threshold
+* `eval_bcd`: During .fit(), at every eval_bcd step: 1. compute the FUGW loss and store it in an array 2. consider stopping early
+* `eval_uot`: During .fit(), at every eval_uot step: 1. consider stopping early
+* `ibpp_eps_base`: Regularization parameter specific to the ibpp solver
+* `ibpp_nits_sinkhorn`: Number of sinkhorn iterations to run within each uot iteration of the ibpp solver
+* `device`: `torch.device` on which computation should happen
 * `verbose`: boolean, log training information
 
 ### Method `fugw.FUGW.transform()` parameters
@@ -248,12 +244,14 @@ except for `.fit()`.
 
 **Parameters are the same as for `fugw.FUGW.fit()` except that `source_geometry`
 (resp. `target_geometry`) is replaced by `source_geometry_embedding`
-(resp. `source_geometry`).**
+(resp. `source_geometry`).** Moreover, `init_plan` is required
+and takes a sparse torch tensor.
 
 * `source_geometry_embedding`: array of size `(n, k)`, $X^s$,
 embedding used to store $D^s$ for high values of `n`
 * `target_geometry_embedding`: array of size `(m, k)`, $X^t$,
 embedding used to store $D^t$ for high values of `m`
+* `init_plan`: sparse torch.Tensor of size `(n, m)`, either COO or CSR, initialization of the transport plan with a sparse matrix whose sparsity mask will be that of the final solution
 
 ### Method `fugw.scripts.coarse_to_fine.fit()` parameters
 

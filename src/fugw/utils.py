@@ -83,9 +83,9 @@ class BaseSolver:
         early_stopping_threshold=1e-6,
         eval_bcd=1,
         eval_uot=10,
-        # dc-specific parameters
-        dc_eps_base=1,
-        dc_nits_sinkhorn=1,
+        # ibpp-specific parameters
+        ibpp_eps_base=1,
+        ibpp_nits_sinkhorn=1,
     ):
         """Init FUGW solver.
 
@@ -113,11 +113,11 @@ class BaseSolver:
         eval_uot: int,
             During .fit(), at every eval_uot step:
             1. consider stopping early
-        dc_eps_base: int,
-            Regularization parameter specific to the dc solver
-        dc_nits_sinkhorn: int,
+        ibpp_eps_base: int,
+            Regularization parameter specific to the ibpp solver
+        ibpp_nits_sinkhorn: int,
             Number of sinkhorn iterations to run
-            within each uot iteration of the dc solver.
+            within each uot iteration of the ibpp solver.
         """
 
         self.nits_bcd = nits_bcd
@@ -127,8 +127,8 @@ class BaseSolver:
         self.early_stopping_threshold = early_stopping_threshold
         self.eval_bcd = eval_bcd
         self.eval_uot = eval_uot
-        self.dc_eps_base = dc_eps_base
-        self.dc_nits_sinkhorn = dc_nits_sinkhorn
+        self.ibpp_eps_base = ibpp_eps_base
+        self.ibpp_nits_sinkhorn = ibpp_nits_sinkhorn
 
 
 def make_tensor(x, device=None, dtype=torch.float32):

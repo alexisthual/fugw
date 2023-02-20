@@ -1,10 +1,11 @@
+import numpy as np
 import pytest
 import torch
 
 from fugw.solvers.dense import FUGWSolver
 
 
-@pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "dc"])
+@pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "ibpp"])
 def test_solvers(uot_solver):
     torch.manual_seed(0)
 
@@ -41,7 +42,7 @@ def test_solvers(uot_solver):
         early_stopping_threshold=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
-        dc_eps_base=1e2,
+        ibpp_eps_base=1e2,
     )
 
     pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solve(
@@ -75,3 +76,5 @@ def test_solvers(uot_solver):
     assert len(loss_steps) <= nits_bcd // eval_bcd + 1
     assert len(loss_steps) == len(loss)
     assert len(loss) == len(loss_ent)
+    # Loss should decrease
+    assert np.all(np.sign(np.array(loss[1:]) - np.array(loss[:-1])) == -1)

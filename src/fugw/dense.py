@@ -57,7 +57,7 @@ class FUGW(BaseTransformer):
             Transport plan to use at initialisation.
         init_duals: tuple of [ndarray(n), ndarray(m)] or None
             Dual potentials to use at initialisation.
-        uot_solver: "sinkhorn" or "mm" or "dc"
+        uot_solver: "sinkhorn" or "mm" or "ibpp"
             Solver to use.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
