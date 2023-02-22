@@ -30,8 +30,11 @@ scripts = [
   "tvb-gdist>=2.1.1",
 ]
 dev = [
+  "flake8",
+  "fugw[doc]",
   "fugw[scripts]",
   "meshzoo>=0.9.20",
+  "pre-commit",
   "pytest>=7.2",
 ]
 

@@ -91,12 +91,16 @@ In a dedicated Python env, run:
 pip install -e .
 ```
 
-Development tests run on CPU and GPU, depending on the configuration of your machine.
-To run them, install development dependencies with:
+Contributors should also install the development dependencies
+in order to test and automatically format their contributions.
 
 ```bash
 pip install -e ".[dev]"
+pre-commit install
 ```
+
+Tests run on CPU and GPU, depending on the configuration of your machine.
+You can run them with:
 
 ```bash
 pytest
