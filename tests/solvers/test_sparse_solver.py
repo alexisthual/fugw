@@ -44,7 +44,9 @@ def test_solvers(uot_solver, device):
     Ds_normalized = (Ds[0] / Ds_norm, Ds[1] / Ds_norm)
     Dt_normalized = (Dt[0] / Dt_norm, Dt[1] / Dt_norm)
 
-    init_plan = (torch.ones(ns, nt) / ns).to_sparse_coo().to(device).to_sparse_csr()
+    init_plan = (
+        (torch.ones(ns, nt) / ns).to_sparse_coo().to(device).to_sparse_csr()
+    )
 
     nits_bcd = 100
     eval_bcd = 1

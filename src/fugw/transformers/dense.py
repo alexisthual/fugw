@@ -194,7 +194,8 @@ class FUGW(BaseTransformer):
             source_features = source_features.reshape(1, -1)
         if source_features.ndim > 2:
             raise ValueError(
-                "source_features has too many dimensions:" f" {source_features.ndim}"
+                "source_features has too many dimensions:"
+                f" {source_features.ndim}"
             )
 
         # Move data to device if need be
@@ -256,7 +257,8 @@ class FUGW(BaseTransformer):
             target_features = target_features.reshape(1, -1)
         if target_features.ndim > 2:
             raise ValueError(
-                "target_features has too many dimensions:" f" {target_features.ndim}"
+                "target_features has too many dimensions:"
+                f" {target_features.ndim}"
             )
 
         # Move data to device if need be

@@ -64,7 +64,10 @@ coarse_to_fine.fit(
 # Both the coarse and fine-scale transport plans can be accessed
 # after the models have been fitted
 print(f"Coarse transport plan's total mass: {coarse_model.pi.sum()}")
-print(f"Fine-scale transport plan's total mass: {torch.sparse.sum(fine_model.pi)}")
+print(
+    "Fine-scale transport plan's total mass:"
+    f" {torch.sparse.sum(fine_model.pi)}"
+)
 
 # Finally, the fitted fine model can transport unseen data
 # between source and target

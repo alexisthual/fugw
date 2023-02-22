@@ -53,5 +53,9 @@ scripts = [
 homepage = "https://github.com/alexisthual/fugw"
 repository = "https://github.com/alexisthual/fugw.git"
 
+[tool.black]
+line-length = 79
+preview = true
+
 [tool.setuptools.dynamic]
 version = {attr = "fugw.__version__"}

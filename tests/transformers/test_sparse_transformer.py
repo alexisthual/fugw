@@ -23,7 +23,9 @@ if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
 
-@pytest.mark.parametrize("device,return_numpy", product(devices, return_numpys))
+@pytest.mark.parametrize(
+    "device,return_numpy", product(devices, return_numpys)
+)
 def test_fugw_sparse(device, return_numpy):
     # Generate random training data for source and target
     _, source_features_train, _, source_embeddings = init_mock_distribution(

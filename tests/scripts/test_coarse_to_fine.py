@@ -19,7 +19,9 @@ if torch.cuda.is_available():
 return_numpys = [False, True]
 
 
-@pytest.mark.parametrize("device,return_numpy", product(devices, return_numpys))
+@pytest.mark.parametrize(
+    "device,return_numpy", product(devices, return_numpys)
+)
 def test_coarse_to_fine(device, return_numpy):
     n_voxels_source = 105
     n_samples_source = 50
@@ -70,7 +72,9 @@ def test_coarse_to_fine(device, return_numpy):
     source_features_on_target = fine_model.transform(source_features_test)
     assert source_features_on_target.shape == target_features_test.shape
     assert isinstance(source_features_on_target, np.ndarray)
-    target_features_on_source = fine_model.inverse_transform(target_features_test)
+    target_features_on_source = fine_model.inverse_transform(
+        target_features_test
+    )
     assert target_features_on_source.shape == source_features_test.shape
     assert isinstance(target_features_on_source, np.ndarray)
 
@@ -79,7 +83,9 @@ def test_coarse_to_fine(device, return_numpy):
     source_features_on_target = fine_model.transform(source_features_test)
     assert source_features_on_target.shape == target_features_test.shape
     assert isinstance(source_features_on_target, np.ndarray)
-    target_features_on_source = fine_model.inverse_transform(target_features_test)
+    target_features_on_source = fine_model.inverse_transform(
+        target_features_test
+    )
     assert target_features_on_source.shape == source_features_test.shape
     assert isinstance(target_features_on_source, np.ndarray)
 
@@ -89,7 +95,9 @@ def test_coarse_to_fine(device, return_numpy):
     source_features_on_target = fine_model.transform(source_features_test)
     assert source_features_on_target.shape == target_features_test.shape
     assert isinstance(source_features_on_target, torch.Tensor)
-    target_features_on_source = fine_model.inverse_transform(target_features_test)
+    target_features_on_source = fine_model.inverse_transform(
+        target_features_test
+    )
     assert target_features_on_source.shape == source_features_test.shape
     assert isinstance(target_features_on_source, torch.Tensor)
 
@@ -98,6 +106,8 @@ def test_coarse_to_fine(device, return_numpy):
     source_features_on_target = fine_model.transform(source_features_test)
     assert source_features_on_target.shape == target_features_test.shape
     assert isinstance(source_features_on_target, torch.Tensor)
-    target_features_on_source = fine_model.inverse_transform(target_features_test)
+    target_features_on_source = fine_model.inverse_transform(
+        target_features_test
+    )
     assert target_features_on_source.shape == source_features_test.shape
     assert isinstance(target_features_on_source, torch.Tensor)

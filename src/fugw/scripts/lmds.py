@@ -36,7 +36,9 @@ def rich_progress_joblib(description=None, total=None, verbose=False):
 
 
 def compute_gdist(coordinates, triangles, index):
-    if isinstance(coordinates, torch.Tensor) or isinstance(triangles, torch.Tensor):
+    if isinstance(coordinates, torch.Tensor) or isinstance(
+        triangles, torch.Tensor
+    ):
         coordinates = np.array(coordinates)
         triangles = np.array(triangles)
 
@@ -122,8 +124,10 @@ def compute_lmds(
     A = (
         -(
             E_squared
-            - torch.tile(torch.sum(E_squared, dim=0), (n_landmarks, 1)) / n_landmarks
-            - torch.tile(torch.sum(E_squared, dim=1), (n_landmarks, 1)).T / n_landmarks
+            - torch.tile(torch.sum(E_squared, dim=0), (n_landmarks, 1))
+            / n_landmarks
+            - torch.tile(torch.sum(E_squared, dim=1), (n_landmarks, 1)).T
+            / n_landmarks
             + E_squared_sum / (n_landmarks**2)
         )
         / 2
@@ -142,7 +146,9 @@ def compute_lmds(
         / 2
         * (
             F_squared
-            - torch.tile(torch.sum(E_squared, axis=1), (n_voxels - n_landmarks, 1)).T
+            - torch.tile(
+                torch.sum(E_squared, axis=1), (n_voxels - n_landmarks, 1)
+            ).T
             / n_landmarks
         )
     )
@@ -160,7 +166,9 @@ def compute_lmds(
         [
             (U * torch.sqrt(torch.abs(S)))[:, :k],
             (U[:, :k].T @ B).T
-            / torch.tile(torch.sqrt(torch.abs(S))[:k], (n_voxels - n_landmarks, 1)),
+            / torch.tile(
+                torch.sqrt(torch.abs(S))[:k], (n_voxels - n_landmarks, 1)
+            ),
         ]
     )
 

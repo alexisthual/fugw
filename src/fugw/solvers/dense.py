@@ -48,7 +48,9 @@ class FUGWSolver(BaseSolver):
         if alpha != 0:
             A = X_sqr @ pi1
             B = Y_sqr @ pi2
-            gromov_wasserstein_cost = A[:, None] + B[None, :] - 2 * X @ pi @ Y.T
+            gromov_wasserstein_cost = (
+                A[:, None] + B[None, :] - 2 * X @ pi @ Y.T
+            )
 
             cost += alpha * gromov_wasserstein_cost
 
@@ -103,7 +105,9 @@ class FUGWSolver(BaseSolver):
             loss += rho_t * marginal_constraint_dim2
 
         if reg_mode == "joint":
-            entropic_regularization = compute_quad_kl(pi, gamma, ws_dot_wt, ws_dot_wt)
+            entropic_regularization = compute_quad_kl(
+                pi, gamma, ws_dot_wt, ws_dot_wt
+            )
         elif reg_mode == "independent":
             entropic_regularization = compute_kl(pi, ws_dot_wt) + compute_kl(
                 gamma, ws_dot_wt
@@ -185,7 +189,9 @@ class FUGWSolver(BaseSolver):
             )
 
         # sanity check
-        if uot_solver == "mm" and (rho_s == float("inf") or rho_t == float("inf")):
+        if uot_solver == "mm" and (
+            rho_s == float("inf") or rho_t == float("inf")
+        ):
             uot_solver = "ibpp"
         if uot_solver == "sinkhorn" and eps == 0:
             uot_solver = "ibpp"
@@ -292,7 +298,9 @@ class FUGWSolver(BaseSolver):
 
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
             if uot_solver == "sinkhorn":
-                duals_g, gamma = self_solver_sinkhorn(cost_gamma, duals_g, uot_params)
+                duals_g, gamma = self_solver_sinkhorn(
+                    cost_gamma, duals_g, uot_params
+                )
             elif uot_solver == "mm":
                 gamma = self_solver_mm(cost_gamma, gamma, uot_params)
             if uot_solver == "ibpp":
@@ -310,11 +318,15 @@ class FUGWSolver(BaseSolver):
 
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
             if uot_solver == "sinkhorn":
-                duals_p, pi = self_solver_sinkhorn(cost_pi, duals_p, uot_params)
+                duals_p, pi = self_solver_sinkhorn(
+                    cost_pi, duals_p, uot_params
+                )
             elif uot_solver == "mm":
                 pi = self_solver_mm(cost_pi, pi, uot_params)
             elif uot_solver == "ibpp":
-                duals_p, pi = self_solver_ibpp(cost_pi, pi, duals_p, uot_params)
+                duals_p, pi = self_solver_ibpp(
+                    cost_pi, pi, duals_p, uot_params
+                )
             pi = (mg / pi.sum()).sqrt() * pi
 
             # Update error

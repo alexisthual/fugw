@@ -23,7 +23,9 @@ def test_fugw_barycenter(device):
     weights_ = []
 
     for _ in range(n_subjects):
-        weights, features, geometry, _ = init_mock_distribution(n_features, n_voxels)
+        weights, features, geometry, _ = init_mock_distribution(
+            n_features, n_voxels
+        )
         weights_.append(weights)
         features_.append(features)
         geometry_.append(geometry)
