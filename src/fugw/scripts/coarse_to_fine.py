@@ -3,7 +3,7 @@ from itertools import product
 import numpy as np
 import torch
 
-from fugw.utils import make_tensor, get_progress
+from fugw.transformers.utils import make_tensor, get_progress
 
 
 def random_normalizing(X, repeats=10, sample_size=100):
@@ -140,13 +140,9 @@ def fit(
         target_weights = torch.ones(m) / m
 
     source_weights_sampled = make_tensor(source_weights)[source_sample]
-    source_weights_sampled = (
-        source_weights_sampled / source_weights_sampled.sum()
-    )
+    source_weights_sampled = source_weights_sampled / source_weights_sampled.sum()
     target_weights_sampled = make_tensor(target_weights)[target_sample]
-    target_weights_sampled = (
-        target_weights_sampled / target_weights_sampled.sum()
-    )
+    target_weights_sampled = target_weights_sampled / target_weights_sampled.sum()
 
     # Fit coarse model
     (pi, _, _, _, _, _, _) = coarse_model.fit(
@@ -172,28 +168,22 @@ def fit(
         # Method 2: keep topk indices per line and per column
         # (this should be prefered as it will keep vertices
         # which are particularly unbalanced)
-        rows = np.concatenate(
-            [np.arange(source_sample_size), np.argmax(pi, axis=0)]
-        )
-        cols = np.concatenate(
-            [np.argmax(pi, axis=1), np.arange(target_sample_size)]
-        )
+        rows = np.concatenate([np.arange(source_sample_size), np.argmax(pi, axis=0)])
+        cols = np.concatenate([np.argmax(pi, axis=1), np.arange(target_sample_size)])
 
     # Build sparsity mask from pairs of coefficients
     def block(i, j, source_radius=5, target_radius=5):
         # find neighbours of voxel i in source subject
         # which are within searchlight radius
         distance_to_i = np.linalg.norm(
-            source_geometry_embeddings
-            - source_geometry_embeddings[source_sample[i]],
+            source_geometry_embeddings - source_geometry_embeddings[source_sample[i]],
             ord=2,
             axis=1,
         )
         i_neighbours = np.nonzero(distance_to_i <= source_radius)[0]
 
         distance_to_j = np.linalg.norm(
-            target_geometry_embeddings
-            - target_geometry_embeddings[target_sample[j]],
+            target_geometry_embeddings - target_geometry_embeddings[target_sample[j]],
             ord=2,
             axis=1,
         )
@@ -224,9 +214,7 @@ def fit(
 
     # Sort 2d array along second axis
     # Takes about 1 minute
-    sorted_mask_indices = np.lexsort(
-        (sparsity_mask[:, 1], sparsity_mask[:, 0])
-    )
+    sorted_mask_indices = np.lexsort((sparsity_mask[:, 1], sparsity_mask[:, 0]))
 
     sorted_mask = sparsity_mask[sorted_mask_indices]
 

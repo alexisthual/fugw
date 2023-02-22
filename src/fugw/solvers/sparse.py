@@ -17,10 +17,12 @@ from fugw.solvers.utils import (
     solver_ibpp_sparse,
     solver_mm_sparse,
 )
-from fugw.utils import BaseSolver, console, make_csr_matrix
+from fugw.transformers.utils import BaseSolver, console, make_csr_matrix
 
 
 class FUGWSparseSolver(BaseSolver):
+    """Solver computing sparse solutions"""
+
     def local_biconvex_cost(
         self, pi, transpose, data_const, tuple_weights, hyperparams
     ):
@@ -81,9 +83,7 @@ class FUGWSparseSolver(BaseSolver):
                 A[row_indices]
                 + B[col_indices]
                 - 2
-                * batch_elementwise_prod_and_sum(
-                    C1, C2, row_indices, col_indices, 1
-                )
+                * batch_elementwise_prod_and_sum(C1, C2, row_indices, col_indices, 1)
             )
 
             cost_values += alpha * gromov_wasserstein_cost_values
@@ -142,9 +142,7 @@ class FUGWSparseSolver(BaseSolver):
             # when adding 2 CSR matrices together.
             # This could become problematic for sparse matrices
             # with more non-null elements than an int can store.
-            wasserstein_loss = csr_sum(
-                elementwise_prod_fact_sparse(K1, K2, pi + gamma)
-            )
+            wasserstein_loss = csr_sum(elementwise_prod_fact_sparse(K1, K2, pi + gamma))
             loss += (1 - alpha) / 2 * wasserstein_loss
 
         if alpha != 0:
@@ -247,9 +245,7 @@ class FUGWSparseSolver(BaseSolver):
             )
 
         # sanity check
-        if uot_solver == "mm" and (
-            rho_s == float("inf") or rho_t == float("inf")
-        ):
+        if uot_solver == "mm" and (rho_s == float("inf") or rho_t == float("inf")):
             uot_solver = "ibpp"
         if uot_solver == "sinkhorn" and eps == 0:
             uot_solver = "ibpp"
@@ -398,9 +394,7 @@ class FUGWSparseSolver(BaseSolver):
 
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
             if uot_solver == "sinkhorn":
-                duals_g, gamma = self_solver_sinkhorn(
-                    cost_gamma, duals_g, uot_params
-                )
+                duals_g, gamma = self_solver_sinkhorn(cost_gamma, duals_g, uot_params)
             elif uot_solver == "mm":
                 gamma = self_solver_mm(cost_gamma, gamma, uot_params)
             if uot_solver == "ibpp":
@@ -426,15 +420,11 @@ class FUGWSparseSolver(BaseSolver):
 
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
             if uot_solver == "sinkhorn":
-                duals_p, pi = self_solver_sinkhorn(
-                    cost_pi, duals_p, uot_params
-                )
+                duals_p, pi = self_solver_sinkhorn(cost_pi, duals_p, uot_params)
             elif uot_solver == "mm":
                 pi = self_solver_mm(cost_pi, pi, uot_params)
             elif uot_solver == "ibpp":
-                duals_p, pi = self_solver_ibpp(
-                    cost_pi, pi, duals_p, uot_params
-                )
+                duals_p, pi = self_solver_ibpp(cost_pi, pi, duals_p, uot_params)
 
             pi_scaling_factor = (mg / csr_sum(pi)).sqrt()
             pi = torch.sparse_csr_tensor(

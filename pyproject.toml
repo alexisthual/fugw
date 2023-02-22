@@ -25,17 +25,28 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-scripts = [
-  "joblib>=1.2.0",
-  "tvb-gdist>=2.1.1",
-]
 dev = [
+  "black",
   "flake8",
   "fugw[doc]",
   "fugw[scripts]",
   "meshzoo>=0.9.20",
   "pre-commit",
   "pytest>=7.2",
+]
+doc = [
+  "furo",
+  "m2r2",
+  "matplotlib",
+  "myst_parser",
+  "numpydoc",
+  "pillow",
+  "sphinx",
+  "sphinx-gallery",
+]
+scripts = [
+  "joblib>=1.2.0",
+  "tvb-gdist>=2.1.1",
 ]
 
 [project.urls]

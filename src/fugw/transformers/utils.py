@@ -158,8 +158,7 @@ def make_sparse_csr_tensor(x, device=None, dtype=torch.float32):
                 )
         else:
             raise Exception(
-                "Expected a torch sparse matrix, "
-                "but attribute 'layout' is missing."
+                "Expected a torch sparse matrix, " "but attribute 'layout' is missing."
             )
     else:
         raise Exception(f"Expected sparse torch.Tensor, got {type(x)}")

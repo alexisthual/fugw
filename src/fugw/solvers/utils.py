@@ -1,6 +1,6 @@
 import torch
 
-from fugw.utils import console, get_progress
+from fugw.transformers.utils import get_progress
 
 
 def csr_dim_sum(values, group_indices, n_groups):
@@ -53,9 +53,7 @@ def csr_sum(csr_matrix, dim=None):
         )
     elif dim == 1:
         row_indices = crow_indices_to_row_indices(csr_matrix.crow_indices())
-        return csr_dim_sum(
-            csr_matrix.values(), row_indices, csr_matrix.shape[0]
-        )
+        return csr_dim_sum(csr_matrix.values(), row_indices, csr_matrix.shape[0])
     else:
         raise ValueError(f"Wrong dim: {dim}")
 
@@ -77,9 +75,7 @@ def fill_csr_matrix_rows(rows, crow_indices):
     Returns values of a CSR matrix M
     such that for all i and j, M[i, j] = rows[i].
     """
-    new_values = torch.repeat_interleave(
-        rows, crow_indices[1:] - crow_indices[:-1]
-    )
+    new_values = torch.repeat_interleave(rows, crow_indices[1:] - crow_indices[:-1])
 
     return new_values
 
@@ -89,16 +85,12 @@ def fill_csr_matrix_cols(cols, ccol_indices, csc_to_csr):
     Returns values of a CSR matrix M
     such that for all i and j, M[i, j] = cols[j].
     """
-    new_values = torch.repeat_interleave(
-        cols, ccol_indices[1:] - ccol_indices[:-1]
-    )
+    new_values = torch.repeat_interleave(cols, ccol_indices[1:] - ccol_indices[:-1])
 
     return new_values[csc_to_csr]
 
 
-def batch_elementwise_prod_and_sum(
-    X1, X2, idx_1, idx_2, axis=1, max_tensor_size=1e8
-):
+def batch_elementwise_prod_and_sum(X1, X2, idx_1, idx_2, axis=1, max_tensor_size=1e8):
     """Batch computation of (X1[idx_1, :] * X2[idx_2, :]).sum(1)
 
     Parameters
@@ -123,9 +115,7 @@ def batch_elementwise_prod_and_sum(
     if isinstance(max_tensor_size, (int, float)):
         batch_size = min(int(max_tensor_size / d), m)
     else:
-        raise Exception(
-            f"Invalid value for max_tensor_size: {max_tensor_size}"
-        )
+        raise Exception(f"Invalid value for max_tensor_size: {max_tensor_size}")
 
     res = torch.cat(
         [
@@ -168,24 +158,19 @@ def solver_sinkhorn(
             if rho_t == 0:
                 v = torch.zeros_like(v)
             else:
-                v = -tau_t * ((u + log_ws)[:, None] - cost / eps).logsumexp(
-                    dim=0
-                )
+                v = -tau_t * ((u + log_ws)[:, None] - cost / eps).logsumexp(dim=0)
 
             if rho_s == 0:
                 u = torch.zeros_like(u)
             else:
-                u = -tau_s * ((v + log_wt)[None, :] - cost / eps).logsumexp(
-                    dim=1
-                )
+                u = -tau_s * ((v + log_wt)[None, :] - cost / eps).logsumexp(dim=1)
 
             if verbose:
                 progress.update(task, advance=1)
 
             if (
                 idx % eval_freq == 0
-                and max((u - u_prev).abs().max(), (v - v_prev).abs().max())
-                < tol
+                and max((u - u_prev).abs().max(), (v - v_prev).abs().max()) < tol
             ):
                 break
 
@@ -260,14 +245,10 @@ def solver_sinkhorn_sparse(
             else:
                 # ((v + log_wt)[None, :] - cost / eps).logsumexp(dim=1)
                 cols = v + log_wt
-                new_values = fill_csr_matrix_cols(
-                    cols, ccol_indices, csc_to_csr
-                )
+                new_values = fill_csr_matrix_cols(cols, ccol_indices, csc_to_csr)
                 new_values = (new_values - (cost.values() / eps)).log()
                 new_values = (
-                    csr_dim_sum(new_values, row_indices, cost.shape[0])
-                    .to_dense()
-                    .exp()
+                    csr_dim_sum(new_values, row_indices, cost.shape[0]).to_dense().exp()
                 )
                 u = -tau_s * new_values
 
@@ -276,8 +257,7 @@ def solver_sinkhorn_sparse(
 
             if (
                 idx % eval_freq == 0
-                and max((u - u_prev).abs().max(), (v - v_prev).abs().max())
-                < tol
+                and max((u - u_prev).abs().max(), (v - v_prev).abs().max()) < tol
             ):
                 break
 
@@ -301,9 +281,7 @@ def solver_sinkhorn_sparse(
     return (u, v), pi
 
 
-def solver_mm(
-    cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
-):
+def solver_mm(cost, init_pi, uot_params, tuple_weights, train_params, verbose=True):
     """
     Solve (entropic) UOT using the majorization-minimization algorithm.
 
@@ -357,8 +335,7 @@ def solver_mm(
                 if max(pi1_error, pi2_error) < tol:
                     if verbose:
                         progress.console.log(
-                            "Reached tol_uot threshold: "
-                            f"{pi1_error}, {pi2_error}"
+                            "Reached tol_uot threshold: " f"{pi1_error}, {pi2_error}"
                         )
                     break
 
@@ -474,8 +451,7 @@ def solver_mm_sparse(
                 if max(pi1_error, pi2_error) < tol:
                     if verbose:
                         progress.console.log(
-                            "Reached tol_uot threshold: "
-                            f"{pi1_error}, {pi2_error}"
+                            "Reached tol_uot threshold: " f"{pi1_error}, {pi2_error}"
                         )
                     break
 
@@ -517,22 +493,10 @@ def solver_ibpp(
             m1_prev = m1.detach().clone()
 
             # IPOT
-            G = (
-                K * pi
-                if (eps_base / sum_eps) == 1
-                else K * pi ** (eps_base / sum_eps)
-            )
+            G = K * pi if (eps_base / sum_eps) == 1 else K * pi ** (eps_base / sum_eps)
             for _ in range(nits_sinkhorn):
-                v = (
-                    (G.T @ (u * ws)) ** (-tau_t)
-                    if rho_t != 0
-                    else torch.ones_like(v)
-                )
-                u = (
-                    (G @ (v * wt)) ** (-tau_s)
-                    if rho_s != 0
-                    else torch.ones_like(u)
-                )
+                v = (G.T @ (u * ws)) ** (-tau_t) if rho_t != 0 else torch.ones_like(v)
+                u = (G @ (v * wt)) ** (-tau_s) if rho_s != 0 else torch.ones_like(u)
             pi = u[:, None] * G * v[None, :]
 
             if verbose:
@@ -549,9 +513,7 @@ def solver_ibpp(
                 error = (m1 - m1_prev).abs().max().item()
                 if error < tol:
                     if verbose:
-                        progress.console.log(
-                            f"Reached tol_uot threshold: {error}"
-                        )
+                        progress.console.log(f"Reached tol_uot threshold: {error}")
                     break
 
     # renormalize couplings
@@ -638,8 +600,7 @@ def solver_ibpp_sparse(
                     else torch.ones_like(v)
                 )
                 u = (
-                    torch.sparse.mm(G, (v * wt).reshape(-1, 1)).squeeze()
-                    ** (-tau_s)
+                    torch.sparse.mm(G, (v * wt).reshape(-1, 1)).squeeze() ** (-tau_s)
                     if rho_s != 0
                     else torch.ones_like(u)
                 )
@@ -660,16 +621,13 @@ def solver_ibpp_sparse(
                 m1 = csr_sum(pi, dim=1)
                 if m1.isnan().any() or m1.isinf().any():
                     raise ValueError(
-                        "There is NaN in coupling. "
-                        "Please increase ibpp_eps_base."
+                        "There is NaN in coupling. " "Please increase ibpp_eps_base."
                     )
 
                 error = (m1 - m1_prev).abs().max().item()
                 if error < tol:
                     if verbose:
-                        progress.console.log(
-                            f"Reached tol_uot threshold: {error}"
-                        )
+                        progress.console.log(f"Reached tol_uot threshold: {error}")
                     break
 
     # renormalize couplings
@@ -685,9 +643,7 @@ def solver_ibpp_sparse(
 
 def compute_approx_kl(p, q):
     # By convention: 0 log 0 = 0
-    entropy = torch.nan_to_num(
-        p * (p / q).log(), nan=0.0, posinf=0.0, neginf=0.0
-    ).sum()
+    entropy = torch.nan_to_num(p * (p / q).log(), nan=0.0, posinf=0.0, neginf=0.0).sum()
     return entropy
 
 
@@ -706,9 +662,7 @@ def elementwise_prod_fact_sparse(a, b, p):
     row_indices = crow_indices_to_row_indices(crow_indices)
     values = batch_elementwise_prod_and_sum(a, b, row_indices, col_indices, 1)
     values = values * p.values()
-    return torch.sparse_csr_tensor(
-        crow_indices, col_indices, values, size=p.size()
-    )
+    return torch.sparse_csr_tensor(crow_indices, col_indices, values, size=p.size())
 
 
 def compute_approx_kl_sparse(p, q):
@@ -760,9 +714,7 @@ def compute_quad_kl_sparse(mu, nu, alpha, beta):
     m_beta = csr_sum(beta)
     const = (m_mu - m_alpha) * (m_nu - m_beta)
     kl = (
-        m_nu * compute_kl_sparse(mu, alpha)
-        + m_mu * compute_kl_sparse(nu, beta)
-        + const
+        m_nu * compute_kl_sparse(mu, alpha) + m_mu * compute_kl_sparse(nu, beta) + const
     )
 
     return kl
