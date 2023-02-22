@@ -27,12 +27,10 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "black",
-  "flake8",
   "fugw[doc]",
   "fugw[scripts]",
-  "meshzoo>=0.9.20",
+  "fugw[test]",
   "pre-commit",
-  "pytest>=7.2",
 ]
 doc = [
   "furo",
@@ -43,6 +41,11 @@ doc = [
   "pillow",
   "sphinx",
   "sphinx-gallery",
+]
+test = [
+  "flake8",
+  "meshzoo>=0.9.20",
+  "pytest>=7.2",
 ]
 scripts = [
   "joblib>=1.2.0",

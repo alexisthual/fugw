@@ -1,0 +1,45 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  unittest:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            version_python: 3.7
+          - os: ubuntu-latest
+            version_python: 3.8
+          - os: ubuntu-latest
+            version_python: 3.9
+          - os: ubuntu-latest
+            version_python: 3.10
+          - os: ubuntu-latest
+            version_python: 3.11
+          - os: macos-latest
+            version_python: 3.7
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.version_python }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e .[test]
+    - name: Lint with flake8
+      run: |
+        flake8 src tests examples
+    - name: Test with pytest
+      run: |
+        pytest
