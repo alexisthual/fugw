@@ -12,4 +12,5 @@
    :hidden:
    :caption: Development
 
+   pages/contributing.md
    GitHub repository <https://github.com/alexisthual/fugw>
