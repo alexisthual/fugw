@@ -286,7 +286,7 @@ embedding used to store $D^t$ for high values of `m`
 
 <a id="1">[1]</a> Thual, Alexis, Huy Tran, Tatiana Zemskova, Nicolas Courty, Rémi Flamary, Stanislas Dehaene, and Bertrand Thirion. ‘Aligning Individual Brains with Fused Unbalanced Gromov-Wasserstein’. arXiv, 19 June 2022. <https://doi.org/10.48550/arXiv.2206.09398>.
 
-<a id="2">[2]</a> Cuturi, Marco. ‘Sinkhorn Distances: Lightspeed Computation of Optimal Transport’. Advances in Neural Information Processing Systems 26 (2013). <https://doi.org/10.48550/arXiv.1306.0895>.
+<a id="2">[2]</a> Chizat, Lenaic, Gabriel Peyré, Bernhard Schmitzer, and François-Xavier Vialard. ‘Scaling Algorithms for Unbalanced Transport Problems’. arXiv, 22 May 2017. <https://arxiv.org/abs/1607.05816>.
 
 <a id="3">[3]</a> Sejourne, Thibault, Francois-Xavier Vialard, and Gabriel Peyré. ‘The Unbalanced Gromov Wasserstein Distance: Conic Formulation and Relaxation’. In Advances in Neural Information Processing Systems, 34:8766–79. Curran Associates, Inc., 2021. <https://proceedings.neurips.cc/paper/2021/hash/4990974d150d0de5e6e15a1454fe6b0f-Abstract.html>.
 
