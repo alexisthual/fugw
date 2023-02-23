@@ -37,6 +37,7 @@ doc = [
   "fugw[test]",
   "m2r2",
   "matplotlib",
+  "meshzoo>=0.9.20",
   "myst_parser",
   "numpydoc",
   "pillow",
