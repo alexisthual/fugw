@@ -34,17 +34,15 @@ dev = [
 ]
 doc = [
   "furo>=2022.12.07",
+  "fugw[scripts]",
   "fugw[test]",
   "m2r2",
   "matplotlib",
-  "meshzoo>=0.9.20",
   "myst_parser",
   "numpydoc",
   "pillow",
   "sphinx==5.3.0",
   "sphinx-gallery>=0.11.1",
-  "joblib>=1.2.0",
-  "tvb-gdist>=2.1.1",
 ]
 test = [
   "fugw[scripts]",
