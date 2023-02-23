@@ -1,6 +1,6 @@
 import torch
 
-from fugw.utils import console, get_progress
+from fugw.transformers.utils import get_progress
 
 
 def csr_dim_sum(values, group_indices, n_groups):
@@ -130,8 +130,10 @@ def batch_elementwise_prod_and_sum(
     res = torch.cat(
         [
             (
-                X1[idx_1[i : i + batch_size].type(torch.LongTensor), :]
-                * X2[idx_2[i : i + batch_size].type(torch.LongTensor), :]
+                X1[idx_1[i : i + batch_size].type(torch.LongTensor), :]  # noqa
+                * X2[
+                    idx_2[i : i + batch_size].type(torch.LongTensor), :  # noqa
+                ]
             ).sum(axis)
             for i in range(0, m, batch_size)
         ]

@@ -10,10 +10,12 @@ from fugw.solvers.utils import (
     solver_mm,
     solver_sinkhorn,
 )
-from fugw.utils import BaseSolver, console
+from fugw.transformers.utils import BaseSolver, console
 
 
 class FUGWSolver(BaseSolver):
+    """Solver computing dense solutions"""
+
     def local_biconvex_cost(
         self, pi, transpose, data_const, tuple_weights, hyperparams
     ):

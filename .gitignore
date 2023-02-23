@@ -3,3 +3,9 @@ __pycache__
 *.egg-info
 build
 dist
+doc/_build
+doc/auto_examples
+doc/gen_modules
+doc/generated
+doc/modules/generated
+.vscode

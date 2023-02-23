@@ -25,19 +25,43 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+dev = [
+  "black",
+  "fugw[doc]",
+  "fugw[scripts]",
+  "fugw[test]",
+  "pre-commit",
+]
+doc = [
+  "furo>=2022.12.07",
+  "fugw[scripts]",
+  "fugw[test]",
+  "m2r2",
+  "matplotlib",
+  "myst_parser",
+  "numpydoc",
+  "pillow",
+  "sphinx==5.3.0",
+  "sphinx-gallery>=0.11.1",
+]
+test = [
+  "fugw[scripts]",
+  "flake8",
+  "meshzoo>=0.9.20",
+  "pytest>=7.2",
+]
 scripts = [
   "joblib>=1.2.0",
   "tvb-gdist>=2.1.1",
-]
-dev = [
-  "fugw[scripts]",
-  "meshzoo>=0.9.20",
-  "pytest>=7.2",
 ]
 
 [project.urls]
 homepage = "https://github.com/alexisthual/fugw"
 repository = "https://github.com/alexisthual/fugw.git"
+
+[tool.black]
+line-length = 79
+preview = true
 
 [tool.setuptools.dynamic]
 version = {attr = "fugw.__version__"}

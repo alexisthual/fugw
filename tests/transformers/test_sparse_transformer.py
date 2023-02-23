@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 import torch
 
-from fugw import FUGWSparse
-from fugw.utils import init_mock_distribution
+from fugw.transformers import FUGWSparse
+from fugw.transformers.utils import init_mock_distribution
 
 np.random.seed(0)
 torch.manual_seed(0)

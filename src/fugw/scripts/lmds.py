@@ -4,7 +4,7 @@ import joblib
 import numpy as np
 import torch
 
-from fugw.utils import get_progress
+from fugw.transformers.utils import get_progress
 from joblib import delayed, Parallel
 
 

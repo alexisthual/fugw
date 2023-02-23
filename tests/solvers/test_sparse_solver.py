@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 import torch
 
-from fugw.solvers.sparse import FUGWSparseSolver
-from fugw.utils import low_rank_squared_l2
+from fugw.solvers import FUGWSparseSolver
+from fugw.transformers.utils import low_rank_squared_l2
 
 
 devices = [torch.device("cpu")]

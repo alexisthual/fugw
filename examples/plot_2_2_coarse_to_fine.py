@@ -1,8 +1,14 @@
+"""
+Transport distributions containing more than 10k points
+=======================================================
+"""
+
+##############################################################################
 import torch
 
-from fugw import FUGW, FUGWSparse
 from fugw.scripts import coarse_to_fine
-from fugw.utils import init_mock_distribution
+from fugw.transformers import FUGW, FUGWSparse
+from fugw.transformers.utils import init_mock_distribution
 
 torch.manual_seed(0)
 
@@ -59,7 +65,8 @@ coarse_to_fine.fit(
 # after the models have been fitted
 print(f"Coarse transport plan's total mass: {coarse_model.pi.sum()}")
 print(
-    f"Fine-scale transport plan's total mass: {torch.sparse.sum(fine_model.pi)}"
+    "Fine-scale transport plan's total mass:"
+    f" {torch.sparse.sum(fine_model.pi)}"
 )
 
 # Finally, the fitted fine model can transport unseen data

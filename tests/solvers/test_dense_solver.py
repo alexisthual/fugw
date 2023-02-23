@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import torch
 
-from fugw.solvers.dense import FUGWSolver
+from fugw.solvers import FUGWSolver
 
 
 @pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "ibpp"])

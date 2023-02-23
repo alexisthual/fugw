@@ -1,10 +1,12 @@
 import torch
 
-from fugw import FUGW
-from fugw.utils import make_tensor
+from fugw.transformers.dense import FUGW
+from fugw.transformers.utils import make_tensor
 
 
 class FUGWBarycenter:
+    """FUGW barycenters"""
+
     def __init__(
         self,
         alpha=0.5,

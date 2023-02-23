@@ -17,10 +17,12 @@ from fugw.solvers.utils import (
     solver_ibpp_sparse,
     solver_mm_sparse,
 )
-from fugw.utils import BaseSolver, console, make_csr_matrix
+from fugw.transformers.utils import BaseSolver, console, make_csr_matrix
 
 
 class FUGWSparseSolver(BaseSolver):
+    """Solver computing sparse solutions"""
+
     def local_biconvex_cost(
         self, pi, transpose, data_const, tuple_weights, hyperparams
     ):

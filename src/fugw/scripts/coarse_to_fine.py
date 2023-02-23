@@ -3,7 +3,7 @@ from itertools import product
 import numpy as np
 import torch
 
-from fugw.utils import make_tensor, get_progress
+from fugw.transformers.utils import make_tensor, get_progress
 
 
 def random_normalizing(X, repeats=10, sample_size=100):

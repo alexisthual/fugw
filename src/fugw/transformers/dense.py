@@ -2,10 +2,12 @@ import numpy as np
 import torch
 
 from fugw.solvers.dense import FUGWSolver
-from fugw.utils import BaseTransformer, make_tensor
+from fugw.transformers.utils import BaseTransformer, make_tensor
 
 
 class FUGW(BaseTransformer):
+    """Transformer computing dense transport plans"""
+
     def fit(
         self,
         source_features,

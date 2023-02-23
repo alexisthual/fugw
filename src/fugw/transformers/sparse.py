@@ -3,7 +3,7 @@ import torch
 import warnings
 
 from fugw.solvers.sparse import FUGWSparseSolver
-from fugw.utils import (
+from fugw.transformers.utils import (
     BaseTransformer,
     low_rank_squared_l2,
     make_sparse_csr_tensor,
@@ -12,6 +12,8 @@ from fugw.utils import (
 
 
 class FUGWSparse(BaseTransformer):
+    """Transformer computing sparse transport plans"""
+
     def fit(
         self,
         source_features,
