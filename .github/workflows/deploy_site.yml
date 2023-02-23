@@ -14,7 +14,6 @@ jobs:
           pre-build-command: |
             apt-get update
             pip install -e ".[doc]"
-          python-version: "3.7"
       - name:  Upload generated HTML as artifact
         uses: actions/upload-artifact@v2
         with:
