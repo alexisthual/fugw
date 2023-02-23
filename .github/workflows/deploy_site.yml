@@ -13,9 +13,8 @@ jobs:
           docs-folder: "doc/"
           pre-build-command: |
             apt-get update
+            pip install -U pip
             pip install -e ".[doc]"
-            pip install -e ".[test]"
-            pip install -e ".[scripts]"
       - name:  Upload generated HTML as artifact
         uses: actions/upload-artifact@v2
         with:
