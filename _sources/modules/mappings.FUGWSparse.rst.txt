@@ -1,7 +1,7 @@
 ``FUGWSparse``
 --------------
 
-.. autoclass:: fugw.transformers.FUGWSparse
+.. autoclass:: fugw.mappings.FUGWSparse
    :members:
    :special-members: __init__
 

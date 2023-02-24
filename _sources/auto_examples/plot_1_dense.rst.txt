@@ -27,8 +27,8 @@ Transport distributions containing less than 10k points
 
     import torch
 
-    from fugw.transformers import FUGW
-    from fugw.transformers.utils import init_mock_distribution
+    from fugw.mappings import FUGW
+    from fugw.mappings.utils import init_mock_distribution
 
     torch.manual_seed(0)
 
@@ -41,7 +41,7 @@ Transport distributions containing less than 10k points
  .. code-block:: none
 
 
-    <torch._C.Generator object at 0x7fd90dca9d10>
+    <torch._C.Generator object at 0x7fd2da709f50>
 
 
 
@@ -142,7 +142,7 @@ The transport plan can be accessed after the model has been fitted
 
  .. code-block:: none
 
-    Transport plan's total mass: 0.9937174320220947
+    Transport plan's total mass: 0.99371737241745
 
 
 
@@ -170,7 +170,7 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.262 seconds)
+   **Total running time of the script:** ( 0 minutes  9.949 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_1_dense.py:

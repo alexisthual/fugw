@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="FUGW" href="transformers.FUGW.html" /><link rel="prev" title="API references" href="../pages/api_references.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="FUGW" href="mappings.FUGW.html" /><link rel="prev" title="API references" href="../pages/api_references.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>fugw.transformers - FUGW</title>
+        <title>fugw.mappings - FUGW</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
@@ -168,9 +168,9 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../pages/api_references.html">API references</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.transformers</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGW.html"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGWSparse.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a></li>
+<li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGW.html"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGWSparse.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="solvers.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -219,31 +219,31 @@
           </label>
         </div>
         <article role="main">
-          <section id="fugw-transformers">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.transformers</span></code><a class="headerlink" href="#fugw-transformers" title="Permalink to this heading">#</a></h1>
+          <section id="fugw-mappings">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code><a class="headerlink" href="#fugw-mappings" title="Permalink to this heading">#</a></h1>
 <p>Most likely, this is the module you want to use.
-It comprises 2 main classes: <a class="reference internal" href="transformers.FUGW.html#fugw.transformers.FUGW" title="fugw.transformers.FUGW"><code class="xref py py-class docutils literal notranslate"><span class="pre">fugw.transformers.FUGW</span></code></a>
-and <a class="reference internal" href="transformers.FUGWSparse.html#fugw.transformers.FUGWSparse" title="fugw.transformers.FUGWSparse"><code class="xref py py-class docutils literal notranslate"><span class="pre">fugw.transformers.FUGWSparse</span></code></a>,
+It comprises 2 main classes: <a class="reference internal" href="mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW"><code class="xref py py-class docutils literal notranslate"><span class="pre">fugw.mappings.FUGW</span></code></a>
+and <a class="reference internal" href="mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse"><code class="xref py py-class docutils literal notranslate"><span class="pre">fugw.mappings.FUGWSparse</span></code></a>,
 each of which comes with <code class="docutils literal notranslate"><span class="pre">.fit()</span></code>, <code class="docutils literal notranslate"><span class="pre">transform()</span></code> and <code class="docutils literal notranslate"><span class="pre">.inverse_transform()</span></code>
 methods to easily fit your FUGW models and apply them to new data.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="transformers.FUGW.html"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="transformers.FUGW.html#fugw.transformers.FUGW"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGW.html#fugw.transformers.FUGW.__init__"><code class="docutils literal notranslate"><span class="pre">FUGW.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGW.html#fugw.transformers.FUGW.fit"><code class="docutils literal notranslate"><span class="pre">FUGW.fit()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGW.html#fugw.transformers.FUGW.inverse_transform"><code class="docutils literal notranslate"><span class="pre">FUGW.inverse_transform()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGW.html#fugw.transformers.FUGW.transform"><code class="docutils literal notranslate"><span class="pre">FUGW.transform()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mappings.FUGW.html"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mappings.FUGW.html#fugw.mappings.FUGW"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGW.html#fugw.mappings.FUGW.__init__"><code class="docutils literal notranslate"><span class="pre">FUGW.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGW.html#fugw.mappings.FUGW.fit"><code class="docutils literal notranslate"><span class="pre">FUGW.fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGW.html#fugw.mappings.FUGW.inverse_transform"><code class="docutils literal notranslate"><span class="pre">FUGW.inverse_transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGW.html#fugw.mappings.FUGW.transform"><code class="docutils literal notranslate"><span class="pre">FUGW.transform()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="transformers.FUGWSparse.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="transformers.FUGWSparse.html#fugw.transformers.FUGWSparse"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGWSparse.html#fugw.transformers.FUGWSparse.__init__"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGWSparse.html#fugw.transformers.FUGWSparse.fit"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.fit()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGWSparse.html#fugw.transformers.FUGWSparse.inverse_transform"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.inverse_transform()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGWSparse.html#fugw.transformers.FUGWSparse.transform"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.transform()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mappings.FUGWSparse.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mappings.FUGWSparse.html#fugw.mappings.FUGWSparse"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGWSparse.html#fugw.mappings.FUGWSparse.__init__"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGWSparse.html#fugw.mappings.FUGWSparse.fit"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGWSparse.html#fugw.mappings.FUGWSparse.inverse_transform"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.inverse_transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGWSparse.html#fugw.mappings.FUGWSparse.transform"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.transform()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -257,7 +257,7 @@ methods to easily fit your FUGW models and apply them to new data.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="transformers.FUGW.html">
+          <a class="next-page" href="mappings.FUGW.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>

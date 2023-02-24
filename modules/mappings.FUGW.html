@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="fugw.solvers" href="solvers.html" /><link rel="prev" title="FUGW" href="transformers.FUGW.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="FUGWSparse" href="mappings.FUGWSparse.html" /><link rel="prev" title="fugw.mappings" href="mappings.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>FUGWSparse - FUGW</title>
+        <title>FUGW - FUGW</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
@@ -168,9 +168,9 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../pages/api_references.html">API references</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current has-children"><a class="reference internal" href="transformers.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.transformers</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="transformers.FUGW.html"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a></li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="mappings.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mappings.FUGWSparse.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="solvers.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -219,31 +219,31 @@
           </label>
         </div>
         <article role="main">
-          <section id="fugwsparse">
-<h1><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code><a class="headerlink" href="#fugwsparse" title="Permalink to this heading">#</a></h1>
+          <section id="fugw">
+<h1><code class="docutils literal notranslate"><span class="pre">FUGW</span></code><a class="headerlink" href="#fugw" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="fugw.transformers.FUGWSparse">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fugw.transformers.</span></span><span class="sig-name descname"><span class="pre">FUGWSparse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.transformers.FUGWSparse" title="Permalink to this definition">#</a></dt>
-<dd><p>Transformer computing sparse transport plans</p>
+<dt class="sig sig-object py" id="fugw.mappings.FUGW">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fugw.mappings.</span></span><span class="sig-name descname"><span class="pre">FUGW</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.mappings.FUGW" title="Permalink to this definition">#</a></dt>
+<dd><p>Class computing dense transport plans</p>
 <p class="rubric">Methods</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fugw.transformers.FUGWSparse.fit" title="fugw.transformers.FUGWSparse.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(source_features, target_features[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fugw.mappings.FUGW.fit" title="fugw.mappings.FUGW.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(source_features, target_features[, ...])</p></td>
 <td><p>Compute transport plan between source and target distributions using feature maps and geometries.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fugw.transformers.FUGWSparse.inverse_transform" title="fugw.transformers.FUGWSparse.inverse_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inverse_transform</span></code></a>(target_features[, device])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fugw.mappings.FUGW.inverse_transform" title="fugw.mappings.FUGW.inverse_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inverse_transform</span></code></a>(target_features[, device])</p></td>
 <td><p>Transport target feature maps using fitted OT plan.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fugw.transformers.FUGWSparse.transform" title="fugw.transformers.FUGWSparse.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(source_features[, device])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fugw.mappings.FUGW.transform" title="fugw.mappings.FUGW.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(source_features[, device])</p></td>
 <td><p>Transport source feature maps using fitted OT plan.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="fugw.transformers.FUGWSparse.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.transformers.FUGWSparse.__init__" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="fugw.mappings.FUGW.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.mappings.FUGW.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Init FUGW problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -269,8 +269,8 @@ the entropy loss</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fugw.transformers.FUGWSparse.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_geometry_embedding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_geometry_embedding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_duals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uot_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.transformers.FUGWSparse.fit" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="fugw.mappings.FUGW.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_duals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uot_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sinkhorn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.mappings.FUGW.fit" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute transport plan between source and target distributions
 using feature maps and geometries.
 In our case, feature maps are fMRI contrast maps,
@@ -288,26 +288,25 @@ target graph.</p>
 </dd>
 <dt><strong>target_features: ndarray(n_features, m)</strong></dt><dd><p>Feature maps for target subject.</p>
 </dd>
-<dt><strong>source_geometry_embedding: ndarray(n, k), optional</strong></dt><dd><p>Embedding X such that norm(X_i - X_j) approximates
-the anatomical distance between vertices i and j
-of the source mesh</p>
+<dt><strong>source_geometry: ndarray(n, n)</strong></dt><dd><p>Kernel matrix of anatomical distances
+between nodes of source mesh</p>
 </dd>
-<dt><strong>target_geometry_embedding: ndarray(m, k), optional</strong></dt><dd><p>Embedding X such that norm(X_i - X_j) approximates
-the anatomical distance between vertices i and j
-of the target mesh</p>
+<dt><strong>target_geometry: ndarray(m, m)</strong></dt><dd><p>Kernel matrix of anatomical distances
+between nodes of target mesh</p>
 </dd>
 <dt><strong>source_weights: ndarray(n) or None</strong></dt><dd><p>Distribution weights of source nodes.
-Should sum to 1. If None, each node’s weight
+Should sum to 1. If None, eahc node’s weight
 will be set to 1 / n.</p>
 </dd>
 <dt><strong>target_weights: ndarray(n) or None</strong></dt><dd><p>Distribution weights of target nodes.
-Should sum to 1. If None, each node’s weight
+Should sum to 1. If None, eahc node’s weight
 will be set to 1 / m.</p>
 </dd>
-<dt><strong>init_plan: torch.sparse COO or CSR matrix or None</strong></dt><dd><p>Torch sparse matrix whose sparsity mask will
-be that of the transport plan computed by this solver.</p>
+<dt><strong>init_plan: ndarray(n, m) or None</strong></dt><dd><p>Transport plan to use at initialisation.</p>
 </dd>
-<dt><strong>uot_solver: “mm” or “ibpp”</strong></dt><dd><p>Solver to use.</p>
+<dt><strong>init_duals: tuple of [ndarray(n), ndarray(m)] or None</strong></dt><dd><p>Dual potentials to use at initialisation.</p>
+</dd>
+<dt><strong>uot_solver: “sinkhorn” or “mm” or “ibpp”</strong></dt><dd><p>Solver to use.</p>
 </dd>
 <dt><strong>device: “auto” or torch.device</strong></dt><dd><p>if “auto”: use first available gpu if it’s available,
 cpu otherwise.</p>
@@ -318,8 +317,8 @@ cpu otherwise.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>self: FUGWSparse class object</dt><dd><p>It comes with the following attributes:
-- pi: a fitted transport plan stored on CPU as a torch COO matrix
+<dt>self: FUGW class object</dt><dd><p>It comes with the following attributes:
+- pi: a fitted transport plan stored on CPU as a torch tensor
 - loss_steps: BCD steps at which the FUGW loss was evaluated
 - <a href="#id1"><span class="problematic" id="id2">loss_</span></a>: values of FUGW loss
 - <a href="#id3"><span class="problematic" id="id4">loss_ent_</span></a>: values of FUGW loss with entropy</p>
@@ -330,8 +329,8 @@ cpu otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fugw.transformers.FUGWSparse.inverse_transform">
-<span class="sig-name descname"><span class="pre">inverse_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.transformers.FUGWSparse.inverse_transform" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="fugw.mappings.FUGW.inverse_transform">
+<span class="sig-name descname"><span class="pre">inverse_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.mappings.FUGW.inverse_transform" title="Permalink to this definition">#</a></dt>
 <dd><p>Transport target feature maps using fitted OT plan.
 Use GPUs if available.</p>
 <dl class="field-list simple">
@@ -346,7 +345,7 @@ CPU otherwise.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>transported_data: ndarray(n_samples, n) or ndarray(n)</dt><dd><p>Contrast map transported in target subject’s space</p>
+<dt>transported_data: ndarray(n_samples, n) or ndarray(n)</dt><dd><p>Contrast map transported in source subject’s space</p>
 </dd>
 </dl>
 </dd>
@@ -354,8 +353,8 @@ CPU otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fugw.transformers.FUGWSparse.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.transformers.FUGWSparse.transform" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="fugw.mappings.FUGW.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.mappings.FUGW.transform" title="Permalink to this definition">#</a></dt>
 <dd><p>Transport source feature maps using fitted OT plan.
 Use GPUs if available.</p>
 <dl class="field-list simple">
@@ -386,23 +385,23 @@ CPU otherwise.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="solvers.html">
+          <a class="next-page" href="mappings.FUGWSparse.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></div>
+                <div class="title"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="transformers.FUGW.html">
+          <a class="prev-page" href="mappings.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></div>
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></div>
                 
               </div>
             </a>
@@ -436,12 +435,12 @@ CPU otherwise.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a><ul>
-<li><a class="reference internal" href="#fugw.transformers.FUGWSparse"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a><ul>
-<li><a class="reference internal" href="#fugw.transformers.FUGWSparse.__init__"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#fugw.transformers.FUGWSparse.fit"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.fit()</span></code></a></li>
-<li><a class="reference internal" href="#fugw.transformers.FUGWSparse.inverse_transform"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.inverse_transform()</span></code></a></li>
-<li><a class="reference internal" href="#fugw.transformers.FUGWSparse.transform"><code class="docutils literal notranslate"><span class="pre">FUGWSparse.transform()</span></code></a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a><ul>
+<li><a class="reference internal" href="#fugw.mappings.FUGW"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a><ul>
+<li><a class="reference internal" href="#fugw.mappings.FUGW.__init__"><code class="docutils literal notranslate"><span class="pre">FUGW.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#fugw.mappings.FUGW.fit"><code class="docutils literal notranslate"><span class="pre">FUGW.fit()</span></code></a></li>
+<li><a class="reference internal" href="#fugw.mappings.FUGW.inverse_transform"><code class="docutils literal notranslate"><span class="pre">FUGW.inverse_transform()</span></code></a></li>
+<li><a class="reference internal" href="#fugw.mappings.FUGW.transform"><code class="docutils literal notranslate"><span class="pre">FUGW.transform()</span></code></a></li>
 </ul>
 </li>
 </ul>

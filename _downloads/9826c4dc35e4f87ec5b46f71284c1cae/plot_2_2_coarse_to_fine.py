@@ -7,8 +7,8 @@ Transport distributions containing more than 10k points
 import torch
 
 from fugw.scripts import coarse_to_fine
-from fugw.transformers import FUGW, FUGWSparse
-from fugw.transformers.utils import init_mock_distribution
+from fugw.mappings import FUGW, FUGWSparse
+from fugw.mappings.utils import init_mock_distribution
 
 torch.manual_seed(0)
 

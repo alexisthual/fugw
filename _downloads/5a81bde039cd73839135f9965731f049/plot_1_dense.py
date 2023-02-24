@@ -6,8 +6,8 @@ Transport distributions containing less than 10k points
 ##############################################################################
 import torch
 
-from fugw.transformers import FUGW
-from fugw.transformers.utils import init_mock_distribution
+from fugw.mappings import FUGW
+from fugw.mappings.utils import init_mock_distribution
 
 torch.manual_seed(0)
 
