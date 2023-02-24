@@ -13,11 +13,11 @@ from rich.progress import (
     TimeRemainingColumn,
 )
 
-# `rich` console used throuout the codebase
+# `rich` console used throughout the codebase
 console = Console()
 
 
-# `rich` progress bar used trhouout the codebase
+# `rich` progress bar used throughout the codebase
 def get_progress(**kwargs):
     return Progress(
         SpinnerColumn(),
