@@ -52,9 +52,9 @@ In this work, we adapt the previous approach to approximate solutions
 to FUGW losses. Moreover, we provide multiple solvers to run inside the BCD algorithm.
 Namely, we provide:
 
-* `sinkhorn`: the classical Sinkhorn procedure described in [(Chizat et al. 2017) [7]](#7)
-* `mm`: a majorize-minimization algorithm described in [(Chapel et al. 2021) [4]](#4)
-* `ibpp`: an inexact-bregman-proximal-point algorithm described in [(Xie et al. 2020) [5]](#5)
+- `sinkhorn`: the classical Sinkhorn procedure described in [(Chizat et al. 2017) [7]](#7)
+- `mm`: a majorize-minimization algorithm described in [(Chapel et al. 2021) [4]](#4)
+- `ibpp`: an inexact-bregman-proximal-point algorithm described in [(Xie et al. 2020) [5]](#5)
 
 ## References
 

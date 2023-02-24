@@ -32,7 +32,7 @@ Transport distributions containing more than 10k points
 
 
 
-    [12:43:22] BCD step 1/10   FUGW loss:      0.033702339977025986     dense.py:342
+    [17:47:54] BCD step 1/10   FUGW loss:      0.033702339977025986     dense.py:342
                (base)     0.033903855830430984 (entropic)                           
 
 
@@ -67,43 +67,43 @@ Transport distributions containing more than 10k points
       return x.to(device, dtype).to_sparse_csr()
 
 
-    [12:43:41] BCD step 1/10   FUGW loss:      0.09190735965967178     sparse.py:460
+    [17:48:10] BCD step 1/10   FUGW loss:      0.09190735965967178     sparse.py:460
                (base)      0.10248613357543945 (entropic)                           
 
 
-    [12:43:45] BCD step 2/10   FUGW loss:      0.07255856692790985     sparse.py:460
+    [17:48:13] BCD step 2/10   FUGW loss:      0.07255856692790985     sparse.py:460
                (base)      0.0914413332939148 (entropic)                            
 
 
-    [12:43:48] BCD step 3/10   FUGW loss:      0.049713876098394394    sparse.py:460
+    [17:48:15] BCD step 3/10   FUGW loss:      0.049713876098394394    sparse.py:460
                (base)     0.08154833316802979 (entropic)                            
 
 
-    [12:43:51] BCD step 4/10   FUGW loss:      0.045637428760528564    sparse.py:460
+    [17:48:18] BCD step 4/10   FUGW loss:      0.045637428760528564    sparse.py:460
                (base)     0.08077586442232132 (entropic)                            
 
 
-    [12:43:54] BCD step 5/10   FUGW loss:      0.04527181759476662     sparse.py:460
+    [17:48:20] BCD step 5/10   FUGW loss:      0.04527181759476662     sparse.py:460
                (base)      0.08072327077388763 (entropic)                           
 
 
-    [12:43:57] BCD step 6/10   FUGW loss:      0.04517510160803795     sparse.py:460
+    [17:48:23] BCD step 6/10   FUGW loss:      0.04517510160803795     sparse.py:460
                (base)      0.08067489415407181 (entropic)                           
 
 
-    [12:44:00] BCD step 7/10   FUGW loss:      0.045062415301799774    sparse.py:460
+    [17:48:25] BCD step 7/10   FUGW loss:      0.045062415301799774    sparse.py:460
                (base)     0.0806085392832756 (entropic)                             
 
 
-    [12:44:03] BCD step 8/10   FUGW loss:      0.04487589746713638     sparse.py:460
+    [17:48:28] BCD step 8/10   FUGW loss:      0.04487589746713638     sparse.py:460
                (base)      0.08050280809402466 (entropic)                           
 
 
-    [12:44:06] BCD step 9/10   FUGW loss:      0.0445578470826149      sparse.py:460
+    [17:48:30] BCD step 9/10   FUGW loss:      0.0445578470826149      sparse.py:460
                (base)       0.08032988011837006 (entropic)                          
 
 
-    [12:44:09] BCD step 10/10  FUGW loss:      0.04408379644155502     sparse.py:460
+    [17:48:33] BCD step 10/10  FUGW loss:      0.04408379644155502     sparse.py:460
                (base)      0.08007900416851044 (entropic)                           
     Coarse transport plan's total mass: 0.9926271438598633
     Fine-scale transport plan's total mass: 0.9793401956558228
@@ -192,7 +192,7 @@ Transport distributions containing more than 10k points
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  47.246 seconds)
+   **Total running time of the script:** ( 0 minutes  39.486 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_2_2_coarse_to_fine.py:
