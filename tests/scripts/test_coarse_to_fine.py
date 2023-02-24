@@ -5,8 +5,8 @@ import pytest
 import torch
 
 from fugw.scripts import coarse_to_fine
-from fugw.transformers import FUGW, FUGWSparse
-from fugw.transformers.utils import init_mock_distribution
+from fugw.mappings import FUGW, FUGWSparse
+from fugw.mappings.utils import init_mock_distribution
 
 np.random.seed(0)
 torch.manual_seed(0)

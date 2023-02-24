@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 import torch
 
-from fugw.transformers import FUGWBarycenter
-from fugw.transformers.utils import init_mock_distribution
+from fugw.mappings import FUGWBarycenter
+from fugw.mappings.utils import init_mock_distribution
 
 devices = [torch.device("cpu")]
 if torch.cuda.is_available():

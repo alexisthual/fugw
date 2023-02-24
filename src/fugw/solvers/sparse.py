@@ -17,7 +17,7 @@ from fugw.solvers.utils import (
     solver_ibpp_sparse,
     solver_mm_sparse,
 )
-from fugw.transformers.utils import BaseSolver, console, make_csr_matrix
+from fugw.mappings.utils import BaseSolver, console, make_csr_matrix
 
 
 class FUGWSparseSolver(BaseSolver):

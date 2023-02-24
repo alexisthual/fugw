@@ -1,6 +1,6 @@
 import torch
 
-from fugw.transformers.utils import get_progress
+from fugw.mappings.utils import get_progress
 
 
 def csr_dim_sum(values, group_indices, n_groups):

@@ -10,7 +10,7 @@ from fugw.solvers.utils import (
     solver_mm,
     solver_sinkhorn,
 )
-from fugw.transformers.utils import BaseSolver, console
+from fugw.mappings.utils import BaseSolver, console
 
 
 class FUGWSolver(BaseSolver):

@@ -32,7 +32,7 @@ def get_progress(**kwargs):
     )
 
 
-class BaseTransformer:
+class BaseMapping:
     def __init__(
         self,
         alpha=0.5,

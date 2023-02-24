@@ -1,24 +1,30 @@
 import numpy as np
 import torch
+import warnings
 
-from fugw.solvers.dense import FUGWSolver
-from fugw.transformers.utils import BaseTransformer, make_tensor
+from fugw.solvers.sparse import FUGWSparseSolver
+from fugw.mappings.utils import (
+    BaseMapping,
+    low_rank_squared_l2,
+    make_sparse_csr_tensor,
+    make_tensor,
+)
 
 
-class FUGW(BaseTransformer):
-    """Transformer computing dense transport plans"""
+class FUGWSparse(BaseMapping):
+    """Class computing sparse transport plans"""
 
     def fit(
         self,
         source_features,
         target_features,
-        source_geometry=None,
-        target_geometry=None,
+        source_geometry_embedding=None,
+        target_geometry_embedding=None,
         source_weights=None,
         target_weights=None,
         init_plan=None,
         init_duals=None,
-        uot_solver="sinkhorn",
+        uot_solver="mm",
         device="auto",
         verbose=False,
         **kwargs,
@@ -41,25 +47,26 @@ class FUGW(BaseTransformer):
             target graph.
         target_features: ndarray(n_features, m)
             Feature maps for target subject.
-        source_geometry: ndarray(n, n)
-            Kernel matrix of anatomical distances
-            between nodes of source mesh
-        target_geometry: ndarray(m, m)
-            Kernel matrix of anatomical distances
-            between nodes of target mesh
+        source_geometry_embedding: ndarray(n, k), optional
+            Embedding X such that norm(X_i - X_j) approximates
+            the anatomical distance between vertices i and j
+            of the source mesh
+        target_geometry_embedding: ndarray(m, k), optional
+            Embedding X such that norm(X_i - X_j) approximates
+            the anatomical distance between vertices i and j
+            of the target mesh
         source_weights: ndarray(n) or None
             Distribution weights of source nodes.
-            Should sum to 1. If None, eahc node's weight
+            Should sum to 1. If None, each node's weight
             will be set to 1 / n.
         target_weights: ndarray(n) or None
             Distribution weights of target nodes.
-            Should sum to 1. If None, eahc node's weight
+            Should sum to 1. If None, each node's weight
             will be set to 1 / m.
-        init_plan: ndarray(n, m) or None
-            Transport plan to use at initialisation.
-        init_duals: tuple of [ndarray(n), ndarray(m)] or None
-            Dual potentials to use at initialisation.
-        uot_solver: "sinkhorn" or "mm" or "ibpp"
+        init_plan: torch.sparse COO or CSR matrix or None
+            Torch sparse matrix whose sparsity mask will
+            be that of the transport plan computed by this solver.
+        uot_solver: "mm" or "ibpp"
             Solver to use.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
@@ -69,9 +76,9 @@ class FUGW(BaseTransformer):
 
         Returns
         -------
-        self: FUGW class object
+        self: FUGWSparse class object
             It comes with the following attributes:
-            - pi: a fitted transport plan stored on CPU as a torch tensor
+            - pi: a fitted transport plan stored on CPU as a torch COO matrix
             - loss_steps: BCD steps at which the FUGW loss was evaluated
             - loss_: values of FUGW loss
             - loss_ent_: values of FUGW loss with entropy
@@ -113,21 +120,42 @@ class FUGW(BaseTransformer):
         # Compute distance matrix between features
         Fs = make_tensor(source_features.T, device=device)
         Ft = make_tensor(target_features.T, device=device)
-        F = torch.cdist(Fs, Ft, p=2) ** 2
+        F1, F2 = low_rank_squared_l2(Fs, Ft)
+        F1 = make_tensor(F1, device=device)
+        F2 = make_tensor(F2, device=device)
 
         # Load anatomical kernels to GPU
-        Ds = make_tensor(source_geometry, device=device)
-        Dt = make_tensor(target_geometry, device=device)
+        Ds1, Ds2 = low_rank_squared_l2(
+            source_geometry_embedding, source_geometry_embedding
+        )
+        Ds1 = make_tensor(Ds1, device=device)
+        Ds2 = make_tensor(Ds2, device=device)
+        Dt1, Dt2 = low_rank_squared_l2(
+            target_geometry_embedding, target_geometry_embedding
+        )
+        Dt1 = make_tensor(Dt1, device=device)
+        Dt2 = make_tensor(Dt2, device=device)
+
+        # Check that all init_plan is valid
+        if init_plan is None:
+            warnings.warn(
+                "Warning: init_plan is None, so this solver "
+                "will compute a dense solution. However, "
+                "dense solutions are much more efficiently computed "
+                "by fugw.FUGW"
+            )
+        else:
+            init_plan = make_sparse_csr_tensor(init_plan, device=device)
 
         # Create model
-        model = FUGWSolver(**kwargs)
+        model = FUGWSparseSolver(**kwargs)
 
         # Compute transport plan
         (
             pi,
             gamma,
-            duals_pi,
-            duals_gamma,
+            duals_p,
+            duals_g,
             loss_steps,
             loss_,
             loss_ent_,
@@ -137,9 +165,9 @@ class FUGW(BaseTransformer):
             rho_t=rho_t,
             eps=self.eps,
             reg_mode=self.reg_mode,
-            F=F,
-            Ds=Ds,
-            Dt=Dt,
+            F=(F1, F2),
+            Ds=(Ds1, Ds2),
+            Dt=(Dt1, Dt2),
             ws=ws,
             wt=wt,
             init_plan=init_plan,
@@ -148,18 +176,17 @@ class FUGW(BaseTransformer):
             verbose=verbose,
         )
 
-        # Store variables of interest in model
-        self.pi = pi.detach().cpu()
+        self.pi = pi.to_sparse_coo().detach().cpu()
         self.loss_steps = loss_steps
         self.loss_ = loss_
-        self.loss_ent = loss_ent_
+        self.loss_ent_ = loss_ent_
 
         # Free allocated GPU memory
-        del Fs, Ft, F, Ds, Dt
+        del Fs, Ft, F1, F2, Ds1, Ds2, Dt1, Dt2
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-        return (pi, gamma, duals_pi, duals_gamma, loss_steps, loss_, loss_ent_)
+        return (pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_)
 
     def transform(self, source_features, device="auto"):
         """
@@ -188,34 +215,45 @@ class FUGW(BaseTransformer):
         if self.pi is None:
             raise Exception("Model should be fitted before calling transform")
 
+        # Set correct type and device
+        source_features_tensor = make_tensor(source_features, device=device)
+
         is_one_dimensional = False
-        if source_features.ndim == 1:
+        if source_features_tensor.ndim == 1:
             is_one_dimensional = True
-            source_features = source_features.reshape(1, -1)
-        if source_features.ndim > 2:
+            source_features_tensor = source_features_tensor.reshape(1, -1)
+        if source_features_tensor.ndim > 2:
             raise ValueError(
                 "source_features has too many dimensions:"
-                f" {source_features.ndim}"
+                f" {source_features_tensor.ndim}"
             )
-
-        # Move data to device if need be
-        pi = make_tensor(self.pi, device=device)
-        source_features_tensor = make_tensor(source_features, device=device)
 
         # Transform data
         transformed_data = (
-            (pi.T @ source_features_tensor.T / pi.sum(dim=0).reshape(-1, 1))
+            (
+                torch.sparse.mm(
+                    self.pi.to(device).transpose(0, 1),
+                    source_features_tensor.T,
+                ).to_dense()
+                / (
+                    torch.sparse.sum(self.pi.to(device), dim=0)
+                    .to_dense()
+                    .reshape(-1, 1)
+                    # Add very small value to handle null rows
+                    + 1e-16
+                )
+            )
             .T.detach()
             .cpu()
         )
 
         # Free allocated GPU memory
-        del pi, source_features_tensor
+        del source_features_tensor
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
         # Modify returned tensor so that it matches
-        # source_features's shape and python type
+        # source_features's type and shape
         if isinstance(source_features, np.ndarray):
             transformed_data = transformed_data.numpy()
 
@@ -240,7 +278,7 @@ class FUGW(BaseTransformer):
         Returns
         -------
         transported_data: ndarray(n_samples, n) or ndarray(n)
-            Contrast map transported in source subject's space
+            Contrast map transported in target subject's space
         """
         if device == "auto":
             if torch.cuda.is_available():
@@ -251,34 +289,45 @@ class FUGW(BaseTransformer):
         if self.pi is None:
             raise Exception("Model should be fitted before calling transform")
 
+        # Set correct type and device
+        target_features_tensor = make_tensor(target_features, device=device)
+
         is_one_dimensional = False
-        if target_features.ndim == 1:
+        if target_features_tensor.ndim == 1:
             is_one_dimensional = True
-            target_features = target_features.reshape(1, -1)
-        if target_features.ndim > 2:
+            target_features_tensor = target_features_tensor.reshape(1, -1)
+        if target_features_tensor.ndim > 2:
             raise ValueError(
                 "target_features has too many dimensions:"
-                f" {target_features.ndim}"
+                f" {target_features_tensor.ndim}"
             )
-
-        # Move data to device if need be
-        pi = make_tensor(self.pi, device=device)
-        target_features_tensor = make_tensor(target_features, device=device)
 
         # Transform data
         transformed_data = (
-            (pi @ target_features_tensor.T / pi.sum(dim=1).reshape(-1, 1))
+            (
+                torch.sparse.mm(
+                    self.pi.to(device),
+                    target_features_tensor.T,
+                ).to_dense()
+                / (
+                    torch.sparse.sum(self.pi.to(device), dim=1)
+                    .to_dense()
+                    .reshape(-1, 1)
+                    # Add very small value to handle null rows
+                    + 1e-16
+                )
+            )
             .T.detach()
             .cpu()
         )
 
         # Free allocated GPU memory
-        del pi, target_features_tensor
+        del target_features_tensor
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
         # Modify returned tensor so that it matches
-        # target_features's  shape and python type
+        # target_features's type and shape
         if isinstance(target_features, np.ndarray):
             transformed_data = transformed_data.numpy()
 

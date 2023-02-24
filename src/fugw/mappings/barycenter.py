@@ -1,7 +1,7 @@
 import torch
 
-from fugw.transformers.dense import FUGW
-from fugw.transformers.utils import make_tensor
+from fugw.mappings.dense import FUGW
+from fugw.mappings.utils import make_tensor
 
 
 class FUGWBarycenter:
