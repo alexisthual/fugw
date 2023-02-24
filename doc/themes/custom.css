@@ -104,7 +104,7 @@ table.plotting-table img {
 }
 
 /* Wrap code blocks */
-pre {                                 
-    white-space: pre-wrap !important; 
-    word-break: break-all;            
+pre {
+  white-space: pre-wrap !important;
+  word-break: break-all;
 }
