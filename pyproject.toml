@@ -39,6 +39,7 @@ doc = [
   "m2r2",
   "matplotlib",
   "myst_parser",
+  "nilearn",
   "numpydoc",
   "pillow",
   "sphinx==5.3.0",
