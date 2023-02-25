@@ -11,25 +11,37 @@ from fugw.mappings.utils import init_mock_distribution
 np.random.seed(0)
 torch.manual_seed(0)
 
+n_voxels_source = 105
+n_samples_source = 50
+n_voxels_target = 95
+n_samples_target = 45
+n_features_train = 10
+n_features_test = 5
+
 devices = [torch.device("cpu")]
 if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
-
 return_numpys = [False, True]
+
+
+@pytest.mark.parametrize("return_numpy", product(return_numpys))
+def test_random_normalizing(return_numpy):
+    _, _, _, embeddings = init_mock_distribution(
+        n_features_train, n_voxels_source, return_numpy=return_numpy
+    )
+
+    embeddings_normalized, d_max = coarse_to_fine.random_normalizing(
+        embeddings
+    )
+    assert isinstance(d_max, float)
+    assert embeddings_normalized.shape == embeddings.shape
 
 
 @pytest.mark.parametrize(
     "device,return_numpy", product(devices, return_numpys)
 )
 def test_coarse_to_fine(device, return_numpy):
-    n_voxels_source = 105
-    n_samples_source = 50
-    n_voxels_target = 95
-    n_samples_target = 45
-    n_features_train = 10
-    n_features_test = 5
-
     _, source_features, _, source_embeddings = init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
     )

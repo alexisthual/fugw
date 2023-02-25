@@ -6,22 +6,41 @@ import torch
 from fugw.mappings.utils import make_tensor, get_progress
 
 
-def random_normalizing(X, repeats=10, sample_size=100):
+def random_normalizing(X, sample_size=100, repeats=10):
     """
-    Normalize X by deviding it by its max coefficient.
-    This coefficient is determined by random sampling.
+    Normalize X by dividing it by the maximum distance
+    between pairs of rows of X.
+    This maximum distance is determined by sampling pairs
+    in X randomly.
+
+    Parameters
+    ----------
+    X: torch.Tensor of size (n, k)
+        Tensor to normalize.
+    sample_size: int, optional, defaults to 100
+        Number of vectors to sample from X at each iteration.
+    repeats: int, optinal, defaults to 10
+        Number of iterations to run.
+
+    Returns
+    -------
+    X_normalized: torch.Tensor of size (n, k)
+        Normalized X.
+    d_max: float
+        Maximum distance encountered while sampling pairs
+        of indices from X.
     """
     d_max = 0
+    X_tensor = make_tensor(X)
     for _ in range(repeats):
-        idx = torch.randperm(torch.arange(X.shape[0]))[:sample_size]
-        distances = torch.cdist(X[idx, :], X[idx, :], p=2)
+        idx = torch.randperm(X_tensor.shape[0])[:sample_size]
+        distances = torch.cdist(X_tensor[idx, :], X_tensor[idx, :], p=2)
         d = distances.max()
         d_max = max(d, d_max)
 
-    print(f"d_max: {d_max}")
+    X_normalized = X_tensor / d_max
 
-    X_normalized = X / d_max
-    return X_normalized
+    return X_normalized, d_max.item()
 
 
 def fit(
@@ -279,3 +298,5 @@ def fit(
         verbose=verbose,
         **fine_mapping_fit_params,
     )
+
+    return source_sample, target_sample
