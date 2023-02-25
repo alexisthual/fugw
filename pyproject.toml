@@ -65,5 +65,8 @@ repository = "https://github.com/alexisthual/fugw.git"
 line-length = 79
 preview = true
 
+[tool.flake8]
+ignore = ["E203"]
+
 [tool.setuptools.dynamic]
 version = {attr = "fugw.__version__"}
