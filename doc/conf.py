@@ -26,6 +26,7 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
+    "sphinx_copybutton",
     "sphinx_gallery.gen_gallery",
 ]
 
@@ -259,13 +260,11 @@ htmlhelp_basename = "fugw_doc"
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    "python": (
-        "https://docs.python.org/{.major}".format(sys.version_info),
-        None,
-    ),
-    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
     "matplotlib": ("https://matplotlib.org/", None),
+    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
 }
+
+plot_gallery = True
 
 sphinx_gallery_conf = {
     "backreferences_dir": "modules/generated",
@@ -276,5 +275,6 @@ sphinx_gallery_conf = {
     "reference_url": {
         "fugw": None,
     },
+    "remove_config_comments": True,
     "within_subsection_order": FileNameSortKey,
 }
