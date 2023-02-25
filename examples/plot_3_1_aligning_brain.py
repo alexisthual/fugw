@@ -1,14 +1,16 @@
 # %%
 """
-=====================================
-Align brain surfaces of 2 individuals
-=====================================
+====================================================
+Align brain surfaces of 2 individuals with fMRI data
+====================================================
 
-In this example, we align 2 left hemispheres using 4 feature maps
-(z-score contrast maps).
+In this example, we align 2 low-resolution left hemispheres
+using 4 fMRI feature maps (z-score contrast maps).
 
 """
 # sphinx_gallery_thumbnail_number = 5
+import time
+
 import gdist
 import matplotlib as mpl
 import matplotlib.gridspec as gridspec
@@ -64,7 +66,7 @@ plotting.view_img(
 # and aggregate these projections to build an array of features for the
 # source and target subjects.
 # For the sake of keeping the training phase of our mapping short even on CPU,
-# we project these volumetric maps on a low-resolution mesh
+# we project these volumetric maps on a very low-resolution mesh
 # made of 642 vertices.
 
 fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
@@ -226,6 +228,8 @@ mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 # Moreover, we limit the number of block-coordinate-descent
 # iterations to 3 in order to limit computation time for this example.
 
+t0 = time.time()
+
 _ = mapping.fit(
     source_features_normalized[:n_training_contrasts],
     target_features_normalized[:n_training_contrasts],
@@ -235,12 +239,48 @@ _ = mapping.fit(
     verbose=True,
 )
 
+t1 = time.time()
+
 ##############################################################################
 # Here is the evolution of the FUGW loss during training,
 # with and without the entropic term:
 
 fig, ax = plt.subplots(figsize=(4, 4))
-ax.set_title("Mapping training loss")
+ax.set_title(f"Mapping training loss\nTotal training time = {t1 - t0}s")
+ax.set_ylabel("Loss")
+ax.set_xlabel("BCD step")
+ax.plot(mapping.loss_steps, mapping.loss_, label="FUGW loss")
+ax.plot(mapping.loss_steps, mapping.loss_ent, label="FUGW entropic loss")
+ax.legend()
+plt.show()
+
+##############################################################################
+# Note that we implicitely used the ``sinkhorn`` solver here, but that
+# this library comes with other solvers which are, in most cases,
+# much faster.
+# Let's retrain our mapping using the ``mm`` solver, which implements
+# a maximize-minimization approach to approximate a solution:
+
+t0 = time.time()
+
+_ = mapping.fit(
+    source_features_normalized[:n_training_contrasts],
+    target_features_normalized[:n_training_contrasts],
+    source_geometry=source_geometry_normalized,
+    target_geometry=target_geometry_normalized,
+    uot_solver="mm",
+    nits_bcd=10,
+    verbose=True,
+)
+
+t1 = time.time()
+
+##############################################################################
+# Here is the evolution of the FUGW loss during training,
+# with and without the entropic term:
+
+fig, ax = plt.subplots(figsize=(4, 4))
+ax.set_title(f"Mapping training loss\nTotal training time = {t1 - t0}s")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
 ax.plot(mapping.loss_steps, mapping.loss_, label="FUGW loss")
