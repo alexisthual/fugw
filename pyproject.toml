@@ -54,6 +54,7 @@ test = [
   "meshzoo>=0.9.20",
   "pyproject-flake8",
   "pytest>=7.2",
+  "scikit-rmt",
 ]
 scripts = [
   "joblib>=1.2.0",
