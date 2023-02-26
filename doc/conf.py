@@ -272,6 +272,7 @@ sphinx_gallery_conf = {
     "download_all_examples": False,
     "examples_dirs": "../examples",
     "gallery_dirs": "auto_examples",
+    "nested_sections": True,
     "reference_url": {
         "fugw": None,
     },
