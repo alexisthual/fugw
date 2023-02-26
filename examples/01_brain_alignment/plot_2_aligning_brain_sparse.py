@@ -15,10 +15,16 @@ hyper-parameters and solver parameters, it takes less than
 10 minutes to compute a mapping between 2 such distributions
 using a V100 Nvidia GPU.
 
+**Before reading this tutorial, you should first go through
+:ref:`_sphx_glr_auto_examples_00_basics_plot_1_aligning_brain_dense.py`**,
+which explains the ropes of brain alignment in more detail
+than this example.
+In the current example, we focus more on how to use this package
+to align data using real-life resolutions.
+
 """
 
-# %%
-# sphinx_gallery_thumbnail_number = 5
+# sphinx_gallery_thumbnail_number = 8
 import time
 
 import matplotlib as mpl
@@ -356,7 +362,7 @@ plt.show()
 # faster (in total time) than the fine-grained one.
 # It probably is a good strategy to invest computational time in deriving
 # a precise coarse solution.
-print(f"Total training time: {t1 - t0}s")
+print(f"Total training time: {t1 - t0:.1f}s")
 
 # %%
 ##############################################################################
@@ -505,9 +511,8 @@ plt.show()
 # %%
 ##############################################################################
 # Here, we transported a feature map which is part of the traning set,
-# so it's just normal that, on the target anatomy,
-# the predicted and actual maps look very similar.
-# But we can also use the computed mapping to transport unseen data,
+# which does not really help evaluate the quality of our model.
+# Instead, we can also use the computed mapping to transport unseen data,
 # which is how we will usually assess whether our model has captured
 # useful information or not:
 

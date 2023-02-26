@@ -6,9 +6,9 @@ Align brain surfaces of 2 individuals with fMRI data
 
 In this example, we align 2 low-resolution left hemispheres
 using 4 fMRI feature maps (z-score contrast maps).
-
 """
-# sphinx_gallery_thumbnail_number = 5
+
+# sphinx_gallery_thumbnail_number = 6
 import time
 
 import gdist
@@ -21,7 +21,7 @@ from fugw.mappings import FUGW
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from nilearn import datasets, image, plotting, surface
 
-##############################################################################
+# %%
 # Let's download 5 volumetric contrast maps per individual
 # using ``nilearn``'s API. We will use the first 4 of them
 # to compute an alignment between the source and target subjects,
@@ -47,7 +47,7 @@ brain_data = datasets.fetch_localizer_contrasts(
 source_imgs_paths = brain_data["cmaps"][0 : len(contrasts)]
 target_imgs_paths = brain_data["cmaps"][len(contrasts) : 2 * len(contrasts)]
 
-##############################################################################
+# %%
 # Here is what the first contrast map of the source subject looks like
 # (the following figure is interactive):
 
@@ -59,7 +59,7 @@ plotting.view_img(
     opacity=0.5,
 )
 
-##############################################################################
+# %%
 # Computing feature arrays
 # ------------------------
 # Let's project these 4 maps to a mesh representing the cortical surface
@@ -71,7 +71,7 @@ plotting.view_img(
 
 fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
 
-##############################################################################
+# %%
 
 
 def load_images_and_project_to_surface(image_paths):
@@ -90,7 +90,7 @@ target_features = load_images_and_project_to_surface(target_imgs_paths)
 source_features.shape
 
 
-##############################################################################
+# %%
 # Here is a figure showing the 4 projected maps for each of
 # the 2 individuals:
 
@@ -146,7 +146,7 @@ fig.colorbar(
 
 plt.show()
 
-##############################################################################
+# %%
 # Computing geometry arrays
 # -------------------------
 # Now we compute the kernel matrix of distances between vertices
@@ -172,7 +172,7 @@ source_geometry = fsaverage3_pial_left_geometry
 target_geometry = fsaverage3_pial_left_geometry
 source_geometry.shape
 
-##############################################################################
+# %%
 # Each line ``vertex_index`` of the geometry matrices contains the anatomical
 # distance (here in millimeters) from ``vertex_index`` to all other vertices
 # of the mesh.
@@ -190,7 +190,7 @@ plot_surface_map(
 )
 plt.show()
 
-##############################################################################
+# %%
 # Normalizing features and geometries
 # -----------------------------------
 # Features and geometries should be normalized before we can train a mapping.
@@ -208,7 +208,7 @@ target_features_normalized = target_features / np.linalg.norm(
 source_geometry_normalized = source_geometry / np.max(source_geometry)
 target_geometry_normalized = target_geometry / np.max(target_geometry)
 
-##############################################################################
+# %%
 # Training the mapping
 # --------------------
 # Let's create our mapping. We set ``alpha=0.5`` to indicate that we are
@@ -223,7 +223,7 @@ target_geometry_normalized = target_geometry / np.max(target_geometry)
 
 mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 
-##############################################################################
+# %%
 # Let's fit our mapping! Remember to use the training maps only.
 # Moreover, we limit the number of block-coordinate-descent
 # iterations to 3 in order to limit computation time for this example.
@@ -241,12 +241,14 @@ _ = mapping.fit(
 
 t1 = time.time()
 
-##############################################################################
+# %%
 # Here is the evolution of the FUGW loss during training,
 # with and without the entropic term:
 
 fig, ax = plt.subplots(figsize=(4, 4))
-ax.set_title(f"Mapping training loss\nTotal training time = {t1 - t0}s")
+ax.set_title(
+    f"Sinkhorn mapping training loss\nTotal training time = {t1 - t0:.1f}s"
+)
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
 ax.plot(mapping.loss_steps, mapping.loss_, label="FUGW loss")
@@ -254,41 +256,52 @@ ax.plot(mapping.loss_steps, mapping.loss_ent, label="FUGW entropic loss")
 ax.legend()
 plt.show()
 
-##############################################################################
+# %%
 # Note that we implicitely used the ``sinkhorn`` solver here, but that
 # this library comes with other solvers which are, in most cases,
 # much faster.
 # Let's retrain our mapping using the ``mm`` solver, which implements
 # a maximize-minimization approach to approximate a solution:
 
+mm_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
+
 t0 = time.time()
 
-_ = mapping.fit(
+_ = mm_mapping.fit(
     source_features_normalized[:n_training_contrasts],
     target_features_normalized[:n_training_contrasts],
     source_geometry=source_geometry_normalized,
     target_geometry=target_geometry_normalized,
     uot_solver="mm",
-    nits_bcd=10,
+    nits_bcd=5,
+    tol_bcd=1e-10,
+    tol_uot=1e-10,
     verbose=True,
 )
 
 t1 = time.time()
 
-##############################################################################
+# %%
 # Here is the evolution of the FUGW loss during training,
-# with and without the entropic term:
+# with and without the entropic term. Note how, in this case,
+# even though ``mm`` needed more block-coordinate-descent steps to converge,
+# it was about 2 times faster to reach the same final FUGW training loss
+# as ``sinkhorn``.
 
 fig, ax = plt.subplots(figsize=(4, 4))
-ax.set_title(f"Mapping training loss\nTotal training time = {t1 - t0}s")
+ax.set_title(f"MM mapping training loss\nTotal training time = {t1 - t0:.1f}s")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
 ax.plot(mapping.loss_steps, mapping.loss_, label="FUGW loss")
 ax.plot(mapping.loss_steps, mapping.loss_ent, label="FUGW entropic loss")
+ax.plot(mm_mapping.loss_steps, mm_mapping.loss_, label="MM FUGW loss")
+ax.plot(
+    mm_mapping.loss_steps, mm_mapping.loss_ent, label="MM FUGW entropic loss"
+)
 ax.legend()
 plt.show()
 
-##############################################################################
+# %%
 # Using the computed mapping
 # --------------------------
 # The computed mapping is stored in ``mapping.pi`` as a ``torch.Tensor``.
@@ -304,7 +317,7 @@ im = plt.imshow(pi, cmap="viridis")
 plt.colorbar(im, ax=ax, shrink=0.8)
 plt.show()
 
-##############################################################################
+# %%
 # Each line ``vertex_index`` of the computed mapping can be interpreted as
 # a probability map describing which vertices of the target
 # should be mapped with the source vertex ``vertex_index``.
@@ -320,7 +333,7 @@ ax.set_title(
 plot_surface_map(probability_map, cmap="viridis", axes=ax)
 plt.show()
 
-##############################################################################
+# %%
 # Using ``mapping.transform()``,
 # we can use the computed mapping to transport any collection of feature maps
 # from the source anatomy onto the target anatomy.
@@ -333,7 +346,7 @@ predicted_target_features = mapping.transform(
 )
 predicted_target_features.shape
 
-##############################################################################
+# %%
 
 fig = plt.figure(figsize=(3 * 3, 3))
 fig.suptitle("Transporting feature maps of the training set")
@@ -357,11 +370,10 @@ plot_surface_map(
 
 plt.show()
 
-##############################################################################
+# %%
 # Here, we transported a feature map which is part of the traning set,
-# so it's just normal that, on the target anatomy,
-# the predicted and actual maps look very similar.
-# But we can also use the computed mapping to transport unseen data,
+# which does not really help evaluate the quality of our model.
+# Instead, we can also use the computed mapping to transport unseen data,
 # which is how we will usually assess whether our model has captured
 # useful information or not:
 
