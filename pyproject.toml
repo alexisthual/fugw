@@ -38,6 +38,7 @@ doc = [
   "fugw[test]",
   "m2r2",
   "matplotlib",
+  "memory_profiler",
   "myst_parser",
   "nilearn",
   "numpydoc",

@@ -276,5 +276,6 @@ sphinx_gallery_conf = {
         "fugw": None,
     },
     "remove_config_comments": True,
+    "show_memory": not sys.platform.startswith("win"),
     "within_subsection_order": FileNameSortKey,
 }
