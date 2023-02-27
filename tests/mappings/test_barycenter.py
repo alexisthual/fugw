@@ -18,17 +18,19 @@ def test_fugw_barycenter(device):
     n_features = 10
 
     # Generate random training data for n subjects
-    features_ = []
-    geometry_ = []
-    weights_ = []
+    features_list = []
+    geometry_list = []
+    weights_list = []
 
     for _ in range(n_subjects):
         weights, features, geometry, _ = init_mock_distribution(
             n_features, n_voxels
         )
-        weights_.append(weights)
-        features_.append(features)
-        geometry_.append(geometry)
+        weights_list.append(weights)
+        features_list.append(features)
+        geometry_list.append(geometry)
 
     fugw_barycenter = FUGWBarycenter()
-    fugw_barycenter.fit(weights_, features_, geometry_, device=device)
+    fugw_barycenter.fit(
+        weights_list, features_list, geometry_list, device=device
+    )

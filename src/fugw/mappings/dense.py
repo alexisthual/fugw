@@ -70,11 +70,6 @@ class FUGW(BaseMapping):
         Returns
         -------
         self: FUGW class object
-            It comes with the following attributes:
-            - pi: a fitted transport plan stored on CPU as a torch tensor
-            - loss_steps: BCD steps at which the FUGW loss was evaluated
-            - loss_: values of FUGW loss
-            - loss_ent_: values of FUGW loss with entropy
         """
         if device == "auto":
             if torch.cuda.is_available():
@@ -123,15 +118,7 @@ class FUGW(BaseMapping):
         model = FUGWSolver(**kwargs)
 
         # Compute transport plan
-        (
-            pi,
-            gamma,
-            duals_pi,
-            duals_gamma,
-            loss_steps,
-            loss_,
-            loss_ent_,
-        ) = model.solve(
+        res = model.solve(
             alpha=self.alpha,
             rho_s=rho_s,
             rho_t=rho_t,
@@ -149,17 +136,18 @@ class FUGW(BaseMapping):
         )
 
         # Store variables of interest in model
-        self.pi = pi.detach().cpu()
-        self.loss_steps = loss_steps
-        self.loss_ = loss_
-        self.loss_ent = loss_ent_
+        self.pi = res["pi"].detach().cpu()
+        self.loss_steps = res["loss_steps"]
+        self.loss = res["loss"]
+        self.loss_entropic = res["loss_entropic"]
+        self.loss_times = res["loss_times"]
 
         # Free allocated GPU memory
         del Fs, Ft, F, Ds, Dt
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-        return (pi, gamma, duals_pi, duals_gamma, loss_steps, loss_, loss_ent_)
+        return self
 
     def transform(self, source_features, device="auto"):
         """

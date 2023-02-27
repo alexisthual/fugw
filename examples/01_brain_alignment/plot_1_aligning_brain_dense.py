@@ -9,8 +9,6 @@ using 4 fMRI feature maps (z-score contrast maps).
 """
 
 # sphinx_gallery_thumbnail_number = 6
-import time
-
 import gdist
 import matplotlib as mpl
 import matplotlib.gridspec as gridspec
@@ -228,8 +226,6 @@ mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 # Moreover, we limit the number of block-coordinate-descent
 # iterations to 3 in order to limit computation time for this example.
 
-t0 = time.time()
-
 _ = mapping.fit(
     source_features_normalized[:n_training_contrasts],
     target_features_normalized[:n_training_contrasts],
@@ -239,20 +235,19 @@ _ = mapping.fit(
     verbose=True,
 )
 
-t1 = time.time()
-
 # %%
 # Here is the evolution of the FUGW loss during training,
 # with and without the entropic term:
 
 fig, ax = plt.subplots(figsize=(4, 4))
 ax.set_title(
-    f"Sinkhorn mapping training loss\nTotal training time = {t1 - t0:.1f}s"
+    "Sinkhorn mapping training loss\n"
+    f"Total training time = {mapping.loss_times[-1]:.1f}s"
 )
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(mapping.loss_steps, mapping.loss_, label="FUGW loss")
-ax.plot(mapping.loss_steps, mapping.loss_ent, label="FUGW entropic loss")
+ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
+ax.plot(mapping.loss_steps, mapping.loss_entropic, label="FUGW entropic loss")
 ax.legend()
 plt.show()
 
@@ -264,8 +259,6 @@ plt.show()
 # a maximize-minimization approach to approximate a solution:
 
 mm_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
-
-t0 = time.time()
 
 _ = mm_mapping.fit(
     source_features_normalized[:n_training_contrasts],
@@ -279,24 +272,39 @@ _ = mm_mapping.fit(
     verbose=True,
 )
 
-t1 = time.time()
-
 # %%
 # Here is the evolution of the FUGW loss during training,
 # with and without the entropic term. Note how, in this case,
 # even though ``mm`` needed more block-coordinate-descent steps to converge,
-# it was about 2 times faster to reach the same final FUGW training loss
+# it was about 2 to 3 times faster to reach the same final FUGW training loss
 # as ``sinkhorn``.
 
-fig, ax = plt.subplots(figsize=(4, 4))
-ax.set_title(f"MM mapping training loss\nTotal training time = {t1 - t0:.1f}s")
+fig = plt.figure(figsize=(4 * 2, 4))
+fig.suptitle("MM mapping training loss compared to sinkhorn mapping")
+
+ax = fig.add_subplot(121)
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(mapping.loss_steps, mapping.loss_, label="FUGW loss")
-ax.plot(mapping.loss_steps, mapping.loss_ent, label="FUGW entropic loss")
-ax.plot(mm_mapping.loss_steps, mm_mapping.loss_, label="MM FUGW loss")
+ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
+ax.plot(mapping.loss_steps, mapping.loss_entropic, label="FUGW entropic loss")
+ax.plot(mm_mapping.loss_steps, mm_mapping.loss, label="MM FUGW loss")
 ax.plot(
-    mm_mapping.loss_steps, mm_mapping.loss_ent, label="MM FUGW entropic loss"
+    mm_mapping.loss_steps,
+    mm_mapping.loss_entropic,
+    label="MM FUGW entropic loss",
+)
+ax.legend()
+
+ax = fig.add_subplot(122)
+ax.set_ylabel("Loss")
+ax.set_xlabel("Time (in seconds)")
+ax.plot(mapping.loss_times, mapping.loss, label="FUGW loss")
+ax.plot(mapping.loss_times, mapping.loss_entropic, label="FUGW entropic loss")
+ax.plot(mm_mapping.loss_times, mm_mapping.loss, label="MM FUGW loss")
+ax.plot(
+    mm_mapping.loss_times,
+    mm_mapping.loss_entropic,
+    label="MM FUGW entropic loss",
 )
 ax.legend()
 plt.show()

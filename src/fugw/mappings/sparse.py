@@ -77,11 +77,6 @@ class FUGWSparse(BaseMapping):
         Returns
         -------
         self: FUGWSparse class object
-            It comes with the following attributes:
-            - pi: a fitted transport plan stored on CPU as a torch COO matrix
-            - loss_steps: BCD steps at which the FUGW loss was evaluated
-            - loss_: values of FUGW loss
-            - loss_ent_: values of FUGW loss with entropy
         """
         if device == "auto":
             if torch.cuda.is_available():
@@ -151,15 +146,7 @@ class FUGWSparse(BaseMapping):
         model = FUGWSparseSolver(**kwargs)
 
         # Compute transport plan
-        (
-            pi,
-            gamma,
-            duals_p,
-            duals_g,
-            loss_steps,
-            loss_,
-            loss_ent_,
-        ) = model.solve(
+        res = model.solve(
             alpha=self.alpha,
             rho_s=rho_s,
             rho_t=rho_t,
@@ -176,17 +163,18 @@ class FUGWSparse(BaseMapping):
             verbose=verbose,
         )
 
-        self.pi = pi.to_sparse_coo().detach().cpu()
-        self.loss_steps = loss_steps
-        self.loss_ = loss_
-        self.loss_ent_ = loss_ent_
+        self.pi = res["pi"].to_sparse_coo().detach().cpu()
+        self.loss_steps = res["loss_steps"]
+        self.loss = res["loss"]
+        self.loss_entropic = res["loss_entropic"]
+        self.loss_times = res["loss_times"]
 
         # Free allocated GPU memory
         del Fs, Ft, F1, F2, Ds1, Ds2, Dt1, Dt2
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-        return (pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_)
+        return self
 
     def transform(self, source_features, device="auto"):
         """

@@ -79,16 +79,15 @@ class FUGWBarycenter:
         return barycenter_geometry
 
     @staticmethod
-    def update_barycenter_features(plans_, weights_, features_, device):
+    def update_barycenter_features(plans, weights_list, features_list, device):
         barycenter_features = 0
-        for i, ((pi_samp, pi_feat), weights, features) in enumerate(
-            zip(plans_, weights_, features_)
+        for i, (pi, weights, features) in enumerate(
+            zip(plans, weights_list, features_list)
         ):
             w = make_tensor(weights, device=device)
             f = make_tensor(features, device=device)
-            pi_sum = pi_samp + pi_feat
             if features is not None:
-                acc = w * pi_sum.T @ f.T / pi_sum.sum(0).reshape(-1, 1)
+                acc = w * pi.T @ f.T / pi.sum(0).reshape(-1, 1)
 
                 if i == 0:
                     barycenter_features = acc
@@ -113,11 +112,11 @@ class FUGWBarycenter:
 
     def compute_all_ot_plans(
         self,
-        plans_,
-        duals_,
-        weights_,
-        features_,
-        geometry_,
+        plans,
+        duals,
+        weights_list,
+        features_list,
+        geometry_list,
         barycenter_weights,
         barycenter_features,
         barycenter_geometry,
@@ -126,32 +125,25 @@ class FUGWBarycenter:
         device,
         verbose,
     ):
-        new_plans_ = []
-        new_duals_ = []
-        new_losses_ = []
+        new_plans = []
+        new_losses = []
 
-        for i, (features, weights) in enumerate(zip(features_, weights_)):
-            if len(geometry_) == 1 and len(weights_) > 1:
-                G = geometry_[0]
+        for i, (features, weights) in enumerate(
+            zip(features_list, weights_list)
+        ):
+            if len(geometry_list) == 1 and len(weights_list) > 1:
+                G = geometry_list[0]
             else:
-                G = geometry_[i]
+                G = geometry_list[i]
 
-            fugw = FUGW(
+            mapping = FUGW(
                 alpha=self.alpha,
                 rho=self.rho,
                 eps=self.eps,
                 reg_mode=self.reg_mode,
             )
 
-            (
-                pi,
-                gamma,
-                dual_pi,
-                dual_gamma,
-                loss_steps,
-                loss,
-                loss_ent,
-            ) = fugw.fit(
+            mapping.fit(
                 features,
                 barycenter_features,
                 source_geometry=G,
@@ -159,25 +151,30 @@ class FUGWBarycenter:
                 source_weights=weights,
                 target_weights=barycenter_weights,
                 uot_solver=uot_solver,
-                # TODO: check if 2 plans couldn't be used instead of just one
-                init_plan=plans_[i][0] if plans_ is not None else None,
-                init_duals=duals_[i][0] if duals_ is not None else None,
+                init_plan=plans[i] if plans is not None else None,
+                init_duals=duals[i] if duals is not None else None,
                 early_stopping_threshold=early_stopping_threshold,
                 device=device,
                 verbose=verbose,
             )
 
-            new_plans_.append((pi, gamma))
-            new_duals_.append((dual_pi, dual_gamma))
-            new_losses_.append((loss_steps, loss, loss_ent))
+            new_plans.append(mapping.pi)
+            new_losses.append(
+                (
+                    mapping.loss_steps,
+                    mapping.loss,
+                    mapping.loss_entropic,
+                    mapping.loss_times,
+                )
+            )
 
-        return new_plans_, new_duals_, new_losses_
+        return new_plans, new_losses
 
     def fit(
         self,
-        weights_,
-        features_,
-        geometry_,
+        weights_list,
+        features_list,
+        geometry_list,
         barycenter_size=None,
         init_barycenter_weights=None,
         init_barycenter_features=None,
@@ -195,11 +192,11 @@ class FUGWBarycenter:
 
         Parameters
         ----------
-        weights_ (list of np.array): List of weights. Different individuals
+        weights_list (list of np.array): List of weights. Different individuals
             can have weights with different sizes.
-        features_ (list of np.array): List of features. Individuals should
+        features_list (list of np.array): List of features. Individuals should
             have the same number of features n_features.
-        geometry_ (list of np.array or np.array): List of kernel matrices
+        geometry_list (list of np.array or np.array): List of kernel matrices
             or just one kernel matrix if it's shared across individuals
             barycenter_size (int, optional): Size of computed
             barycentric features and geometry. Defaults to None.
@@ -220,10 +217,10 @@ class FUGWBarycenter:
         barycenter_features: np.array of size (barycenter_size, n_features)
         barycenter_geometry: np.array of size
             (barycenter_size, barycenter_size)
-        plans_: list of (np.array, np.array)
-        duals_: list of (np.array, np.array)
+        plans: list of arrays
+        duals: list of (array, array)
         losses_each_bar_step: list such that l[s][i]
-            is a tuple containing (loss_steps, loss, loss_ent)
+            is a tuple containing (loss_steps, loss, loss_entropic, loss_times)
             for individual i at barycenter computation step s
         """
         if device == "auto":
@@ -233,7 +230,7 @@ class FUGWBarycenter:
                 device = torch.device("cpu")
 
         if barycenter_size is None:
-            barycenter_size = weights_[0].shape[0]
+            barycenter_size = weights_list[0].shape[0]
 
         # Initialize barycenter weights, features and geometry
         if init_barycenter_weights is None:
@@ -247,7 +244,7 @@ class FUGWBarycenter:
 
         if init_barycenter_features is None:
             barycenter_features = torch.ones(
-                (features_[0].shape[0], barycenter_size)
+                (features_list[0].shape[0], barycenter_size)
             ).to(device)
             barycenter_features = barycenter_features / torch.norm(
                 barycenter_features, dim=1
@@ -267,18 +264,18 @@ class FUGWBarycenter:
                 init_barycenter_geometry, device=device
             )
 
-        plans_ = None
-        duals_ = None
+        plans = None
+        duals = None
         losses_each_bar_step = []
 
         for _ in range(nits_barycenter):
             # Transport all elements
-            plans_, duals_, losses_ = self.compute_all_ot_plans(
-                plans_,
-                duals_,
-                weights_,
-                features_,
-                geometry_,
+            plans, losses = self.compute_all_ot_plans(
+                plans,
+                duals,
+                weights_list,
+                features_list,
+                geometry_list,
                 barycenter_weights,
                 barycenter_features,
                 barycenter_geometry,
@@ -288,22 +285,22 @@ class FUGWBarycenter:
                 verbose,
             )
 
-            losses_each_bar_step.append(losses_)
+            losses_each_bar_step.append(losses)
 
             # Update barycenter features and geometry
             barycenter_features = self.update_barycenter_features(
-                plans_, weights_, features_, device
+                plans, weights_list, features_list, device
             )
             if self.learn_geometry:
                 barycenter_geometry = self.update_barycenter_geometry(
-                    plans_, weights_, geometry_, self.force_psd, device
+                    plans, weights_list, geometry_list, self.force_psd, device
                 )
 
         return (
             barycenter_weights,
             barycenter_features,
             barycenter_geometry,
-            plans_,
-            duals_,
+            plans,
+            duals,
             losses_each_bar_step,
         )

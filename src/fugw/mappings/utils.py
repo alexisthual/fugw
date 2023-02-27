@@ -67,6 +67,13 @@ class BaseMapping:
         self.eps = eps
         self.reg_mode = reg_mode
 
+        self.pi = None
+
+        self.loss_steps = []
+        self.loss = []
+        self.loss_entropic = []
+        self.loss_times = []
+
     def fit(self, source_data, target_data):
         return None
 

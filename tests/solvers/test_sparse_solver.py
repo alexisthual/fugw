@@ -63,7 +63,7 @@ def test_solvers(uot_solver, device):
         ibpp_eps_base=1e2,
     )
 
-    pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solve(
+    res = fugw.solve(
         alpha=0.2,
         rho_s=2,
         rho_t=3,
@@ -77,6 +77,15 @@ def test_solvers(uot_solver, device):
         verbose=True,
     )
 
+    pi = res["pi"]
+    gamma = res["gamma"]
+    duals_pi = res["duals_pi"]
+    duals_gamma = res["duals_gamma"]
+    loss_steps = res["loss_steps"]
+    loss = res["loss"]
+    loss_entropic = res["loss_entropic"]
+    loss_times = res["loss_times"]
+
     assert pi.size() == (ns, nt)
     assert gamma.size() == (ns, nt)
 
@@ -88,8 +97,9 @@ def test_solvers(uot_solver, device):
         assert duals_pi[0].shape == (ns,)
         assert duals_pi[1].shape == (nt,)
 
-    assert len(loss_steps) <= nits_bcd // eval_bcd + 1
-    assert len(loss_steps) == len(loss)
-    assert len(loss) == len(loss_ent)
+    assert len(loss_steps) - 1 <= nits_bcd // eval_bcd + 1
+    assert len(loss) == len(loss_steps)
+    assert len(loss_entropic) == len(loss_steps)
+    assert len(loss_times) == len(loss_steps)
     # Loss should decrease
     assert np.all(np.sign(np.array(loss[1:]) - np.array(loss[:-1])) == -1)
