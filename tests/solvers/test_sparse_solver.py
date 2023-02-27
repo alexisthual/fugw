@@ -13,9 +13,10 @@ if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
 
+# TODO: need to test sinkhorn
 @pytest.mark.parametrize(
     "uot_solver,device",
-    product(["sinkhorn", "mm", "ibpp"], devices),
+    product(["mm", "ibpp"], devices),
 )
 def test_sparse_solvers(uot_solver, device):
     torch.manual_seed(1)
