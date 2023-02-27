@@ -6,7 +6,7 @@ from fugw.solvers import FUGWSolver
 
 
 @pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "ibpp"])
-def test_solvers(uot_solver):
+def test_dense_solvers(uot_solver):
     torch.manual_seed(0)
 
     use_cuda = torch.cuda.is_available()

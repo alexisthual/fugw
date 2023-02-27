@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from fugw.mappings import FUGW
-from fugw.mappings.utils import init_mock_distribution
+from fugw.utils import init_mock_distribution
 
 np.random.seed(0)
 torch.manual_seed(0)
@@ -36,8 +36,8 @@ def test_fugw(device, return_numpy):
 
     fugw = FUGW()
     fugw.fit(
-        source_features_train,
-        target_features_train,
+        source_features=source_features_train,
+        target_features=target_features_train,
         source_geometry=source_geometry,
         target_geometry=target_geometry,
         device=device,

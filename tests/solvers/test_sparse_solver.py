@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from fugw.solvers import FUGWSparseSolver
-from fugw.mappings.utils import low_rank_squared_l2
+from fugw.utils import low_rank_squared_l2
 
 
 devices = [torch.device("cpu")]
@@ -17,8 +17,8 @@ if torch.cuda.is_available():
     "uot_solver,device",
     product(["sinkhorn", "mm", "ibpp"], devices),
 )
-def test_solvers(uot_solver, device):
-    torch.manual_seed(0)
+def test_sparse_solvers(uot_solver, device):
+    torch.manual_seed(1)
     torch.backends.cudnn.benchmark = True
 
     ns = 104
@@ -102,4 +102,5 @@ def test_solvers(uot_solver, device):
     assert len(loss_entropic) == len(loss_steps)
     assert len(loss_times) == len(loss_steps)
     # Loss should decrease
+    print(f"loss: {loss}")
     assert np.all(np.sign(np.array(loss[1:]) - np.array(loss[:-1])) == -1)

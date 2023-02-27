@@ -2,9 +2,9 @@ import numpy as np
 import torch
 import warnings
 
+from fugw.mappings.utils import BaseMapping
 from fugw.solvers.sparse import FUGWSparseSolver
-from fugw.mappings.utils import (
-    BaseMapping,
+from fugw.utils import (
     low_rank_squared_l2,
     make_sparse_csr_tensor,
     make_tensor,
@@ -16,8 +16,8 @@ class FUGWSparse(BaseMapping):
 
     def fit(
         self,
-        source_features,
-        target_features,
+        source_features=None,
+        target_features=None,
         source_geometry_embedding=None,
         target_geometry_embedding=None,
         source_weights=None,
@@ -38,23 +38,31 @@ class FUGWSparse(BaseMapping):
 
         Parameters
         ----------
-        source_features: ndarray(n_features, n)
+        source_features: ndarray(n_features, n), optional
             Feature maps for source subject.
             n_features is the number of contrast maps, it should
             be the same for source and target data.
             n is the number of nodes on the source graph, it
             can be different from m, the number of nodes on the
             target graph.
-        target_features: ndarray(n_features, m)
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
+        target_features: ndarray(n_features, m), optional
             Feature maps for target subject.
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         source_geometry_embedding: ndarray(n, k), optional
             Embedding X such that norm(X_i - X_j) approximates
             the anatomical distance between vertices i and j
             of the source mesh
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         target_geometry_embedding: ndarray(m, k), optional
             Embedding X such that norm(X_i - X_j) approximates
             the anatomical distance between vertices i and j
             of the target mesh
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         source_weights: ndarray(n) or None
             Distribution weights of source nodes.
             Should sum to 1. If None, each node's weight

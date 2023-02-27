@@ -1,7 +1,7 @@
 import torch
 
 from fugw.mappings.dense import FUGW
-from fugw.mappings.utils import make_tensor
+from fugw.utils import make_tensor
 
 
 class FUGWBarycenter:
@@ -144,8 +144,8 @@ class FUGWBarycenter:
             )
 
             mapping.fit(
-                features,
-                barycenter_features,
+                source_features=features,
+                target_features=barycenter_features,
                 source_geometry=G,
                 target_geometry=barycenter_geometry,
                 source_weights=weights,

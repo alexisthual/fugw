@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from fugw.mappings import FUGWSparse
-from fugw.mappings.utils import init_mock_distribution
+from fugw.utils import init_mock_distribution
 
 np.random.seed(0)
 torch.manual_seed(0)
@@ -37,8 +37,8 @@ def test_fugw_sparse(device, return_numpy):
 
     fugw = FUGWSparse()
     fugw.fit(
-        source_features_train,
-        target_features_train,
+        source_features=source_features_train,
+        target_features=target_features_train,
         source_geometry_embedding=source_embeddings,
         target_geometry_embedding=target_embeddings,
         device=device,
@@ -124,8 +124,8 @@ def test_fugw_sparse_with_init(device, sparse_layout, return_numpy):
 
     fugw = FUGWSparse()
     fugw.fit(
-        source_features_train,
-        target_features_train,
+        source_features=source_features_train,
+        target_features=target_features_train,
         source_geometry_embedding=source_embeddings,
         target_geometry_embedding=target_embeddings,
         init_plan=init_plan,

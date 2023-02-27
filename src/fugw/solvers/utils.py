@@ -1,6 +1,64 @@
 import torch
 
-from fugw.mappings.utils import get_progress
+from fugw.utils import get_progress
+
+
+class BaseSolver:
+    def __init__(
+        self,
+        nits_bcd=10,
+        nits_uot=1000,
+        tol_bcd=1e-7,
+        tol_uot=1e-7,
+        early_stopping_threshold=1e-6,
+        eval_bcd=1,
+        eval_uot=10,
+        # ibpp-specific parameters
+        ibpp_eps_base=1,
+        ibpp_nits_sinkhorn=1,
+    ):
+        """Init FUGW solver.
+
+        Parameters
+        ----------
+        nits_bcd: int,
+            Number of block-coordinate-descent iterations to run
+        nits_uot: int,
+            Number of solver iteration to run at each BCD iteration
+        tol_bcd: float,
+            Stop the BCD procedure early if the absolute difference
+            between two consecutive transport plans
+            under this threshold
+        tol_uot: float,
+            Stop the BCD procedure early if the absolute difference
+            between two consecutive transport plans
+            under this threshold
+        early_stopping_threshold: float,
+            Stop the BCD procedure early if the FUGW loss falls
+            under this threshold
+        eval_bcd: int,
+            During .fit(), at every eval_bcd step:
+            1. compute the FUGW loss and store it in an array
+            2. consider stopping early
+        eval_uot: int,
+            During .fit(), at every eval_uot step:
+            1. consider stopping early
+        ibpp_eps_base: int,
+            Regularization parameter specific to the ibpp solver
+        ibpp_nits_sinkhorn: int,
+            Number of sinkhorn iterations to run
+            within each uot iteration of the ibpp solver.
+        """
+
+        self.nits_bcd = nits_bcd
+        self.nits_uot = nits_uot
+        self.tol_bcd = tol_bcd
+        self.tol_uot = tol_uot
+        self.early_stopping_threshold = early_stopping_threshold
+        self.eval_bcd = eval_bcd
+        self.eval_uot = eval_uot
+        self.ibpp_eps_base = ibpp_eps_base
+        self.ibpp_nits_sinkhorn = ibpp_nits_sinkhorn
 
 
 def csr_dim_sum(values, group_indices, n_groups):

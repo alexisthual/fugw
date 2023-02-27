@@ -6,6 +6,7 @@ import numpy as np
 import torch
 
 from fugw.solvers.utils import (
+    BaseSolver,
     batch_elementwise_prod_and_sum,
     compute_approx_kl,
     compute_approx_kl_sparse,
@@ -19,7 +20,7 @@ from fugw.solvers.utils import (
     solver_ibpp_sparse,
     solver_mm_sparse,
 )
-from fugw.mappings.utils import BaseSolver, console, make_csr_matrix
+from fugw.utils import console, make_csr_matrix
 
 
 class FUGWSparseSolver(BaseSolver):

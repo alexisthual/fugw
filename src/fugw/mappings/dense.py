@@ -2,7 +2,8 @@ import numpy as np
 import torch
 
 from fugw.solvers.dense import FUGWSolver
-from fugw.mappings.utils import BaseMapping, make_tensor
+from fugw.mappings.utils import BaseMapping
+from fugw.utils import make_tensor
 
 
 class FUGW(BaseMapping):
@@ -10,8 +11,8 @@ class FUGW(BaseMapping):
 
     def fit(
         self,
-        source_features,
-        target_features,
+        source_features=None,
+        target_features=None,
         source_geometry=None,
         target_geometry=None,
         source_weights=None,
@@ -32,21 +33,29 @@ class FUGW(BaseMapping):
 
         Parameters
         ----------
-        source_features: ndarray(n_features, n)
+        source_features: ndarray(n_features, n), optional
             Feature maps for source subject.
             n_features is the number of contrast maps, it should
             be the same for source and target data.
             n is the number of nodes on the source graph, it
             can be different from m, the number of nodes on the
             target graph.
-        target_features: ndarray(n_features, m)
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
+        target_features: ndarray(n_features, m), optional
             Feature maps for target subject.
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         source_geometry: ndarray(n, n)
             Kernel matrix of anatomical distances
             between nodes of source mesh
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         target_geometry: ndarray(m, m)
             Kernel matrix of anatomical distances
             between nodes of target mesh
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         source_weights: ndarray(n) or None
             Distribution weights of source nodes.
             Should sum to 1. If None, eahc node's weight

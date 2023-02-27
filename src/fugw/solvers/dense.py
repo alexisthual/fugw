@@ -5,6 +5,7 @@ import time
 import torch
 
 from fugw.solvers.utils import (
+    BaseSolver,
     compute_approx_kl,
     compute_kl,
     compute_quad_kl,
@@ -12,7 +13,7 @@ from fugw.solvers.utils import (
     solver_mm,
     solver_sinkhorn,
 )
-from fugw.mappings.utils import BaseSolver, console
+from fugw.utils import console
 
 
 class FUGWSolver(BaseSolver):
