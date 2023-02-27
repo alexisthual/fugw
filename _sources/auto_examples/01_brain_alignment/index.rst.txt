@@ -1,0 +1,60 @@
+
+
+.. _sphx_glr_auto_examples_01_brain_alignment:
+
+===============
+Brain alignment
+===============
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution left hemispheres using 4 fMRI feature maps (z-score ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_1_aligning_brain_dense_thumb.png
+    :alt: Align brain surfaces of 2 individuals with fMRI data
+
+  :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Align brain surfaces of 2 individuals with fMRI data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to use this package to align 2 high-resolution left hemispheres us...">
+
+.. only:: html
+
+  .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_2_aligning_brain_sparse_thumb.png
+    :alt: Align high-resolution brain surfaces of 2 individuals with fMRI data
+
+  :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_2_aligning_brain_sparse.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Align high-resolution brain surfaces of 2 individuals with fMRI data</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/01_brain_alignment/plot_1_aligning_brain_dense
+   /auto_examples/01_brain_alignment/plot_2_aligning_brain_sparse
+

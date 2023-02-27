@@ -3,12 +3,13 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Transport distributions containing less than 10k points" href="plot_1_dense.html" /><link rel="prev" title="Introduction" href="../pages/introduction.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Basics" href="00_basics/index.html" /><link rel="prev" title="Introduction" href="../pages/introduction.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>Examples - FUGW</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
@@ -139,7 +140,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -162,18 +163,26 @@
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../pages/introduction.html">Introduction</a></li>
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="plot_1_dense.html">Transport distributions containing less than 10k points</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_2_1_lmds.html">Generate embeddings from mesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_2_2_coarse_to_fine.html">Transport distributions containing more than 10k points</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="00_basics/index.html">Basics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="00_basics/plot_1_dense.html">Transport distributions using dense solvers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="00_basics/plot_2_1_lmds.html">Generate embeddings from mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="00_basics/plot_2_2_coarse_to_fine.html">Transport distributions using sparse solvers</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../pages/api_references.html">API references</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../modules/mappings.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="01_brain_alignment/index.html">Brain alignment</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="01_brain_alignment/plot_1_aligning_brain_dense.html">Align brain surfaces of 2 individuals with fMRI data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="01_brain_alignment/plot_2_aligning_brain_sparse.html">Align high-resolution brain surfaces of 2 individuals with fMRI data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../pages/api_references.html">API references</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../modules/mappings.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../modules/mappings.FUGW.html"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/mappings.FUGWSparse.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../modules/solvers.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../modules/solvers.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../modules/solvers.FUGWSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSolver</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/solvers.FUGWSparseSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver</span></code></a></li>
 </ul>
@@ -213,7 +222,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -221,18 +230,30 @@
         <article role="main">
           <section id="examples">
 <h1>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">#</a></h1>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Transport distributions containing less than 10k points"><img alt="Transport distributions containing less than 10k points" src="../_images/sphx_glr_plot_1_dense_thumb.png" />
-<p><a class="reference internal" href="plot_1_dense.html#sphx-glr-auto-examples-plot-1-dense-py"><span class="std std-ref">Transport distributions containing less than 10k points</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Transport distributions containing less than 10k points</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Generate embeddings from mesh"><img alt="Generate embeddings from mesh" src="../_images/sphx_glr_plot_2_1_lmds_thumb.png" />
-<p><a class="reference internal" href="plot_2_1_lmds.html#sphx-glr-auto-examples-plot-2-1-lmds-py"><span class="std std-ref">Generate embeddings from mesh</span></a></p>
+<div class="sphx-glr-thumbnails"></div><section id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this heading">#</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a dense fugw alignment between them...."><img alt="Transport distributions using dense solvers" src="../_images/sphx_glr_plot_1_dense_thumb.png" />
+<p><a class="reference internal" href="00_basics/plot_1_dense.html#sphx-glr-auto-examples-00-basics-plot-1-dense-py"><span class="std std-ref">Transport distributions using dense solvers</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Transport distributions using dense solvers</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to derive an embedding which approximates the kernel matrix of geo..."><img alt="Generate embeddings from mesh" src="../_images/sphx_glr_plot_2_1_lmds_thumb.png" />
+<p><a class="reference internal" href="00_basics/plot_2_1_lmds.html#sphx-glr-auto-examples-00-basics-plot-2-1-lmds-py"><span class="std std-ref">Generate embeddings from mesh</span></a></p>
   <div class="sphx-glr-thumbnail-title">Generate embeddings from mesh</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Transport distributions containing more than 10k points"><img alt="Transport distributions containing more than 10k points" src="../_images/sphx_glr_plot_2_2_coarse_to_fine_thumb.png" />
-<p><a class="reference internal" href="plot_2_2_coarse_to_fine.html#sphx-glr-auto-examples-plot-2-2-coarse-to-fine-py"><span class="std std-ref">Transport distributions containing more than 10k points</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Transport distributions containing more than 10k points</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a sparse fugw alignment between them..."><img alt="Transport distributions using sparse solvers" src="../_images/sphx_glr_plot_2_2_coarse_to_fine_thumb.png" />
+<p><a class="reference internal" href="00_basics/plot_2_2_coarse_to_fine.html#sphx-glr-auto-examples-00-basics-plot-2-2-coarse-to-fine-py"><span class="std std-ref">Transport distributions using sparse solvers</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Transport distributions using sparse solvers</div>
+</div></div></section>
+<section id="brain-alignment">
+<h2>Brain alignment<a class="headerlink" href="#brain-alignment" title="Permalink to this heading">#</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution left hemispheres using 4 fMRI feature maps (z-score ..."><img alt="Align brain surfaces of 2 individuals with fMRI data" src="../_images/sphx_glr_plot_1_aligning_brain_dense_thumb.png" />
+<p><a class="reference internal" href="01_brain_alignment/plot_1_aligning_brain_dense.html#sphx-glr-auto-examples-01-brain-alignment-plot-1-aligning-brain-dense-py"><span class="std std-ref">Align brain surfaces of 2 individuals with fMRI data</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Align brain surfaces of 2 individuals with fMRI data</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to use this package to align 2 high-resolution left hemispheres us..."><img alt="Align high-resolution brain surfaces of 2 individuals with fMRI data" src="../_images/sphx_glr_plot_2_aligning_brain_sparse_thumb.png" />
+<p><a class="reference internal" href="01_brain_alignment/plot_2_aligning_brain_sparse.html#sphx-glr-auto-examples-01-brain-alignment-plot-2-aligning-brain-sparse-py"><span class="std std-ref">Align high-resolution brain surfaces of 2 individuals with fMRI data</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Align high-resolution brain surfaces of 2 individuals with fMRI data</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
 </section>
 
         </article>
@@ -240,12 +261,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="plot_1_dense.html">
+          <a class="next-page" href="00_basics/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Transport distributions containing less than 10k points</div>
+                <div class="title">Basics</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -278,8 +299,28 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Examples</a><ul>
+<li><a class="reference internal" href="#basics">Basics</a></li>
+<li><a class="reference internal" href="#brain-alignment">Brain alignment</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -291,5 +332,7 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
     </body>
 </html>

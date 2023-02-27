@@ -13,31 +13,46 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Transport distributions containing less than 10k points">
+    </div>
 
-.. only:: html
+======
+Basics
+======
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_plot_1_dense_thumb.png
-    :alt: Transport distributions containing less than 10k points
 
-  :ref:`sphx_glr_auto_examples_plot_1_dense.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Transport distributions containing less than 10k points</div>
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a dense fugw alignment between them....">
+
+.. only:: html
+
+  .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_1_dense_thumb.png
+    :alt: Transport distributions using dense solvers
+
+  :ref:`sphx_glr_auto_examples_00_basics_plot_1_dense.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Transport distributions using dense solvers</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Generate embeddings from mesh">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to derive an embedding which approximates the kernel matrix of geo...">
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_plot_2_1_lmds_thumb.png
+  .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_2_1_lmds_thumb.png
     :alt: Generate embeddings from mesh
 
-  :ref:`sphx_glr_auto_examples_plot_2_1_lmds.py`
+  :ref:`sphx_glr_auto_examples_00_basics_plot_2_1_lmds.py`
 
 .. raw:: html
 
@@ -47,18 +62,67 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Transport distributions containing more than 10k points">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a sparse fugw alignment between them...">
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_plot_2_2_coarse_to_fine_thumb.png
-    :alt: Transport distributions containing more than 10k points
+  .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_2_2_coarse_to_fine_thumb.png
+    :alt: Transport distributions using sparse solvers
 
-  :ref:`sphx_glr_auto_examples_plot_2_2_coarse_to_fine.py`
+  :ref:`sphx_glr_auto_examples_00_basics_plot_2_2_coarse_to_fine.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Transport distributions containing more than 10k points</div>
+      <div class="sphx-glr-thumbnail-title">Transport distributions using sparse solvers</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+===============
+Brain alignment
+===============
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution left hemispheres using 4 fMRI feature maps (z-score ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_1_aligning_brain_dense_thumb.png
+    :alt: Align brain surfaces of 2 individuals with fMRI data
+
+  :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Align brain surfaces of 2 individuals with fMRI data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to use this package to align 2 high-resolution left hemispheres us...">
+
+.. only:: html
+
+  .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_2_aligning_brain_sparse_thumb.png
+    :alt: Align high-resolution brain surfaces of 2 individuals with fMRI data
+
+  :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_2_aligning_brain_sparse.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Align high-resolution brain surfaces of 2 individuals with fMRI data</div>
     </div>
 
 
@@ -69,10 +133,10 @@ Examples
 
 .. toctree::
    :hidden:
+   :includehidden:
 
-   /auto_examples/plot_1_dense
-   /auto_examples/plot_2_1_lmds
-   /auto_examples/plot_2_2_coarse_to_fine
+   /auto_examples/00_basics/index.rst
+   /auto_examples/01_brain_alignment/index.rst
 
 
 

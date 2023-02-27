@@ -1,0 +1,78 @@
+
+
+.. _sphx_glr_auto_examples_00_basics:
+
+======
+Basics
+======
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a dense fugw alignment between them....">
+
+.. only:: html
+
+  .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_1_dense_thumb.png
+    :alt: Transport distributions using dense solvers
+
+  :ref:`sphx_glr_auto_examples_00_basics_plot_1_dense.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Transport distributions using dense solvers</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to derive an embedding which approximates the kernel matrix of geo...">
+
+.. only:: html
+
+  .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_2_1_lmds_thumb.png
+    :alt: Generate embeddings from mesh
+
+  :ref:`sphx_glr_auto_examples_00_basics_plot_2_1_lmds.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Generate embeddings from mesh</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a sparse fugw alignment between them...">
+
+.. only:: html
+
+  .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_2_2_coarse_to_fine_thumb.png
+    :alt: Transport distributions using sparse solvers
+
+  :ref:`sphx_glr_auto_examples_00_basics_plot_2_2_coarse_to_fine.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Transport distributions using sparse solvers</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/00_basics/plot_1_dense
+   /auto_examples/00_basics/plot_2_1_lmds
+   /auto_examples/00_basics/plot_2_2_coarse_to_fine
+
