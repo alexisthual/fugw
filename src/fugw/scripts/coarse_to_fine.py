@@ -6,32 +6,51 @@ import torch
 from fugw.mappings.utils import make_tensor, get_progress
 
 
-def random_normalizing(X, repeats=10, sample_size=100):
+def random_normalizing(X, sample_size=100, repeats=10):
     """
-    Normalize X by deviding it by its max coefficient.
-    This coefficient is determined by random sampling.
+    Normalize X by dividing it by the maximum distance
+    between pairs of rows of X.
+    This maximum distance is determined by sampling pairs
+    in X randomly.
+
+    Parameters
+    ----------
+    X: torch.Tensor of size (n, k)
+        Tensor to normalize.
+    sample_size: int, optional, defaults to 100
+        Number of vectors to sample from X at each iteration.
+    repeats: int, optinal, defaults to 10
+        Number of iterations to run.
+
+    Returns
+    -------
+    X_normalized: torch.Tensor of size (n, k)
+        Normalized X.
+    d_max: float
+        Maximum distance encountered while sampling pairs
+        of indices from X.
     """
     d_max = 0
+    X_tensor = make_tensor(X)
     for _ in range(repeats):
-        idx = torch.randperm(torch.arange(X.shape[0]))[:sample_size]
-        distances = torch.cdist(X[idx, :], X[idx, :], p=2)
+        idx = torch.randperm(X_tensor.shape[0])[:sample_size]
+        distances = torch.cdist(X_tensor[idx, :], X_tensor[idx, :], p=2)
         d = distances.max()
         d_max = max(d, d_max)
 
-    print(f"d_max: {d_max}")
+    X_normalized = X_tensor / d_max
 
-    X_normalized = X / d_max
-    return X_normalized
+    return X_normalized, d_max.item()
 
 
 def fit(
-    coarse_model=None,
-    coarse_model_fit_params={},
+    coarse_mapping=None,
+    coarse_mapping_fit_params={},
     coarse_pairs_selection_method="topk",
     source_selection_radius=1,
     target_selection_radius=1,
-    fine_model=None,
-    fine_model_fit_params={},
+    fine_mapping=None,
+    fine_mapping_fit_params={},
     source_sample_size=None,
     target_sample_size=None,
     source_features=None,
@@ -49,9 +68,9 @@ def fit(
 
     Parameters
     ----------
-    coarse_model: fugw.FUGW
+    coarse_mapping: fugw.FUGW
         Coarse model to fit
-    coarse_model_fit_params: dict
+    coarse_mapping_fit_params: dict
         Parameters to give to the `.fit()` method
         of the coarse model
     coarse_pairs_selection_method: "topk" or "quantile"
@@ -66,9 +85,9 @@ def fit(
         Radius used to determine the neighbourhood
         of target vertices when defining sparsity mask
         for fine-scale solution
-    fine_model: fugw.FUGWSparse
+    fine_mapping: fugw.FUGWSparse
         Fine-scale model to fit
-    fine_model_fit_params: dict
+    fine_mapping_fit_params: dict
         Parameters to give to the `.fit()` method
         of the fine-scale model
     source_sample_size: int
@@ -105,6 +124,15 @@ def fit(
         cpu otherwise.
     verbose: bool, optional, defaults to False
         Log solving process.
+
+    Returns
+    -------
+    source_sample: torch.Tensor of size(source_sample_size)
+        Tensor containing the indices which were sampled on the
+        source so as to compute the coarse mapping.
+    target_sample: torch.Tensor of size(target_sample_size)
+        Tensor containing the indices which were sampled on the
+        target so as to compute the coarse mapping.
     """
     # Sub-sample source and target distributions
     source_sample = torch.randperm(source_geometry_embeddings.shape[0])[
@@ -149,7 +177,7 @@ def fit(
     )
 
     # Fit coarse model
-    (pi, _, _, _, _, _, _) = coarse_model.fit(
+    (pi, _, _, _, _, _, _) = coarse_mapping.fit(
         source_features[:, source_sample],
         target_features[:, target_sample],
         source_geometry=source_geometry_kernel,
@@ -158,7 +186,7 @@ def fit(
         target_weights=target_weights_sampled,
         device=device,
         verbose=verbose,
-        **coarse_model_fit_params,
+        **coarse_mapping_fit_params,
     )
 
     # Select best pairs of source and target vertices from coarse alignment
@@ -258,7 +286,7 @@ def fit(
         ),
     )
 
-    _ = fine_model.fit(
+    _ = fine_mapping.fit(
         source_features,
         target_features,
         source_geometry_embedding=source_geometry_embeddings,
@@ -268,5 +296,7 @@ def fit(
         init_plan=init_plan,
         device=device,
         verbose=verbose,
-        **fine_model_fit_params,
+        **fine_mapping_fit_params,
     )
+
+    return source_sample, target_sample

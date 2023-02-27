@@ -1,6 +1,12 @@
-name: Deploy documentation to GitHub pages
+name: Build and/or deploy documentation
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   build_docs:

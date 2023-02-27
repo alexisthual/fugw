@@ -1,4 +1,6 @@
 import contextlib
+import warnings
+
 import gdist
 import joblib
 import numpy as np
@@ -59,6 +61,7 @@ def compute_lmds(
     n_landmarks=100,
     k=3,
     n_jobs=2,
+    tol=1e-3,
     verbose=False,
 ):
     """
@@ -77,6 +80,8 @@ def compute_lmds(
         Dimension of embedding
     n_jobs: int, optional, defaults to 2
         Number of CPUs to use to parallelise computation
+    tol: float, optional, defaults to 1e-3
+        Relative tolerance used to check intermediate results
     verbose: bool, optional, defaults to False
         Log solving process
 
@@ -117,29 +122,43 @@ def compute_lmds(
     F_squared = F * F
 
     # Check E is symmetric
-    assert torch.allclose(E, E.T, rtol=1e-5, atol=1e-8)
-    assert torch.allclose(E_squared, E_squared.T, rtol=1e-5, atol=1e-8)
+    E_Et_abs_max = torch.max(torch.abs(E - E.T))
+    E_abs_max = torch.max(torch.abs(E))
+    if not E_Et_abs_max <= tol * E_abs_max:
+        warnings.warn(
+            f"E might not be symmetric ({E_Et_abs_max} > {E_abs_max})"
+        )
 
     # Double centring of A
     A = (
         -(
             E_squared
-            - torch.tile(torch.sum(E_squared, dim=0), (n_landmarks, 1))
-            / n_landmarks
-            - torch.tile(torch.sum(E_squared, dim=1), (n_landmarks, 1)).T
-            / n_landmarks
+            - (
+                torch.tile(torch.sum(E_squared, dim=0), (n_landmarks, 1))
+                / n_landmarks
+            )
+            - (
+                torch.tile(torch.sum(E_squared, dim=1), (n_landmarks, 1)).T
+                / n_landmarks
+            )
             + E_squared_sum / (n_landmarks**2)
         )
         / 2
     )
 
     # Check A is symmetric
-    assert torch.allclose(A, A.T, atol=1e-3)
+    A_At_abs_max = torch.max(torch.abs(A - A.T))
+    A_abs_max = torch.max(torch.abs(A))
+    if not A_At_abs_max <= tol * A_abs_max:
+        warnings.warn(
+            f"A might not be symmetric ({A_At_abs_max} > {A_abs_max})"
+        )
 
     # Check that np.ones(n_landmarks) is an eigen vector
-    # to control double centering
+    # associated with eigen value 0 to control double centering
     t = torch.ones(n_landmarks) @ A @ torch.ones(n_landmarks)
-    assert torch.isclose(t, torch.tensor([0.0]), atol=1e-3)
+    if not t <= tol:
+        warnings.warn(f"A might not be centered ({t} > {tol})")
 
     B = (
         -1

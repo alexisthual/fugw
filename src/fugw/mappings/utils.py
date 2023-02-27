@@ -12,6 +12,7 @@ from rich.progress import (
     TimeElapsedColumn,
     TimeRemainingColumn,
 )
+from skrmt.ensemble import WishartEnsemble
 
 # `rich` console used throughout the codebase
 console = Console()
@@ -210,11 +211,36 @@ def low_rank_squared_l2(X, Y):
     return (A1, A2)
 
 
+def sample_multivariate_normal(n_dims=2, n_points=200):
+    """
+    Samples n_points from a multivariate normal distribution
+    with random mean and covariance matrix
+    in dimension n_dims.
+
+    Returns
+    -------
+    x: torch.Tensor of size (n_dims, n_points)
+    """
+    # Generate random mean
+    mean = torch.normal(0, 3, size=(n_dims,))
+
+    # Generate random covariance matrix from Wishart distribution
+    cov = torch.tensor(
+        WishartEnsemble(beta=1, p=n_dims, n=n_dims).matrix, dtype=torch.float32
+    )
+
+    # Generate random multivariate normal
+    m = torch.distributions.multivariate_normal.MultivariateNormal(mean, cov)
+    x = torch.stack([m.sample() for _ in range(n_points)]).T
+
+    return x
+
+
 def init_mock_distribution(
-    n_features, n_voxels, should_normalize=True, return_numpy=True
+    n_features, n_voxels, should_normalize=False, return_numpy=False
 ):
     weights = torch.ones(n_voxels) / n_voxels
-    features = torch.rand(n_features, n_voxels)
+    features = sample_multivariate_normal(n_features, n_voxels)
     embeddings = torch.rand(n_voxels, 3)
     geometry = torch.cdist(embeddings, embeddings)
 
