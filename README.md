@@ -11,6 +11,8 @@ won't change in the near future.**
 
 ## Installation
 
+**You might need to use an up-to-date version of `pip` to install this package**.
+
 ### From PyPI
 
 In a dedicated Python env, run:
