@@ -15,8 +15,9 @@ hyper-parameters and solver parameters, it takes less than
 10 minutes to compute a mapping between 2 such distributions
 using a V100 Nvidia GPU.
 
-**Before reading this tutorial, you should first go through
-:ref:`_sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py`**,
+**Before reading this tutorial, you should first go through**
+:ref:`the example aligning brain data at a low-resolution
+<sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py>`,
 which explains the ropes of brain alignment in more detail
 than this example.
 In the current example, we focus more on how to use this package
