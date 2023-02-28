@@ -603,7 +603,9 @@ def solver_ibpp(
                 m1 = pi.sum(1)
                 if m1.isnan().any() or m1.isinf().any():
                     raise ValueError(
-                        "There is NaN in coupling. Please increase eps_base."
+                        "There is NaN in coupling. "
+                        "You may want to increase ibpp_eps_base "
+                        f"(current value: {eps_base})."
                     )
 
                 error = (m1 - m1_prev).abs().max().item()
@@ -721,7 +723,8 @@ def solver_ibpp_sparse(
                 if m1.isnan().any() or m1.isinf().any():
                     raise ValueError(
                         "There is NaN in coupling. "
-                        "Please increase ibpp_eps_base."
+                        "You may want to increase ibpp_eps_base "
+                        f"(current value: {eps_base})."
                     )
 
                 error = (m1 - m1_prev).abs().max().item()
