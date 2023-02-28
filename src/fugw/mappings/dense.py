@@ -19,7 +19,7 @@ class FUGW(BaseMapping):
         target_weights=None,
         init_plan=None,
         init_duals=None,
-        solver="sinkhorn",
+        solver="mm",
         solver_params={},
         device="auto",
         verbose=False,
