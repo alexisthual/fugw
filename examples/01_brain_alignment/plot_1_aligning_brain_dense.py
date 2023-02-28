@@ -231,6 +231,7 @@ _ = mapping.fit(
     target_features_normalized[:n_training_contrasts],
     source_geometry=source_geometry_normalized,
     target_geometry=target_geometry_normalized,
+    solver="sinkhorn",
     solver_params={
         "nits_bcd": 3,
     },
@@ -254,11 +255,13 @@ ax.legend()
 plt.show()
 
 # %%
-# Note that we implicitely used the ``sinkhorn`` solver here, but that
+# Note that we used the ``sinkhorn`` solver here because it's well known
+# in the optimal transport community, but that
 # this library comes with other solvers which are, in most cases,
 # much faster.
 # Let's retrain our mapping using the ``mm`` solver, which implements
-# a maximize-minimization approach to approximate a solution:
+# a maximize-minimization approach to approximate a solution and is
+# used by default in ``fugw.mappings``:
 
 mm_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 
@@ -277,40 +280,52 @@ _ = mm_mapping.fit(
 )
 
 # %%
+# And now with the ``ibpp`` solver:
+ibpp_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
+
+_ = ibpp_mapping.fit(
+    source_features_normalized[:n_training_contrasts],
+    target_features_normalized[:n_training_contrasts],
+    source_geometry=source_geometry_normalized,
+    target_geometry=target_geometry_normalized,
+    solver="ibpp",
+    solver_params={
+        "nits_bcd": 5,
+        "tol_bcd": 1e-10,
+        "tol_uot": 1e-10,
+    },
+    verbose=True,
+)
+
+# %%
 # Here is the evolution of the FUGW loss during training,
-# with and without the entropic term. Note how, in this case,
-# even though ``mm`` needed more block-coordinate-descent steps to converge,
-# it was about 2 to 3 times faster to reach the same final FUGW training loss
-# as ``sinkhorn``.
+# without the entropic term. Note how, in this case,
+# even though ``mm`` and ``ibpp`` needed more block-coordinate-descent steps
+# to converge, they were about 2 to 3 times faster to reach the same final
+# FUGW training loss as ``sinkhorn``.
+# You might want to tweak solver parameters like ``nits_bcd`` and ``nits_uot``
+# to get the fastest convergence rates.
 
 fig = plt.figure(figsize=(4 * 2, 4))
-fig.suptitle("MM mapping training loss compared to sinkhorn mapping")
+fig.suptitle("Training loss comparison\nSinkhorn vs MM vs IBPP")
 
 ax = fig.add_subplot(121)
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
-ax.plot(mapping.loss_steps, mapping.loss_entropic, label="FUGW entropic loss")
+ax.plot(mapping.loss_steps, mapping.loss, label="Sinkhorn FUGW loss")
 ax.plot(mm_mapping.loss_steps, mm_mapping.loss, label="MM FUGW loss")
-ax.plot(
-    mm_mapping.loss_steps,
-    mm_mapping.loss_entropic,
-    label="MM FUGW entropic loss",
-)
+ax.plot(ibpp_mapping.loss_steps, ibpp_mapping.loss, label="IBPP FUGW loss")
 ax.legend()
 
 ax = fig.add_subplot(122)
 ax.set_ylabel("Loss")
 ax.set_xlabel("Time (in seconds)")
 ax.plot(mapping.loss_times, mapping.loss, label="FUGW loss")
-ax.plot(mapping.loss_times, mapping.loss_entropic, label="FUGW entropic loss")
 ax.plot(mm_mapping.loss_times, mm_mapping.loss, label="MM FUGW loss")
-ax.plot(
-    mm_mapping.loss_times,
-    mm_mapping.loss_entropic,
-    label="MM FUGW entropic loss",
-)
+ax.plot(ibpp_mapping.loss_times, ibpp_mapping.loss, label="IBPP FUGW loss")
 ax.legend()
+
+fig.tight_layout()
 plt.show()
 
 # %%
