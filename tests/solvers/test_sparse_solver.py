@@ -15,10 +15,10 @@ if torch.cuda.is_available():
 
 # TODO: need to test sinkhorn
 @pytest.mark.parametrize(
-    "uot_solver,device",
+    "solver,device",
     product(["mm", "ibpp"], devices),
 )
-def test_sparse_solvers(uot_solver, device):
+def test_sparse_solvers(solver, device):
     torch.manual_seed(1)
     torch.backends.cudnn.benchmark = True
 
@@ -74,7 +74,7 @@ def test_sparse_solvers(uot_solver, device):
         Ds=Ds_normalized,
         Dt=Dt_normalized,
         init_plan=init_plan,
-        uot_solver=uot_solver,
+        solver=solver,
         verbose=True,
     )
 
@@ -90,10 +90,10 @@ def test_sparse_solvers(uot_solver, device):
     assert pi.size() == (ns, nt)
     assert gamma.size() == (ns, nt)
 
-    if uot_solver == "mm":
+    if solver == "mm":
         assert duals_pi is None
         assert duals_gamma is None
-    elif uot_solver == "ibpp":
+    elif solver == "ibpp":
         assert len(duals_pi) == 2
         assert duals_pi[0].shape == (ns,)
         assert duals_pi[1].shape == (nt,)

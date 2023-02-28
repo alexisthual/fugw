@@ -5,8 +5,8 @@ import torch
 from fugw.solvers import FUGWSolver
 
 
-@pytest.mark.parametrize("uot_solver", ["sinkhorn", "mm", "ibpp"])
-def test_dense_solvers(uot_solver):
+@pytest.mark.parametrize("solver", ["sinkhorn", "mm", "ibpp"])
+def test_dense_solvers(solver):
     torch.manual_seed(0)
 
     use_cuda = torch.cuda.is_available()
@@ -55,7 +55,7 @@ def test_dense_solvers(uot_solver):
         Ds=Ds_normalized,
         Dt=Dt_normalized,
         init_plan=None,
-        uot_solver=uot_solver,
+        solver=solver,
         verbose=True,
     )
 
@@ -71,7 +71,7 @@ def test_dense_solvers(uot_solver):
     assert pi.shape == (ns, nt)
     assert gamma.shape == (ns, nt)
 
-    if uot_solver == "mm":
+    if solver == "mm":
         assert duals_pi is None
         assert duals_gamma is None
     else:

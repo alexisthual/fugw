@@ -134,7 +134,7 @@ class FUGWSolver(BaseSolver):
         wt=None,
         init_plan=None,
         init_duals=None,
-        uot_solver="sinkhorn",
+        solver="sinkhorn",
         verbose=False,
     ):
         """
@@ -159,7 +159,7 @@ class FUGWSolver(BaseSolver):
             Initialisation matrix for coupling.
         init_duals: tuple or None
             Initialisation duals for coupling.
-        uot_solver: "sinkhorn", "mm", "ibpp"
+        solver: "sinkhorn", "mm", "ibpp"
             Solver to use.
         verbose: bool, optional, defaults to False
             Log solving process.
@@ -203,12 +203,10 @@ class FUGWSolver(BaseSolver):
             )
 
         # sanity check
-        if uot_solver == "mm" and (
-            rho_s == float("inf") or rho_t == float("inf")
-        ):
-            uot_solver = "ibpp"
-        if uot_solver == "sinkhorn" and eps == 0:
-            uot_solver = "ibpp"
+        if solver == "mm" and (rho_s == float("inf") or rho_t == float("inf")):
+            solver = "ibpp"
+        if solver == "sinkhorn" and eps == 0:
+            solver = "ibpp"
 
         device, dtype = Ds.device, Ds.dtype
 
@@ -233,7 +231,7 @@ class FUGWSolver(BaseSolver):
         pi = ws_dot_wt if init_plan is None else init_plan
         gamma = pi
 
-        if uot_solver == "sinkhorn":
+        if solver == "sinkhorn":
             if init_duals is None:
                 duals_pi = (
                     torch.zeros_like(ws),
@@ -242,9 +240,9 @@ class FUGWSolver(BaseSolver):
             else:
                 duals_pi = init_duals
             duals_gamma = duals_pi
-        elif uot_solver == "mm":
+        elif solver == "mm":
             duals_pi, duals_gamma = None, None
-        elif uot_solver == "ibpp":
+        elif solver == "ibpp":
             if init_duals is None:
                 duals_pi = (
                     torch.ones_like(ws),
@@ -314,13 +312,13 @@ class FUGWSolver(BaseSolver):
             uot_params = (new_rho_s, new_rho_t, new_eps)
 
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
-            if uot_solver == "sinkhorn":
+            if solver == "sinkhorn":
                 duals_gamma, gamma = self_solver_sinkhorn(
                     cost_gamma, duals_gamma, uot_params
                 )
-            elif uot_solver == "mm":
+            elif solver == "mm":
                 gamma = self_solver_mm(cost_gamma, gamma, uot_params)
-            if uot_solver == "ibpp":
+            if solver == "ibpp":
                 duals_gamma, gamma = self_solver_ibpp(
                     cost_gamma, gamma, duals_gamma, uot_params
                 )
@@ -334,13 +332,13 @@ class FUGWSolver(BaseSolver):
             uot_params = (new_rho_s, new_rho_t, new_eps)
 
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
-            if uot_solver == "sinkhorn":
+            if solver == "sinkhorn":
                 duals_pi, pi = self_solver_sinkhorn(
                     cost_pi, duals_pi, uot_params
                 )
-            elif uot_solver == "mm":
+            elif solver == "mm":
                 pi = self_solver_mm(cost_pi, pi, uot_params)
-            elif uot_solver == "ibpp":
+            elif solver == "ibpp":
                 duals_pi, pi = self_solver_ibpp(
                     cost_pi, pi, duals_pi, uot_params
                 )

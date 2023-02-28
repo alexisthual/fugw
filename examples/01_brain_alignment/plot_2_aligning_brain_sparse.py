@@ -269,16 +269,15 @@ target_embeddings_normalized, target_distance_max = (
 # Note that the 2 solvers can use different parameters.
 
 coarse_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
-fine_mapping = FUGWSparse(alpha=0.5, rho=1, eps=1e-4)
-
-coarse_mapping_fit_params = {
-    "uot_solver": "mm",
+coarse_mapping_solver = "mm"
+coarse_mapping_solver_params = {
     "nits_bcd": 5,
     "tol_uot": 1e-10,
 }
 
-fine_mapping_fit_params = {
-    "uot_solver": "mm",
+fine_mapping = FUGWSparse(alpha=0.5, rho=1, eps=1e-4)
+fine_mapping_solver = "mm"
+fine_mapping_solver_params = {
     "nits_bcd": 3,
     "tol_uot": 1e-10,
 }
@@ -302,19 +301,27 @@ fine_mapping_fit_params = {
 t0 = time.time()
 
 source_sample, target_sample = coarse_to_fine.fit(
-    coarse_mapping=coarse_mapping,
-    coarse_mapping_fit_params=coarse_mapping_fit_params,
-    coarse_pairs_selection_method="topk",
-    source_selection_radius=10 / source_distance_max,
-    target_selection_radius=10 / target_distance_max,
-    fine_mapping=fine_mapping,
-    fine_mapping_fit_params=fine_mapping_fit_params,
-    source_sample_size=1000,
-    target_sample_size=1000,
+    # Source and target's features and embeddings
     source_features=source_features_normalized[:n_training_contrasts, :],
     target_features=target_features_normalized[:n_training_contrasts, :],
     source_geometry_embeddings=source_embeddings_normalized,
     target_geometry_embeddings=target_embeddings_normalized,
+    # Parametrize step 1 (coarse alignment between source and target)
+    source_sample_size=1000,
+    target_sample_size=1000,
+    coarse_mapping=coarse_mapping,
+    coarse_mapping_solver=coarse_mapping_solver,
+    coarse_mapping_solver_params=coarse_mapping_solver_params,
+    # Parametrize step 2 (selection of pairs of indices present in
+    # fine-grained's sparsity mask)
+    coarse_pairs_selection_method="topk",
+    source_selection_radius=10 / source_distance_max,
+    target_selection_radius=10 / target_distance_max,
+    # Parametrize step 3 (fine-grained alignment)
+    fine_mapping=fine_mapping,
+    fine_mapping_solver=fine_mapping_solver,
+    fine_mapping_solver_params=fine_mapping_solver_params,
+    # Misc
     verbose=True,
 )
 

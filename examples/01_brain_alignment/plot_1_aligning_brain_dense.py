@@ -231,7 +231,9 @@ _ = mapping.fit(
     target_features_normalized[:n_training_contrasts],
     source_geometry=source_geometry_normalized,
     target_geometry=target_geometry_normalized,
-    nits_bcd=3,
+    solver_params={
+        "nits_bcd": 3,
+    },
     verbose=True,
 )
 
@@ -265,10 +267,12 @@ _ = mm_mapping.fit(
     target_features_normalized[:n_training_contrasts],
     source_geometry=source_geometry_normalized,
     target_geometry=target_geometry_normalized,
-    uot_solver="mm",
-    nits_bcd=5,
-    tol_bcd=1e-10,
-    tol_uot=1e-10,
+    solver="mm",
+    solver_params={
+        "nits_bcd": 5,
+        "tol_bcd": 1e-10,
+        "tol_uot": 1e-10,
+    },
     verbose=True,
 )
 

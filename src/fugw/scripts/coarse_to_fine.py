@@ -45,12 +45,14 @@ def random_normalizing(X, sample_size=100, repeats=10):
 
 def fit(
     coarse_mapping=None,
-    coarse_mapping_fit_params={},
+    coarse_mapping_solver="mm",
+    coarse_mapping_solver_params={},
     coarse_pairs_selection_method="topk",
     source_selection_radius=1,
     target_selection_radius=1,
     fine_mapping=None,
-    fine_mapping_fit_params={},
+    fine_mapping_solver="mm",
+    fine_mapping_solver_params={},
     source_sample_size=None,
     target_sample_size=None,
     source_features=None,
@@ -70,7 +72,9 @@ def fit(
     ----------
     coarse_mapping: fugw.FUGW
         Coarse model to fit
-    coarse_mapping_fit_params: dict
+    coarse_mapping_solver: str, defaults to "mm"
+        Solver to use to fit the coarse mapping
+    coarse_mapping_solver_params: dict
         Parameters to give to the `.fit()` method
         of the coarse model
     coarse_pairs_selection_method: "topk" or "quantile"
@@ -87,7 +91,9 @@ def fit(
         for fine-scale solution
     fine_mapping: fugw.FUGWSparse
         Fine-scale model to fit
-    fine_mapping_fit_params: dict
+    fine_mapping_solver: str, defaults to "mm"
+        Solver to use to fit the fine-grained mapping
+    fine_mapping_solver_params: dict
         Parameters to give to the `.fit()` method
         of the fine-scale model
     source_sample_size: int
@@ -184,9 +190,10 @@ def fit(
         target_geometry=target_geometry_kernel,
         source_weights=source_weights_sampled,
         target_weights=target_weights_sampled,
+        solver=coarse_mapping_solver,
+        solver_params=coarse_mapping_solver_params,
         device=device,
         verbose=verbose,
-        **coarse_mapping_fit_params,
     )
 
     # Select best pairs of source and target vertices from coarse alignment
@@ -302,7 +309,8 @@ def fit(
         init_plan=init_plan,
         device=device,
         verbose=verbose,
-        **fine_mapping_fit_params,
+        solver=fine_mapping_solver,
+        solver_params=fine_mapping_solver_params,
     )
 
     return source_sample, target_sample

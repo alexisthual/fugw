@@ -14,9 +14,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from fugw.scripts import coarse_to_fine
 from fugw.mappings import FUGW, FUGWSparse
-from fugw.mappings.utils import init_mock_distribution
+from fugw.scripts import coarse_to_fine
+from fugw.utils import init_mock_distribution
 from matplotlib.collections import LineCollection
 from scipy.sparse import coo_matrix
 
@@ -70,21 +70,21 @@ target_embeddings_normalized, target_d_max = coarse_to_fine.random_normalizing(
 )
 
 # %%
-# Let us define the coarse and fine-grained optimization problems to solve
+# Let us define the coarse and fine-grained optimization problems to solve.
+# We also specify which solver to use at each of the 2 steps:
 coarse_mapping = FUGW(alpha=0.5, eps=1e-4)
+coarse_mapping_solver = "mm"
+coarse_mapping_solver_params = {
+    "tol_uot": 1e-10,
+}
+
 fine_mapping = FUGWSparse(alpha=0.5, eps=1e-4)
+fine_mapping_solver = "mm"
+fine_mapping_solver_params = {
+    "tol_uot": 1e-10,
+}
 
 # %%
-# We also specify which solver to use at each of the 2 steps:
-coarse_mapping_fit_params = {
-    "uot_solver": "mm",
-    "tol_uot": 1e-10,
-}
-
-fine_mapping_fit_params = {
-    "uot_solver": "mm",
-    "tol_uot": 1e-10,
-}
 
 # %%
 # Now, let us fit both the coarse and fine-grained mappings.
@@ -95,19 +95,27 @@ fine_mapping_fit_params = {
 # They should usally be set using domain knowledge related to the distributions
 # you are trying to align.
 _, _ = coarse_to_fine.fit(
-    coarse_mapping=coarse_mapping,
-    coarse_mapping_fit_params=coarse_mapping_fit_params,
-    coarse_pairs_selection_method="topk",
-    source_selection_radius=1 / source_d_max,
-    target_selection_radius=1 / target_d_max,
-    fine_mapping=fine_mapping,
-    fine_mapping_fit_params=fine_mapping_fit_params,
-    source_sample_size=n_samples_source,
-    target_sample_size=n_samples_target,
+    # Source and target's features and embeddings
     source_features=source_features_train_normalized,
     target_features=target_features_train_normalized,
     source_geometry_embeddings=source_embeddings_normalized,
     target_geometry_embeddings=target_embeddings_normalized,
+    # Parametrize step 1 (coarse alignment between source and target)
+    source_sample_size=n_samples_source,
+    target_sample_size=n_samples_target,
+    coarse_mapping=coarse_mapping,
+    coarse_mapping_solver=coarse_mapping_solver,
+    coarse_mapping_solver_params=coarse_mapping_solver_params,
+    # Parametrize step 2 (selection of pairs of indices present in
+    # fine-grained's sparsity mask)
+    coarse_pairs_selection_method="topk",
+    source_selection_radius=1 / source_d_max,
+    target_selection_radius=1 / target_d_max,
+    # Parametrize step 3 (fine-grained alignment)
+    fine_mapping=fine_mapping,
+    fine_mapping_solver=fine_mapping_solver,
+    fine_mapping_solver_params=fine_mapping_solver_params,
+    # Misc
     verbose=True,
 )
 

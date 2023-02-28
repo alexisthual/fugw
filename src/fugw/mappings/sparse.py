@@ -24,10 +24,10 @@ class FUGWSparse(BaseMapping):
         target_weights=None,
         init_plan=None,
         init_duals=None,
-        uot_solver="mm",
+        solver="mm",
+        solver_params={},
         device="auto",
         verbose=False,
-        **kwargs,
     ):
         """
         Compute transport plan between source and target distributions
@@ -74,8 +74,10 @@ class FUGWSparse(BaseMapping):
         init_plan: torch.sparse COO or CSR matrix or None
             Torch sparse matrix whose sparsity mask will
             be that of the transport plan computed by this solver.
-        uot_solver: "mm" or "ibpp"
+        solver: "mm" or "ibpp"
             Solver to use.
+        solver_params: fugw.solvers.utils.BaseSolver params
+            Parameters given to the solver.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
@@ -151,7 +153,7 @@ class FUGWSparse(BaseMapping):
             init_plan = make_sparse_csr_tensor(init_plan, device=device)
 
         # Create model
-        model = FUGWSparseSolver(**kwargs)
+        model = FUGWSparseSolver(**solver_params)
 
         # Compute transport plan
         res = model.solve(
@@ -167,7 +169,7 @@ class FUGWSparse(BaseMapping):
             wt=wt,
             init_plan=init_plan,
             init_duals=init_duals,
-            uot_solver=uot_solver,
+            solver=solver,
             verbose=verbose,
         )
 

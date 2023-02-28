@@ -19,10 +19,10 @@ class FUGW(BaseMapping):
         target_weights=None,
         init_plan=None,
         init_duals=None,
-        uot_solver="sinkhorn",
+        solver="sinkhorn",
+        solver_params={},
         device="auto",
         verbose=False,
-        **kwargs,
     ):
         """
         Compute transport plan between source and target distributions
@@ -68,8 +68,10 @@ class FUGW(BaseMapping):
             Transport plan to use at initialisation.
         init_duals: tuple of [ndarray(n), ndarray(m)] or None
             Dual potentials to use at initialisation.
-        uot_solver: "sinkhorn" or "mm" or "ibpp"
+        solver: "sinkhorn" or "mm" or "ibpp"
             Solver to use.
+        solver_params: fugw.solvers.utils.BaseSolver params
+            Parameters given to the solver.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
@@ -124,7 +126,7 @@ class FUGW(BaseMapping):
         Dt = make_tensor(target_geometry, device=device)
 
         # Create model
-        model = FUGWSolver(**kwargs)
+        model = FUGWSolver(**solver_params)
 
         # Compute transport plan
         res = model.solve(
@@ -140,7 +142,7 @@ class FUGW(BaseMapping):
             wt=wt,
             init_plan=init_plan,
             init_duals=init_duals,
-            uot_solver=uot_solver,
+            solver=solver,
             verbose=verbose,
         )
 

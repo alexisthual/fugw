@@ -50,21 +50,16 @@ def test_coarse_to_fine(device, return_numpy):
     )
 
     coarse_mapping = FUGW()
+    coarse_mapping_solver = "mm"
+
     fine_mapping = FUGWSparse()
-
-    coarse_mapping_fit_params = {
-        "uot_solver": "mm",
-    }
-
-    fine_mapping_fit_params = {
-        "uot_solver": "mm",
-    }
+    fine_mapping_solver = "mm"
 
     source_sample, target_sample = coarse_to_fine.fit(
         coarse_mapping=coarse_mapping,
-        coarse_mapping_fit_params=coarse_mapping_fit_params,
+        coarse_mapping_solver=coarse_mapping_solver,
         fine_mapping=fine_mapping,
-        fine_mapping_fit_params=fine_mapping_fit_params,
+        fine_mapping_solver=fine_mapping_solver,
         source_sample_size=n_samples_source,
         target_sample_size=n_samples_target,
         source_features=source_features,

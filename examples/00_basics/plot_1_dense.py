@@ -15,7 +15,7 @@ import numpy as np
 import torch
 
 from fugw.mappings import FUGW
-from fugw.mappings.utils import init_mock_distribution
+from fugw.utils import init_mock_distribution
 from matplotlib.collections import LineCollection
 
 # %%
@@ -94,7 +94,7 @@ _ = mapping.fit(
     target_features_train_normalized,
     source_geometry=source_geometry_normalized,
     target_geometry=target_geometry_normalized,
-    uot_solver="sinkhorn",
+    solver="sinkhorn",
     verbose=True,
 )
 
