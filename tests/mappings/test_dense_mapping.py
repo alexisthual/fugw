@@ -27,7 +27,7 @@ solvers = ["sinkhorn", "mm", "ibpp"]
 @pytest.mark.parametrize(
     "device,return_numpy,solver", product(devices, return_numpys, solvers)
 )
-def test_fugw(device, return_numpy, solver):
+def test_dense_mapping(device, return_numpy, solver):
     # Generate random training data for source and target
     _, source_features_train, source_geometry, _ = init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
