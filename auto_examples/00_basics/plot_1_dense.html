@@ -240,7 +240,6 @@ a dense fugw alignment between them.
 Dense alignments are typically used when both aligned distributions
 have less than 10k points.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
@@ -248,8 +247,7 @@ have less than 10k points.</p>
 <span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <a href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.LineCollection" title="matplotlib.collections.LineCollection" class="sphx-glr-backref-module-matplotlib-collections sphx-glr-backref-type-py-class"><span class="n">LineCollection</span></a>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.seed.html#numpy.random.seed" title="numpy.random.seed" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span></a><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="n">n_points_source</span> <span class="o">=</span> <span class="mi">50</span>
 <span class="n">n_points_target</span> <span class="o">=</span> <span class="mi">40</span>
@@ -267,7 +265,10 @@ have less than 10k points.</p>
 <span class="n">source_features_train</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 50])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:250: UserWarning: Singular sample detected.
+  warnings.warn(&quot;Singular sample detected.&quot;)
+
+torch.Size([2, 50])
 </pre></div>
 </div>
 <p>We can visualize the generated features:</p>
@@ -331,44 +332,44 @@ using a sinkhorn solver</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[16:38:06] BCD step 1/10   FUGW loss:      0.07106098532676697      dense.py:360
-           (base)      0.0716898962855339 (entropic)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:00:03] BCD step 1/10   FUGW loss:      0.028000006452202797     dense.py:360
+           (base)     0.02861664816737175 (entropic)
 
 
-[16:38:07] BCD step 2/10   FUGW loss:      0.06062595546245575      dense.py:360
-           (base)      0.06126530095934868 (entropic)
+[21:00:04] BCD step 2/10   FUGW loss:      0.02218690887093544      dense.py:360
+           (base)      0.022839007899165154 (entropic)
 
 
-           BCD step 3/10   FUGW loss:      0.05847756192088127      dense.py:360
-           (base)      0.05912858247756958 (entropic)
+           BCD step 3/10   FUGW loss:      0.021671757102012634     dense.py:360
+           (base)     0.022318946197628975 (entropic)
 
 
-           BCD step 4/10   FUGW loss:      0.0584559366106987       dense.py:360
-           (base)       0.059106577187776566 (entropic)
+[21:00:05] BCD step 4/10   FUGW loss:      0.020506752654910088     dense.py:360
+           (base)     0.02114957384765148 (entropic)
 
 
-[16:38:08] BCD step 5/10   FUGW loss:      0.05841211974620819      dense.py:360
-           (base)      0.059064075350761414 (entropic)
+[21:00:06] BCD step 5/10   FUGW loss:      0.019838696345686913     dense.py:360
+           (base)     0.020485999062657356 (entropic)
 
 
-           BCD step 6/10   FUGW loss:      0.0584060437977314       dense.py:360
-           (base)       0.059058528393507004 (entropic)
+           BCD step 6/10   FUGW loss:      0.019212042912840843     dense.py:360
+           (base)     0.019857466220855713 (entropic)
 
 
-[16:38:09] BCD step 7/10   FUGW loss:      0.058397069573402405     dense.py:360
-           (base)     0.05904938280582428 (entropic)
+[21:00:07] BCD step 7/10   FUGW loss:      0.018401773646473885     dense.py:360
+           (base)     0.019050441682338715 (entropic)
 
 
-           BCD step 8/10   FUGW loss:      0.058390866965055466     dense.py:360
-           (base)     0.05904326215386391 (entropic)
+           BCD step 8/10   FUGW loss:      0.018040582537651062     dense.py:360
+           (base)     0.01869758404791355 (entropic)
 
 
-[16:38:10] BCD step 9/10   FUGW loss:      0.05838455259799957      dense.py:360
-           (base)      0.05903756245970726 (entropic)
+[21:00:08] BCD step 9/10   FUGW loss:      0.017871618270874023     dense.py:360
+           (base)     0.018533602356910706 (entropic)
 
 
-           BCD step 10/10  FUGW loss:      0.05838431790471077      dense.py:360
-           (base)      0.059037402272224426 (entropic)
+           BCD step 10/10  FUGW loss:      0.017864057794213295     dense.py:360
+           (base)     0.01852637529373169 (entropic)
 </pre></div>
 </div>
 <p>The transport plan can be accessed after the model has been fitted</p>
@@ -376,7 +377,7 @@ using a sinkhorn solver</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Transport plan&#39;s total mass: </span><span class="si">{</span><span class="n">pi</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Transport plan&#39;s total mass: 0.99099
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Transport plan&#39;s total mass: 0.99568
 </pre></div>
 </div>
 <p>Here is the evolution of the FUGW loss during training,
@@ -453,8 +454,8 @@ between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.031 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  270 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.761 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  254 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-1-dense-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a64fd8220c23833034dc49e205e032b8/plot_1_dense.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_1_dense.py</span></code></a></p>
