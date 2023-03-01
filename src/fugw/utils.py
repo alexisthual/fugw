@@ -12,7 +12,6 @@ from rich.progress import (
     TimeElapsedColumn,
     TimeRemainingColumn,
 )
-from skrmt.ensemble import WishartEnsemble
 
 # `rich` console used throughout the codebase
 console = Console()
@@ -125,11 +124,12 @@ def sample_multivariate_normal(n_dims=2, n_points=200):
     # Generate random mean
     mean = torch.normal(0, 3, size=(n_dims,))
 
-    # TODO: replace Wishart sampling with that of torch
     # Generate random covariance matrix from Wishart distribution
-    cov = torch.tensor(
-        WishartEnsemble(beta=1, p=n_dims, n=n_dims).matrix, dtype=torch.float32
+    m = torch.distributions.wishart.Wishart(
+        df=torch.tensor(n_dims),
+        covariance_matrix=torch.eye(n_dims),
     )
+    cov = m.sample()
 
     # Generate random multivariate normal
     m = torch.distributions.multivariate_normal.MultivariateNormal(mean, cov)

@@ -11,7 +11,6 @@ have more than 10k points.
 
 # sphinx_gallery_thumbnail_number = 4
 import matplotlib.pyplot as plt
-import numpy as np
 import torch
 
 from fugw.mappings import FUGW, FUGWSparse
@@ -21,8 +20,7 @@ from matplotlib.collections import LineCollection
 from scipy.sparse import coo_matrix
 
 # %%
-np.random.seed(4)
-torch.manual_seed(0)
+torch.manual_seed(13)
 
 n_points_source = 300
 n_samples_source = 100

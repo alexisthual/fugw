@@ -23,7 +23,6 @@ dependencies = [
   "numpy>=1.20",
   "torch>=1.13",
   "rich>=13.3.1",
-  "scikit-rmt",
   "tvb-gdist>=2.1.1",
 ]
 

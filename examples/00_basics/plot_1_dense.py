@@ -11,7 +11,6 @@ have less than 10k points.
 
 # sphinx_gallery_thumbnail_number = 4
 import matplotlib.pyplot as plt
-import numpy as np
 import torch
 
 from fugw.mappings import FUGW
@@ -19,8 +18,7 @@ from fugw.utils import init_mock_distribution
 from matplotlib.collections import LineCollection
 
 # %%
-np.random.seed(2)
-torch.manual_seed(2)
+torch.manual_seed(0)
 
 n_points_source = 50
 n_points_target = 40
@@ -176,3 +174,5 @@ transformed_data.shape
 
 # %%
 assert transformed_data.shape == target_features_test.shape
+
+# %%

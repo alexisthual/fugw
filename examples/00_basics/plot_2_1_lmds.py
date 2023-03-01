@@ -33,7 +33,7 @@ k = 3
 # %%
 # Let us load a pre-computed mesh and have a look at it first
 fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
-coordinates, triangles = surface.load_surf_mesh(fsaverage3.pial_left)
+coordinates, triangles = surface.load_surf_mesh(fsaverage3.sphere_left)
 coordinates.shape
 
 # %%
