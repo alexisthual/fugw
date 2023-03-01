@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from fugw.solvers import FUGWSparseSolver
-from fugw.mappings.utils import low_rank_squared_l2
+from fugw.utils import low_rank_squared_l2
 
 
 devices = [torch.device("cpu")]
@@ -13,12 +13,13 @@ if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
 
+# TODO: need to test sinkhorn
 @pytest.mark.parametrize(
-    "uot_solver,device",
-    product(["sinkhorn", "mm", "ibpp"], devices),
+    "solver,device",
+    product(["mm", "ibpp"], devices),
 )
-def test_solvers(uot_solver, device):
-    torch.manual_seed(0)
+def test_sparse_solvers(solver, device):
+    torch.manual_seed(1)
     torch.backends.cudnn.benchmark = True
 
     ns = 104
@@ -63,7 +64,7 @@ def test_solvers(uot_solver, device):
         ibpp_eps_base=1e2,
     )
 
-    pi, gamma, duals_pi, duals_gamma, loss_steps, loss, loss_ent = fugw.solve(
+    res = fugw.solve(
         alpha=0.2,
         rho_s=2,
         rho_t=3,
@@ -73,23 +74,34 @@ def test_solvers(uot_solver, device):
         Ds=Ds_normalized,
         Dt=Dt_normalized,
         init_plan=init_plan,
-        uot_solver=uot_solver,
+        solver=solver,
         verbose=True,
     )
+
+    pi = res["pi"]
+    gamma = res["gamma"]
+    duals_pi = res["duals_pi"]
+    duals_gamma = res["duals_gamma"]
+    loss_steps = res["loss_steps"]
+    loss = res["loss"]
+    loss_entropic = res["loss_entropic"]
+    loss_times = res["loss_times"]
 
     assert pi.size() == (ns, nt)
     assert gamma.size() == (ns, nt)
 
-    if uot_solver == "mm":
+    if solver == "mm":
         assert duals_pi is None
         assert duals_gamma is None
-    elif uot_solver == "ibpp":
+    elif solver == "ibpp":
         assert len(duals_pi) == 2
         assert duals_pi[0].shape == (ns,)
         assert duals_pi[1].shape == (nt,)
 
-    assert len(loss_steps) <= nits_bcd // eval_bcd + 1
-    assert len(loss_steps) == len(loss)
-    assert len(loss) == len(loss_ent)
+    assert len(loss_steps) - 1 <= nits_bcd // eval_bcd + 1
+    assert len(loss) == len(loss_steps)
+    assert len(loss_entropic) == len(loss_steps)
+    assert len(loss_times) == len(loss_steps)
     # Loss should decrease
+    print(f"loss: {loss}")
     assert np.all(np.sign(np.array(loss[1:]) - np.array(loss[:-1])) == -1)

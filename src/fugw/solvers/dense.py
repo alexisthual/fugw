@@ -1,8 +1,11 @@
 from functools import partial
 
+import time
+
 import torch
 
 from fugw.solvers.utils import (
+    BaseSolver,
     compute_approx_kl,
     compute_kl,
     compute_quad_kl,
@@ -10,7 +13,7 @@ from fugw.solvers.utils import (
     solver_mm,
     solver_sinkhorn,
 )
-from fugw.mappings.utils import BaseSolver, console
+from fugw.utils import console
 
 
 class FUGWSolver(BaseSolver):
@@ -131,7 +134,7 @@ class FUGWSolver(BaseSolver):
         wt=None,
         init_plan=None,
         init_duals=None,
-        uot_solver="sinkhorn",
+        solver="sinkhorn",
         verbose=False,
     ):
         """
@@ -156,18 +159,29 @@ class FUGWSolver(BaseSolver):
             Initialisation matrix for coupling.
         init_duals: tuple or None
             Initialisation duals for coupling.
-        uot_solver: "sinkhorn", "mm", "ibpp"
+        solver: "sinkhorn", "mm", "ibpp"
             Solver to use.
         verbose: bool, optional, defaults to False
             Log solving process.
 
         Returns
         -------
-        pi: matrix of size n x m. Sample matrix.
-        gamma: matrix of size d1 x d2. Feature matrix.
-        log_cost: if log is True, return a list of loss
-            (without taking into account the regularisation term).
-        log_ent_cost: if log is True, return a list of entropic loss.
+        res: dict
+            Dictionary containing the following keys:
+                pi: torch.Tensor of size n x m
+                    Sample matrix.
+                gamma: torch.Tensor of size d1 x d2
+                    Feature matrix.
+                duals_pi: tuple of torch.Tensor of size
+                    Duals of pi
+                duals_gamma: tuple of torch.Tensor of size
+                    Duals of gamma
+                loss_steps: list
+                    BCD steps at the end of which the FUGW loss was evaluated
+                loss: list
+                    Values of FUGW loss
+                loss_entropic: list
+                    Values of FUGW loss with entropy
         """
 
         if rho_s == float("inf") and rho_t == float("inf") and eps == 0:
@@ -189,12 +203,10 @@ class FUGWSolver(BaseSolver):
             )
 
         # sanity check
-        if uot_solver == "mm" and (
-            rho_s == float("inf") or rho_t == float("inf")
-        ):
-            uot_solver = "ibpp"
-        if uot_solver == "sinkhorn" and eps == 0:
-            uot_solver = "ibpp"
+        if solver == "mm" and (rho_s == float("inf") or rho_t == float("inf")):
+            solver = "ibpp"
+        if solver == "sinkhorn" and eps == 0:
+            solver = "ibpp"
 
         device, dtype = Ds.device, Ds.dtype
 
@@ -219,26 +231,26 @@ class FUGWSolver(BaseSolver):
         pi = ws_dot_wt if init_plan is None else init_plan
         gamma = pi
 
-        if uot_solver == "sinkhorn":
+        if solver == "sinkhorn":
             if init_duals is None:
-                duals_p = (
+                duals_pi = (
                     torch.zeros_like(ws),
                     torch.zeros_like(wt),
                 )
             else:
-                duals_p = init_duals
-            duals_g = duals_p
-        elif uot_solver == "mm":
-            duals_p, duals_g = None, None
-        elif uot_solver == "ibpp":
+                duals_pi = init_duals
+            duals_gamma = duals_pi
+        elif solver == "mm":
+            duals_pi, duals_gamma = None, None
+        elif solver == "ibpp":
             if init_duals is None:
-                duals_p = (
+                duals_pi = (
                     torch.ones_like(ws),
                     torch.ones_like(wt),
                 )
             else:
-                duals_p = init_duals
-            duals_g = duals_p
+                duals_pi = init_duals
+            duals_gamma = duals_pi
 
         compute_local_biconvex_cost = partial(
             self.local_biconvex_cost,
@@ -280,12 +292,15 @@ class FUGWSolver(BaseSolver):
         )
 
         # Initialize loss
-        loss_steps = []
-        loss_ = []
-        loss_ent_ = []
+        current_loss, current_loss_entropic = compute_fugw_loss(pi, gamma)
+        loss_steps = [0]
+        loss = [current_loss]
+        loss_entropic = [current_loss_entropic]
+        loss_times = [0]
         idx = 0
         err = None
 
+        t0 = time.time()
         while (err is None or err > self.tol_bcd) and (idx < self.nits_bcd):
             pi_prev = pi.detach().clone()
 
@@ -297,15 +312,15 @@ class FUGWSolver(BaseSolver):
             uot_params = (new_rho_s, new_rho_t, new_eps)
 
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
-            if uot_solver == "sinkhorn":
-                duals_g, gamma = self_solver_sinkhorn(
-                    cost_gamma, duals_g, uot_params
+            if solver == "sinkhorn":
+                duals_gamma, gamma = self_solver_sinkhorn(
+                    cost_gamma, duals_gamma, uot_params
                 )
-            elif uot_solver == "mm":
+            elif solver == "mm":
                 gamma = self_solver_mm(cost_gamma, gamma, uot_params)
-            if uot_solver == "ibpp":
-                duals_g, gamma = self_solver_ibpp(
-                    cost_gamma, gamma, duals_g, uot_params
+            if solver == "ibpp":
+                duals_gamma, gamma = self_solver_ibpp(
+                    cost_gamma, gamma, duals_gamma, uot_params
                 )
             gamma = (mp / gamma.sum()).sqrt() * gamma
 
@@ -317,36 +332,40 @@ class FUGWSolver(BaseSolver):
             uot_params = (new_rho_s, new_rho_t, new_eps)
 
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
-            if uot_solver == "sinkhorn":
-                duals_p, pi = self_solver_sinkhorn(
-                    cost_pi, duals_p, uot_params
+            if solver == "sinkhorn":
+                duals_pi, pi = self_solver_sinkhorn(
+                    cost_pi, duals_pi, uot_params
                 )
-            elif uot_solver == "mm":
+            elif solver == "mm":
                 pi = self_solver_mm(cost_pi, pi, uot_params)
-            elif uot_solver == "ibpp":
-                duals_p, pi = self_solver_ibpp(
-                    cost_pi, pi, duals_p, uot_params
+            elif solver == "ibpp":
+                duals_pi, pi = self_solver_ibpp(
+                    cost_pi, pi, duals_pi, uot_params
                 )
             pi = (mg / pi.sum()).sqrt() * pi
 
             # Update error
             err = (pi - pi_prev).abs().sum().item()
             if idx % self.eval_bcd == 0:
-                loss, loss_ent = compute_fugw_loss(pi, gamma)
+                current_loss, current_loss_entropic = compute_fugw_loss(
+                    pi, gamma
+                )
 
-                loss_steps.append(idx)
-                loss_.append(loss)
-                loss_ent_.append(loss_ent)
+                loss_steps.append(idx + 1)
+                loss.append(current_loss)
+                loss_entropic.append(current_loss_entropic)
+                loss_times.append(time.time() - t0)
 
                 if verbose:
                     console.log(
                         f"BCD step {idx+1}/{self.nits_bcd}\t"
-                        f"FUGW loss:\t{loss} (base)\t{loss_ent} (entropic)"
+                        f"FUGW loss:\t{current_loss} (base)\t"
+                        f"{current_loss_entropic} (entropic)"
                     )
 
                 if (
-                    len(loss_ent_) >= 2
-                    and abs(loss_ent_[-2] - loss_ent_[-1])
+                    len(loss_entropic) >= 2
+                    and abs(loss_entropic[-2] - loss_entropic[-1])
                     < self.early_stopping_threshold
                 ):
                     break
@@ -356,4 +375,13 @@ class FUGWSolver(BaseSolver):
         if pi.isnan().any() or gamma.isnan().any():
             console.log("There is NaN in coupling")
 
-        return pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_
+        return {
+            "pi": pi,
+            "gamma": gamma,
+            "duals_pi": duals_pi,
+            "duals_gamma": duals_gamma,
+            "loss_steps": loss_steps,
+            "loss": loss,
+            "loss_entropic": loss_entropic,
+            "loss_times": loss_times,
+        }

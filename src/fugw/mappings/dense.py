@@ -2,7 +2,8 @@ import numpy as np
 import torch
 
 from fugw.solvers.dense import FUGWSolver
-from fugw.mappings.utils import BaseMapping, make_tensor
+from fugw.mappings.utils import BaseMapping
+from fugw.utils import make_tensor
 
 
 class FUGW(BaseMapping):
@@ -10,18 +11,18 @@ class FUGW(BaseMapping):
 
     def fit(
         self,
-        source_features,
-        target_features,
+        source_features=None,
+        target_features=None,
         source_geometry=None,
         target_geometry=None,
         source_weights=None,
         target_weights=None,
         init_plan=None,
         init_duals=None,
-        uot_solver="sinkhorn",
+        solver="mm",
+        solver_params={},
         device="auto",
         verbose=False,
-        **kwargs,
     ):
         """
         Compute transport plan between source and target distributions
@@ -32,21 +33,29 @@ class FUGW(BaseMapping):
 
         Parameters
         ----------
-        source_features: ndarray(n_features, n)
+        source_features: ndarray(n_features, n), optional
             Feature maps for source subject.
             n_features is the number of contrast maps, it should
             be the same for source and target data.
             n is the number of nodes on the source graph, it
             can be different from m, the number of nodes on the
             target graph.
-        target_features: ndarray(n_features, m)
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
+        target_features: ndarray(n_features, m), optional
             Feature maps for target subject.
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         source_geometry: ndarray(n, n)
             Kernel matrix of anatomical distances
             between nodes of source mesh
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         target_geometry: ndarray(m, m)
             Kernel matrix of anatomical distances
             between nodes of target mesh
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         source_weights: ndarray(n) or None
             Distribution weights of source nodes.
             Should sum to 1. If None, eahc node's weight
@@ -59,8 +68,10 @@ class FUGW(BaseMapping):
             Transport plan to use at initialisation.
         init_duals: tuple of [ndarray(n), ndarray(m)] or None
             Dual potentials to use at initialisation.
-        uot_solver: "sinkhorn" or "mm" or "ibpp"
+        solver: "sinkhorn" or "mm" or "ibpp"
             Solver to use.
+        solver_params: fugw.solvers.utils.BaseSolver params
+            Parameters given to the solver.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
@@ -70,11 +81,6 @@ class FUGW(BaseMapping):
         Returns
         -------
         self: FUGW class object
-            It comes with the following attributes:
-            - pi: a fitted transport plan stored on CPU as a torch tensor
-            - loss_steps: BCD steps at which the FUGW loss was evaluated
-            - loss_: values of FUGW loss
-            - loss_ent_: values of FUGW loss with entropy
         """
         if device == "auto":
             if torch.cuda.is_available():
@@ -120,18 +126,10 @@ class FUGW(BaseMapping):
         Dt = make_tensor(target_geometry, device=device)
 
         # Create model
-        model = FUGWSolver(**kwargs)
+        model = FUGWSolver(**solver_params)
 
         # Compute transport plan
-        (
-            pi,
-            gamma,
-            duals_pi,
-            duals_gamma,
-            loss_steps,
-            loss_,
-            loss_ent_,
-        ) = model.solve(
+        res = model.solve(
             alpha=self.alpha,
             rho_s=rho_s,
             rho_t=rho_t,
@@ -144,22 +142,23 @@ class FUGW(BaseMapping):
             wt=wt,
             init_plan=init_plan,
             init_duals=init_duals,
-            uot_solver=uot_solver,
+            solver=solver,
             verbose=verbose,
         )
 
         # Store variables of interest in model
-        self.pi = pi.detach().cpu()
-        self.loss_steps = loss_steps
-        self.loss_ = loss_
-        self.loss_ent = loss_ent_
+        self.pi = res["pi"].detach().cpu()
+        self.loss_steps = res["loss_steps"]
+        self.loss = res["loss"]
+        self.loss_entropic = res["loss_entropic"]
+        self.loss_times = res["loss_times"]
 
         # Free allocated GPU memory
         del Fs, Ft, F, Ds, Dt
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-        return (pi, gamma, duals_pi, duals_gamma, loss_steps, loss_, loss_ent_)
+        return self
 
     def transform(self, source_features, device="auto"):
         """

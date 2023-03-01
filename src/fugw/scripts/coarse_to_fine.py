@@ -3,7 +3,7 @@ from itertools import product
 import numpy as np
 import torch
 
-from fugw.mappings.utils import make_tensor, get_progress
+from fugw.utils import get_progress, make_tensor
 
 
 def random_normalizing(X, sample_size=100, repeats=10):
@@ -45,12 +45,14 @@ def random_normalizing(X, sample_size=100, repeats=10):
 
 def fit(
     coarse_mapping=None,
-    coarse_mapping_fit_params={},
+    coarse_mapping_solver="mm",
+    coarse_mapping_solver_params={},
     coarse_pairs_selection_method="topk",
     source_selection_radius=1,
     target_selection_radius=1,
     fine_mapping=None,
-    fine_mapping_fit_params={},
+    fine_mapping_solver="mm",
+    fine_mapping_solver_params={},
     source_sample_size=None,
     target_sample_size=None,
     source_features=None,
@@ -70,7 +72,9 @@ def fit(
     ----------
     coarse_mapping: fugw.FUGW
         Coarse model to fit
-    coarse_mapping_fit_params: dict
+    coarse_mapping_solver: str, defaults to "mm"
+        Solver to use to fit the coarse mapping
+    coarse_mapping_solver_params: dict
         Parameters to give to the `.fit()` method
         of the coarse model
     coarse_pairs_selection_method: "topk" or "quantile"
@@ -87,7 +91,9 @@ def fit(
         for fine-scale solution
     fine_mapping: fugw.FUGWSparse
         Fine-scale model to fit
-    fine_mapping_fit_params: dict
+    fine_mapping_solver: str, defaults to "mm"
+        Solver to use to fit the fine-grained mapping
+    fine_mapping_solver_params: dict
         Parameters to give to the `.fit()` method
         of the fine-scale model
     source_sample_size: int
@@ -177,16 +183,17 @@ def fit(
     )
 
     # Fit coarse model
-    (pi, _, _, _, _, _, _) = coarse_mapping.fit(
+    coarse_mapping.fit(
         source_features[:, source_sample],
         target_features[:, target_sample],
         source_geometry=source_geometry_kernel,
         target_geometry=target_geometry_kernel,
         source_weights=source_weights_sampled,
         target_weights=target_weights_sampled,
+        solver=coarse_mapping_solver,
+        solver_params=coarse_mapping_solver_params,
         device=device,
         verbose=verbose,
-        **coarse_mapping_fit_params,
     )
 
     # Select best pairs of source and target vertices from coarse alignment
@@ -194,17 +201,23 @@ def fit(
         # Method 1: keep first percentile
         quantile = 99.95
 
-        threshold = np.percentile(pi, quantile)
-        rows, cols = np.nonzero(pi > threshold)
+        threshold = np.percentile(coarse_mapping.pi, quantile)
+        rows, cols = np.nonzero(coarse_mapping.pi > threshold)
     elif coarse_pairs_selection_method == "topk":
         # Method 2: keep topk indices per line and per column
         # (this should be prefered as it will keep vertices
         # which are particularly unbalanced)
         rows = np.concatenate(
-            [np.arange(source_sample_size), np.argmax(pi, axis=0)]
+            [
+                np.arange(source_sample_size),
+                np.argmax(coarse_mapping.pi, axis=0),
+            ]
         )
         cols = np.concatenate(
-            [np.argmax(pi, axis=1), np.arange(target_sample_size)]
+            [
+                np.argmax(coarse_mapping.pi, axis=1),
+                np.arange(target_sample_size),
+            ]
         )
 
     # Build sparsity mask from pairs of coefficients
@@ -286,7 +299,7 @@ def fit(
         ),
     )
 
-    _ = fine_mapping.fit(
+    fine_mapping.fit(
         source_features,
         target_features,
         source_geometry_embedding=source_geometry_embeddings,
@@ -296,7 +309,8 @@ def fit(
         init_plan=init_plan,
         device=device,
         verbose=verbose,
-        **fine_mapping_fit_params,
+        solver=fine_mapping_solver,
+        solver_params=fine_mapping_solver_params,
     )
 
     return source_sample, target_sample

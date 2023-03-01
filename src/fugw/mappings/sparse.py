@@ -2,9 +2,9 @@ import numpy as np
 import torch
 import warnings
 
+from fugw.mappings.utils import BaseMapping
 from fugw.solvers.sparse import FUGWSparseSolver
-from fugw.mappings.utils import (
-    BaseMapping,
+from fugw.utils import (
     low_rank_squared_l2,
     make_sparse_csr_tensor,
     make_tensor,
@@ -16,18 +16,18 @@ class FUGWSparse(BaseMapping):
 
     def fit(
         self,
-        source_features,
-        target_features,
+        source_features=None,
+        target_features=None,
         source_geometry_embedding=None,
         target_geometry_embedding=None,
         source_weights=None,
         target_weights=None,
         init_plan=None,
         init_duals=None,
-        uot_solver="mm",
+        solver="mm",
+        solver_params={},
         device="auto",
         verbose=False,
-        **kwargs,
     ):
         """
         Compute transport plan between source and target distributions
@@ -38,23 +38,31 @@ class FUGWSparse(BaseMapping):
 
         Parameters
         ----------
-        source_features: ndarray(n_features, n)
+        source_features: ndarray(n_features, n), optional
             Feature maps for source subject.
             n_features is the number of contrast maps, it should
             be the same for source and target data.
             n is the number of nodes on the source graph, it
             can be different from m, the number of nodes on the
             target graph.
-        target_features: ndarray(n_features, m)
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
+        target_features: ndarray(n_features, m), optional
             Feature maps for target subject.
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         source_geometry_embedding: ndarray(n, k), optional
             Embedding X such that norm(X_i - X_j) approximates
             the anatomical distance between vertices i and j
             of the source mesh
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         target_geometry_embedding: ndarray(m, k), optional
             Embedding X such that norm(X_i - X_j) approximates
             the anatomical distance between vertices i and j
             of the target mesh
+            **This array should be normalized**, otherwise you will
+            run into computational errors.
         source_weights: ndarray(n) or None
             Distribution weights of source nodes.
             Should sum to 1. If None, each node's weight
@@ -66,8 +74,10 @@ class FUGWSparse(BaseMapping):
         init_plan: torch.sparse COO or CSR matrix or None
             Torch sparse matrix whose sparsity mask will
             be that of the transport plan computed by this solver.
-        uot_solver: "mm" or "ibpp"
+        solver: "mm" or "ibpp"
             Solver to use.
+        solver_params: fugw.solvers.utils.BaseSolver params
+            Parameters given to the solver.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
@@ -77,11 +87,6 @@ class FUGWSparse(BaseMapping):
         Returns
         -------
         self: FUGWSparse class object
-            It comes with the following attributes:
-            - pi: a fitted transport plan stored on CPU as a torch COO matrix
-            - loss_steps: BCD steps at which the FUGW loss was evaluated
-            - loss_: values of FUGW loss
-            - loss_ent_: values of FUGW loss with entropy
         """
         if device == "auto":
             if torch.cuda.is_available():
@@ -148,18 +153,10 @@ class FUGWSparse(BaseMapping):
             init_plan = make_sparse_csr_tensor(init_plan, device=device)
 
         # Create model
-        model = FUGWSparseSolver(**kwargs)
+        model = FUGWSparseSolver(**solver_params)
 
         # Compute transport plan
-        (
-            pi,
-            gamma,
-            duals_p,
-            duals_g,
-            loss_steps,
-            loss_,
-            loss_ent_,
-        ) = model.solve(
+        res = model.solve(
             alpha=self.alpha,
             rho_s=rho_s,
             rho_t=rho_t,
@@ -172,21 +169,22 @@ class FUGWSparse(BaseMapping):
             wt=wt,
             init_plan=init_plan,
             init_duals=init_duals,
-            uot_solver=uot_solver,
+            solver=solver,
             verbose=verbose,
         )
 
-        self.pi = pi.to_sparse_coo().detach().cpu()
-        self.loss_steps = loss_steps
-        self.loss_ = loss_
-        self.loss_ent_ = loss_ent_
+        self.pi = res["pi"].to_sparse_coo().detach().cpu()
+        self.loss_steps = res["loss_steps"]
+        self.loss = res["loss"]
+        self.loss_entropic = res["loss_entropic"]
+        self.loss_times = res["loss_times"]
 
         # Free allocated GPU memory
         del Fs, Ft, F1, F2, Ds1, Ds2, Dt1, Dt2
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-        return (pi, gamma, duals_p, duals_g, loss_steps, loss_, loss_ent_)
+        return self
 
     def transform(self, source_features, device="auto"):
         """

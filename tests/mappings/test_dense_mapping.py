@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from fugw.mappings import FUGW
-from fugw.mappings.utils import init_mock_distribution
+from fugw.utils import init_mock_distribution
 
 np.random.seed(0)
 torch.manual_seed(0)
@@ -21,11 +21,13 @@ devices = [torch.device("cpu")]
 if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
+solvers = ["sinkhorn", "mm", "ibpp"]
+
 
 @pytest.mark.parametrize(
-    "device,return_numpy", product(devices, return_numpys)
+    "device,return_numpy,solver", product(devices, return_numpys, solvers)
 )
-def test_fugw(device, return_numpy):
+def test_dense_mapping(device, return_numpy, solver):
     # Generate random training data for source and target
     _, source_features_train, source_geometry, _ = init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
@@ -36,10 +38,15 @@ def test_fugw(device, return_numpy):
 
     fugw = FUGW()
     fugw.fit(
-        source_features_train,
-        target_features_train,
+        source_features=source_features_train,
+        target_features=target_features_train,
         source_geometry=source_geometry,
         target_geometry=target_geometry,
+        solver=solver,
+        solver_params={
+            "nits_bcd": 3,
+            "ibpp_eps_base": 1e8,
+        },
         device=device,
     )
 
