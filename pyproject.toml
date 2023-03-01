@@ -19,28 +19,28 @@ classifiers = [
 dynamic = ["version"]
 requires-python = ">=3.7"
 dependencies = [
+  "joblib>=1.2.0",
   "numpy>=1.20",
   "torch>=1.13",
   "rich>=13.3.1",
+  "scikit-rmt",
+  "tvb-gdist>=2.1.1",
 ]
 
 [project.optional-dependencies]
 dev = [
   "black",
   "fugw[doc]",
-  "fugw[scripts]",
   "fugw[test]",
   "pre-commit",
 ]
 doc = [
   "furo>=2022.12.07",
-  "fugw[scripts]",
   "fugw[test]",
   "m2r2",
   "matplotlib",
   "memory_profiler",
   "myst_parser",
-  "nilearn",
   "numpydoc",
   "pillow",
   "scipy",
@@ -49,16 +49,10 @@ doc = [
   "sphinx-gallery>=0.11.1",
 ]
 test = [
-  "fugw[scripts]",
   "flake8",
-  "meshzoo>=0.9.20",
+  "nilearn",
   "pyproject-flake8",
   "pytest>=7.2",
-  "scikit-rmt",
-]
-scripts = [
-  "joblib>=1.2.0",
-  "tvb-gdist>=2.1.1",
 ]
 
 [project.urls]

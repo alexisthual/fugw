@@ -1,6 +1,6 @@
 # Fused Unbalanced Gromov-Wasserstein for Python
 
-![python version](https://img.shields.io/badge/python->=3.7-blue?style=for-the-badge)
+![python version](https://img.shields.io/badge/python-3.7|3.8|3.9|3.10|3.11-blue?style=for-the-badge)
 ![code style](https://img.shields.io/badge/code_style-black-black?style=for-the-badge)
 
 This package implements multiple GPU-compatible PyTorch solvers
@@ -19,12 +19,6 @@ In a dedicated Python env, run:
 
 ```bash
 pip install fugw
-```
-
-If you need to call functions within `fugw.scripts`, you should also run
-
-```bash
-pip install "fugw[scripts]"
 ```
 
 ### From source
