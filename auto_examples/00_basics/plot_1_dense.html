@@ -244,7 +244,7 @@ have less than 10k points.</p>
 <span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
-<span class="kn">from</span> <span class="nn">fugw.mappings.utils</span> <span class="kn">import</span> <span class="n">init_mock_distribution</span>
+<span class="kn">from</span> <span class="nn">fugw.utils</span> <span class="kn">import</span> <span class="n">init_mock_distribution</span>
 <span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <a href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.LineCollection" title="matplotlib.collections.LineCollection" class="sphx-glr-backref-module-matplotlib-collections sphx-glr-backref-type-py-class"><span class="n">LineCollection</span></a>
 </pre></div>
 </div>
@@ -258,10 +258,10 @@ have less than 10k points.</p>
 </pre></div>
 </div>
 <p>Let us generate random training data for the source and target distributions</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">source_features_train</span><span class="p">,</span> <span class="n">source_geometry</span><span class="p">,</span> <span class="n">source_embeddings</span> <span class="o">=</span> <span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a><span class="p">,</span> <span class="n">source_features_train</span><span class="p">,</span> <span class="n">source_geometry</span><span class="p">,</span> <span class="n">source_embeddings</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">init_mock_distribution</span><span class="p">(</span><span class="n">n_features_train</span><span class="p">,</span> <span class="n">n_points_source</span><span class="p">)</span>
 <span class="p">)</span>
-<span class="n">_</span><span class="p">,</span> <span class="n">target_features_train</span><span class="p">,</span> <span class="n">target_geometry</span><span class="p">,</span> <span class="n">target_embeddings</span> <span class="o">=</span> <span class="p">(</span>
+<a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a><span class="p">,</span> <span class="n">target_features_train</span><span class="p">,</span> <span class="n">target_geometry</span><span class="p">,</span> <span class="n">target_embeddings</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">init_mock_distribution</span><span class="p">(</span><span class="n">n_features_train</span><span class="p">,</span> <span class="n">n_points_target</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">source_features_train</span><span class="o">.</span><span class="n">shape</span>
@@ -321,53 +321,53 @@ have less than 10k points.</p>
 </div>
 <p>Now, we fit a transport plan between source and target distributions
 using a sinkhorn solver</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW.fit" title="fugw.mappings.FUGW.fit" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">mapping</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW.fit" title="fugw.mappings.FUGW.fit" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">mapping</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span>
     <span class="n">source_features_train_normalized</span><span class="p">,</span>
     <span class="n">target_features_train_normalized</span><span class="p">,</span>
     <span class="n">source_geometry</span><span class="o">=</span><span class="n">source_geometry_normalized</span><span class="p">,</span>
     <span class="n">target_geometry</span><span class="o">=</span><span class="n">target_geometry_normalized</span><span class="p">,</span>
-    <span class="n">uot_solver</span><span class="o">=</span><span class="s2">&quot;sinkhorn&quot;</span><span class="p">,</span>
+    <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sinkhorn&quot;</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[11:03:11] BCD step 1/10   FUGW loss:      0.07106098532676697      dense.py:342
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[16:38:06] BCD step 1/10   FUGW loss:      0.07106098532676697      dense.py:360
            (base)      0.0716898962855339 (entropic)
 
 
-[11:03:12] BCD step 2/10   FUGW loss:      0.06062595546245575      dense.py:342
+[16:38:07] BCD step 2/10   FUGW loss:      0.06062595546245575      dense.py:360
            (base)      0.06126530095934868 (entropic)
 
 
-           BCD step 3/10   FUGW loss:      0.05847756192088127      dense.py:342
+           BCD step 3/10   FUGW loss:      0.05847756192088127      dense.py:360
            (base)      0.05912858247756958 (entropic)
 
 
-           BCD step 4/10   FUGW loss:      0.0584559366106987       dense.py:342
+           BCD step 4/10   FUGW loss:      0.0584559366106987       dense.py:360
            (base)       0.059106577187776566 (entropic)
 
 
-[11:03:13] BCD step 5/10   FUGW loss:      0.05841211974620819      dense.py:342
+[16:38:08] BCD step 5/10   FUGW loss:      0.05841211974620819      dense.py:360
            (base)      0.059064075350761414 (entropic)
 
 
-           BCD step 6/10   FUGW loss:      0.0584060437977314       dense.py:342
+           BCD step 6/10   FUGW loss:      0.0584060437977314       dense.py:360
            (base)       0.059058528393507004 (entropic)
 
 
-[11:03:14] BCD step 7/10   FUGW loss:      0.058397069573402405     dense.py:342
+[16:38:09] BCD step 7/10   FUGW loss:      0.058397069573402405     dense.py:360
            (base)     0.05904938280582428 (entropic)
 
 
-           BCD step 8/10   FUGW loss:      0.058390866965055466     dense.py:342
+           BCD step 8/10   FUGW loss:      0.058390866965055466     dense.py:360
            (base)     0.05904326215386391 (entropic)
 
 
-[11:03:15] BCD step 9/10   FUGW loss:      0.05838455259799957      dense.py:342
+[16:38:10] BCD step 9/10   FUGW loss:      0.05838455259799957      dense.py:360
            (base)      0.05903756245970726 (entropic)
 
 
-           BCD step 10/10  FUGW loss:      0.05838431790471077      dense.py:342
+           BCD step 10/10  FUGW loss:      0.05838431790471077      dense.py:360
            (base)      0.059037402272224426 (entropic)
 </pre></div>
 </div>
@@ -385,8 +385,8 @@ with and without the entropic term:</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html#matplotlib.axes.Axes.set_title" title="matplotlib.axes.Axes.set_title" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span></a><span class="p">(</span><span class="s2">&quot;Mapping training loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html#matplotlib.axes.Axes.set_ylabel" title="matplotlib.axes.Axes.set_ylabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span></a><span class="p">(</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html#matplotlib.axes.Axes.set_xlabel" title="matplotlib.axes.Axes.set_xlabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span></a><span class="p">(</span><span class="s2">&quot;BCD step&quot;</span><span class="p">)</span>
-<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss_</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW loss&quot;</span><span class="p">)</span>
-<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss_ent</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW entropic loss&quot;</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW loss&quot;</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss_entropic</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW entropic loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.legend.html#matplotlib.axes.Axes.legend" title="matplotlib.axes.Axes.legend" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">legend</span></a><span class="p">()</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
@@ -453,8 +453,8 @@ between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.348 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  271 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.031 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  270 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-1-dense-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a64fd8220c23833034dc49e205e032b8/plot_1_dense.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_1_dense.py</span></code></a></p>

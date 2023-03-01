@@ -9,8 +9,6 @@ using 4 fMRI feature maps (z-score contrast maps).
 """
 
 # sphinx_gallery_thumbnail_number = 6
-import time
-
 import gdist
 import matplotlib as mpl
 import matplotlib.gridspec as gridspec
@@ -228,18 +226,17 @@ mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 # Moreover, we limit the number of block-coordinate-descent
 # iterations to 3 in order to limit computation time for this example.
 
-t0 = time.time()
-
 _ = mapping.fit(
     source_features_normalized[:n_training_contrasts],
     target_features_normalized[:n_training_contrasts],
     source_geometry=source_geometry_normalized,
     target_geometry=target_geometry_normalized,
-    nits_bcd=3,
+    solver="sinkhorn",
+    solver_params={
+        "nits_bcd": 3,
+    },
     verbose=True,
 )
-
-t1 = time.time()
 
 # %%
 # Here is the evolution of the FUGW loss during training,
@@ -247,58 +244,88 @@ t1 = time.time()
 
 fig, ax = plt.subplots(figsize=(4, 4))
 ax.set_title(
-    f"Sinkhorn mapping training loss\nTotal training time = {t1 - t0:.1f}s"
+    "Sinkhorn mapping training loss\n"
+    f"Total training time = {mapping.loss_times[-1]:.1f}s"
 )
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(mapping.loss_steps, mapping.loss_, label="FUGW loss")
-ax.plot(mapping.loss_steps, mapping.loss_ent, label="FUGW entropic loss")
+ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
+ax.plot(mapping.loss_steps, mapping.loss_entropic, label="FUGW entropic loss")
 ax.legend()
 plt.show()
 
 # %%
-# Note that we implicitely used the ``sinkhorn`` solver here, but that
+# Note that we used the ``sinkhorn`` solver here because it's well known
+# in the optimal transport community, but that
 # this library comes with other solvers which are, in most cases,
 # much faster.
 # Let's retrain our mapping using the ``mm`` solver, which implements
-# a maximize-minimization approach to approximate a solution:
+# a maximize-minimization approach to approximate a solution and is
+# used by default in ``fugw.mappings``:
 
 mm_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
-
-t0 = time.time()
 
 _ = mm_mapping.fit(
     source_features_normalized[:n_training_contrasts],
     target_features_normalized[:n_training_contrasts],
     source_geometry=source_geometry_normalized,
     target_geometry=target_geometry_normalized,
-    uot_solver="mm",
-    nits_bcd=5,
-    tol_bcd=1e-10,
-    tol_uot=1e-10,
+    solver="mm",
+    solver_params={
+        "nits_bcd": 5,
+        "tol_bcd": 1e-10,
+        "tol_uot": 1e-10,
+    },
     verbose=True,
 )
 
-t1 = time.time()
+# %%
+# And now with the ``ibpp`` solver:
+ibpp_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
+
+_ = ibpp_mapping.fit(
+    source_features_normalized[:n_training_contrasts],
+    target_features_normalized[:n_training_contrasts],
+    source_geometry=source_geometry_normalized,
+    target_geometry=target_geometry_normalized,
+    solver="ibpp",
+    solver_params={
+        "nits_bcd": 5,
+        "tol_bcd": 1e-10,
+        "tol_uot": 1e-10,
+    },
+    verbose=True,
+)
 
 # %%
 # Here is the evolution of the FUGW loss during training,
-# with and without the entropic term. Note how, in this case,
-# even though ``mm`` needed more block-coordinate-descent steps to converge,
-# it was about 2 times faster to reach the same final FUGW training loss
-# as ``sinkhorn``.
+# without the entropic term. Note how, in this case,
+# even though ``mm`` and ``ibpp`` needed more block-coordinate-descent steps
+# to converge, they were about 2 to 3 times faster to reach the same final
+# FUGW training loss as ``sinkhorn``.
+# You might want to tweak solver parameters like ``nits_bcd`` and ``nits_uot``
+# to get the fastest convergence rates.
 
-fig, ax = plt.subplots(figsize=(4, 4))
-ax.set_title(f"MM mapping training loss\nTotal training time = {t1 - t0:.1f}s")
+fig = plt.figure(figsize=(4 * 2, 4))
+fig.suptitle("Training loss comparison\nSinkhorn vs MM vs IBPP")
+
+ax = fig.add_subplot(121)
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(mapping.loss_steps, mapping.loss_, label="FUGW loss")
-ax.plot(mapping.loss_steps, mapping.loss_ent, label="FUGW entropic loss")
-ax.plot(mm_mapping.loss_steps, mm_mapping.loss_, label="MM FUGW loss")
-ax.plot(
-    mm_mapping.loss_steps, mm_mapping.loss_ent, label="MM FUGW entropic loss"
-)
+ax.plot(mapping.loss_steps, mapping.loss, label="Sinkhorn FUGW loss")
+ax.plot(mm_mapping.loss_steps, mm_mapping.loss, label="MM FUGW loss")
+ax.plot(ibpp_mapping.loss_steps, ibpp_mapping.loss, label="IBPP FUGW loss")
 ax.legend()
+
+ax = fig.add_subplot(122)
+ax.set_ylabel("Loss")
+ax.set_xlabel("Time (in seconds)")
+ax.plot(mapping.loss_times, mapping.loss, label="FUGW loss")
+ax.plot(mm_mapping.loss_times, mm_mapping.loss, label="MM FUGW loss")
+ax.plot(ibpp_mapping.loss_times, ibpp_mapping.loss, label="IBPP FUGW loss")
+ax.legend()
+
+fig.tight_layout()
 plt.show()
 
 # %%

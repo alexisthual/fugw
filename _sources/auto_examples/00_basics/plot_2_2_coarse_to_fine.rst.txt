@@ -35,9 +35,9 @@ have more than 10k points.
     import numpy as np
     import torch
 
-    from fugw.scripts import coarse_to_fine
     from fugw.mappings import FUGW, FUGWSparse
-    from fugw.mappings.utils import init_mock_distribution
+    from fugw.scripts import coarse_to_fine
+    from fugw.utils import init_mock_distribution
     from matplotlib.collections import LineCollection
     from scipy.sparse import coo_matrix
 
@@ -151,39 +151,24 @@ before fitting the models.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-74
+.. GENERATED FROM PYTHON SOURCE LINES 73-75
 
-Let us define the coarse and fine-grained optimization problems to solve
+Let us define the coarse and fine-grained optimization problems to solve.
+We also specify which solver to use at each of the 2 steps:
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-77
+.. GENERATED FROM PYTHON SOURCE LINES 75-87
 
 .. code-block:: default
 
     coarse_mapping = FUGW(alpha=0.5, eps=1e-4)
-    fine_mapping = FUGWSparse(alpha=0.5, eps=1e-4)
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 78-79
-
-We also specify which solver to use at each of the 2 steps:
-
-.. GENERATED FROM PYTHON SOURCE LINES 79-89
-
-.. code-block:: default
-
-    coarse_mapping_fit_params = {
-        "uot_solver": "mm",
+    coarse_mapping_solver = "mm"
+    coarse_mapping_solver_params = {
         "tol_uot": 1e-10,
     }
 
-    fine_mapping_fit_params = {
-        "uot_solver": "mm",
+    fine_mapping = FUGWSparse(alpha=0.5, eps=1e-4)
+    fine_mapping_solver = "mm"
+    fine_mapping_solver_params = {
         "tol_uot": 1e-10,
     }
 
@@ -204,24 +189,32 @@ as they will greatly affect the sparsity of the computed mappings.
 They should usally be set using domain knowledge related to the distributions
 you are trying to align.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-114
+.. GENERATED FROM PYTHON SOURCE LINES 97-122
 
 .. code-block:: default
 
     _, _ = coarse_to_fine.fit(
-        coarse_mapping=coarse_mapping,
-        coarse_mapping_fit_params=coarse_mapping_fit_params,
-        coarse_pairs_selection_method="topk",
-        source_selection_radius=1 / source_d_max,
-        target_selection_radius=1 / target_d_max,
-        fine_mapping=fine_mapping,
-        fine_mapping_fit_params=fine_mapping_fit_params,
-        source_sample_size=n_samples_source,
-        target_sample_size=n_samples_target,
+        # Source and target's features and embeddings
         source_features=source_features_train_normalized,
         target_features=target_features_train_normalized,
         source_geometry_embeddings=source_embeddings_normalized,
         target_geometry_embeddings=target_embeddings_normalized,
+        # Parametrize step 1 (coarse alignment between source and target)
+        source_sample_size=n_samples_source,
+        target_sample_size=n_samples_target,
+        coarse_mapping=coarse_mapping,
+        coarse_mapping_solver=coarse_mapping_solver,
+        coarse_mapping_solver_params=coarse_mapping_solver_params,
+        # Parametrize step 2 (selection of pairs of indices present in
+        # fine-grained's sparsity mask)
+        coarse_pairs_selection_method="topk",
+        source_selection_radius=1 / source_d_max,
+        target_selection_radius=1 / target_d_max,
+        # Parametrize step 3 (fine-grained alignment)
+        fine_mapping=fine_mapping,
+        fine_mapping_solver=fine_mapping_solver,
+        fine_mapping_solver_params=fine_mapping_solver_params,
+        # Misc
         verbose=True,
     )
 
@@ -235,97 +228,97 @@ you are trying to align.
 
 
 
-    [11:03:22] BCD step 1/10   FUGW loss:      0.028055913746356964     dense.py:342
+    [16:38:22] BCD step 1/10   FUGW loss:      0.028055913746356964     dense.py:360
                (base)     0.02814635820686817 (entropic)                            
 
 
-               BCD step 2/10   FUGW loss:      0.025683855637907982     dense.py:342
+               BCD step 2/10   FUGW loss:      0.025683855637907982     dense.py:360
                (base)     0.025863073766231537 (entropic)                           
 
 
-               BCD step 3/10   FUGW loss:      0.016268832609057426     dense.py:342
+    [16:38:23] BCD step 3/10   FUGW loss:      0.016268832609057426     dense.py:360
                (base)     0.01665913127362728 (entropic)                            
 
 
-    [11:03:23] BCD step 4/10   FUGW loss:      0.011751125566661358     dense.py:342
+               BCD step 4/10   FUGW loss:      0.011751125566661358     dense.py:360
                (base)     0.012296381406486034 (entropic)                           
 
 
-               BCD step 5/10   FUGW loss:      0.010866605676710606     dense.py:342
+               BCD step 5/10   FUGW loss:      0.010866605676710606     dense.py:360
                (base)     0.011479916982352734 (entropic)                           
 
 
-    [11:03:24] BCD step 6/10   FUGW loss:      0.010522968135774136     dense.py:342
+    [16:38:24] BCD step 6/10   FUGW loss:      0.010522968135774136     dense.py:360
                (base)     0.011175187304615974 (entropic)                           
 
 
-               BCD step 7/10   FUGW loss:      0.010338868945837021     dense.py:342
+               BCD step 7/10   FUGW loss:      0.010338868945837021     dense.py:360
                (base)     0.011017151176929474 (entropic)                           
 
 
-    [11:03:25] BCD step 8/10   FUGW loss:      0.010221882723271847     dense.py:342
+    [16:38:25] BCD step 8/10   FUGW loss:      0.010221882723271847     dense.py:360
                (base)     0.010919460095465183 (entropic)                           
 
 
-    [11:03:26] BCD step 9/10   FUGW loss:      0.0101405568420887       dense.py:342
+    [16:38:26] BCD step 9/10   FUGW loss:      0.0101405568420887       dense.py:360
                (base)       0.010853287763893604 (entropic)                         
 
 
-    [11:03:27] BCD step 10/10  FUGW loss:      0.0100807324051857       dense.py:342
+    [16:38:27] BCD step 10/10  FUGW loss:      0.0100807324051857       dense.py:360
                (base)       0.01080571860074997 (entropic)                          
       100% Sparsity mask ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 200/200 0:00:01 < 0:00:00
-    /github/workspace/src/fugw/mappings/utils.py:150: UserWarning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
+    /github/workspace/src/fugw/utils.py:51: UserWarning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
       return x.to(device, dtype).to_sparse_csr()
 
 
-    [11:03:38] BCD step 1/10   FUGW loss:      0.021763041615486145    sparse.py:460
+    [16:38:39] BCD step 1/10   FUGW loss:      0.021763041615486145    sparse.py:478
                (base)     0.02189093828201294 (entropic)                            
 
 
-    [11:03:41] BCD step 2/10   FUGW loss:      0.017754876986145973    sparse.py:460
+    [16:38:42] BCD step 2/10   FUGW loss:      0.017754876986145973    sparse.py:478
                (base)     0.01801164820790291 (entropic)                            
 
 
-    [11:03:44] BCD step 3/10   FUGW loss:      0.011553710326552391    sparse.py:460
+    [16:38:45] BCD step 3/10   FUGW loss:      0.011553710326552391    sparse.py:478
                (base)     0.012020763009786606 (entropic)                           
 
 
-    [11:03:46] BCD step 4/10   FUGW loss:      0.009638299234211445    sparse.py:460
+    [16:38:47] BCD step 4/10   FUGW loss:      0.009638299234211445    sparse.py:478
                (base)     0.010233832523226738 (entropic)                           
 
 
-    [11:03:49] BCD step 5/10   FUGW loss:      0.008976257406175137    sparse.py:460
+    [16:38:50] BCD step 5/10   FUGW loss:      0.008976257406175137    sparse.py:478
                (base)     0.009645415470004082 (entropic)                           
 
 
-    [11:03:51] BCD step 6/10   FUGW loss:      0.008657296188175678    sparse.py:460
+    [16:38:52] BCD step 6/10   FUGW loss:      0.008657296188175678    sparse.py:478
                (base)     0.009374301880598068 (entropic)                           
 
 
-    [11:03:55] BCD step 7/10   FUGW loss:      0.008474555797874928    sparse.py:460
+    [16:38:55] BCD step 7/10   FUGW loss:      0.008474555797874928    sparse.py:478
                (base)     0.009225510992109776 (entropic)                           
 
 
-    [11:03:58] BCD step 8/10   FUGW loss:      0.008358475752174854    sparse.py:460
+    [16:38:59] BCD step 8/10   FUGW loss:      0.008358475752174854    sparse.py:478
                (base)     0.009134968742728233 (entropic)                           
 
 
-    [11:04:03] BCD step 9/10   FUGW loss:      0.008279440924525261    sparse.py:460
+    [16:39:04] BCD step 9/10   FUGW loss:      0.008279440924525261    sparse.py:478
                (base)     0.009075913578271866 (entropic)                           
 
 
-    [11:04:08] BCD step 10/10  FUGW loss:      0.008222405798733234    sparse.py:460
+    [16:39:09] BCD step 10/10  FUGW loss:      0.008222405798733234    sparse.py:478
                (base)     0.009034985676407814 (entropic)                           
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-117
+.. GENERATED FROM PYTHON SOURCE LINES 123-125
 
 Both the coarse and fine-grained transport plans can be accessed
 after the models have been fitted
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-123
+.. GENERATED FROM PYTHON SOURCE LINES 125-131
 
 .. code-block:: default
 
@@ -349,12 +342,12 @@ after the models have been fitted
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-126
+.. GENERATED FROM PYTHON SOURCE LINES 132-134
 
 Here is the evolution of the FUGW loss during training
 of the coarse mapping, with and without the entropic term:
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-140
+.. GENERATED FROM PYTHON SOURCE LINES 134-148
 
 .. code-block:: default
 
@@ -363,10 +356,10 @@ of the coarse mapping, with and without the entropic term:
     ax.set_title("Coarse mapping training loss")
     ax.set_ylabel("Loss")
     ax.set_xlabel("BCD step")
-    ax.plot(coarse_mapping.loss_steps, coarse_mapping.loss_, label="FUGW loss")
+    ax.plot(coarse_mapping.loss_steps, coarse_mapping.loss, label="FUGW loss")
     ax.plot(
         coarse_mapping.loss_steps,
-        coarse_mapping.loss_ent,
+        coarse_mapping.loss_entropic,
         label="FUGW entropic loss",
     )
     ax.legend()
@@ -384,11 +377,11 @@ of the coarse mapping, with and without the entropic term:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-142
+.. GENERATED FROM PYTHON SOURCE LINES 149-150
 
 And here is that of the fine-grained mapping:
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-154
+.. GENERATED FROM PYTHON SOURCE LINES 150-164
 
 .. code-block:: default
 
@@ -397,9 +390,11 @@ And here is that of the fine-grained mapping:
     ax.set_title("Fine-grained mapping training loss")
     ax.set_ylabel("Loss")
     ax.set_xlabel("BCD step")
-    ax.plot(fine_mapping.loss_steps, fine_mapping.loss_, label="FUGW loss")
+    ax.plot(fine_mapping.loss_steps, fine_mapping.loss, label="FUGW loss")
     ax.plot(
-        fine_mapping.loss_steps, fine_mapping.loss_ent_, label="FUGW entropic loss"
+        fine_mapping.loss_steps,
+        fine_mapping.loss_entropic,
+        label="FUGW entropic loss",
     )
     ax.legend()
     plt.show()
@@ -416,7 +411,7 @@ And here is that of the fine-grained mapping:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-160
+.. GENERATED FROM PYTHON SOURCE LINES 165-170
 
 In this example, the computed sparse transport plan is not very sparse:
 it stores about 60% of what the equivalent dense transport plan
@@ -424,7 +419,7 @@ would store.
 When aligning distributions with a high number of points,
 we usually want to keep this number much smaller.
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-166
+.. GENERATED FROM PYTHON SOURCE LINES 170-176
 
 .. code-block:: default
 
@@ -447,13 +442,13 @@ we usually want to keep this number much smaller.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-170
+.. GENERATED FROM PYTHON SOURCE LINES 177-180
 
 We can also have a look at the sparsity mask of the
 fine-grained transport plan. In this particular example,
 we don't expect it to show a particularly meaningful structure.
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-186
+.. GENERATED FROM PYTHON SOURCE LINES 180-196
 
 .. code-block:: default
 
@@ -485,12 +480,12 @@ we don't expect it to show a particularly meaningful structure.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-189
+.. GENERATED FROM PYTHON SOURCE LINES 197-199
 
 We can observe the computed mappings between source
 and target points in the feature space.
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-218
+.. GENERATED FROM PYTHON SOURCE LINES 199-228
 
 .. code-block:: default
 
@@ -535,12 +530,12 @@ and target points in the feature space.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-221
+.. GENERATED FROM PYTHON SOURCE LINES 229-231
 
 Finally, the fitted fine-grained model can transport unseen data
 between source and target
 
-.. GENERATED FROM PYTHON SOURCE LINES 221-226
+.. GENERATED FROM PYTHON SOURCE LINES 231-236
 
 .. code-block:: default
 
@@ -562,7 +557,7 @@ between source and target
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-228
+.. GENERATED FROM PYTHON SOURCE LINES 237-238
 
 .. code-block:: default
 
@@ -577,9 +572,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  53.786 seconds)
+   **Total running time of the script:** ( 0 minutes  55.815 seconds)
 
-**Estimated memory usage:**  1536 MB
+**Estimated memory usage:**  1544 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_2_coarse_to_fine.py:

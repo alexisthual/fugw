@@ -36,11 +36,11 @@ computed in the right dimension can probably estimate it.
 
     import gdist
     import matplotlib.pyplot as plt
-    import meshzoo
     import numpy as np
     import torch
 
     from fugw.scripts import lmds
+    from nilearn import datasets, surface
 
 
 
@@ -75,11 +75,12 @@ The derived embedding will be in dimension ``k``.
 
 Let us load a pre-computed mesh and have a look at it first
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-38
+.. GENERATED FROM PYTHON SOURCE LINES 35-39
 
 .. code-block:: default
 
-    coordinates, triangles = meshzoo.octa_sphere(10)
+    fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
+    coordinates, triangles = surface.load_surf_mesh(fsaverage3.pial_left)
     coordinates.shape
 
 
@@ -91,11 +92,17 @@ Let us load a pre-computed mesh and have a look at it first
  .. code-block:: none
 
 
-    (402, 3)
+    Dataset created in /github/home/nilearn_data/fsaverage3
+
+    Downloading data from https://osf.io/asvjk/download ...
+     ...done. (1 seconds, 0 min)
+    Extracting data from /github/home/nilearn_data/fsaverage3/b9ce491b47822c5b4950eeeb75d15a92/download..... done.
+
+    (642, 3)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-49
+.. GENERATED FROM PYTHON SOURCE LINES 40-50
 
 .. code-block:: default
 
@@ -121,11 +128,11 @@ Let us load a pre-computed mesh and have a look at it first
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-51
+.. GENERATED FROM PYTHON SOURCE LINES 51-52
 
 Now, let's compute the embedding! This computation is easy to parallelize.
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-60
+.. GENERATED FROM PYTHON SOURCE LINES 52-61
 
 .. code-block:: default
 
@@ -146,16 +153,16 @@ Now, let's compute the embedding! This computation is easy to parallelize.
 
  .. code-block:: none
 
-      100% Geodesic_distances for landmarks ━━━━━━━━━━━━━━ 100/100 0:00:01 < 0:00:00
+      100% Geodesic_distances for landmarks ━━━━━━━━━━━━━━ 100/100 0:00:02 < 0:00:00
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-62
+.. GENERATED FROM PYTHON SOURCE LINES 62-63
 
 It should have the correct size
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-64
+.. GENERATED FROM PYTHON SOURCE LINES 63-65
 
 .. code-block:: default
 
@@ -168,11 +175,11 @@ It should have the correct size
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-66
+.. GENERATED FROM PYTHON SOURCE LINES 66-67
 
 We can actually have a peek at the computed embedding:
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-78
+.. GENERATED FROM PYTHON SOURCE LINES 67-79
 
 .. code-block:: default
 
@@ -200,13 +207,13 @@ We can actually have a peek at the computed embedding:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-82
+.. GENERATED FROM PYTHON SOURCE LINES 80-83
 
 Finally, we check that the exact matrix of geodesic distances
 between pairs of vertices of the mesh
 is well approximated by the kernel matrix derived from the embeddings:
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-101
+.. GENERATED FROM PYTHON SOURCE LINES 83-102
 
 .. code-block:: default
 
@@ -244,9 +251,9 @@ is well approximated by the kernel matrix derived from the embeddings:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.487 seconds)
+   **Total running time of the script:** ( 0 minutes  8.975 seconds)
 
-**Estimated memory usage:**  42 MB
+**Estimated memory usage:**  138 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_1_lmds.py:

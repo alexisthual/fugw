@@ -313,7 +313,7 @@ which makes use of this cost to update the transport plans.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fugw.solvers.FUGWSolver.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_duals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uot_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sinkhorn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver.solve" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_duals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sinkhorn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver.solve" title="Permalink to this definition">#</a></dt>
 <dd><p>Function running the BCD iterations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -335,7 +335,7 @@ which makes use of this cost to update the transport plans.</p>
 </dd>
 <dt><strong>init_duals: tuple or None</strong></dt><dd><p>Initialisation duals for coupling.</p>
 </dd>
-<dt><strong>uot_solver: “sinkhorn”, “mm”, “ibpp”</strong></dt><dd><p>Solver to use.</p>
+<dt><strong>solver: “sinkhorn”, “mm”, “ibpp”</strong></dt><dd><p>Solver to use.</p>
 </dd>
 <dt><strong>verbose: bool, optional, defaults to False</strong></dt><dd><p>Log solving process.</p>
 </dd>
@@ -343,11 +343,26 @@ which makes use of this cost to update the transport plans.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>pi: matrix of size n x m. Sample matrix.</dt><dd></dd>
-<dt>gamma: matrix of size d1 x d2. Feature matrix.</dt><dd></dd>
-<dt>log_cost: if log is True, return a list of loss</dt><dd><p>(without taking into account the regularisation term).</p>
+<dt>res: dict</dt><dd><dl class="simple">
+<dt>Dictionary containing the following keys:</dt><dd><dl class="simple">
+<dt>pi: torch.Tensor of size n x m</dt><dd><p>Sample matrix.</p>
 </dd>
-<dt>log_ent_cost: if log is True, return a list of entropic loss.</dt><dd></dd>
+<dt>gamma: torch.Tensor of size d1 x d2</dt><dd><p>Feature matrix.</p>
+</dd>
+<dt>duals_pi: tuple of torch.Tensor of size</dt><dd><p>Duals of pi</p>
+</dd>
+<dt>duals_gamma: tuple of torch.Tensor of size</dt><dd><p>Duals of gamma</p>
+</dd>
+<dt>loss_steps: list</dt><dd><p>BCD steps at the end of which the FUGW loss was evaluated</p>
+</dd>
+<dt>loss: list</dt><dd><p>Values of FUGW loss</p>
+</dd>
+<dt>loss_entropic: list</dt><dd><p>Values of FUGW loss with entropy</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>

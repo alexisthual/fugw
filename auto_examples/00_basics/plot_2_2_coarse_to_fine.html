@@ -243,9 +243,9 @@ have more than 10k points.</p>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">fugw.scripts</span> <span class="kn">import</span> <span class="n">coarse_to_fine</span>
 <span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">,</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGWSparse</span></a>
-<span class="kn">from</span> <span class="nn">fugw.mappings.utils</span> <span class="kn">import</span> <span class="n">init_mock_distribution</span>
+<span class="kn">from</span> <span class="nn">fugw.scripts</span> <span class="kn">import</span> <span class="n">coarse_to_fine</span>
+<span class="kn">from</span> <span class="nn">fugw.utils</span> <span class="kn">import</span> <span class="n">init_mock_distribution</span>
 <span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <a href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.LineCollection" title="matplotlib.collections.LineCollection" class="sphx-glr-backref-module-matplotlib-collections sphx-glr-backref-type-py-class"><span class="n">LineCollection</span></a>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span>
 </pre></div>
@@ -298,19 +298,17 @@ before fitting the models.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>Let us define the coarse and fine-grained optimization problems to solve</p>
+<p>Let us define the coarse and fine-grained optimization problems to solve.
+We also specify which solver to use at each of the 2 steps:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
-<a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGWSparse</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>We also specify which solver to use at each of the 2 steps:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">coarse_mapping_fit_params</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;uot_solver&quot;</span><span class="p">:</span> <span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+<span class="n">coarse_mapping_solver</span> <span class="o">=</span> <span class="s2">&quot;mm&quot;</span>
+<span class="n">coarse_mapping_solver_params</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;tol_uot&quot;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">fine_mapping_fit_params</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;uot_solver&quot;</span><span class="p">:</span> <span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+<a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGWSparse</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+<span class="n">fine_mapping_solver</span> <span class="o">=</span> <span class="s2">&quot;mm&quot;</span>
+<span class="n">fine_mapping_solver_params</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;tol_uot&quot;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
@@ -323,103 +321,111 @@ as they will greatly affect the sparsity of the computed mappings.
 They should usally be set using domain knowledge related to the distributions
 you are trying to align.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">coarse_to_fine</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-    <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">=</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="p">,</span>
-    <span class="n">coarse_mapping_fit_params</span><span class="o">=</span><span class="n">coarse_mapping_fit_params</span><span class="p">,</span>
-    <span class="n">coarse_pairs_selection_method</span><span class="o">=</span><span class="s2">&quot;topk&quot;</span><span class="p">,</span>
-    <span class="n">source_selection_radius</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">source_d_max</span><span class="p">,</span>
-    <span class="n">target_selection_radius</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">target_d_max</span><span class="p">,</span>
-    <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">=</span><a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="p">,</span>
-    <span class="n">fine_mapping_fit_params</span><span class="o">=</span><span class="n">fine_mapping_fit_params</span><span class="p">,</span>
-    <span class="n">source_sample_size</span><span class="o">=</span><span class="n">n_samples_source</span><span class="p">,</span>
-    <span class="n">target_sample_size</span><span class="o">=</span><span class="n">n_samples_target</span><span class="p">,</span>
+    <span class="c1"># Source and target&#39;s features and embeddings</span>
     <span class="n">source_features</span><span class="o">=</span><span class="n">source_features_train_normalized</span><span class="p">,</span>
     <span class="n">target_features</span><span class="o">=</span><span class="n">target_features_train_normalized</span><span class="p">,</span>
     <span class="n">source_geometry_embeddings</span><span class="o">=</span><span class="n">source_embeddings_normalized</span><span class="p">,</span>
     <span class="n">target_geometry_embeddings</span><span class="o">=</span><span class="n">target_embeddings_normalized</span><span class="p">,</span>
+    <span class="c1"># Parametrize step 1 (coarse alignment between source and target)</span>
+    <span class="n">source_sample_size</span><span class="o">=</span><span class="n">n_samples_source</span><span class="p">,</span>
+    <span class="n">target_sample_size</span><span class="o">=</span><span class="n">n_samples_target</span><span class="p">,</span>
+    <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">=</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="p">,</span>
+    <span class="n">coarse_mapping_solver</span><span class="o">=</span><span class="n">coarse_mapping_solver</span><span class="p">,</span>
+    <span class="n">coarse_mapping_solver_params</span><span class="o">=</span><span class="n">coarse_mapping_solver_params</span><span class="p">,</span>
+    <span class="c1"># Parametrize step 2 (selection of pairs of indices present in</span>
+    <span class="c1"># fine-grained&#39;s sparsity mask)</span>
+    <span class="n">coarse_pairs_selection_method</span><span class="o">=</span><span class="s2">&quot;topk&quot;</span><span class="p">,</span>
+    <span class="n">source_selection_radius</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">source_d_max</span><span class="p">,</span>
+    <span class="n">target_selection_radius</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">target_d_max</span><span class="p">,</span>
+    <span class="c1"># Parametrize step 3 (fine-grained alignment)</span>
+    <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">=</span><a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="p">,</span>
+    <span class="n">fine_mapping_solver</span><span class="o">=</span><span class="n">fine_mapping_solver</span><span class="p">,</span>
+    <span class="n">fine_mapping_solver_params</span><span class="o">=</span><span class="n">fine_mapping_solver_params</span><span class="p">,</span>
+    <span class="c1"># Misc</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[11:03:22] BCD step 1/10   FUGW loss:      0.028055913746356964     dense.py:342
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[16:38:22] BCD step 1/10   FUGW loss:      0.028055913746356964     dense.py:360
            (base)     0.02814635820686817 (entropic)
 
 
-           BCD step 2/10   FUGW loss:      0.025683855637907982     dense.py:342
+           BCD step 2/10   FUGW loss:      0.025683855637907982     dense.py:360
            (base)     0.025863073766231537 (entropic)
 
 
-           BCD step 3/10   FUGW loss:      0.016268832609057426     dense.py:342
+[16:38:23] BCD step 3/10   FUGW loss:      0.016268832609057426     dense.py:360
            (base)     0.01665913127362728 (entropic)
 
 
-[11:03:23] BCD step 4/10   FUGW loss:      0.011751125566661358     dense.py:342
+           BCD step 4/10   FUGW loss:      0.011751125566661358     dense.py:360
            (base)     0.012296381406486034 (entropic)
 
 
-           BCD step 5/10   FUGW loss:      0.010866605676710606     dense.py:342
+           BCD step 5/10   FUGW loss:      0.010866605676710606     dense.py:360
            (base)     0.011479916982352734 (entropic)
 
 
-[11:03:24] BCD step 6/10   FUGW loss:      0.010522968135774136     dense.py:342
+[16:38:24] BCD step 6/10   FUGW loss:      0.010522968135774136     dense.py:360
            (base)     0.011175187304615974 (entropic)
 
 
-           BCD step 7/10   FUGW loss:      0.010338868945837021     dense.py:342
+           BCD step 7/10   FUGW loss:      0.010338868945837021     dense.py:360
            (base)     0.011017151176929474 (entropic)
 
 
-[11:03:25] BCD step 8/10   FUGW loss:      0.010221882723271847     dense.py:342
+[16:38:25] BCD step 8/10   FUGW loss:      0.010221882723271847     dense.py:360
            (base)     0.010919460095465183 (entropic)
 
 
-[11:03:26] BCD step 9/10   FUGW loss:      0.0101405568420887       dense.py:342
+[16:38:26] BCD step 9/10   FUGW loss:      0.0101405568420887       dense.py:360
            (base)       0.010853287763893604 (entropic)
 
 
-[11:03:27] BCD step 10/10  FUGW loss:      0.0100807324051857       dense.py:342
+[16:38:27] BCD step 10/10  FUGW loss:      0.0100807324051857       dense.py:360
            (base)       0.01080571860074997 (entropic)
   100% Sparsity mask ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 200/200 0:00:01 &lt; 0:00:00
-/github/workspace/src/fugw/mappings/utils.py:150: UserWarning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
+/github/workspace/src/fugw/utils.py:51: UserWarning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
   return x.to(device, dtype).to_sparse_csr()
 
 
-[11:03:38] BCD step 1/10   FUGW loss:      0.021763041615486145    sparse.py:460
+[16:38:39] BCD step 1/10   FUGW loss:      0.021763041615486145    sparse.py:478
            (base)     0.02189093828201294 (entropic)
 
 
-[11:03:41] BCD step 2/10   FUGW loss:      0.017754876986145973    sparse.py:460
+[16:38:42] BCD step 2/10   FUGW loss:      0.017754876986145973    sparse.py:478
            (base)     0.01801164820790291 (entropic)
 
 
-[11:03:44] BCD step 3/10   FUGW loss:      0.011553710326552391    sparse.py:460
+[16:38:45] BCD step 3/10   FUGW loss:      0.011553710326552391    sparse.py:478
            (base)     0.012020763009786606 (entropic)
 
 
-[11:03:46] BCD step 4/10   FUGW loss:      0.009638299234211445    sparse.py:460
+[16:38:47] BCD step 4/10   FUGW loss:      0.009638299234211445    sparse.py:478
            (base)     0.010233832523226738 (entropic)
 
 
-[11:03:49] BCD step 5/10   FUGW loss:      0.008976257406175137    sparse.py:460
+[16:38:50] BCD step 5/10   FUGW loss:      0.008976257406175137    sparse.py:478
            (base)     0.009645415470004082 (entropic)
 
 
-[11:03:51] BCD step 6/10   FUGW loss:      0.008657296188175678    sparse.py:460
+[16:38:52] BCD step 6/10   FUGW loss:      0.008657296188175678    sparse.py:478
            (base)     0.009374301880598068 (entropic)
 
 
-[11:03:55] BCD step 7/10   FUGW loss:      0.008474555797874928    sparse.py:460
+[16:38:55] BCD step 7/10   FUGW loss:      0.008474555797874928    sparse.py:478
            (base)     0.009225510992109776 (entropic)
 
 
-[11:03:58] BCD step 8/10   FUGW loss:      0.008358475752174854    sparse.py:460
+[16:38:59] BCD step 8/10   FUGW loss:      0.008358475752174854    sparse.py:478
            (base)     0.009134968742728233 (entropic)
 
 
-[11:04:03] BCD step 9/10   FUGW loss:      0.008279440924525261    sparse.py:460
+[16:39:04] BCD step 9/10   FUGW loss:      0.008279440924525261    sparse.py:478
            (base)     0.009075913578271866 (entropic)
 
 
-[11:04:08] BCD step 10/10  FUGW loss:      0.008222405798733234    sparse.py:460
+[16:39:09] BCD step 10/10  FUGW loss:      0.008222405798733234    sparse.py:478
            (base)     0.009034985676407814 (entropic)
 </pre></div>
 </div>
@@ -442,10 +448,10 @@ of the coarse mapping, with and without the entropic term:</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html#matplotlib.axes.Axes.set_title" title="matplotlib.axes.Axes.set_title" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span></a><span class="p">(</span><span class="s2">&quot;Coarse mapping training loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html#matplotlib.axes.Axes.set_ylabel" title="matplotlib.axes.Axes.set_ylabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span></a><span class="p">(</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html#matplotlib.axes.Axes.set_xlabel" title="matplotlib.axes.Axes.set_xlabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span></a><span class="p">(</span><span class="s2">&quot;BCD step&quot;</span><span class="p">)</span>
-<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">.</span><span class="n">loss_</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW loss&quot;</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span>
     <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span>
-    <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">.</span><span class="n">loss_ent</span><span class="p">,</span>
+    <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">.</span><span class="n">loss_entropic</span><span class="p">,</span>
     <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW entropic loss&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.legend.html#matplotlib.axes.Axes.legend" title="matplotlib.axes.Axes.legend" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">legend</span></a><span class="p">()</span>
@@ -457,9 +463,11 @@ of the coarse mapping, with and without the entropic term:</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html#matplotlib.axes.Axes.set_title" title="matplotlib.axes.Axes.set_title" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span></a><span class="p">(</span><span class="s2">&quot;Fine-grained mapping training loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html#matplotlib.axes.Axes.set_ylabel" title="matplotlib.axes.Axes.set_ylabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span></a><span class="p">(</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html#matplotlib.axes.Axes.set_xlabel" title="matplotlib.axes.Axes.set_xlabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span></a><span class="p">(</span><span class="s2">&quot;BCD step&quot;</span><span class="p">)</span>
-<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">loss_</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW loss&quot;</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span>
-    <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">loss_ent_</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW entropic loss&quot;</span>
+    <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span>
+    <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">loss_entropic</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;FUGW entropic loss&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.legend.html#matplotlib.axes.Axes.legend" title="matplotlib.axes.Axes.legend" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">legend</span></a><span class="p">()</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
@@ -545,8 +553,8 @@ between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  53.786 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  1536 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  55.815 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  1544 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-2-2-coarse-to-fine-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/400739f84596661dbde0701b2a6ac605/plot_2_2_coarse_to_fine.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_2_2_coarse_to_fine.py</span></code></a></p>

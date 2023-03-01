@@ -36,7 +36,7 @@ have less than 10k points.
     import torch
 
     from fugw.mappings import FUGW
-    from fugw.mappings.utils import init_mock_distribution
+    from fugw.utils import init_mock_distribution
     from matplotlib.collections import LineCollection
 
 
@@ -219,7 +219,7 @@ using a sinkhorn solver
         target_features_train_normalized,
         source_geometry=source_geometry_normalized,
         target_geometry=target_geometry_normalized,
-        uot_solver="sinkhorn",
+        solver="sinkhorn",
         verbose=True,
     )
 
@@ -233,43 +233,43 @@ using a sinkhorn solver
 
 
 
-    [11:03:11] BCD step 1/10   FUGW loss:      0.07106098532676697      dense.py:342
+    [16:38:06] BCD step 1/10   FUGW loss:      0.07106098532676697      dense.py:360
                (base)      0.0716898962855339 (entropic)                            
 
 
-    [11:03:12] BCD step 2/10   FUGW loss:      0.06062595546245575      dense.py:342
+    [16:38:07] BCD step 2/10   FUGW loss:      0.06062595546245575      dense.py:360
                (base)      0.06126530095934868 (entropic)                           
 
 
-               BCD step 3/10   FUGW loss:      0.05847756192088127      dense.py:342
+               BCD step 3/10   FUGW loss:      0.05847756192088127      dense.py:360
                (base)      0.05912858247756958 (entropic)                           
 
 
-               BCD step 4/10   FUGW loss:      0.0584559366106987       dense.py:342
+               BCD step 4/10   FUGW loss:      0.0584559366106987       dense.py:360
                (base)       0.059106577187776566 (entropic)                         
 
 
-    [11:03:13] BCD step 5/10   FUGW loss:      0.05841211974620819      dense.py:342
+    [16:38:08] BCD step 5/10   FUGW loss:      0.05841211974620819      dense.py:360
                (base)      0.059064075350761414 (entropic)                          
 
 
-               BCD step 6/10   FUGW loss:      0.0584060437977314       dense.py:342
+               BCD step 6/10   FUGW loss:      0.0584060437977314       dense.py:360
                (base)       0.059058528393507004 (entropic)                         
 
 
-    [11:03:14] BCD step 7/10   FUGW loss:      0.058397069573402405     dense.py:342
+    [16:38:09] BCD step 7/10   FUGW loss:      0.058397069573402405     dense.py:360
                (base)     0.05904938280582428 (entropic)                            
 
 
-               BCD step 8/10   FUGW loss:      0.058390866965055466     dense.py:342
+               BCD step 8/10   FUGW loss:      0.058390866965055466     dense.py:360
                (base)     0.05904326215386391 (entropic)                            
 
 
-    [11:03:15] BCD step 9/10   FUGW loss:      0.05838455259799957      dense.py:342
+    [16:38:10] BCD step 9/10   FUGW loss:      0.05838455259799957      dense.py:360
                (base)      0.05903756245970726 (entropic)                           
 
 
-               BCD step 10/10  FUGW loss:      0.05838431790471077      dense.py:342
+               BCD step 10/10  FUGW loss:      0.05838431790471077      dense.py:360
                (base)      0.059037402272224426 (entropic)                          
 
 
@@ -313,8 +313,8 @@ with and without the entropic term:
     ax.set_title("Mapping training loss")
     ax.set_ylabel("Loss")
     ax.set_xlabel("BCD step")
-    ax.plot(mapping.loss_steps, mapping.loss_, label="FUGW loss")
-    ax.plot(mapping.loss_steps, mapping.loss_ent, label="FUGW entropic loss")
+    ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
+    ax.plot(mapping.loss_steps, mapping.loss_entropic, label="FUGW entropic loss")
     ax.legend()
     plt.show()
 
@@ -458,9 +458,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.348 seconds)
+   **Total running time of the script:** ( 0 minutes  8.031 seconds)
 
-**Estimated memory usage:**  271 MB
+**Estimated memory usage:**  270 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_1_dense.py:

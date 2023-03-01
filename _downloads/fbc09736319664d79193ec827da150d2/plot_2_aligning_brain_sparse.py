@@ -15,8 +15,9 @@ hyper-parameters and solver parameters, it takes less than
 10 minutes to compute a mapping between 2 such distributions
 using a V100 Nvidia GPU.
 
-**Before reading this tutorial, you should first go through
-:ref:`_sphx_glr_auto_examples_00_basics_plot_1_aligning_brain_dense.py`**,
+**Before reading this tutorial, you should first go through**
+:ref:`the example aligning brain data at a low-resolution
+<sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py>`,
 which explains the ropes of brain alignment in more detail
 than this example.
 In the current example, we focus more on how to use this package
@@ -39,7 +40,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from nilearn import datasets, image, plotting, surface
 from scipy.sparse import coo_matrix
 
-##############################################################################
+# %%
 # Let's download 5 volumetric contrast maps per individual
 # using ``nilearn``'s API. We will use the first 4 of them
 # to compute an alignment between the source and target subjects,
@@ -69,7 +70,6 @@ source_imgs_paths = brain_data["cmaps"][0 : len(contrasts)]
 target_imgs_paths = brain_data["cmaps"][len(contrasts) : 2 * len(contrasts)]
 
 # %%
-##############################################################################
 # Here is what the first contrast map of the source subject looks like
 # (the following figure is interactive):
 
@@ -82,7 +82,6 @@ plotting.view_img(
 )
 
 # %%
-##############################################################################
 # Computing feature arrays
 # ------------------------
 # Let's project these 4 maps to a mesh of the cortical surface
@@ -94,7 +93,7 @@ plotting.view_img(
 
 fsaverage5 = datasets.fetch_surf_fsaverage(mesh="fsaverage5")
 
-##############################################################################
+# %%
 
 
 def load_images_and_project_to_surface(image_paths):
@@ -114,7 +113,6 @@ source_features.shape
 
 
 # %%
-##############################################################################
 # Here is a figure showing the 4 projected maps for each of
 # the 2 individuals:
 
@@ -178,7 +176,6 @@ plt.show()
 
 
 # %%
-##############################################################################
 # Estimating geometry kernel matrices
 # -----------------------------------
 # This time, let's assume matrices of size ``(n, n)`` (or ``(n, m)``,
@@ -211,7 +208,6 @@ target_geometry_embeddings = fs5_pial_left_geometry_embeddings
 source_geometry_embeddings.shape
 
 # %%
-##############################################################################
 # Each line ``vertex_index`` of the geometry matrices contains the anatomical
 # distance (here in millimeters) from ``vertex_index`` to all other vertices
 # of the mesh.
@@ -234,7 +230,6 @@ plot_surface_map(
 plt.show()
 
 # %%
-##############################################################################
 # Normalizing features and geometries
 # -----------------------------------
 # Features and embeddings should be normalized before we can train a mapping.
@@ -259,7 +254,6 @@ target_embeddings_normalized, target_distance_max = (
 )
 
 # %%
-##############################################################################
 # Training the mapping
 # --------------------
 # Let's create our mappings. We will need 2 of them: one for computing
@@ -269,22 +263,20 @@ target_embeddings_normalized, target_distance_max = (
 # Note that the 2 solvers can use different parameters.
 
 coarse_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
-fine_mapping = FUGWSparse(alpha=0.5, rho=1, eps=1e-4)
-
-coarse_mapping_fit_params = {
-    "uot_solver": "mm",
+coarse_mapping_solver = "mm"
+coarse_mapping_solver_params = {
     "nits_bcd": 5,
     "tol_uot": 1e-10,
 }
 
-fine_mapping_fit_params = {
-    "uot_solver": "mm",
+fine_mapping = FUGWSparse(alpha=0.5, rho=1, eps=1e-4)
+fine_mapping_solver = "mm"
+fine_mapping_solver_params = {
     "nits_bcd": 3,
     "tol_uot": 1e-10,
 }
 
 # %%
-##############################################################################
 # Let's fit our mappings! Remember to use the training maps only.
 # Moreover, note the importance of ``source_selection_radius`` and
 # ``target_selection_radius``. Their meaning is the following:
@@ -302,26 +294,33 @@ fine_mapping_fit_params = {
 t0 = time.time()
 
 source_sample, target_sample = coarse_to_fine.fit(
-    coarse_mapping=coarse_mapping,
-    coarse_mapping_fit_params=coarse_mapping_fit_params,
-    coarse_pairs_selection_method="topk",
-    source_selection_radius=10 / source_distance_max,
-    target_selection_radius=10 / target_distance_max,
-    fine_mapping=fine_mapping,
-    fine_mapping_fit_params=fine_mapping_fit_params,
-    source_sample_size=1000,
-    target_sample_size=1000,
+    # Source and target's features and embeddings
     source_features=source_features_normalized[:n_training_contrasts, :],
     target_features=target_features_normalized[:n_training_contrasts, :],
     source_geometry_embeddings=source_embeddings_normalized,
     target_geometry_embeddings=target_embeddings_normalized,
+    # Parametrize step 1 (coarse alignment between source and target)
+    source_sample_size=1000,
+    target_sample_size=1000,
+    coarse_mapping=coarse_mapping,
+    coarse_mapping_solver=coarse_mapping_solver,
+    coarse_mapping_solver_params=coarse_mapping_solver_params,
+    # Parametrize step 2 (selection of pairs of indices present in
+    # fine-grained's sparsity mask)
+    coarse_pairs_selection_method="topk",
+    source_selection_radius=10 / source_distance_max,
+    target_selection_radius=10 / target_distance_max,
+    # Parametrize step 3 (fine-grained alignment)
+    fine_mapping=fine_mapping,
+    fine_mapping_solver=fine_mapping_solver,
+    fine_mapping_solver_params=fine_mapping_solver_params,
+    # Misc
     verbose=True,
 )
 
 t1 = time.time()
 
 # %%
-##############################################################################
 # Here is the evolution of the FUGW loss while traning of the coarse mapping,
 # with and without the entropic term. As you can see, we most likely
 # stopped fitting the coarse mapping too early, yet it is probably enough
@@ -331,32 +330,32 @@ fig, ax = plt.subplots(figsize=(4, 4))
 ax.set_title("Coarse mapping's training loss")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(coarse_mapping.loss_steps, coarse_mapping.loss_, label="FUGW loss")
+ax.plot(coarse_mapping.loss_steps, coarse_mapping.loss, label="FUGW loss")
 ax.plot(
     coarse_mapping.loss_steps,
-    coarse_mapping.loss_ent,
+    coarse_mapping.loss_entropic,
     label="FUGW entropic loss",
 )
 ax.legend()
 plt.show()
 
 # %%
-##############################################################################
 # Here is that of the fine-grained mapping:
 
 fig, ax = plt.subplots(figsize=(4, 4))
 ax.set_title("Fine mapping's training loss")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(fine_mapping.loss_steps, fine_mapping.loss_, label="FUGW loss")
+ax.plot(fine_mapping.loss_steps, fine_mapping.loss, label="FUGW loss")
 ax.plot(
-    fine_mapping.loss_steps, fine_mapping.loss_ent_, label="FUGW entropic loss"
+    fine_mapping.loss_steps,
+    fine_mapping.loss_entropic,
+    label="FUGW entropic loss",
 )
 ax.legend()
 plt.show()
 
 # %%
-##############################################################################
 # Note how few iterations are neede for the fine-grained model to converge
 # compared to the coarse one, although the coarse model usually runs much
 # faster (in total time) than the fine-grained one.
@@ -365,7 +364,6 @@ plt.show()
 print(f"Total training time: {t1 - t0:.1f}s")
 
 # %%
-##############################################################################
 # One can also inspect the sampled vertices used to derive the coarse mapping.
 # Note that a poor sampling of some cortical areas can have really bad
 # consequences on the fine-grained mapping, in which case you should probably
@@ -394,7 +392,6 @@ plot_surface_map(
 plt.show()
 
 # %%
-##############################################################################
 # Using the computed mappings
 # ---------------------------
 # In this example, the transport plan of the coarse mapping
@@ -413,7 +410,6 @@ plt.colorbar(im, ax=ax, shrink=0.8)
 plt.show()
 
 # %%
-##############################################################################
 # However, we can visualize the sparse transport plan computed by the
 # fine-grained mapping, which is much more informative.
 # Indeed, it exhibits some structure because the source and target meshes
@@ -438,7 +434,6 @@ plt.spy(fine_mapping_as_scipy_coo, precision="present", markersize=0.01)
 plt.show()
 
 # %%
-##############################################################################
 # In this example, the computed sparse transport plan is quite sparse:
 # it stores about 0.5% of what the equivalent dense transport plan
 # would store.
@@ -447,7 +442,6 @@ plt.show()
 
 
 # %%
-##############################################################################
 # Each line ``vertex_index`` of the computed mapping can be interpreted as
 # a probability map describing which vertices of the target
 # should be mapped with the source vertex ``vertex_index``.
@@ -470,7 +464,6 @@ plot_surface_map(probability_map, cmap="viridis", axes=ax)
 plt.show()
 
 # %%
-##############################################################################
 # Using ``mapping.transform()``,
 # we can use the computed mapping to transport any collection of feature maps
 # from the source anatomy onto the target anatomy.
@@ -484,7 +477,6 @@ predicted_target_features = fine_mapping.transform(
 predicted_target_features.shape
 
 # %%
-##############################################################################
 
 fig = plt.figure(figsize=(3 * 3, 3))
 fig.suptitle("Transporting feature maps of the training set")
@@ -509,7 +501,6 @@ plot_surface_map(
 plt.show()
 
 # %%
-##############################################################################
 # Here, we transported a feature map which is part of the traning set,
 # which does not really help evaluate the quality of our model.
 # Instead, we can also use the computed mapping to transport unseen data,
@@ -542,5 +533,3 @@ plot_surface_map(
 )
 
 plt.show()
-
-# %%

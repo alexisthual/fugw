@@ -15,11 +15,11 @@ computed in the right dimension can probably estimate it.
 # sphinx_gallery_thumbnail_number = 1
 import gdist
 import matplotlib.pyplot as plt
-import meshzoo
 import numpy as np
 import torch
 
 from fugw.scripts import lmds
+from nilearn import datasets, surface
 
 # %%
 # Here, we will compute the exact geodesic distances from
@@ -32,7 +32,8 @@ k = 3
 
 # %%
 # Let us load a pre-computed mesh and have a look at it first
-coordinates, triangles = meshzoo.octa_sphere(10)
+fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
+coordinates, triangles = surface.load_surf_mesh(fsaverage3.pial_left)
 coordinates.shape
 
 # %%
