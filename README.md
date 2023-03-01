@@ -21,12 +21,6 @@ In a dedicated Python env, run:
 pip install fugw
 ```
 
-If you need to call functions within `fugw.scripts`, you should also run
-
-```bash
-pip install "fugw[scripts]"
-```
-
 ### From source
 
 ```bash

@@ -1,9 +1,9 @@
-import meshzoo
 import numpy as np
 import pytest
 import torch
 
 from fugw.scripts import lmds
+from nilearn import datasets, surface
 
 np.random.seed(0)
 torch.manual_seed(0)
@@ -16,7 +16,8 @@ numpy_inputs = [True, False]
 
 @pytest.mark.parametrize("numpy_inputs", numpy_inputs)
 def test_lmds(numpy_inputs):
-    coordinates, triangles = meshzoo.octa_sphere(6)
+    fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
+    coordinates, triangles = surface.load_surf_mesh(fsaverage3.pial_left)
 
     if numpy_inputs is False:
         coordinates = torch.from_numpy(coordinates)
