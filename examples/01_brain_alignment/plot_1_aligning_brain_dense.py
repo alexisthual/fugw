@@ -222,7 +222,9 @@ target_geometry_normalized = target_geometry / np.max(target_geometry)
 mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 
 # %%
-# Let's fit our mapping! Remember to use the training maps only.
+# Let's fit our mapping! 🚀
+#
+# Remember to use the training maps only.
 # Moreover, we limit the number of block-coordinate-descent
 # iterations to 3 in order to limit computation time for this example.
 
