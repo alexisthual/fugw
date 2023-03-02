@@ -32,13 +32,23 @@ def get_progress(**kwargs):
     )
 
 
-def make_tensor(x, device=None, dtype=torch.float32):
+def make_tensor(x, device=None, dtype=None):
     if isinstance(x, np.ndarray):
-        return torch.tensor(x).to(device, dtype)
+        tensor = torch.tensor(x)
     elif isinstance(x, torch.Tensor):
-        return x.to(device, dtype)
+        tensor = x
     else:
         raise Exception(f"Expected np.ndarray or torch.Tensor, got {type(x)}")
+
+    # By default, cast x to float32 or int32
+    # depending on its original type
+    if dtype is None:
+        if tensor.is_floating_point():
+            dtype = torch.float32
+        else:
+            dtype = torch.int32
+
+    return tensor.to(device=device, dtype=dtype)
 
 
 def make_sparse_csr_tensor(x, device=None, dtype=torch.float32):

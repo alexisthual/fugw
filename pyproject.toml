@@ -23,6 +23,8 @@ dependencies = [
   "numpy>=1.20",
   "torch>=1.13",
   "rich>=13.3.1",
+  "scikit-learn",
+  "scipy",
   "tvb-gdist>=2.1.1",
 ]
 
@@ -36,13 +38,14 @@ dev = [
 doc = [
   "furo>=2022.12.07",
   "fugw[test]",
+  "kaleido",
   "m2r2",
   "matplotlib",
   "memory_profiler",
   "myst_parser",
   "numpydoc",
   "pillow",
-  "scipy",
+  "plotly",
   "sphinx==5.3.0",
   "sphinx-copybutton",
   "sphinx-gallery>=0.11.1",

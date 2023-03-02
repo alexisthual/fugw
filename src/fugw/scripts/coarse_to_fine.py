@@ -4,6 +4,8 @@ import numpy as np
 import torch
 
 from fugw.utils import get_progress, make_tensor
+from scipy.sparse import coo_matrix
+from sklearn.cluster import AgglomerativeClustering
 
 
 def random_normalizing(X, sample_size=100, repeats=10):
@@ -43,6 +45,69 @@ def random_normalizing(X, sample_size=100, repeats=10):
     return X_normalized, d_max.item()
 
 
+def mesh_connectivity_matrix(coordinates, triangles):
+    """
+    Compute sparse matrix representing edges of a given mesh.
+
+    Parameters
+    ----------
+    coordinates: ndarray of size (n, k)
+    triangles: ndarray of size (e, 3)
+
+    Returns
+    -------
+    connectivity: sparse coo matrix of size (n, n)
+    """
+    n_vertices = coordinates.shape[0]
+    edges = np.hstack(
+        (
+            np.vstack((triangles[:, 0], triangles[:, 1])),
+            np.vstack((triangles[:, 0], triangles[:, 2])),
+            np.vstack((triangles[:, 1], triangles[:, 0])),
+            np.vstack((triangles[:, 1], triangles[:, 2])),
+            np.vstack((triangles[:, 2], triangles[:, 0])),
+            np.vstack((triangles[:, 2], triangles[:, 1])),
+        )
+    )
+    weights = np.ones(edges.shape[1])
+
+    # Divide data by 2 since all edges i -> j are counted twice
+    # because they all belong to exactly two triangles on the mesh
+    connectivity = (
+        coo_matrix((weights, edges), (n_vertices, n_vertices)).tocsr() / 2
+    )
+
+    # Force symmetry
+    connectivity = (connectivity + connectivity.T) / 2
+
+    return connectivity
+
+
+def sample_mesh_uniformly(
+    coordinates, triangles, embeddings=None, n_samples=100
+):
+    if embeddings is None:
+        embeddings = np.ones(coordinates.shape[0]).reshape(-1, 1)
+
+    connectivity = mesh_connectivity_matrix(coordinates, triangles)
+
+    ward = AgglomerativeClustering(
+        n_clusters=n_samples,
+        connectivity=connectivity,
+        linkage="ward",
+    )
+    ward.fit_predict(embeddings)
+
+    naive_samples = np.hstack(
+        [
+            np.random.choice(np.argwhere(ward.labels_ == label).flatten(), 1)
+            for label in range(n_samples)
+        ]
+    ).astype(np.int32)
+
+    return naive_samples
+
+
 def fit(
     coarse_mapping=None,
     coarse_mapping_solver="mm",
@@ -53,8 +118,8 @@ def fit(
     fine_mapping=None,
     fine_mapping_solver="mm",
     fine_mapping_solver_params={},
-    source_sample_size=None,
-    target_sample_size=None,
+    source_sample=None,
+    target_sample=None,
     source_features=None,
     target_features=None,
     source_geometry_embeddings=None,
@@ -96,12 +161,12 @@ def fit(
     fine_mapping_solver_params: dict
         Parameters to give to the `.fit()` method
         of the fine-scale model
-    source_sample_size: int
-        Number of vertices to sample from source
-        for coarse step
-    target_sample_size: int
-        Number of vertices to sample from target
-        for coarse step
+    source_sample: array of size (n1, )
+        Indices of vertices sampled on source distribution
+        which will be used when fitting the coarse mapping
+    target_sample: array of size (m1, )
+        Indices of vertices sampled on target distribution
+        which will be used when fitting the coarse mapping
     source_features: ndarray(n_features, n)
         Feature maps for source subject.
         n_features is the number of contrast maps, it should
@@ -140,13 +205,8 @@ def fit(
         Tensor containing the indices which were sampled on the
         target so as to compute the coarse mapping.
     """
-    # Sub-sample source and target distributions
-    source_sample = torch.randperm(source_geometry_embeddings.shape[0])[
-        :source_sample_size
-    ]
-    target_sample = torch.randperm(target_geometry_embeddings.shape[0])[
-        :target_sample_size
-    ]
+    source_sample = make_tensor(source_sample, dtype=torch.int64)
+    target_sample = make_tensor(target_sample, dtype=torch.int64)
 
     source_geometry_embeddings = make_tensor(source_geometry_embeddings)
     target_geometry_embeddings = make_tensor(target_geometry_embeddings)
@@ -209,14 +269,14 @@ def fit(
         # which are particularly unbalanced)
         rows = np.concatenate(
             [
-                np.arange(source_sample_size),
+                np.arange(source_sample.shape[0]),
                 np.argmax(coarse_mapping.pi, axis=0),
             ]
         )
         cols = np.concatenate(
             [
                 np.argmax(coarse_mapping.pi, axis=1),
-                np.arange(target_sample_size),
+                np.arange(target_sample.shape[0]),
             ]
         )
 

@@ -7,6 +7,7 @@ import torch
 from fugw.scripts import coarse_to_fine
 from fugw.mappings import FUGW, FUGWSparse
 from fugw.utils import init_mock_distribution
+from nilearn import datasets, surface
 
 np.random.seed(0)
 torch.manual_seed(0)
@@ -38,6 +39,20 @@ def test_random_normalizing(return_numpy):
     assert embeddings_normalized.shape == embeddings.shape
 
 
+def test_uniform_mesh_sampling():
+    fsaverage = datasets.fetch_surf_fsaverage(mesh="fsaverage4")
+    coordinates, triangles = surface.load_surf_mesh(fsaverage.pial_left)
+
+    n_samples = 104
+    sample = coarse_to_fine.sample_mesh_uniformly(
+        coordinates, triangles, n_samples=n_samples
+    )
+
+    assert sample.shape == (n_samples,)
+    # All sampled indices should be different
+    assert np.unique(sample).shape == (n_samples,)
+
+
 @pytest.mark.parametrize(
     "device,return_numpy", product(devices, return_numpys)
 )
@@ -55,13 +70,17 @@ def test_coarse_to_fine(device, return_numpy):
     fine_mapping = FUGWSparse()
     fine_mapping_solver = "mm"
 
+    # Sub-sample source and target distributions
+    source_sample = torch.randperm(n_voxels_source)[:n_samples_source]
+    target_sample = torch.randperm(n_voxels_target)[:n_samples_target]
+
     source_sample, target_sample = coarse_to_fine.fit(
         coarse_mapping=coarse_mapping,
         coarse_mapping_solver=coarse_mapping_solver,
         fine_mapping=fine_mapping,
         fine_mapping_solver=fine_mapping_solver,
-        source_sample_size=n_samples_source,
-        target_sample_size=n_samples_target,
+        source_sample=source_sample,
+        target_sample=target_sample,
         source_features=source_features,
         target_features=target_features,
         source_geometry_embeddings=source_embeddings,
@@ -71,9 +90,6 @@ def test_coarse_to_fine(device, return_numpy):
 
     assert coarse_mapping.pi.shape == (n_samples_source, n_samples_target)
     assert fine_mapping.pi.shape == (n_voxels_source, n_voxels_target)
-
-    assert source_sample.shape == (n_samples_source,)
-    assert target_sample.shape == (n_samples_target,)
 
     # Use trained model to transport new features
     # 1. with numpy arrays

@@ -1,7 +1,8 @@
 # Fused Unbalanced Gromov-Wasserstein for Python
 
-![python version](https://img.shields.io/badge/python-3.7_|_3.8_|_3.9_|_3.10_|_3.11-blue?style=for-the-badge)
 ![build](https://img.shields.io/github/actions/workflow/status/alexisthual/fugw/unit_tests.yml?event=push&style=for-the-badge)
+![python version](https://img.shields.io/badge/python-3.7_|_3.8_|_3.9_|_3.10_|_3.11-blue?style=for-the-badge)
+![license](https://img.shields.io/github/license/alexisthual/fugw?style=for-the-badge)
 ![code style](https://img.shields.io/badge/code_style-black-black?style=for-the-badge)
 
 This package implements multiple GPU-compatible PyTorch solvers
@@ -12,7 +13,7 @@ won't change in the near future.**
 
 ## Installation
 
-**You might need to use an up-to-date version of `pip` to install this package**.
+**To install this package, make sure you have an up-to-date version of** `pip`.
 
 ### From PyPI
 

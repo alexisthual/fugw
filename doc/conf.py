@@ -1,5 +1,6 @@
 import datetime
 import os
+import plotly.io as pio
 import sys
 
 from sphinx_gallery.sorting import FileNameSortKey
@@ -264,7 +265,9 @@ intersphinx_mapping = {
     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
 }
 
+# Sphinx-gallery config
 plot_gallery = True
+pio.renderers.default = "sphinx_gallery"
 
 sphinx_gallery_conf = {
     "backreferences_dir": "modules/generated",
