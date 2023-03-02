@@ -1,3 +1,3 @@
 ==================
-Brain alignment 🧠
+🧠 Brain alignment
 ==================
