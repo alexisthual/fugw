@@ -25,7 +25,7 @@ to align data using real-life resolutions.
 
 """
 
-# sphinx_gallery_thumbnail_number = 8
+# sphinx_gallery_thumbnail_number = 2
 import copy
 import time
 
