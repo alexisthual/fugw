@@ -2,9 +2,9 @@
 
 .. _sphx_glr_auto_examples_00_basics:
 
-======
-Basics
-======
+=========
+Basics 📚
+=========
 
 
 

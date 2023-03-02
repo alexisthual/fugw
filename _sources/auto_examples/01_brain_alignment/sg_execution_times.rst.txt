@@ -5,10 +5,10 @@
 
 Computation times
 =================
-**06:16.258** total execution time for **auto_examples_01_brain_alignment** files:
+**07:09.772** total execution time for **auto_examples_01_brain_alignment** files:
 
 +------------------------------------------------------------------------------------------------------------------------+-----------+----------+
-| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py` (``plot_1_aligning_brain_dense.py``)   | 03:08.347 | 215.3 MB |
+| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_2_aligning_brain_sparse.py` (``plot_2_aligning_brain_sparse.py``) | 03:35.546 | 732.3 MB |
 +------------------------------------------------------------------------------------------------------------------------+-----------+----------+
-| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_2_aligning_brain_sparse.py` (``plot_2_aligning_brain_sparse.py``) | 03:07.912 | 740.8 MB |
+| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py` (``plot_1_aligning_brain_dense.py``)   | 03:34.226 | 234.0 MB |
 +------------------------------------------------------------------------------------------------------------------------+-----------+----------+

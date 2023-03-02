@@ -163,13 +163,13 @@
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../pages/introduction.html">Introduction</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Basics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Basics 📚</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="plot_1_dense.html">Transport distributions using dense solvers</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Generate embeddings from mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_2_2_coarse_to_fine.html">Transport distributions using sparse solvers</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../01_brain_alignment/index.html">Brain alignment</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../01_brain_alignment/index.html">Brain alignment 🧠</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_1_aligning_brain_dense.html">Align brain surfaces of 2 individuals with fMRI data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_2_aligning_brain_sparse.html">Align high-resolution brain surfaces of 2 individuals with fMRI data</a></li>
 </ul>
@@ -269,7 +269,7 @@ The derived embedding will be in dimension <code class="docutils literal notrans
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dataset created in /github/home/nilearn_data/fsaverage3
 
 Downloading data from https://osf.io/asvjk/download ...
- ...done. (2 seconds, 0 min)
+ ...done. (1 seconds, 0 min)
 Extracting data from /github/home/nilearn_data/fsaverage3/b9ce491b47822c5b4950eeeb75d15a92/download..... done.
 
 (642, 3)
@@ -297,9 +297,10 @@ Extracting data from /github/home/nilearn_data/fsaverage3/b9ce491b47822c5b4950ee
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  100% Geodesic_distances for landmarks ━━━━━━━━━━━━━━ 100/100 0:00:01 &lt; 0:00:00
-/github/workspace/src/fugw/scripts/lmds.py:161: UserWarning: A might not be centered (1.8740234375 &gt; 0.001)
-  warnings.warn(f&quot;A might not be centered ({t} &gt; {tol})&quot;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  100% Geodesic_distances for landmarks ━━━━━━━━━━━━━━ 100/100 0:00:02 &lt; 0:00:00
+/github/workspace/src/fugw/scripts/lmds.py:161: UserWarning:
+
+A might not be centered (1.8740234375 &gt; 0.001)
 </pre></div>
 </div>
 <p>It should have the correct size</p>
@@ -342,8 +343,8 @@ is well approximated by the kernel matrix derived from the embeddings:</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_2_1_lmds_003.png" srcset="../../_images/sphx_glr_plot_2_1_lmds_003.png" alt="True matrix of geodesic distances, Approximated matrix of geodesic distances" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.079 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  160 MB</p>
+<img src="../../_images/sphx_glr_plot_2_1_lmds_003.png" srcset="../../_images/sphx_glr_plot_2_1_lmds_003.png" alt="True matrix of geodesic distances, Approximated matrix of geodesic distances" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.241 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  155 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-2-1-lmds-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/545a55507fc13d508b1b0e8d6dd28609/plot_2_1_lmds.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_2_1_lmds.py</span></code></a></p>

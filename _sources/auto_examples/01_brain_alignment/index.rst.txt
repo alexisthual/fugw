@@ -2,9 +2,9 @@
 
 .. _sphx_glr_auto_examples_01_brain_alignment:
 
-===============
-Brain alignment
-===============
+==================
+Brain alignment 🧠
+==================
 
 
 

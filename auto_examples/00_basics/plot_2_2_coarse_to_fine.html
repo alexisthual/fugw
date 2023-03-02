@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Brain alignment" href="../01_brain_alignment/index.html" /><link rel="prev" title="Generate embeddings from mesh" href="plot_2_1_lmds.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Brain alignment 🧠" href="../01_brain_alignment/index.html" /><link rel="prev" title="Generate embeddings from mesh" href="plot_2_1_lmds.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>Transport distributions using sparse solvers - FUGW</title>
@@ -163,13 +163,13 @@
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../pages/introduction.html">Introduction</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Basics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Basics 📚</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="plot_1_dense.html">Transport distributions using dense solvers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_2_1_lmds.html">Generate embeddings from mesh</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Transport distributions using sparse solvers</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../01_brain_alignment/index.html">Brain alignment</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../01_brain_alignment/index.html">Brain alignment 🧠</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_1_aligning_brain_dense.html">Align brain surfaces of 2 individuals with fMRI data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_2_aligning_brain_sparse.html">Align high-resolution brain surfaces of 2 individuals with fMRI data</a></li>
 </ul>
@@ -268,8 +268,9 @@ have more than 10k points.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:250: UserWarning: Singular sample detected.
-  warnings.warn(&quot;Singular sample detected.&quot;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:250: UserWarning:
+
+Singular sample detected.
 </pre></div>
 </div>
 <p>We can visualize the generated features:</p>
@@ -317,20 +318,25 @@ We also specify which solver to use at each of the 2 steps:</p>
 </div>
 <p>Now, let us fit both the coarse and fine-grained mappings.
 The coarse mapping is fitted on a limited number
-of points from the source and target distributions.
+of points from the source and target distributions,
+which we sample randomly in this example.
 You should carefully set the source and target <code class="docutils literal notranslate"><span class="pre">selection_radius</span></code>
 as they will greatly affect the sparsity of the computed mappings.
 They should usally be set using domain knowledge related to the distributions
 you are trying to align.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">coarse_to_fine</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sub-sample source and target distributions</span>
+<span class="n">source_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">n_points_source</span><span class="p">)[:</span><span class="n">n_samples_source</span><span class="p">]</span>
+<span class="n">target_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">n_points_target</span><span class="p">)[:</span><span class="n">n_samples_target</span><span class="p">]</span>
+
+<span class="n">coarse_to_fine</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
     <span class="c1"># Source and target&#39;s features and embeddings</span>
     <span class="n">source_features</span><span class="o">=</span><span class="n">source_features_train_normalized</span><span class="p">,</span>
     <span class="n">target_features</span><span class="o">=</span><span class="n">target_features_train_normalized</span><span class="p">,</span>
     <span class="n">source_geometry_embeddings</span><span class="o">=</span><span class="n">source_embeddings_normalized</span><span class="p">,</span>
     <span class="n">target_geometry_embeddings</span><span class="o">=</span><span class="n">target_embeddings_normalized</span><span class="p">,</span>
     <span class="c1"># Parametrize step 1 (coarse alignment between source and target)</span>
-    <span class="n">source_sample_size</span><span class="o">=</span><span class="n">n_samples_source</span><span class="p">,</span>
-    <span class="n">target_sample_size</span><span class="o">=</span><span class="n">n_samples_target</span><span class="p">,</span>
+    <span class="n">source_sample</span><span class="o">=</span><span class="n">source_sample</span><span class="p">,</span>
+    <span class="n">target_sample</span><span class="o">=</span><span class="n">target_sample</span><span class="p">,</span>
     <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">=</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="p">,</span>
     <span class="n">coarse_mapping_solver</span><span class="o">=</span><span class="n">coarse_mapping_solver</span><span class="p">,</span>
     <span class="n">coarse_mapping_solver_params</span><span class="o">=</span><span class="n">coarse_mapping_solver_params</span><span class="p">,</span>
@@ -348,15 +354,15 @@ you are trying to align.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:09:33] BCD step 1/10   FUGW loss:      0.03198949992656708      dense.py:360
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[22:11:15] BCD step 1/10   FUGW loss:      0.03198949992656708      dense.py:360
            (base)      0.032095134258270264 (entropic)
 
 
-[21:09:34] BCD step 2/10   FUGW loss:      0.027364276349544525     dense.py:360
+           BCD step 2/10   FUGW loss:      0.027364276349544525     dense.py:360
            (base)     0.027612881734967232 (entropic)
 
 
-           BCD step 3/10   FUGW loss:      0.017961936071515083     dense.py:360
+[22:11:16] BCD step 3/10   FUGW loss:      0.017961936071515083     dense.py:360
            (base)     0.01844286173582077 (entropic)
 
 
@@ -364,71 +370,89 @@ you are trying to align.</p>
            (base)     0.015796463936567307 (entropic)
 
 
-[21:09:35] BCD step 5/10   FUGW loss:      0.014496020041406155     dense.py:360
+           BCD step 5/10   FUGW loss:      0.014496020041406155     dense.py:360
            (base)     0.015153813175857067 (entropic)
 
 
-           BCD step 6/10   FUGW loss:      0.014186171814799309     dense.py:360
+[22:11:17] BCD step 6/10   FUGW loss:      0.014186171814799309     dense.py:360
            (base)     0.014875920489430428 (entropic)
 
 
-[21:09:36] BCD step 7/10   FUGW loss:      0.014005331322550774     dense.py:360
+[22:11:18] BCD step 7/10   FUGW loss:      0.014005331322550774     dense.py:360
            (base)     0.01471529621630907 (entropic)
 
 
-[21:09:37] BCD step 8/10   FUGW loss:      0.013867946341633797     dense.py:360
+[22:11:19] BCD step 8/10   FUGW loss:      0.013867946341633797     dense.py:360
            (base)     0.014592503197491169 (entropic)
 
 
-[21:09:38] BCD step 9/10   FUGW loss:      0.013740603812038898     dense.py:360
+[22:11:20] BCD step 9/10   FUGW loss:      0.013740603812038898     dense.py:360
            (base)     0.014477620832622051 (entropic)
 
 
-[21:09:39] BCD step 10/10  FUGW loss:      0.013632165268063545     dense.py:360
+[22:11:21] BCD step 10/10  FUGW loss:      0.013632165268063545     dense.py:360
            (base)     0.014380687847733498 (entropic)
   100% Sparsity mask ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 200/200 0:00:01 &lt; 0:00:00
-/github/workspace/src/fugw/utils.py:50: UserWarning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
-  return x.to(device, dtype).to_sparse_csr()
+/github/workspace/src/fugw/utils.py:60: UserWarning:
+
+Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
 
 
-[21:09:50] BCD step 1/10   FUGW loss:      0.02426101453602314     sparse.py:478
+
+[22:11:35] BCD step 1/10   FUGW loss:      0.02426101453602314     sparse.py:478
            (base)      0.024409931153059006 (entropic)
 
 
-[21:09:52] BCD step 2/10   FUGW loss:      0.01927129738032818     sparse.py:478
+[22:11:38] BCD step 2/10   FUGW loss:      0.01927129738032818     sparse.py:478
            (base)      0.019580353051424026 (entropic)
 
 
-[21:09:55] BCD step 3/10   FUGW loss:      0.014165128581225872    sparse.py:478
+[22:11:41] BCD step 3/10   FUGW loss:      0.014165128581225872    sparse.py:478
            (base)     0.014671804383397102 (entropic)
 
 
-[21:09:58] BCD step 4/10   FUGW loss:      0.012343265116214752    sparse.py:478
+[22:11:44] BCD step 4/10   FUGW loss:      0.012343265116214752    sparse.py:478
            (base)     0.01297290250658989 (entropic)
 
 
-[21:10:00] BCD step 5/10   FUGW loss:      0.011675005778670311    sparse.py:478
+[22:11:47] BCD step 5/10   FUGW loss:      0.011675005778670311    sparse.py:478
            (base)     0.012375805526971817 (entropic)
 
 
-[21:10:03] BCD step 6/10   FUGW loss:      0.01134925801306963     sparse.py:478
+[22:11:50] BCD step 6/10   FUGW loss:      0.01134925801306963     sparse.py:478
            (base)      0.012095878832042217 (entropic)
 
 
-[21:10:06] BCD step 7/10   FUGW loss:      0.011161427944898605    sparse.py:478
+[22:11:55] BCD step 7/10   FUGW loss:      0.011161427944898605    sparse.py:478
            (base)     0.011940025724470615 (entropic)
 
 
-[21:10:10] BCD step 8/10   FUGW loss:      0.011038612574338913    sparse.py:478
+[22:11:59] BCD step 8/10   FUGW loss:      0.011038612574338913    sparse.py:478
            (base)     0.011841125786304474 (entropic)
 
 
-[21:10:14] BCD step 9/10   FUGW loss:      0.010950836353003979    sparse.py:478
+[22:12:05] BCD step 9/10   FUGW loss:      0.010950836353003979    sparse.py:478
            (base)     0.011772247031331062 (entropic)
 
 
-[21:10:20] BCD step 10/10  FUGW loss:      0.010884434916079044    sparse.py:478
+[22:12:11] BCD step 10/10  FUGW loss:      0.010884434916079044    sparse.py:478
            (base)     0.011721358634531498 (entropic)
+
+(tensor([ 52, 229, 140, 249, 186, 210, 131, 128, 209, 227,   6,  75,  71, 217,
+        164, 291,  58, 109, 116, 118,  66, 206, 189, 212,  15, 286,  14, 268,
+         64, 127,  70,  25,  60, 106, 142, 185,  11, 136,  31, 226, 284, 287,
+        276,   1,  33, 120, 273, 182,  39, 266,  88,  82, 223,  96, 101, 256,
+         62, 264, 211,  48, 219, 283,  36, 280,  76,  12, 238,  44,  80,  50,
+         38, 244,  34, 122, 148,  99, 113,  43,  49,  92, 170, 133, 107, 296,
+        111,   3, 199, 247, 299, 257, 258,  85,  26, 259,   5, 184,  19, 263,
+        298, 196]), tensor([  1,  63,  58,  35,   2, 153, 188, 136, 161,  45, 178, 120, 297,  75,
+        134, 226, 183, 295, 126,  54,  11, 108, 124, 210, 127, 203,  42, 106,
+        260, 193, 133, 123, 224,  80,  38,  46, 100,  67, 184, 206,  68,  97,
+        207,  77, 245, 116,  25, 199, 288,   6,  17, 290, 180, 117, 280, 172,
+        235, 227,  22,  94, 221, 162,  59, 102, 132, 249,  78, 144, 212, 122,
+        264, 243,  20, 112, 289, 187,  12, 233,  19, 151, 196,  29, 142,  70,
+         36, 211, 256, 217, 113, 269, 104, 248,  66,   9, 140, 101, 105,  81,
+        267, 154]))
 </pre></div>
 </div>
 <p>Both the coarse and fine-grained transport plans can be accessed
@@ -555,8 +579,8 @@ between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  54.485 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  1518 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  6.805 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  1521 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-2-2-coarse-to-fine-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/400739f84596661dbde0701b2a6ac605/plot_2_2_coarse_to_fine.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_2_2_coarse_to_fine.py</span></code></a></p>
@@ -578,7 +602,7 @@ between source and target</p>
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Brain alignment</div>
+                <div class="title">Brain alignment 🧠</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

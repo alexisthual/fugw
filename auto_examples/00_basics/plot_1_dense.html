@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Generate embeddings from mesh" href="plot_2_1_lmds.html" /><link rel="prev" title="Basics" href="index.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Generate embeddings from mesh" href="plot_2_1_lmds.html" /><link rel="prev" title="Basics 📚" href="index.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>Transport distributions using dense solvers - FUGW</title>
@@ -163,13 +163,13 @@
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../pages/introduction.html">Introduction</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Basics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Basics 📚</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Transport distributions using dense solvers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_2_1_lmds.html">Generate embeddings from mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_2_2_coarse_to_fine.html">Transport distributions using sparse solvers</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../01_brain_alignment/index.html">Brain alignment</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../01_brain_alignment/index.html">Brain alignment 🧠</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_1_aligning_brain_dense.html">Align brain surfaces of 2 individuals with fMRI data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_2_aligning_brain_sparse.html">Align high-resolution brain surfaces of 2 individuals with fMRI data</a></li>
 </ul>
@@ -265,8 +265,10 @@ have less than 10k points.</p>
 <span class="n">source_features_train</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:250: UserWarning: Singular sample detected.
-  warnings.warn(&quot;Singular sample detected.&quot;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:250: UserWarning:
+
+Singular sample detected.
+
 
 torch.Size([2, 50])
 </pre></div>
@@ -332,7 +334,7 @@ using a sinkhorn solver</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:09:17] BCD step 1/10   FUGW loss:      0.028000006452202797     dense.py:360
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[22:10:56] BCD step 1/10   FUGW loss:      0.028000006452202797     dense.py:360
            (base)     0.02861664816737175 (entropic)
 
 
@@ -340,7 +342,7 @@ using a sinkhorn solver</p>
            (base)      0.022839007899165154 (entropic)
 
 
-[21:09:18] BCD step 3/10   FUGW loss:      0.021671757102012634     dense.py:360
+[22:10:57] BCD step 3/10   FUGW loss:      0.021671757102012634     dense.py:360
            (base)     0.022318946197628975 (entropic)
 
 
@@ -348,7 +350,7 @@ using a sinkhorn solver</p>
            (base)     0.02114957384765148 (entropic)
 
 
-[21:09:19] BCD step 5/10   FUGW loss:      0.019838696345686913     dense.py:360
+[22:10:58] BCD step 5/10   FUGW loss:      0.019838696345686913     dense.py:360
            (base)     0.020485999062657356 (entropic)
 
 
@@ -356,7 +358,7 @@ using a sinkhorn solver</p>
            (base)     0.019857466220855713 (entropic)
 
 
-[21:09:20] BCD step 7/10   FUGW loss:      0.018401773646473885     dense.py:360
+[22:10:59] BCD step 7/10   FUGW loss:      0.018401773646473885     dense.py:360
            (base)     0.019050441682338715 (entropic)
 
 
@@ -364,11 +366,11 @@ using a sinkhorn solver</p>
            (base)     0.01869758404791355 (entropic)
 
 
-           BCD step 9/10   FUGW loss:      0.017871618270874023     dense.py:360
+[22:11:00] BCD step 9/10   FUGW loss:      0.017871618270874023     dense.py:360
            (base)     0.018533602356910706 (entropic)
 
 
-[21:09:21] BCD step 10/10  FUGW loss:      0.017864057794213295     dense.py:360
+           BCD step 10/10  FUGW loss:      0.017864057794213295     dense.py:360
            (base)     0.01852637529373169 (entropic)
 </pre></div>
 </div>
@@ -454,8 +456,8 @@ between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.015 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  256 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.776 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  253 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-1-dense-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a64fd8220c23833034dc49e205e032b8/plot_1_dense.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_1_dense.py</span></code></a></p>
@@ -489,7 +491,7 @@ between source and target</p>
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Basics</div>
+                <div class="title">Basics 📚</div>
                 
               </div>
             </a>

@@ -83,24 +83,28 @@ fine_mapping_solver_params = {
 }
 
 # %%
-
-# %%
 # Now, let us fit both the coarse and fine-grained mappings.
 # The coarse mapping is fitted on a limited number
-# of points from the source and target distributions.
+# of points from the source and target distributions,
+# which we sample randomly in this example.
 # You should carefully set the source and target ``selection_radius``
 # as they will greatly affect the sparsity of the computed mappings.
 # They should usally be set using domain knowledge related to the distributions
 # you are trying to align.
-_, _ = coarse_to_fine.fit(
+
+# Sub-sample source and target distributions
+source_sample = torch.randperm(n_points_source)[:n_samples_source]
+target_sample = torch.randperm(n_points_target)[:n_samples_target]
+
+coarse_to_fine.fit(
     # Source and target's features and embeddings
     source_features=source_features_train_normalized,
     target_features=target_features_train_normalized,
     source_geometry_embeddings=source_embeddings_normalized,
     target_geometry_embeddings=target_embeddings_normalized,
     # Parametrize step 1 (coarse alignment between source and target)
-    source_sample_size=n_samples_source,
-    target_sample_size=n_samples_target,
+    source_sample=source_sample,
+    target_sample=target_sample,
     coarse_mapping=coarse_mapping,
     coarse_mapping_solver=coarse_mapping_solver,
     coarse_mapping_solver_params=coarse_mapping_solver_params,
