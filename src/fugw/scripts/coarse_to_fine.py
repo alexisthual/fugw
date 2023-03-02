@@ -2,6 +2,8 @@ from itertools import product
 
 import numpy as np
 import torch
+from sklearn.cluster import AgglomerativeClustering
+from scipy.sparse import coo_matrix
 
 from fugw.utils import get_progress, make_tensor
 
@@ -42,6 +44,60 @@ def random_normalizing(X, sample_size=100, repeats=10):
 
     return X_normalized, d_max.item()
 
+def mesh_to_graph(coordinates, triangles):
+    """
+    Compute sparse matrix representing edges of a given mesh.
+
+    Inputs
+    ------
+    mesh: str or os.PathLike or mesh object
+
+    Outputs
+    -------
+    connectivity: sparse connectivity matrix
+    """
+
+    n_points = coordinates.shape[0]
+    edges = np.hstack(
+        (
+            np.vstack((triangles[:, 0], triangles[:, 1])),
+            np.vstack((triangles[:, 0], triangles[:, 2])),
+            np.vstack((triangles[:, 1], triangles[:, 0])),
+            np.vstack((triangles[:, 1], triangles[:, 2])),
+            np.vstack((triangles[:, 2], triangles[:, 0])),
+            np.vstack((triangles[:, 2], triangles[:, 1])),
+        )
+    )
+    weights = np.ones(edges.shape[1])
+
+    # Divide data by 2 since all edges i -> j are counted twice
+    # because they all belong to exactly two triangles on the mesh
+    connectivity = (
+        coo_matrix((weights, edges), (n_points, n_points)).tocsr() / 2
+    )
+
+    # Making it symmetrical
+    connectivity = (connectivity + connectivity.T) / 2
+
+    return connectivity
+
+
+def uniform_sampling_from_mesh(
+        coordinates,
+        triangles,
+        embeddings,
+        n_samples=100
+):
+    connectivity = mesh_to_graph(coordinates, triangles)
+    ward = AgglomerativeClustering(
+        n_clusters=n_samples,
+        connectivity=connectivity,
+        linkage="ward",
+    )
+
+    ward.fit_predict(embeddings)
+    naive_samples = np.hstack([np.random.choice(np.argwhere(ward.labels_ == label).flatten(), 1) for label in range(n_samples)])
+    return naive_samples
 
 def fit(
     coarse_mapping=None,
@@ -53,8 +109,8 @@ def fit(
     fine_mapping=None,
     fine_mapping_solver="mm",
     fine_mapping_solver_params={},
-    source_sample_size=None,
-    target_sample_size=None,
+    source_sample=None,
+    target_sample=None,
     source_features=None,
     target_features=None,
     source_geometry_embeddings=None,
@@ -130,23 +186,7 @@ def fit(
         cpu otherwise.
     verbose: bool, optional, defaults to False
         Log solving process.
-
-    Returns
-    -------
-    source_sample: torch.Tensor of size(source_sample_size)
-        Tensor containing the indices which were sampled on the
-        source so as to compute the coarse mapping.
-    target_sample: torch.Tensor of size(target_sample_size)
-        Tensor containing the indices which were sampled on the
-        target so as to compute the coarse mapping.
     """
-    # Sub-sample source and target distributions
-    source_sample = torch.randperm(source_geometry_embeddings.shape[0])[
-        :source_sample_size
-    ]
-    target_sample = torch.randperm(target_geometry_embeddings.shape[0])[
-        :target_sample_size
-    ]
 
     source_geometry_embeddings = make_tensor(source_geometry_embeddings)
     target_geometry_embeddings = make_tensor(target_geometry_embeddings)
@@ -209,14 +249,14 @@ def fit(
         # which are particularly unbalanced)
         rows = np.concatenate(
             [
-                np.arange(source_sample_size),
+                np.arange(source_sample.shape[0]),
                 np.argmax(coarse_mapping.pi, axis=0),
             ]
         )
         cols = np.concatenate(
             [
                 np.argmax(coarse_mapping.pi, axis=1),
-                np.arange(target_sample_size),
+                np.arange(target_sample.shape[0]),
             ]
         )
 
@@ -312,5 +352,3 @@ def fit(
         solver=fine_mapping_solver,
         solver_params=fine_mapping_solver_params,
     )
-
-    return source_sample, target_sample
