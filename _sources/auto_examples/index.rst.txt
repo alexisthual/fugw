@@ -16,7 +16,7 @@ Examples
     </div>
 
 =========
-Basics 📚
+📚 Basics
 =========
 
 
@@ -82,7 +82,7 @@ Basics 📚
     </div>
 
 ==================
-Brain alignment 🧠
+🧠 Brain alignment
 ==================
 
 

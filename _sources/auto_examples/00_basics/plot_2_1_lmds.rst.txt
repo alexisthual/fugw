@@ -95,7 +95,7 @@ Let us load a pre-computed mesh and have a look at it first
     Dataset created in /github/home/nilearn_data/fsaverage3
 
     Downloading data from https://osf.io/asvjk/download ...
-     ...done. (1 seconds, 0 min)
+     ...done. (2 seconds, 0 min)
     Extracting data from /github/home/nilearn_data/fsaverage3/b9ce491b47822c5b4950eeeb75d15a92/download..... done.
 
     (642, 3)
@@ -153,10 +153,10 @@ Now, let's compute the embedding! This computation is easy to parallelize.
 
  .. code-block:: none
 
-      100% Geodesic_distances for landmarks ━━━━━━━━━━━━━━ 100/100 0:00:02 < 0:00:00
+      100% Geodesic_distances for landmarks ━━━━━━━━━━━━━━ 100/100 0:00:01 < 0:00:00
     /github/workspace/src/fugw/scripts/lmds.py:161: UserWarning:
 
-    A might not be centered (1.8740234375 > 0.001)
+    A might not be centered (1.8671875 > 0.001)
 
 
 
@@ -255,9 +255,9 @@ is well approximated by the kernel matrix derived from the embeddings:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.241 seconds)
+   **Total running time of the script:** ( 0 minutes  9.994 seconds)
 
-**Estimated memory usage:**  155 MB
+**Estimated memory usage:**  156 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_1_lmds.py:
