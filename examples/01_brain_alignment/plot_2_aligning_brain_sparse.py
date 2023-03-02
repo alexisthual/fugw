@@ -26,6 +26,7 @@ to align data using real-life resolutions.
 """
 
 # sphinx_gallery_thumbnail_number = 8
+import copy
 import time
 
 import matplotlib as mpl
@@ -38,6 +39,8 @@ from fugw.mappings import FUGW, FUGWSparse
 from fugw.scripts import coarse_to_fine, lmds
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from nilearn import datasets, image, plotting, surface
+from nilearn.plotting.surf_plotting import CAMERAS, LAYOUT
+from plotly.subplots import make_subplots
 from scipy.sparse import coo_matrix
 
 # %%
@@ -117,9 +120,11 @@ source_features.shape
 # the 2 individuals:
 
 
-def plot_surface_map(surface_map, cmap="coolwarm", colorbar=True, **kwargs):
+def plot_surface_map(
+    surface_map, cmap="coolwarm", colorbar=True, engine="matplotlib", **kwargs
+):
     """Util function for plotting surfaces."""
-    plotting.plot_surf(
+    return plotting.plot_surf(
         fsaverage5.pial_left,
         surface_map,
         cmap=cmap,
@@ -127,6 +132,7 @@ def plot_surface_map(surface_map, cmap="coolwarm", colorbar=True, **kwargs):
         bg_map=fsaverage5.sulc_left,
         bg_on_data=True,
         darkness=0.5,
+        engine=engine,
         **kwargs,
     )
 
@@ -277,31 +283,204 @@ fine_mapping_solver_params = {
 }
 
 # %%
-# Let's fit our mappings! Remember to use the training maps only.
-# Moreover, note the importance of ``source_selection_radius`` and
-# ``target_selection_radius``. Their meaning is the following:
-# if a vertex ``i`` from the source was maximally matched with a vertex ``j``
-# from the target during the coarse step, we allow vertices which are at most
-# ``source_selection_radius`` away from ``i`` to be matched with vertices
-# which are at most ``target_selection_radius`` away from ``j``.
-# In this example, we set this radius to 10 millimeters,
-# but **note that the radius
+# Before fitting our mappings, we sub-sample vertices from the source and
+# target distributions. We could sample them randomly, but a poor sampling
+# of some cortical areas can have really bad consequences
+# on the fine-grained mapping.
+# Therefore, we try to sample vertices uniformly spread across the cortical
+# surface. We use a util function which leverages the ward algorithm to
+# compute this sampling.
+
+source_sample = coarse_to_fine.sample_mesh_uniformly(
+    coordinates,
+    triangles,
+    embeddings=source_geometry_embeddings,
+    n_samples=1000,
+)
+target_sample = coarse_to_fine.sample_mesh_uniformly(
+    coordinates,
+    triangles,
+    embeddings=target_geometry_embeddings,
+    n_samples=1000,
+)
+
+# %%
+# Let's inspect the sampled vertices used to derive the coarse mapping.
+# We here switch to ``plotly`` to generate interactive figures.
+
+source_sampled_surface = np.zeros(source_features.shape[1])
+source_sampled_surface[source_sample] = 1
+target_sampled_surface = np.zeros(target_features.shape[1])
+target_sampled_surface[target_sample] = 1
+
+# Generate figure with 2 subplots
+fig = make_subplots(
+    rows=1,
+    cols=2,
+    specs=[[{"type": "surface"}, {"type": "surface"}]],
+    subplot_titles=["Source subject", "Target subject"],
+)
+
+fig_source = plot_surface_map(
+    source_sampled_surface, cmap="Blues", engine="plotly"
+)
+fig_target = plot_surface_map(
+    target_sampled_surface, cmap="Blues", engine="plotly"
+)
+fig.add_trace(fig_source.figure.data[0], row=1, col=1)
+fig.add_trace(fig_target.figure.data[0], row=1, col=2)
+
+# Edit figure layout
+layout = copy.deepcopy(LAYOUT)
+m = 50
+layout["margin"] = {"l": m, "r": m, "t": m, "b": m, "pad": 0}
+layout["scene"]["camera"] = CAMERAS["left"]
+layout["scene"]["camera"]["eye"] = {"x": -1.5, "y": 0, "z": 0}
+layout["scene2"] = layout["scene"]
+
+fig.update_layout(
+    **layout, height=400, width=800, title_text="Sampled vertices", title_x=0.5
+)
+
+fig
+
+
+# %%
+# The rationale behind sampling uniformly across the cortical surface
+# is that only vertices which are within a certain radius of sub-sampled
+# vertices will eventually appear in the sparsity mask, and therefore
+# in the transport plan.
+# In other words, vertices which are too far from sub-sampled vertices
+# won't be mapped.
+# Let us set a radius of 7 millimeters to see what proportion of vertices
+# will be allowed to be transported.
+# We leverage the properties of sparse matrices to
+# derive a scalable way to derive which vertices are selected.
+
+
+def vertices_in_sparcity_mask(embeddings, sample, radius):
+    n_vertices = embeddings.shape[0]
+    elligible_vertices = [
+        torch.tensor(
+            np.argwhere(
+                np.linalg.norm(
+                    embeddings - embeddings[i],
+                    axis=1,
+                )
+                <= radius
+            )
+        )
+        for i in sample
+    ]
+
+    rows = torch.concat(
+        [
+            i * torch.ones(len(elligible_vertices[i]))
+            for i in range(len(elligible_vertices))
+        ]
+    ).type(torch.int)
+    cols = torch.concat(elligible_vertices).flatten().type(torch.int)
+    values = torch.ones_like(rows)
+
+    vertex_within_radius = torch.sparse_coo_tensor(
+        torch.stack([rows, cols]),
+        values,
+        size=(n_vertices, n_vertices),
+    )
+    selected_vertices = torch.sparse.sum(
+        vertex_within_radius, dim=0
+    ).to_dense()
+
+    return selected_vertices
+
+
+source_selection_radius = 7
+selected_source_vertices = vertices_in_sparcity_mask(
+    source_geometry_embeddings, source_sample, source_selection_radius
+)
+
+target_selection_radius = 7
+selected_target_vertices = vertices_in_sparcity_mask(
+    target_geometry_embeddings, target_sample, target_selection_radius
+)
+
+# %%
+# Let's now check which vertices will appear in the sparsity mask.
+# In the following figure, deep blue is for vertices which were
+# sampled, light blue for vertices which are within radius-distance
+# of a sampled vertex. Vertices which won't be selected appear in white.
+# The following figure is interactive.
+
+source_vertices_in_mask = np.zeros(source_features.shape[1])
+source_vertices_in_mask[selected_source_vertices > 0] = 1
+source_vertices_in_mask[source_sample] = 2
+target_vertices_in_mask = np.zeros(target_features.shape[1])
+target_vertices_in_mask[selected_target_vertices > 0] = 1
+target_vertices_in_mask[target_sample] = 2
+
+# Generate figure with 2 subplots
+fig = make_subplots(
+    rows=1,
+    cols=2,
+    specs=[[{"type": "surface"}, {"type": "surface"}]],
+    subplot_titles=["Source subject", "Target subject"],
+)
+
+fig_source = plot_surface_map(
+    source_vertices_in_mask, cmap="Blues", engine="plotly"
+)
+fig_target = plot_surface_map(
+    target_vertices_in_mask, cmap="Blues", engine="plotly"
+)
+
+fig.add_trace(fig_source.figure.data[0], row=1, col=1)
+fig.add_trace(fig_target.figure.data[0], row=1, col=2)
+
+# Edit figure layout
+layout = copy.deepcopy(LAYOUT)
+m = 50
+layout["margin"] = {"l": m, "r": m, "t": m, "b": m, "pad": 0}
+layout["scene"]["camera"] = CAMERAS["left"]
+layout["scene"]["camera"]["eye"] = {"x": -1.5, "y": 0, "z": 0}
+layout["scene2"] = layout["scene"]
+
+fig.update_layout(
+    **layout,
+    height=400,
+    width=800,
+    title_text="Sampled & and selected vertices",
+    title_x=0.5,
+)
+
+fig
+
+
+# %%
+# We just saw that, given the number of vertices sampled on the
+# source and target subjects, a 7mm selection radius will not cover
+# the entier cortical surface.
+# One could increase the radius to circumvent this issue, but this
+# comes at a high computational cost. We generally advise
+# to increase the number of sampled vertices.
+# For practicality, we increase the radius to 10mm in this example.
+#
+# Now, let's fit our mappings! 🚀
+#
+# Remember to use the training maps only. **Note that the radius
 # should be normalized by the same coefficient that was used
 # to normalize the respective embeddings matrices**.
-# Finally, in this example, we sample 1000 vertices in the source and target
-# individuals to compute our coarse mapping.
 
 t0 = time.time()
 
-source_sample, target_sample = coarse_to_fine.fit(
+coarse_to_fine.fit(
     # Source and target's features and embeddings
     source_features=source_features_normalized[:n_training_contrasts, :],
     target_features=target_features_normalized[:n_training_contrasts, :],
     source_geometry_embeddings=source_embeddings_normalized,
     target_geometry_embeddings=target_embeddings_normalized,
     # Parametrize step 1 (coarse alignment between source and target)
-    source_sample_size=1000,
-    target_sample_size=1000,
+    source_sample=source_sample,
+    target_sample=target_sample,
     coarse_mapping=coarse_mapping,
     coarse_mapping_solver=coarse_mapping_solver,
     coarse_mapping_solver_params=coarse_mapping_solver_params,
@@ -364,41 +543,16 @@ plt.show()
 print(f"Total training time: {t1 - t0:.1f}s")
 
 # %%
-# One can also inspect the sampled vertices used to derive the coarse mapping.
-# Note that a poor sampling of some cortical areas can have really bad
-# consequences on the fine-grained mapping, in which case you should probably
-# increase the number of samples (as opposed to increasing the radius).
-source_sampled_surface = np.zeros(source_features.shape[1])
-source_sampled_surface[source_sample] = 1
-target_sampled_surface = np.zeros(target_features.shape[1])
-target_sampled_surface[target_sample] = 1
-
-fig = plt.figure(figsize=(3 * 2, 3))
-fig.suptitle("Sampled vertices")
-grid_spec = gridspec.GridSpec(1, 2, figure=fig)
-
-ax = fig.add_subplot(grid_spec[0, 0], projection="3d")
-ax.set_title("Source individual")
-plot_surface_map(
-    source_sampled_surface, cmap="Blues", avg_method="max", axes=ax
-)
-
-ax = fig.add_subplot(grid_spec[0, 1], projection="3d")
-ax.set_title("Target individual")
-plot_surface_map(
-    target_sampled_surface, cmap="Blues", avg_method="max", axes=ax
-)
-
-plt.show()
-
-# %%
 # Using the computed mappings
 # ---------------------------
 # In this example, the transport plan of the coarse mapping
 # is already too big to be displayed, but we can still look at the top-left
 # corder.
-# In should not show any meaningful structure because the indices on which
-# it was computed were sampled at random.
+# This plot will not always be informative, as mapped vertices are sampled
+# at random. In this example, it does show some structure though,
+# due to the fact that the source and target meshes are the same,
+# and that our uniform sampling strategy returns compable results
+# for the 2 distributions.
 
 coarse_pi = coarse_mapping.pi.numpy()
 fig, ax = plt.subplots(figsize=(10, 10))
