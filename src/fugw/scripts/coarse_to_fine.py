@@ -1,9 +1,7 @@
-from itertools import product
-
 import numpy as np
 import torch
 
-from fugw.utils import get_progress, make_tensor
+from fugw.utils import make_tensor
 from scipy.sparse import coo_matrix
 from sklearn.cluster import AgglomerativeClustering
 
@@ -108,6 +106,58 @@ def sample_mesh_uniformly(
     return naive_samples
 
 
+def get_cluster_matrix(clusters, n_samples):
+    n_clusters = clusters.shape[0]
+    C = torch.sparse_coo_tensor(
+        torch.stack(
+            [
+                torch.tensor(clusters).type(torch.int32),
+                torch.arange(n_clusters).type(torch.int32),
+            ]
+        ),
+        torch.ones(n_clusters).type(torch.float32),
+        size=(n_samples, n_clusters),
+    ).coalesce()
+
+    return C
+
+
+def get_neighbourhood_matrix(embeddings, sample, radius):
+    n_vertices = embeddings.shape[0]
+    n_samples = sample.shape[0]
+
+    vertices_within_radius = [
+        torch.tensor(
+            np.argwhere(
+                np.linalg.norm(
+                    embeddings - embeddings[i],
+                    ord=2,
+                    axis=1,
+                )
+                <= radius
+            )
+        )
+        for i in sample
+    ]
+
+    rows = torch.concat(vertices_within_radius).flatten().type(torch.int32)
+    cols = torch.concat(
+        [
+            i * torch.ones(len(vertices_within_radius[i]))
+            for i in range(n_samples)
+        ]
+    ).type(torch.int32)
+    values = torch.ones_like(rows).type(torch.float32)
+
+    neighbourhood_matrix = torch.sparse_coo_tensor(
+        torch.stack([rows, cols]),
+        values,
+        size=(n_vertices, n_samples),
+    ).coalesce()
+
+    return neighbourhood_matrix
+
+
 def fit(
     coarse_mapping=None,
     coarse_mapping_solver="mm",
@@ -205,8 +255,12 @@ def fit(
         Tensor containing the indices which were sampled on the
         target so as to compute the coarse mapping.
     """
+    # 0. Parse input tensors
     source_sample = make_tensor(source_sample, dtype=torch.int64)
     target_sample = make_tensor(target_sample, dtype=torch.int64)
+
+    source_features = make_tensor(source_features)
+    target_features = make_tensor(target_features)
 
     source_geometry_embeddings = make_tensor(source_geometry_embeddings)
     target_geometry_embeddings = make_tensor(target_geometry_embeddings)
@@ -242,7 +296,7 @@ def fit(
         target_weights_sampled / target_weights_sampled.sum()
     )
 
-    # Fit coarse model
+    # 1. Fit coarse mapping
     coarse_mapping.fit(
         source_features[:, source_sample],
         target_features[:, target_sample],
@@ -256,6 +310,8 @@ def fit(
         verbose=verbose,
     )
 
+    # 2. Build sparsity mask
+
     # Select best pairs of source and target vertices from coarse alignment
     if coarse_pairs_selection_method == "quantile":
         # Method 1: keep first percentile
@@ -263,6 +319,7 @@ def fit(
 
         threshold = np.percentile(coarse_mapping.pi, quantile)
         rows, cols = np.nonzero(coarse_mapping.pi > threshold)
+
     elif coarse_pairs_selection_method == "topk":
         # Method 2: keep topk indices per line and per column
         # (this should be prefered as it will keep vertices
@@ -280,85 +337,33 @@ def fit(
             ]
         )
 
-    # Build sparsity mask from pairs of coefficients
-    def block(i, j, source_radius=5, target_radius=5):
-        # find neighbours of voxel i in source subject
-        # which are within searchlight radius
-        distance_to_i = np.linalg.norm(
-            source_geometry_embeddings
-            - source_geometry_embeddings[source_sample[i]],
-            ord=2,
-            axis=1,
-        )
-        i_neighbours = np.nonzero(distance_to_i <= source_radius)[0]
-
-        distance_to_j = np.linalg.norm(
-            target_geometry_embeddings
-            - target_geometry_embeddings[target_sample[j]],
-            ord=2,
-            axis=1,
-        )
-        j_neighbours = np.nonzero(distance_to_j <= target_radius)[0]
-
-        return list(product(i_neighbours, j_neighbours))
-
-    # Store pairs of source and target indices which are allowed to be matched
-    sparsity_mask = []
-
-    with get_progress() as progress:
-        pairs = list(zip(rows, cols))
-        if verbose:
-            task = progress.add_task("Sparsity mask", total=len(pairs))
-        for i, j in pairs:
-            sparsity_mask.extend(
-                block(
-                    i,
-                    j,
-                    source_radius=source_selection_radius,
-                    target_radius=target_selection_radius,
-                )
-            )
-            if verbose:
-                progress.update(task, advance=1)
-
-    sparsity_mask = np.array(sparsity_mask, dtype=np.int32)
-
-    # Sort 2d array along second axis
-    # Takes about 1 minute
-    sorted_mask_indices = np.lexsort(
-        (sparsity_mask[:, 1], sparsity_mask[:, 0])
+    # Compute mask as a matrix product between:
+    # a. neighbourhood matrices that encode
+    # which vertex is close to which sampled point
+    N_source = get_neighbourhood_matrix(
+        source_geometry_embeddings, source_sample, source_selection_radius
     )
-
-    sorted_mask = sparsity_mask[sorted_mask_indices]
-
-    # Keep all indices whose value is different from the value
-    # of their predecesor
-    kept_indices = (
-        np.nonzero(
-            np.any(
-                (sorted_mask[1:, :] - sorted_mask[:-1, :]) != np.array([0, 0]),
-                axis=1,
-            )
-        )[0]
-        # Don't forget to shift indices
-        + 1
+    N_target = get_neighbourhood_matrix(
+        target_geometry_embeddings, target_sample, target_selection_radius
     )
-    # Don't forget first element of array
-    kept_indices = np.append(kept_indices, 0)
+    # b. cluster matrices that encode
+    # which sampled point belongs to which cluster
+    C_source = get_cluster_matrix(rows, source_sample.shape[0])
+    C_target = get_cluster_matrix(cols, target_sample.shape[0])
 
-    deduplicated_mask = sparsity_mask[kept_indices]
+    mask = (N_source @ C_source) @ (N_target @ C_target).T
 
+    # Define init plan from spasity mask
     init_plan = torch.sparse_coo_tensor(
-        torch.from_numpy(deduplicated_mask.T),
-        torch.from_numpy(
-            np.ones(deduplicated_mask.shape[0]) / deduplicated_mask.shape[0]
-        ),
+        mask.indices(),
+        torch.ones_like(mask.values()) / mask.values().shape[0],
         (
             source_geometry_embeddings.shape[0],
             target_geometry_embeddings.shape[0],
         ),
-    )
+    ).coalesce()
 
+    # 3. Fit fine-grained mapping
     fine_mapping.fit(
         source_features,
         target_features,

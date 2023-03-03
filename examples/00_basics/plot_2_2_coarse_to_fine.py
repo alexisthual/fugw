@@ -111,8 +111,8 @@ coarse_to_fine.fit(
     # Parametrize step 2 (selection of pairs of indices present in
     # fine-grained's sparsity mask)
     coarse_pairs_selection_method="topk",
-    source_selection_radius=1 / source_d_max,
-    target_selection_radius=1 / target_d_max,
+    source_selection_radius=0.5 / source_d_max,
+    target_selection_radius=0.5 / target_d_max,
     # Parametrize step 3 (fine-grained alignment)
     fine_mapping=fine_mapping,
     fine_mapping_solver=fine_mapping_solver,
@@ -216,7 +216,11 @@ segments = torch.stack(
 ).permute(2, 0, 1)
 pi_normalized = pi / pi.sum(dim=1).reshape(-1, 1)
 line_segments = LineCollection(
-    segments, alpha=pi_normalized.flatten(), colors="black", lw=1, zorder=1
+    segments,
+    alpha=pi_normalized.flatten().nan_to_num(),
+    colors="black",
+    lw=1,
+    zorder=1,
 )
 ax.add_collection(line_segments)
 
