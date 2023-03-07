@@ -73,18 +73,6 @@ source_imgs_paths = brain_data["cmaps"][0 : len(contrasts)]
 target_imgs_paths = brain_data["cmaps"][len(contrasts) : 2 * len(contrasts)]
 
 # %%
-# Here is what the first contrast map of the source subject looks like
-# (the following figure is interactive):
-
-contrast_index = 0
-plotting.view_img(
-    source_imgs_paths[contrast_index],
-    brain_data["anats"][0],
-    title=f"Contrast {contrast_index} (source subject)",
-    opacity=0.5,
-)
-
-# %%
 # Computing feature arrays
 # ------------------------
 # Let's project these 4 maps to a mesh of the cortical surface
