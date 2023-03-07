@@ -51,7 +51,7 @@ div[class^="highlight-"].sphx-glr-script-out {
 
 .sphx-glr-script-out .highlight {
   border-radius: 0px;
-  border-left: 4px solid var(--sd-color-primary);
+  border-left: 4px solid var(--color-background-border);
 }
 
 .sphx-glr-script-out .highlight pre {
@@ -74,11 +74,11 @@ button.copybtn {
 }
 
 .highlight-default .highlight {
-  border-left: 4px solid var(--color-background-border);
+  border-left: 4px solid var(--sd-color-primary);
 }
 
 .highlight-primary .highlight {
-  border-left: 4px solid var(--sd-color-primary);
+  border-left: 4px solid var(--color-background-border);
 }
 
 table.plotting-table {
