@@ -84,6 +84,28 @@ def mesh_connectivity_matrix(coordinates, triangles):
 def sample_mesh_uniformly(
     coordinates, triangles, embeddings=None, n_samples=100
 ):
+    """
+    Returns random indices on a mesh such that their are
+    approximately uniformly spead over the surface.
+    It leverages Ward's algorithm to build same-size clusters
+    from ``embeddings`` and then samples in these clusters.
+
+    Parameters
+    ----------
+    coordinates: np.ndarray of size (n, 3)
+        3D coordinates of vertices of the mesh
+    triangles: np.ndarray of size (e, 3)
+        Faces of the mesh
+    embeddings: np.ndarray of size (n, d)
+        Embeddings approximating the geodesic distance on the mesh
+    n_samples: int
+        Number of points to sample
+
+    Returns
+    -------
+    samples: np.ndarray of size (s)
+        Indices of sampled points
+    """
     if embeddings is None:
         embeddings = np.ones(coordinates.shape[0]).reshape(-1, 1)
 
@@ -107,6 +129,23 @@ def sample_mesh_uniformly(
 
 
 def get_cluster_matrix(clusters, n_samples):
+    """
+    Computes a sparse matrix C such that C_{i, j} = 1
+    if and only if the ``i``-th sampled point
+    belongs to cluster ``j``.
+
+    Parameters
+    ----------
+    clusters: torch.Tensor of size (c,)
+        An array such that the index at ``clusters[i]``
+        belongs to cluster ``i``
+    n_samples: int
+        Number of sampled points ``s``
+
+    Returns
+    -------
+    C: torch.Tensor sparse COO matrix of size (s, c)
+    """
     n_clusters = clusters.shape[0]
     C = torch.sparse_coo_tensor(
         torch.stack(
@@ -123,6 +162,25 @@ def get_cluster_matrix(clusters, n_samples):
 
 
 def get_neighbourhood_matrix(embeddings, sample, radius):
+    """
+    Computes a sparse matrix ``N`` such that ``N_{i, j} = 1``
+    if and only if the geodesic distance between vertex ``i``
+    and the ``j``-th sampled vertex is less than ``radius``.
+
+    Parameters
+    ----------
+    embeddings: torch.Tensor of size (n, d)
+        Embeddings X such that ``torch.linalg.norm(X[i], X[j], ord=2)``
+        approximates the geodesic distance between points ``i`` and ``j``
+    sample: torch.Tensor of size (s)
+        Indices of points of ``embeddings`` which were sampled
+    radius: float
+        Radius of computed neighbouhoods
+
+    Returns
+    -------
+    N: torch.Tensor sparse COO matrix of size (n, s)
+    """
     n_vertices = embeddings.shape[0]
     n_samples = sample.shape[0]
 
@@ -130,14 +188,14 @@ def get_neighbourhood_matrix(embeddings, sample, radius):
         torch.tensor(
             np.argwhere(
                 np.linalg.norm(
-                    embeddings - embeddings[i],
+                    embeddings - embeddings[sample_index],
                     ord=2,
                     axis=1,
                 )
                 <= radius
             )
         )
-        for i in sample
+        for sample_index in sample
     ]
 
     rows = torch.concat(vertices_within_radius).flatten().type(torch.int32)
