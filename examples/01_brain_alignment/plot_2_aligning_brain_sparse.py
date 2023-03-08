@@ -73,18 +73,6 @@ source_imgs_paths = brain_data["cmaps"][0 : len(contrasts)]
 target_imgs_paths = brain_data["cmaps"][len(contrasts) : 2 * len(contrasts)]
 
 # %%
-# Here is what the first contrast map of the source subject looks like
-# (the following figure is interactive):
-
-contrast_index = 0
-plotting.view_img(
-    source_imgs_paths[contrast_index],
-    brain_data["anats"][0],
-    title=f"Contrast {contrast_index} (source subject)",
-    opacity=0.5,
-)
-
-# %%
 # Computing feature arrays
 # ------------------------
 # Let's project these 4 maps to a mesh of the cortical surface
@@ -358,50 +346,28 @@ fig
 # derive a scalable way to derive which vertices are selected.
 
 
-def vertices_in_sparcity_mask(embeddings, sample, radius):
-    n_vertices = embeddings.shape[0]
-    elligible_vertices = [
-        torch.tensor(
-            np.argwhere(
-                np.linalg.norm(
-                    embeddings - embeddings[i],
-                    axis=1,
-                )
-                <= radius
-            )
-        )
-        for i in sample
-    ]
-
-    rows = torch.concat(
-        [
-            i * torch.ones(len(elligible_vertices[i]))
-            for i in range(len(elligible_vertices))
-        ]
-    ).type(torch.int)
-    cols = torch.concat(elligible_vertices).flatten().type(torch.int)
-    values = torch.ones_like(rows)
-
-    vertex_within_radius = torch.sparse_coo_tensor(
-        torch.stack([rows, cols]),
-        values,
-        size=(n_vertices, n_vertices),
-    )
-    selected_vertices = torch.sparse.sum(
-        vertex_within_radius, dim=0
-    ).to_dense()
-
-    return selected_vertices
-
-
 source_selection_radius = 7
-selected_source_vertices = vertices_in_sparcity_mask(
-    source_geometry_embeddings, source_sample, source_selection_radius
+n_neighbourhoods_per_vertex_source = (
+    torch.sparse.sum(
+        coarse_to_fine.get_neighbourhood_matrix(
+            source_geometry_embeddings, source_sample, source_selection_radius
+        ),
+        dim=1,
+    )
+    .to_dense()
+    .numpy()
 )
 
 target_selection_radius = 7
-selected_target_vertices = vertices_in_sparcity_mask(
-    target_geometry_embeddings, target_sample, target_selection_radius
+n_neighbourhoods_per_vertex_target = (
+    torch.sparse.sum(
+        coarse_to_fine.get_neighbourhood_matrix(
+            target_geometry_embeddings, target_sample, target_selection_radius
+        ),
+        dim=1,
+    )
+    .to_dense()
+    .numpy()
 )
 
 # %%
@@ -410,12 +376,16 @@ selected_target_vertices = vertices_in_sparcity_mask(
 # sampled, light blue for vertices which are within radius-distance
 # of a sampled vertex. Vertices which won't be selected appear in white.
 # The following figure is interactive.
+# **Note that, because embeddings are not very precise for short distances,
+# vertices that are very close to sampled vertices can actually
+# be absent from the mask**. In order to limit this effect, the radius
+# should generally be set to a high enough value.
 
 source_vertices_in_mask = np.zeros(source_features.shape[1])
-source_vertices_in_mask[selected_source_vertices > 0] = 1
+source_vertices_in_mask[n_neighbourhoods_per_vertex_source > 0] = 1
 source_vertices_in_mask[source_sample] = 2
 target_vertices_in_mask = np.zeros(target_features.shape[1])
-target_vertices_in_mask[selected_target_vertices > 0] = 1
+target_vertices_in_mask[n_neighbourhoods_per_vertex_target > 0] = 1
 target_vertices_in_mask[target_sample] = 2
 
 # Generate figure with 2 subplots
