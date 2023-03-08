@@ -1,8 +1,8 @@
 # %%
 """
-====================================================
-Align brain surfaces of 2 individuals with fMRI data
-====================================================
+===================================================================
+Align low-resolution brain surfaces of 2 individuals with fMRI data
+===================================================================
 
 In this example, we align 2 low-resolution left hemispheres
 using 4 fMRI feature maps (z-score contrast maps).

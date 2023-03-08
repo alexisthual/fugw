@@ -20,13 +20,13 @@
 .. only:: html
 
   .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_1_aligning_brain_dense_thumb.png
-    :alt: Align brain surfaces of 2 individuals with fMRI data
+    :alt: Align low-resolution brain surfaces of 2 individuals with fMRI data
 
   :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Align brain surfaces of 2 individuals with fMRI data</div>
+      <div class="sphx-glr-thumbnail-title">Align low-resolution brain surfaces of 2 individuals with fMRI data</div>
     </div>
 
 

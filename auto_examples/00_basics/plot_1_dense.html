@@ -170,7 +170,7 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../01_brain_alignment/index.html">🧠 Brain alignment</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_1_aligning_brain_dense.html">Align brain surfaces of 2 individuals with fMRI data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_1_aligning_brain_dense.html">Align low-resolution brain surfaces of 2 individuals with fMRI data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_2_aligning_brain_sparse.html">Align high-resolution brain surfaces of 2 individuals with fMRI data</a></li>
 </ul>
 </li>
@@ -334,44 +334,44 @@ using a sinkhorn solver</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[22:30:49] BCD step 1/10   FUGW loss:      0.027999892830848694     dense.py:360
-           (base)     0.028616538271307945 (entropic)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[08:15:55] BCD step 1/10   FUGW loss:      0.028000006452202797     dense.py:360
+           (base)     0.02861664816737175 (entropic)
 
 
-           BCD step 2/10   FUGW loss:      0.022187184542417526     dense.py:360
-           (base)     0.022839292883872986 (entropic)
+           BCD step 2/10   FUGW loss:      0.02218690887093544      dense.py:360
+           (base)      0.022839007899165154 (entropic)
 
 
-[22:30:50] BCD step 3/10   FUGW loss:      0.021671801805496216     dense.py:360
-           (base)     0.022319018840789795 (entropic)
+[08:15:56] BCD step 3/10   FUGW loss:      0.021671757102012634     dense.py:360
+           (base)     0.022318946197628975 (entropic)
 
 
-[22:30:51] BCD step 4/10   FUGW loss:      0.020506123080849648     dense.py:360
-           (base)     0.021148966625332832 (entropic)
+           BCD step 4/10   FUGW loss:      0.020506752654910088     dense.py:360
+           (base)     0.02114957384765148 (entropic)
 
 
-           BCD step 5/10   FUGW loss:      0.019838837906718254     dense.py:360
-           (base)     0.0204861331731081 (entropic)
+           BCD step 5/10   FUGW loss:      0.019838696345686913     dense.py:360
+           (base)     0.020485999062657356 (entropic)
 
 
-[22:30:52] BCD step 6/10   FUGW loss:      0.019212665036320686     dense.py:360
-           (base)     0.019858088344335556 (entropic)
+[08:15:57] BCD step 6/10   FUGW loss:      0.019212042912840843     dense.py:360
+           (base)     0.019857466220855713 (entropic)
 
 
-[22:30:53] BCD step 7/10   FUGW loss:      0.01840667426586151      dense.py:360
-           (base)      0.019055141136050224 (entropic)
+           BCD step 7/10   FUGW loss:      0.018401773646473885     dense.py:360
+           (base)     0.019050441682338715 (entropic)
 
 
-           BCD step 8/10   FUGW loss:      0.01804225705564022      dense.py:360
-           (base)      0.01869918964803219 (entropic)
+[08:15:58] BCD step 8/10   FUGW loss:      0.018040582537651062     dense.py:360
+           (base)     0.01869758404791355 (entropic)
 
 
-[22:30:54] BCD step 9/10   FUGW loss:      0.017871538177132607     dense.py:360
-           (base)     0.018533505499362946 (entropic)
+           BCD step 9/10   FUGW loss:      0.017871618270874023     dense.py:360
+           (base)     0.018533602356910706 (entropic)
 
 
-           BCD step 10/10  FUGW loss:      0.017864016816020012     dense.py:360
-           (base)     0.018526341766119003 (entropic)
+[08:15:59] BCD step 10/10  FUGW loss:      0.017864057794213295     dense.py:360
+           (base)     0.01852637529373169 (entropic)
 </pre></div>
 </div>
 <p>The transport plan can be accessed after the model has been fitted</p>
@@ -456,7 +456,7 @@ between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.486 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.341 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  250 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-1-dense-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">

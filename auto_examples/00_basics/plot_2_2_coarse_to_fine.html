@@ -170,7 +170,7 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../01_brain_alignment/index.html">🧠 Brain alignment</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_1_aligning_brain_dense.html">Align brain surfaces of 2 individuals with fMRI data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_1_aligning_brain_dense.html">Align low-resolution brain surfaces of 2 individuals with fMRI data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../01_brain_alignment/plot_2_aligning_brain_sparse.html">Align high-resolution brain surfaces of 2 individuals with fMRI data</a></li>
 </ul>
 </li>
@@ -343,8 +343,8 @@ you are trying to align.</p>
     <span class="c1"># Parametrize step 2 (selection of pairs of indices present in</span>
     <span class="c1"># fine-grained&#39;s sparsity mask)</span>
     <span class="n">coarse_pairs_selection_method</span><span class="o">=</span><span class="s2">&quot;topk&quot;</span><span class="p">,</span>
-    <span class="n">source_selection_radius</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">source_d_max</span><span class="p">,</span>
-    <span class="n">target_selection_radius</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">target_d_max</span><span class="p">,</span>
+    <span class="n">source_selection_radius</span><span class="o">=</span><span class="mf">0.5</span> <span class="o">/</span> <span class="n">source_d_max</span><span class="p">,</span>
+    <span class="n">target_selection_radius</span><span class="o">=</span><span class="mf">0.5</span> <span class="o">/</span> <span class="n">target_d_max</span><span class="p">,</span>
     <span class="c1"># Parametrize step 3 (fine-grained alignment)</span>
     <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">=</span><a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="p">,</span>
     <span class="n">fine_mapping_solver</span><span class="o">=</span><span class="n">fine_mapping_solver</span><span class="p">,</span>
@@ -354,89 +354,88 @@ you are trying to align.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[22:31:07] BCD step 1/10   FUGW loss:      0.031989529728889465     dense.py:360
-           (base)     0.03209516406059265 (entropic)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[08:16:12] BCD step 1/10   FUGW loss:      0.03198949992656708      dense.py:360
+           (base)      0.032095134258270264 (entropic)
 
 
-[22:31:08] BCD step 2/10   FUGW loss:      0.027364250272512436     dense.py:360
-           (base)     0.027612853795289993 (entropic)
+[08:16:13] BCD step 2/10   FUGW loss:      0.027364276349544525     dense.py:360
+           (base)     0.027612881734967232 (entropic)
 
 
-           BCD step 3/10   FUGW loss:      0.01796204037964344      dense.py:360
-           (base)      0.018442964181303978 (entropic)
+           BCD step 3/10   FUGW loss:      0.017961936071515083     dense.py:360
+           (base)     0.01844286173582077 (entropic)
 
 
-[22:31:09] BCD step 4/10   FUGW loss:      0.015194856561720371     dense.py:360
-           (base)     0.015796542167663574 (entropic)
+           BCD step 4/10   FUGW loss:      0.015194778330624104     dense.py:360
+           (base)     0.015796463936567307 (entropic)
 
 
-           BCD step 5/10   FUGW loss:      0.01449587196111679      dense.py:360
-           (base)      0.015153665095567703 (entropic)
+[08:16:14] BCD step 5/10   FUGW loss:      0.014496020041406155     dense.py:360
+           (base)     0.015153813175857067 (entropic)
 
 
-[22:31:10] BCD step 6/10   FUGW loss:      0.014186009764671326     dense.py:360
-           (base)     0.014875759370625019 (entropic)
+           BCD step 6/10   FUGW loss:      0.014186171814799309     dense.py:360
+           (base)     0.014875920489430428 (entropic)
 
 
-[22:31:11] BCD step 7/10   FUGW loss:      0.014005268923938274     dense.py:360
-           (base)     0.014715234749019146 (entropic)
+[08:16:15] BCD step 7/10   FUGW loss:      0.014005331322550774     dense.py:360
+           (base)     0.01471529621630907 (entropic)
 
 
-[22:31:12] BCD step 8/10   FUGW loss:      0.013867850415408611     dense.py:360
-           (base)     0.014592410065233707 (entropic)
+[08:16:16] BCD step 8/10   FUGW loss:      0.013867946341633797     dense.py:360
+           (base)     0.014592503197491169 (entropic)
 
 
-[22:31:13] BCD step 9/10   FUGW loss:      0.013740324415266514     dense.py:360
-           (base)     0.014477348886430264 (entropic)
+[08:16:17] BCD step 9/10   FUGW loss:      0.013740603812038898     dense.py:360
+           (base)     0.014477620832622051 (entropic)
 
 
-[22:31:14] BCD step 10/10  FUGW loss:      0.01363184954971075      dense.py:360
-           (base)      0.014380378648638725 (entropic)
-  100% Sparsity mask ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 200/200 0:00:01 &lt; 0:00:00
+[08:16:18] BCD step 10/10  FUGW loss:      0.013632165268063545     dense.py:360
+           (base)     0.014380687847733498 (entropic)
 /github/workspace/src/fugw/utils.py:60: UserWarning:
 
 Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
 
 
 
-[22:31:27] BCD step 1/10   FUGW loss:      0.02426113188266754     sparse.py:478
-           (base)      0.024410048499703407 (entropic)
+[08:16:21] BCD step 1/10   FUGW loss:      0.020308256149291992    sparse.py:478
+           (base)     0.020477615296840668 (entropic)
 
 
-[22:31:30] BCD step 2/10   FUGW loss:      0.019271081313490868    sparse.py:478
-           (base)     0.019580138847231865 (entropic)
+[08:16:24] BCD step 2/10   FUGW loss:      0.013988880440592766    sparse.py:478
+           (base)     0.014400288462638855 (entropic)
 
 
-[22:31:33] BCD step 3/10   FUGW loss:      0.014164840802550316    sparse.py:478
-           (base)     0.014671523123979568 (entropic)
+[08:16:28] BCD step 3/10   FUGW loss:      0.01208634115755558     sparse.py:478
+           (base)      0.012644429691135883 (entropic)
 
 
-[22:31:36] BCD step 4/10   FUGW loss:      0.012342985719442368    sparse.py:478
-           (base)     0.012972626835107803 (entropic)
+[08:16:31] BCD step 4/10   FUGW loss:      0.011344446800649166    sparse.py:478
+           (base)     0.011991022154688835 (entropic)
 
 
-[22:31:39] BCD step 5/10   FUGW loss:      0.011674736626446247    sparse.py:478
-           (base)     0.012375537306070328 (entropic)
+[08:16:34] BCD step 5/10   FUGW loss:      0.010971869342029095    sparse.py:478
+           (base)     0.011676927097141743 (entropic)
 
 
-[22:31:43] BCD step 6/10   FUGW loss:      0.01134908851236105     sparse.py:478
-           (base)      0.012095710262656212 (entropic)
+[08:16:38] BCD step 6/10   FUGW loss:      0.010754159651696682    sparse.py:478
+           (base)     0.01150030642747879 (entropic)
 
 
-[22:31:47] BCD step 7/10   FUGW loss:      0.011161362752318382    sparse.py:478
-           (base)     0.011939960531890392 (entropic)
+[08:16:42] BCD step 7/10   FUGW loss:      0.010611843317747116    sparse.py:478
+           (base)     0.011388429440557957 (entropic)
 
 
-[22:31:52] BCD step 8/10   FUGW loss:      0.011038539931178093    sparse.py:478
-           (base)     0.011841053143143654 (entropic)
+[08:16:47] BCD step 8/10   FUGW loss:      0.010510009713470936    sparse.py:478
+           (base)     0.011310222558677197 (entropic)
 
 
-[22:31:57] BCD step 9/10   FUGW loss:      0.01095086894929409     sparse.py:478
-           (base)      0.011772279627621174 (entropic)
+[08:16:52] BCD step 9/10   FUGW loss:      0.01043227780610323     sparse.py:478
+           (base)      0.011251525953412056 (entropic)
 
 
-[22:32:03] BCD step 10/10  FUGW loss:      0.010884549468755722    sparse.py:478
-           (base)     0.011721473187208176 (entropic)
+[08:16:58] BCD step 10/10  FUGW loss:      0.01037062332034111     sparse.py:478
+           (base)      0.011205591261386871 (entropic)
 
 (tensor([ 52, 229, 140, 249, 186, 210, 131, 128, 209, 227,   6,  75,  71, 217,
         164, 291,  58, 109, 116, 118,  66, 206, 189, 212,  15, 286,  14, 268,
@@ -465,7 +464,7 @@ after the models have been fitted</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Coarse transport plan&#39;s total mass: 0.99738
-Fine-grained transport plan&#39;s total mass: 0.99798
+Fine-grained transport plan&#39;s total mass: 0.99811
 </pre></div>
 </div>
 <p>Here is the evolution of the FUGW loss during training
@@ -510,7 +509,7 @@ we usually want to keep this number much smaller.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ratio of non-null coefficients: </span><span class="si">{</span><span class="n">sparsity_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ratio of non-null coefficients: 62.82%
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ratio of non-null coefficients: 86.10%
 </pre></div>
 </div>
 <p>We can also have a look at the sparsity mask of the
@@ -553,7 +552,11 @@ and target points in the feature space.</p>
 <span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">pi_normalized</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">/</span> <span class="n">pi</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.LineCollection" title="matplotlib.collections.LineCollection" class="sphx-glr-backref-module-matplotlib-collections sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">line_segments</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.LineCollection" title="matplotlib.collections.LineCollection" class="sphx-glr-backref-module-matplotlib-collections sphx-glr-backref-type-py-class"><span class="n">LineCollection</span></a><span class="p">(</span>
-    <span class="n">segments</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">pi_normalized</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">segments</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="n">pi_normalized</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(),</span>
+    <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+    <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.add_collection.html#matplotlib.axes.Axes.add_collection" title="matplotlib.axes.Axes.add_collection" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span></a><span class="p">(</span><a href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.LineCollection" title="matplotlib.collections.LineCollection" class="sphx-glr-backref-module-matplotlib-collections sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">line_segments</span></a><span class="p">)</span>
 
@@ -579,8 +582,8 @@ between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  4.921 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  1516 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  55.004 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  151 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-2-2-coarse-to-fine-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/400739f84596661dbde0701b2a6ac605/plot_2_2_coarse_to_fine.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_2_2_coarse_to_fine.py</span></code></a></p>
