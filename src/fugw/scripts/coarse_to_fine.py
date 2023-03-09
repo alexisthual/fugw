@@ -313,15 +313,29 @@ def fit(
         Tensor containing the indices which were sampled on the
         target so as to compute the coarse mapping.
     """
+    if device == "auto":
+        if torch.cuda.is_available():
+            device = torch.device("cuda", 0)
+        else:
+            device = torch.device("cpu")
+
     # 0. Parse input tensors
-    source_sample = make_tensor(source_sample, dtype=torch.int64)
-    target_sample = make_tensor(target_sample, dtype=torch.int64)
+    source_sample = make_tensor(
+        source_sample, device=device, dtype=torch.int64
+    )
+    target_sample = make_tensor(
+        target_sample, device=device, dtype=torch.int64
+    )
 
-    source_features = make_tensor(source_features)
-    target_features = make_tensor(target_features)
+    source_features = make_tensor(source_features, device=device)
+    target_features = make_tensor(target_features, device=device)
 
-    source_geometry_embeddings = make_tensor(source_geometry_embeddings)
-    target_geometry_embeddings = make_tensor(target_geometry_embeddings)
+    source_geometry_embeddings = make_tensor(
+        source_geometry_embeddings, device=device
+    )
+    target_geometry_embeddings = make_tensor(
+        target_geometry_embeddings, device=device
+    )
 
     # Compute anatomical kernels
     source_geometry_kernel = torch.cdist(
