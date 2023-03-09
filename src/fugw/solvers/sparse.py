@@ -488,6 +488,10 @@ class FUGWSparseSolver(BaseSolver):
                 ):
                     break
 
+            # Free allocated GPU memory
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
             idx += 1
 
         if pi.values().isnan().any() or gamma.values().isnan().any():
