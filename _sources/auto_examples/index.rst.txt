@@ -33,7 +33,7 @@ Examples
 .. only:: html
 
   .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_1_dense_thumb.png
-    :alt: Transport distributions using dense solvers
+    :alt:
 
   :ref:`sphx_glr_auto_examples_00_basics_plot_1_dense.py`
 
@@ -50,7 +50,7 @@ Examples
 .. only:: html
 
   .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_2_1_lmds_thumb.png
-    :alt: Generate embeddings from mesh
+    :alt:
 
   :ref:`sphx_glr_auto_examples_00_basics_plot_2_1_lmds.py`
 
@@ -67,7 +67,7 @@ Examples
 .. only:: html
 
   .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_2_2_coarse_to_fine_thumb.png
-    :alt: Transport distributions using sparse solvers
+    :alt:
 
   :ref:`sphx_glr_auto_examples_00_basics_plot_2_2_coarse_to_fine.py`
 
@@ -99,7 +99,7 @@ Examples
 .. only:: html
 
   .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_1_aligning_brain_dense_thumb.png
-    :alt: Align low-resolution brain surfaces of 2 individuals with fMRI data
+    :alt:
 
   :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py`
 
@@ -116,7 +116,7 @@ Examples
 .. only:: html
 
   .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_2_aligning_brain_sparse_thumb.png
-    :alt: Align high-resolution brain surfaces of 2 individuals with fMRI data
+    :alt:
 
   :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_2_aligning_brain_sparse.py`
 
@@ -134,6 +134,7 @@ Examples
 .. toctree::
    :hidden:
    :includehidden:
+
 
    /auto_examples/00_basics/index.rst
    /auto_examples/01_brain_alignment/index.rst

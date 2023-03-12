@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_00_basics_plot_1_dense.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_00_basics_plot_1_dense.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -235,19 +235,19 @@ using a sinkhorn solver
 
 
 
-    [08:15:55] BCD step 1/10   FUGW loss:      0.028000006452202797     dense.py:360
+    [14:43:53] BCD step 1/10   FUGW loss:      0.028000006452202797     dense.py:360
                (base)     0.02861664816737175 (entropic)                            
 
 
-               BCD step 2/10   FUGW loss:      0.02218690887093544      dense.py:360
+    [14:43:54] BCD step 2/10   FUGW loss:      0.02218690887093544      dense.py:360
                (base)      0.022839007899165154 (entropic)                          
 
 
-    [08:15:56] BCD step 3/10   FUGW loss:      0.021671757102012634     dense.py:360
+               BCD step 3/10   FUGW loss:      0.021671757102012634     dense.py:360
                (base)     0.022318946197628975 (entropic)                           
 
 
-               BCD step 4/10   FUGW loss:      0.020506752654910088     dense.py:360
+    [14:43:55] BCD step 4/10   FUGW loss:      0.020506752654910088     dense.py:360
                (base)     0.02114957384765148 (entropic)                            
 
 
@@ -255,7 +255,7 @@ using a sinkhorn solver
                (base)     0.020485999062657356 (entropic)                           
 
 
-    [08:15:57] BCD step 6/10   FUGW loss:      0.019212042912840843     dense.py:360
+    [14:43:56] BCD step 6/10   FUGW loss:      0.019212042912840843     dense.py:360
                (base)     0.019857466220855713 (entropic)                           
 
 
@@ -263,15 +263,15 @@ using a sinkhorn solver
                (base)     0.019050441682338715 (entropic)                           
 
 
-    [08:15:58] BCD step 8/10   FUGW loss:      0.018040582537651062     dense.py:360
+               BCD step 8/10   FUGW loss:      0.018040582537651062     dense.py:360
                (base)     0.01869758404791355 (entropic)                            
 
 
-               BCD step 9/10   FUGW loss:      0.017871618270874023     dense.py:360
+    [14:43:57] BCD step 9/10   FUGW loss:      0.017871618270874023     dense.py:360
                (base)     0.018533602356910706 (entropic)                           
 
 
-    [08:15:59] BCD step 10/10  FUGW loss:      0.017864057794213295     dense.py:360
+               BCD step 10/10  FUGW loss:      0.017864057794213295     dense.py:360
                (base)     0.01852637529373169 (entropic)                            
 
 
@@ -461,9 +461,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.341 seconds)
+   **Total running time of the script:** ( 0 minutes  7.043 seconds)
 
-**Estimated memory usage:**  250 MB
+**Estimated memory usage:**  254 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_1_dense.py:
@@ -471,6 +471,8 @@ between source and target
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

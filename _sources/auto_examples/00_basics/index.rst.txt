@@ -20,7 +20,7 @@
 .. only:: html
 
   .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_1_dense_thumb.png
-    :alt: Transport distributions using dense solvers
+    :alt:
 
   :ref:`sphx_glr_auto_examples_00_basics_plot_1_dense.py`
 
@@ -37,7 +37,7 @@
 .. only:: html
 
   .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_2_1_lmds_thumb.png
-    :alt: Generate embeddings from mesh
+    :alt:
 
   :ref:`sphx_glr_auto_examples_00_basics_plot_2_1_lmds.py`
 
@@ -54,7 +54,7 @@
 .. only:: html
 
   .. image:: /auto_examples/00_basics/images/thumb/sphx_glr_plot_2_2_coarse_to_fine_thumb.png
-    :alt: Transport distributions using sparse solvers
+    :alt:
 
   :ref:`sphx_glr_auto_examples_00_basics_plot_2_2_coarse_to_fine.py`
 

@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_00_basics_plot_2_2_coarse_to_fine.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_00_basics_plot_2_2_coarse_to_fine.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -241,11 +241,11 @@ you are trying to align.
 
 
 
-    [08:16:12] BCD step 1/10   FUGW loss:      0.03198949992656708      dense.py:360
+    [14:44:10] BCD step 1/10   FUGW loss:      0.03198949992656708      dense.py:360
                (base)      0.032095134258270264 (entropic)                          
 
 
-    [08:16:13] BCD step 2/10   FUGW loss:      0.027364276349544525     dense.py:360
+               BCD step 2/10   FUGW loss:      0.027364276349544525     dense.py:360
                (base)     0.027612881734967232 (entropic)                           
 
 
@@ -253,11 +253,11 @@ you are trying to align.
                (base)     0.01844286173582077 (entropic)                            
 
 
-               BCD step 4/10   FUGW loss:      0.015194778330624104     dense.py:360
+    [14:44:11] BCD step 4/10   FUGW loss:      0.015194778330624104     dense.py:360
                (base)     0.015796463936567307 (entropic)                           
 
 
-    [08:16:14] BCD step 5/10   FUGW loss:      0.014496020041406155     dense.py:360
+               BCD step 5/10   FUGW loss:      0.014496020041406155     dense.py:360
                (base)     0.015153813175857067 (entropic)                           
 
 
@@ -265,19 +265,19 @@ you are trying to align.
                (base)     0.014875920489430428 (entropic)                           
 
 
-    [08:16:15] BCD step 7/10   FUGW loss:      0.014005331322550774     dense.py:360
+    [14:44:12] BCD step 7/10   FUGW loss:      0.014005331322550774     dense.py:360
                (base)     0.01471529621630907 (entropic)                            
 
 
-    [08:16:16] BCD step 8/10   FUGW loss:      0.013867946341633797     dense.py:360
+    [14:44:13] BCD step 8/10   FUGW loss:      0.013867946341633797     dense.py:360
                (base)     0.014592503197491169 (entropic)                           
 
 
-    [08:16:17] BCD step 9/10   FUGW loss:      0.013740603812038898     dense.py:360
+    [14:44:14] BCD step 9/10   FUGW loss:      0.013740603812038898     dense.py:360
                (base)     0.014477620832622051 (entropic)                           
 
 
-    [08:16:18] BCD step 10/10  FUGW loss:      0.013632165268063545     dense.py:360
+    [14:44:15] BCD step 10/10  FUGW loss:      0.013632165268063545     dense.py:360
                (base)     0.014380687847733498 (entropic)                           
     /github/workspace/src/fugw/utils.py:60: UserWarning:
 
@@ -285,43 +285,43 @@ you are trying to align.
 
 
 
-    [08:16:21] BCD step 1/10   FUGW loss:      0.020308256149291992    sparse.py:478
+    [14:44:18] BCD step 1/10   FUGW loss:      0.020308256149291992    sparse.py:478
                (base)     0.020477615296840668 (entropic)                           
 
 
-    [08:16:24] BCD step 2/10   FUGW loss:      0.013988880440592766    sparse.py:478
+    [14:44:22] BCD step 2/10   FUGW loss:      0.013988880440592766    sparse.py:478
                (base)     0.014400288462638855 (entropic)                           
 
 
-    [08:16:28] BCD step 3/10   FUGW loss:      0.01208634115755558     sparse.py:478
+    [14:44:25] BCD step 3/10   FUGW loss:      0.01208634115755558     sparse.py:478
                (base)      0.012644429691135883 (entropic)                          
 
 
-    [08:16:31] BCD step 4/10   FUGW loss:      0.011344446800649166    sparse.py:478
+    [14:44:28] BCD step 4/10   FUGW loss:      0.011344446800649166    sparse.py:478
                (base)     0.011991022154688835 (entropic)                           
 
 
-    [08:16:34] BCD step 5/10   FUGW loss:      0.010971869342029095    sparse.py:478
+    [14:44:31] BCD step 5/10   FUGW loss:      0.010971869342029095    sparse.py:478
                (base)     0.011676927097141743 (entropic)                           
 
 
-    [08:16:38] BCD step 6/10   FUGW loss:      0.010754159651696682    sparse.py:478
+    [14:44:35] BCD step 6/10   FUGW loss:      0.010754159651696682    sparse.py:478
                (base)     0.01150030642747879 (entropic)                            
 
 
-    [08:16:42] BCD step 7/10   FUGW loss:      0.010611843317747116    sparse.py:478
+    [14:44:39] BCD step 7/10   FUGW loss:      0.010611843317747116    sparse.py:478
                (base)     0.011388429440557957 (entropic)                           
 
 
-    [08:16:47] BCD step 8/10   FUGW loss:      0.010510009713470936    sparse.py:478
+    [14:44:44] BCD step 8/10   FUGW loss:      0.010510009713470936    sparse.py:478
                (base)     0.011310222558677197 (entropic)                           
 
 
-    [08:16:52] BCD step 9/10   FUGW loss:      0.01043227780610323     sparse.py:478
+    [14:44:49] BCD step 9/10   FUGW loss:      0.01043227780610323     sparse.py:478
                (base)      0.011251525953412056 (entropic)                          
 
 
-    [08:16:58] BCD step 10/10  FUGW loss:      0.01037062332034111     sparse.py:478
+    [14:44:56] BCD step 10/10  FUGW loss:      0.01037062332034111     sparse.py:478
                (base)      0.011205591261386871 (entropic)                          
 
     (tensor([ 52, 229, 140, 249, 186, 210, 131, 128, 209, 227,   6,  75,  71, 217,
@@ -605,7 +605,7 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  55.004 seconds)
+   **Total running time of the script:** ( 0 minutes  54.436 seconds)
 
 **Estimated memory usage:**  151 MB
 
@@ -615,6 +615,8 @@ between source and target
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python
