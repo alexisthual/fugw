@@ -9,3 +9,5 @@ doc/gen_modules
 doc/generated
 doc/modules/generated
 .vscode
+
+examples/**/*.pkl

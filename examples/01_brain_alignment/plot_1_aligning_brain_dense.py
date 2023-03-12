@@ -7,8 +7,9 @@ Align low-resolution brain surfaces of 2 individuals with fMRI data
 In this example, we align 2 low-resolution left hemispheres
 using 4 fMRI feature maps (z-score contrast maps).
 """
-
 # sphinx_gallery_thumbnail_number = 6
+import pickle
+
 import gdist
 import matplotlib as mpl
 import matplotlib.gridspec as gridspec
@@ -298,6 +299,17 @@ _ = ibpp_mapping.fit(
     },
     verbose=True,
 )
+
+# %%
+# Computed mappings can easily be saved on disk and loaded back:
+
+# Save mappings
+with open("./mapping.pkl", "wb") as f:
+    pickle.dump(mapping, f)
+
+# Load mappings
+with open("./mapping.pkl", "rb") as f:
+    mapping = pickle.load(f)
 
 # %%
 # Here is the evolution of the FUGW loss during training,
