@@ -3,11 +3,13 @@ import warnings
 
 import gdist
 import joblib
+import networkx as nx
 import numpy as np
 import torch
 
 from fugw.utils import get_progress
 from joblib import delayed, Parallel
+from scipy.sparse import coo_matrix
 
 
 @contextlib.contextmanager
@@ -53,6 +55,43 @@ def compute_geodesic_distances(coordinates, triangles, index):
     )
 
     return geodesic_distances
+
+
+def adjacency_matrix_from_triangles(n, triangles):
+    edges = np.hstack(
+        (
+            np.vstack((triangles[:, 0], triangles[:, 1])),
+            np.vstack((triangles[:, 0], triangles[:, 2])),
+            np.vstack((triangles[:, 1], triangles[:, 0])),
+            np.vstack((triangles[:, 1], triangles[:, 2])),
+            np.vstack((triangles[:, 2], triangles[:, 0])),
+            np.vstack((triangles[:, 2], triangles[:, 1])),
+        )
+    )
+    values = np.ones(edges.shape[1])
+
+    # Divide data by 2 since all edges i -> j are counted twice
+    # because they all belong to exactly two triangles on the mesh
+    adjacency = coo_matrix((values, edges), (n, n)).tocsr() / 2
+
+    # Making it symmetrical
+    adjacency = (adjacency + adjacency.T) / 2
+
+    return adjacency
+
+
+def compute_geodesic_distances_edges(coordinates, adjacency, index):
+    # Build graph
+    G = nx.Graph(adjacency)
+
+    def weights(u, v, d):
+        # print(u, v, d)
+        return np.linalg.norm(coordinates[u] - coordinates[v])
+
+    d = nx.single_source_dijkstra_path_length(G, index, weight=weights)
+    geodesic_distances = np.array(list(d.values()))[list(d.keys())]
+
+    return torch.from_numpy(geodesic_distances)
 
 
 def compute_lmds(

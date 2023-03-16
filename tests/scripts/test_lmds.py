@@ -24,6 +24,23 @@ def test_compute_geodesic_distances():
     assert distances.dtype == torch.float64
 
 
+def test_compute_geodesic_distances_edges():
+    fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
+    coordinates, triangles = surface.load_surf_mesh(fsaverage3.pial_left)
+    adjacency = lmds.adjacency_matrix_from_triangles(
+        coordinates.shape[0], triangles
+    )
+    print(adjacency.shape)
+    print(coordinates.shape)
+
+    distances = lmds.compute_geodesic_distances_edges(
+        coordinates, adjacency, 0
+    )
+
+    assert distances.shape == (642,)
+    assert distances.dtype == torch.float64
+
+
 @pytest.mark.parametrize("numpy_inputs", numpy_inputs)
 def test_lmds(numpy_inputs):
     fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
