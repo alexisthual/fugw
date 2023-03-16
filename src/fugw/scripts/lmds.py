@@ -37,7 +37,7 @@ def rich_progress_joblib(description=None, total=None, verbose=False):
         joblib.parallel.BatchCompletionCallBack = old_callback
 
 
-def compute_gdist(coordinates, triangles, index):
+def compute_geodesic_distances(coordinates, triangles, index):
     if isinstance(coordinates, torch.Tensor) or isinstance(
         triangles, torch.Tensor
     ):
@@ -103,7 +103,7 @@ def compute_lmds(
     ):
         basis_distance = torch.vstack(
             Parallel(n_jobs=n_jobs)(
-                delayed(compute_gdist)(
+                delayed(compute_geodesic_distances)(
                     coordinates,
                     triangles,
                     index,

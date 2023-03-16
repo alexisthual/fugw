@@ -14,6 +14,16 @@ k = 3
 numpy_inputs = [True, False]
 
 
+def test_compute_geodesic_distances():
+    fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
+    coordinates, triangles = surface.load_surf_mesh(fsaverage3.pial_left)
+
+    distances = lmds.compute_geodesic_distances(coordinates, triangles, 0)
+
+    assert distances.shape == (642,)
+    assert distances.dtype == torch.float64
+
+
 @pytest.mark.parametrize("numpy_inputs", numpy_inputs)
 def test_lmds(numpy_inputs):
     fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
