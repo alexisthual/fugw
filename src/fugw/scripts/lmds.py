@@ -80,12 +80,14 @@ def adjacency_matrix_from_triangles(n, triangles):
     return adjacency
 
 
-def compute_geodesic_distances_from_adjacency(coordinates, adjacency, index):
+def compute_geodesic_distances_from_graph(graph, coordinates, index):
     def weights(u, v, _):
         return np.linalg.norm(coordinates[u] - coordinates[v])
 
-    G = nx.Graph(adjacency)
-    d = nx.single_source_dijkstra_path_length(G, index, weight=weights)
+    print(len(list(graph)), coordinates.shape, index)
+    d = nx.single_source_dijkstra_path_length(
+        graph, int(index), weight=weights
+    )
     geodesic_distances = np.array(list(d.values()))[list(d.keys())]
 
     return torch.from_numpy(geodesic_distances)
@@ -132,6 +134,11 @@ def compute_lmds(
     invert_indices[indices] = torch.arange(n_voxels)
     basis_indices = indices[:n_landmarks]
 
+    adjacency = adjacency_matrix_from_triangles(
+        coordinates.shape[0], triangles
+    )
+    graph = nx.Graph(adjacency)
+
     with rich_progress_joblib(
         "Geodesic_distances for landmarks",
         total=basis_indices.shape[0],
@@ -139,9 +146,14 @@ def compute_lmds(
     ):
         basis_distance = torch.vstack(
             Parallel(n_jobs=n_jobs)(
-                delayed(compute_geodesic_distances)(
+                # delayed(compute_geodesic_distances)(
+                #     coordinates,
+                #     triangles,
+                #     index,
+                # )
+                delayed(compute_geodesic_distances_from_graph)(
+                    graph,
                     coordinates,
-                    triangles,
                     index,
                 )
                 for index in basis_indices

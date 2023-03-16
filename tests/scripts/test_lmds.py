@@ -1,3 +1,4 @@
+import networkx as nx
 import numpy as np
 import pytest
 import torch
@@ -30,11 +31,10 @@ def test_compute_geodesic_distances_edges():
     adjacency = lmds.adjacency_matrix_from_triangles(
         coordinates.shape[0], triangles
     )
-    print(adjacency.shape)
-    print(coordinates.shape)
 
-    distances = lmds.compute_geodesic_distances_edges(
-        coordinates, adjacency, 0
+    graph = nx.Graph(adjacency)
+    distances = lmds.compute_geodesic_distances_from_graph(
+        graph, coordinates, 0
     )
 
     assert distances.shape == (642,)
