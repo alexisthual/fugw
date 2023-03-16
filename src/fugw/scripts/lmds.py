@@ -80,14 +80,11 @@ def adjacency_matrix_from_triangles(n, triangles):
     return adjacency
 
 
-def compute_geodesic_distances_edges(coordinates, adjacency, index):
-    # Build graph
-    G = nx.Graph(adjacency)
-
-    def weights(u, v, d):
-        # print(u, v, d)
+def compute_geodesic_distances_from_adjacency(coordinates, adjacency, index):
+    def weights(u, v, _):
         return np.linalg.norm(coordinates[u] - coordinates[v])
 
+    G = nx.Graph(adjacency)
     d = nx.single_source_dijkstra_path_length(G, index, weight=weights)
     geodesic_distances = np.array(list(d.values()))[list(d.keys())]
 
