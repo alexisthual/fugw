@@ -88,3 +88,34 @@ def test_dense_mapping(device, return_numpy, solver):
     target_features_on_source = fugw.inverse_transform(target_features_test)
     assert target_features_on_source.shape == source_features_test.shape
     assert isinstance(target_features_on_source, torch.Tensor)
+
+
+divergences = ["KL", "L2"]
+
+
+@pytest.mark.parametrize(
+    "device,return_numpy,solver,divergence",
+    product(devices, return_numpys, solvers, divergences),
+)
+def test_dense_mapping_divergence(device, return_numpy, solver, divergence):
+    # Generate random training data for source and target
+    _, source_features_train, source_geometry, _ = init_mock_distribution(
+        n_features_train, n_voxels_source, return_numpy=return_numpy
+    )
+    _, target_features_train, target_geometry, _ = init_mock_distribution(
+        n_features_train, n_voxels_target, return_numpy=return_numpy
+    )
+
+    fugw = FUGW(divergence=divergence)
+    fugw.fit(
+        source_features=source_features_train,
+        target_features=target_features_train,
+        source_geometry=source_geometry,
+        target_geometry=target_geometry,
+        solver=solver,
+        solver_params={
+            "nits_bcd": 3,
+            "ibpp_eps_base": 1e8,
+        },
+        device=device,
+    )

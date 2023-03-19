@@ -134,6 +134,7 @@ class FUGW(BaseMapping):
             rho_s=rho_s,
             rho_t=rho_t,
             eps=self.eps,
+            divergence=self.divergence,
             reg_mode=self.reg_mode,
             F=F,
             Ds=Ds,

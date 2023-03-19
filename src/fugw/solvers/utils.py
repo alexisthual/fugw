@@ -754,6 +754,10 @@ def compute_approx_kl(p, q):
     return entropy
 
 
+def compute_approx_l2(p, q):
+    pass
+
+
 def elementwise_prod_sparse(p, q):
     """Element-wise product between 2 sparse CSR matrices
     which have the same sparcity indices."""
@@ -784,6 +788,10 @@ def compute_kl(p, q):
 
 def compute_kl_sparse(p, q):
     return compute_approx_kl_sparse(p, q) - csr_sum(p) + csr_sum(q)
+
+
+def compute_l2(p, q):
+    return ((p - q) ** 2).sum()
 
 
 def compute_quad_kl(mu, nu, alpha, beta):

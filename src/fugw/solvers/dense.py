@@ -8,6 +8,7 @@ from fugw.solvers.utils import (
     BaseSolver,
     compute_approx_kl,
     compute_kl,
+    compute_approx_l2,
     compute_quad_kl,
     solver_ibpp,
     solver_mm,
@@ -32,7 +33,7 @@ class FUGWSolver(BaseSolver):
         which makes use of this cost to update the transport plans.
         """
 
-        rho_s, rho_t, eps, alpha, reg_mode = hyperparams
+        rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         X_sqr, Y_sqr, X, Y, D = data_const
         if transpose:
@@ -59,15 +60,28 @@ class FUGWSolver(BaseSolver):
 
         # or when cost is balanced
         if rho_s != float("inf") and rho_s != 0:
-            marginal_cost_dim1 = compute_approx_kl(pi1, ws)
+            if divergence == "KL":
+                marginal_cost_dim1 = compute_approx_kl(pi1, ws)
+            elif divergence == "L2":
+                marginal_cost_dim1 = compute_approx_l2(pi1, ws)
             cost += rho_s * marginal_cost_dim1
         if rho_t != float("inf") and rho_t != 0:
-            marginal_cost_dim2 = compute_approx_kl(pi2, wt)
+            if divergence == "KL":
+                marginal_cost_dim2 = compute_approx_kl(pi2, wt)
+            elif divergence == "L2":
+                marginal_cost_dim2 = compute_approx_l2(pi2, wt)
             cost += rho_t * marginal_cost_dim2
 
         if reg_mode == "joint":
-            entropic_cost = compute_approx_kl(pi, ws_dot_wt)
+            if divergence == "KL":
+                entropic_cost = compute_approx_kl(pi, ws_dot_wt)
+            elif divergence == "L2":
+                entropic_cost = compute_approx_l2(pi, ws_dot_wt)
             cost += eps * entropic_cost
+        elif reg_mode == "independent":
+            # Note that for the independent case,
+            # there is no entropic term in the cost matrix
+            pass
 
         return cost
 
@@ -126,6 +140,7 @@ class FUGWSolver(BaseSolver):
         rho_s=1,
         rho_t=1,
         eps=1e-2,
+        divergence="KL",
         reg_mode="joint",
         F=None,
         Ds=None,
@@ -147,6 +162,7 @@ class FUGWSolver(BaseSolver):
         rho_t: float
         eps: float
         reg_mode: str
+        divergence: str
         F: matrix of size n x m.
             Kernel matrix between the source and target features.
         Ds: matrix of size n x n
@@ -256,14 +272,14 @@ class FUGWSolver(BaseSolver):
             self.local_biconvex_cost,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
         compute_fugw_loss = partial(
             self.fugw_loss,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
         self_solver_sinkhorn = partial(
