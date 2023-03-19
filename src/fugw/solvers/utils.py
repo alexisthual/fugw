@@ -188,9 +188,9 @@ def batch_elementwise_prod_and_sum(
     res = torch.cat(
         [
             (
-                X1[idx_1[i : i + batch_size].type(torch.LongTensor), :]  # noqa
+                X1[idx_1[i: i + batch_size].type(torch.LongTensor), :]  # noqa
                 * X2[
-                    idx_2[i : i + batch_size].type(torch.LongTensor), :  # noqa
+                    idx_2[i: i + batch_size].type(torch.LongTensor), :  # noqa
                 ]
             ).sum(axis)
             for i in range(0, m, batch_size)
@@ -397,7 +397,7 @@ def solver_mm(
 
     with get_progress(transient=True) as progress:
         if verbose:
-            task = progress.add_task("MM iterations", total=niters)
+            task = progress.add_task("MM-KL iterations", total=niters)
 
         for idx in range(niters):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
@@ -423,6 +423,49 @@ def solver_mm(
                     break
 
     return pi
+
+
+def solver_mm_l2(cost, init_pi, uot_params, tuple_weights, train_params, verbose=True):
+    """
+    Solve regularized UOT with L2-squared norm using the majorization-minimization algorithm.
+    Allow epsilon to be 0 but rho_s and rho_t can't be infinity.
+
+    If $\rho$ is too small, then we obtain $0$ everywhere, which will result in NaN coupling.
+    If $\rho$ is too large, then we lose the sparsity. So, need to choose $\rho$ adequately.
+    """
+
+    niters, tol, eval_freq = train_params
+    ws, wt, ws_dot_wt = tuple_weights
+    rho_s, rho_t, eps = uot_params
+
+    thres = torch.clamp(
+        (rho_s * ws[:, None]) + (rho_t * wt[None, :]) + eps * ws_dot_wt - cost, min=0)
+
+    pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
+
+    with get_progress(transient=True) as progress:
+        if verbose:
+            task = progress.add_task("MM-L2 iterations", total=niters)
+
+        for idx in range(niters):
+            pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
+            denom = (rho_s * pi1[:, None]) + (rho_t * pi2[None, :]) + eps * pi
+            pi = thres * pi / denom
+            pi1, pi2 = pi.sum(1), pi.sum(0)
+
+            if verbose:
+                progress.update(task, advance=1)
+
+            if idx % eval_freq == 0:
+                pi1_error = (pi1 - pi1_prev).abs().max()
+                pi2_error = (pi2 - pi2_prev).abs().max()
+                if max(pi1_error, pi2_error) < tol:
+                    if verbose:
+                        progress.console.log(
+                            "Reached tol_uot threshold: "
+                            f"{pi1_error}, {pi2_error}"
+                        )
+                    break
 
 
 def solver_mm_sparse(
@@ -829,3 +872,34 @@ def compute_quad_kl_sparse(mu, nu, alpha, beta):
     )
 
     return kl
+
+
+def compute_quad_l2(a, b, mu, nu):
+    """
+    Compute || a otimes b - mu otimes nu ||^2
+    """
+
+    norm_a2 = (a**2).sum()
+    ratio = a.dot(mu) / norm_a2
+    norm = norm_a2 * torch.sum((b - ratio * nu)**2) + \
+        (nu**2).sum() * (torch.sum((mu**2)) - ratio)
+
+    return norm
+
+
+def compute_l2(p, q):
+    return torch.sum((p - q)**2)
+
+
+def compute_quad_divergence(mu, nu, alpha, beta, divergence="kl"):
+    if divergence == "kl":
+        return compute_quad_kl(mu, nu, alpha, beta)
+    elif divergence == "l2":
+        return compute_quad_l2(mu, nu, alpha, beta)
+
+
+def compute_divergence(p, q, divergence="kl"):
+    if divergence == "kl":
+        return compute_kl(p, q)
+    elif divergence == "l2":
+        return compute_l2(p, q)
