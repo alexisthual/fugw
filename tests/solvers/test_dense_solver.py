@@ -129,8 +129,8 @@ def test_dense_solvers_l2(reg_mode):
 
     res = fugw.solve(
         alpha=0.8,
-        rho_s=2,
-        rho_t=3,
+        rho_s=200,
+        rho_t=300,
         eps=0.02,
         reg_mode=reg_mode,
         F=F_normalized,
