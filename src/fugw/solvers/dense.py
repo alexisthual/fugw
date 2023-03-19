@@ -351,7 +351,7 @@ class FUGWSolver(BaseSolver):
 
                 r_ws = pi1.dot(ws) / m1
                 r_wt = pi2.dot(wt) / m2
-                r_wst = pi.dot(ws_dot_wt) / m
+                r_wst = (pi * ws_dot_wt).sum() / m
                 tuple_weights = (r_ws * ws, r_wt * wt, r_wst * ws_dot_wt)
 
                 new_rho_s = rho_s * m1
@@ -392,7 +392,7 @@ class FUGWSolver(BaseSolver):
 
                 r_ws = gamma1.dot(ws) / m1
                 r_wt = gamma2.dot(wt) / m2
-                r_wst = gamma.dot(ws_dot_wt) / m
+                r_wst = (gamma * ws_dot_wt).sum() / m
                 tuple_weights = (r_ws * ws, r_wt * wt, r_wst * ws_dot_wt)
 
                 new_rho_s = rho_s * m1
