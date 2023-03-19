@@ -442,6 +442,6 @@ class FUGWSolver(BaseSolver):
             "duals_gamma": duals_gamma,
             "loss_steps": loss_steps,
             "loss": loss,
-            "loss_regularized": loss_regularized,
+            "loss_entropic": loss_regularized,
             "loss_times": loss_times,
         }
