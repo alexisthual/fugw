@@ -886,7 +886,7 @@ def compute_quad_l2(a, b, mu, nu):
     """
 
     norm_a2 = (a**2).sum()
-    ratio = a.dot(mu) / norm_a2
+    ratio = (a * mu).sum() / norm_a2
     norm = norm_a2 * torch.sum((b - ratio * nu)**2) + \
         (nu**2).sum() * (torch.sum((mu**2)) - ratio)
 
