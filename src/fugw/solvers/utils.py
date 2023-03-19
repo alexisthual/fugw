@@ -473,6 +473,8 @@ def solver_mm_l2(
                         )
                     break
 
+    return pi
+
 
 def solver_mm_sparse(
     cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
