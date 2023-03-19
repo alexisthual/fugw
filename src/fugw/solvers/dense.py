@@ -239,25 +239,20 @@ class FUGWSolver(BaseSolver):
         gamma = pi
 
         # initialization of dual vectors
-        if divergence == "mm":
+        if divergence == "l2" or solver == "mm":
             duals_pi, duals_gamma = None, None
-        if solver == "sinkhorn":
+        else:
             if init_duals is None:
-                duals_pi = (
-                    torch.zeros_like(ws),
-                    torch.zeros_like(wt),
-                )
-            else:
-                duals_pi = init_duals
-            duals_gamma = duals_pi
-        elif solver == "mm":
-            duals_pi, duals_gamma = None, None
-        elif solver == "ibpp":
-            if init_duals is None:
-                duals_pi = (
-                    torch.ones_like(ws),
-                    torch.ones_like(wt),
-                )
+                if solver == "sinkhorn":
+                    duals_pi = (
+                        torch.zeros_like(ws),
+                        torch.zeros_like(wt),
+                    )
+                elif solver == "ibpp":
+                    duals_pi = (
+                        torch.ones_like(ws),
+                        torch.ones_like(wt),
+                    )
             else:
                 duals_pi = init_duals
             duals_gamma = duals_pi
