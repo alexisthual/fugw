@@ -119,8 +119,8 @@ class FUGWSolver(BaseSolver):
             )
         elif reg_mode == "independent":
             regularization = (
-                compute_divergence(pi, ws_dot_wt, divergence) +
-                compute_divergence(gamma, ws_dot_wt, divergence)
+                compute_divergence(pi, ws_dot_wt, divergence)
+                + compute_divergence(gamma, ws_dot_wt, divergence)
             )
         regularized_loss = loss + eps * regularization
 
