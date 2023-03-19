@@ -73,7 +73,9 @@ class FUGWSolver(BaseSolver):
 
         return cost
 
-    def fugw_loss(self, pi, gamma, data_const, tuple_weights, hyperparams, divergence):
+    def fugw_loss(
+        self, pi, gamma, data_const, tuple_weights, hyperparams, divergence
+    ):
         """
         Returns scalar fugw loss, which is a combination of:
         - a Wasserstein loss on features
@@ -116,9 +118,10 @@ class FUGWSolver(BaseSolver):
                 pi, gamma, ws_dot_wt, ws_dot_wt, divergence
             )
         elif reg_mode == "independent":
-            regularization = compute_divergence(
-                pi, ws_dot_wt, divergence) + compute_divergence(gamma, ws_dot_wt, divergence)
-
+            regularization = (
+                compute_divergence(pi, ws_dot_wt, divergence) +
+                compute_divergence(gamma, ws_dot_wt, divergence)
+            )
         regularized_loss = loss + eps * regularization
 
         return loss.item(), regularized_loss.item()
@@ -384,8 +387,8 @@ class FUGWSolver(BaseSolver):
 
             elif divergence == "l2":
                 gamma1, gamma2 = gamma.sum(1), gamma.sum(0)
-                m1, m2, m = (gamma2**2).sum(), (gamma2 **
-                                                2).sum(), (gamma**2).sum()
+                m1, m2 = (gamma2**2).sum(), (gamma2 ** 2).sum()
+                m = (gamma**2).sum()
 
                 r_ws = gamma1.dot(ws) / m1
                 r_wt = gamma2.dot(wt) / m2

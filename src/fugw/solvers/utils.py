@@ -425,21 +425,27 @@ def solver_mm(
     return pi
 
 
-def solver_mm_l2(cost, init_pi, uot_params, tuple_weights, train_params, verbose=True):
+def solver_mm_l2(
+    cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
+):
     """
-    Solve regularized UOT with L2-squared norm using the majorization-minimization algorithm.
-    Allow epsilon to be 0 but rho_s and rho_t can't be infinity.
+    Solve regularized UOT with L2-squared norm using
+    the majorization-minimization algorithm. Allow epsilon to be 0
+    but rho_s and rho_t can't be infinity.
 
-    If $\rho$ is too small, then we obtain $0$ everywhere, which will result in NaN coupling.
-    If $\rho$ is too large, then we lose the sparsity. So, need to choose $\rho$ adequately.
+    If $\rho$ is too small, then we obtain $0$ everywhere,
+    which will result in NaN coupling.
+    If $\rho$ is too large, then we lose the sparsity.
+    So, need to choose $\rho$ adequately.
     """
 
     niters, tol, eval_freq = train_params
     ws, wt, ws_dot_wt = tuple_weights
     rho_s, rho_t, eps = uot_params
 
-    thres = torch.clamp(
-        (rho_s * ws[:, None]) + (rho_t * wt[None, :]) + eps * ws_dot_wt - cost, min=0)
+    thres = (rho_s * ws[:, None]) + \
+        (rho_t * wt[None, :]) + eps * ws_dot_wt - cost
+    thres = torch.clamp(thres, min=0)
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
