@@ -188,9 +188,9 @@ def batch_elementwise_prod_and_sum(
     res = torch.cat(
         [
             (
-                X1[idx_1[i: i + batch_size].type(torch.LongTensor), :]  # noqa
+                X1[idx_1[i : i + batch_size].type(torch.LongTensor), :]  # noqa
                 * X2[
-                    idx_2[i: i + batch_size].type(torch.LongTensor), :  # noqa
+                    idx_2[i : i + batch_size].type(torch.LongTensor), :  # noqa
                 ]
             ).sum(axis)
             for i in range(0, m, batch_size)
@@ -443,8 +443,9 @@ def solver_mm_l2(
     ws, wt, ws_dot_wt = tuple_weights
     rho_s, rho_t, eps = uot_params
 
-    thres = (rho_s * ws[:, None]) + \
-        (rho_t * wt[None, :]) + eps * ws_dot_wt - cost
+    thres = (
+        (rho_s * ws[:, None]) + (rho_t * wt[None, :]) + eps * ws_dot_wt - cost
+    )
     thres = torch.clamp(thres, min=0)
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
@@ -889,14 +890,15 @@ def compute_quad_l2(a, b, mu, nu):
 
     norm_a2 = (a**2).sum()
     ratio = (a * mu).sum() / norm_a2
-    norm = norm_a2 * torch.sum((b - ratio * nu)**2) + \
-        (nu**2).sum() * (torch.sum((mu**2)) - ratio)
+    norm = norm_a2 * torch.sum((b - ratio * nu) ** 2) + (nu**2).sum() * (
+        torch.sum((mu**2)) - ratio
+    )
 
     return norm
 
 
 def compute_l2(p, q):
-    return torch.sum((p - q)**2)
+    return torch.sum((p - q) ** 2)
 
 
 def compute_quad_divergence(mu, nu, alpha, beta, divergence="kl"):

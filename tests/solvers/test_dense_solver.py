@@ -124,7 +124,7 @@ def test_dense_solvers_l2(reg_mode):
         tol_uot=1e-7,
         early_stopping_threshold=1e-5,
         eval_bcd=eval_bcd,
-        eval_uot=10
+        eval_uot=10,
     )
 
     res = fugw.solve(

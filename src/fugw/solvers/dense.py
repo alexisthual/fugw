@@ -12,7 +12,7 @@ from fugw.solvers.utils import (
     solver_ibpp,
     solver_mm,
     solver_sinkhorn,
-    solver_mm_l2
+    solver_mm_l2,
 )
 from fugw.utils import console
 
@@ -106,11 +106,13 @@ class FUGWSolver(BaseSolver):
 
         if rho_s != float("inf") and rho_s != 0:
             marginal_constraint_dim1 = compute_quad_divergence(
-                pi1, gamma1, ws, ws, divergence)
+                pi1, gamma1, ws, ws, divergence
+            )
             loss += rho_s * marginal_constraint_dim1
         if rho_t != float("inf") and rho_t != 0:
             marginal_constraint_dim2 = compute_quad_divergence(
-                pi2, gamma2, wt, wt, divergence)
+                pi2, gamma2, wt, wt, divergence
+            )
             loss += rho_t * marginal_constraint_dim2
 
         if reg_mode == "joint":
@@ -118,10 +120,9 @@ class FUGWSolver(BaseSolver):
                 pi, gamma, ws_dot_wt, ws_dot_wt, divergence
             )
         elif reg_mode == "independent":
-            regularization = (
-                compute_divergence(pi, ws_dot_wt, divergence)
-                + compute_divergence(gamma, ws_dot_wt, divergence)
-            )
+            regularization = compute_divergence(
+                pi, ws_dot_wt, divergence
+            ) + compute_divergence(gamma, ws_dot_wt, divergence)
         regularized_loss = loss + eps * regularization
 
         return loss.item(), regularized_loss.item()
@@ -263,7 +264,7 @@ class FUGWSolver(BaseSolver):
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
             hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
-            divergence=divergence
+            divergence=divergence,
         )
 
         compute_fugw_loss = partial(
@@ -271,7 +272,7 @@ class FUGWSolver(BaseSolver):
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
             hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
-            divergence=divergence
+            divergence=divergence,
         )
 
         # If divergence is L2
@@ -355,7 +356,8 @@ class FUGWSolver(BaseSolver):
                 uot_params = (new_rho_s, new_rho_t, new_eps)
 
                 gamma = self_solver_mm_l2(
-                    cost_gamma, gamma, uot_params, tuple_weights)
+                    cost_gamma, gamma, uot_params, tuple_weights
+                )
 
             gamma = (mp / gamma.sum()).sqrt() * gamma
 
@@ -382,7 +384,7 @@ class FUGWSolver(BaseSolver):
 
             elif divergence == "l2":
                 gamma1, gamma2 = gamma.sum(1), gamma.sum(0)
-                m1, m2 = (gamma2**2).sum(), (gamma2 ** 2).sum()
+                m1, m2 = (gamma2**2).sum(), (gamma2**2).sum()
                 m = (gamma**2).sum()
 
                 r_ws = gamma1.dot(ws) / m1
