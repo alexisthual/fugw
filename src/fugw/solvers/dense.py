@@ -115,17 +115,42 @@ class FUGWSolver(BaseSolver):
             )
             loss += rho_t * marginal_constraint_dim2
 
-        if reg_mode == "joint":
-            regularization = compute_quad_divergence(
-                pi, gamma, ws_dot_wt, ws_dot_wt, divergence
-            )
-        elif reg_mode == "independent":
-            regularization = compute_divergence(
-                pi, ws_dot_wt, divergence
-            ) + compute_divergence(gamma, ws_dot_wt, divergence)
-        regularized_loss = loss + eps * regularization
+        regularized_loss = loss
+        if eps != 0:
+            if reg_mode == "joint":
+                regularization = compute_quad_divergence(
+                    pi, gamma, ws_dot_wt, ws_dot_wt, divergence
+                )
+            elif reg_mode == "independent":
+                regularization = compute_divergence(
+                    pi, ws_dot_wt, divergence
+                ) + compute_divergence(gamma, ws_dot_wt, divergence)
+            regularized_loss += eps * regularization
 
         return loss.item(), regularized_loss.item()
+
+    def get_parameters_uot(self, pi, tuple_weights, hyperparams):
+        rho_s, rho_t, eps, reg_mode = hyperparams
+        ws, wt, ws_dot_wt = tuple_weights
+
+        pi1, pi2 = pi.sum(1), pi.sum(0)
+        l2_pi1, l2_pi2 = (pi1**2).sum(), (pi2**2).sum()
+        l2_pi = (pi**2).sum()
+
+        weight_ws = pi1.dot(ws) / l2_pi1
+        weight_wt = pi2.dot(wt) / l2_pi2
+        weight_wst = (pi * ws_dot_wt).sum() / \
+            l2_pi if reg_mode == "joint" else 1
+        weighted_tuple_weights = (weight_ws * ws,
+                                  weight_wt * wt,
+                                  weight_wst * ws_dot_wt)
+
+        new_rho_s = rho_s * l2_pi1
+        new_rho_t = rho_t * l2_pi2
+        new_eps = eps * l2_pi if reg_mode == "joint" else eps
+        uot_params = (new_rho_s, new_rho_t, new_eps)
+
+        return weighted_tuple_weights, uot_params
 
     def solve(
         self,
@@ -281,6 +306,12 @@ class FUGWSolver(BaseSolver):
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
         )
 
+        self_get_params_uot = partial(
+            self.get_parameters_uot,
+            tuple_weights=(ws, wt, ws_dot_wt),
+            hyperparams=(rho_s, rho_t, eps, reg_mode)
+        )
+
         # If divergence is KL
         self_solver_sinkhorn = partial(
             solver_sinkhorn,
@@ -321,13 +352,12 @@ class FUGWSolver(BaseSolver):
             pi_prev = pi.detach().clone()
 
             # Update gamma
-            mp = pi.sum()
+            l1_pi = pi.sum()
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
 
             if divergence == "kl":
-                new_rho_s = rho_s * mp
-                new_rho_t = rho_t * mp
-                new_eps = mp * eps if reg_mode == "joint" else eps
+                new_rho_s, new_rho_t = rho_s * l1_pi, rho_t * l1_pi
+                new_eps = l1_pi * eps if reg_mode == "joint" else eps
                 uot_params = (new_rho_s, new_rho_t, new_eps)
 
                 if solver == "sinkhorn":
@@ -342,33 +372,21 @@ class FUGWSolver(BaseSolver):
                     )
 
             elif divergence == "l2":
-                pi1, pi2 = pi.sum(1), pi.sum(0)
-                m1, m2, m = (pi1**2).sum(), (pi2**2).sum(), (pi**2).sum()
-
-                r_ws = pi1.dot(ws) / m1
-                r_wt = pi2.dot(wt) / m2
-                r_wst = (pi * ws_dot_wt).sum() / m
-                tuple_weights = (r_ws * ws, r_wt * wt, r_wst * ws_dot_wt)
-
-                new_rho_s = rho_s * m1
-                new_rho_t = rho_t * m2
-                new_eps = eps * m if reg_mode == "joint" else eps
-                uot_params = (new_rho_s, new_rho_t, new_eps)
-
+                tuple_weights, uot_params = self_get_params_uot(pi)
                 gamma = self_solver_mm_l2(
                     cost_gamma, gamma, uot_params, tuple_weights
                 )
 
-            gamma = (mp / gamma.sum()).sqrt() * gamma
+            # Rescale mass
+            gamma = (l1_pi / gamma.sum()).sqrt() * gamma
 
             # Update pi
-            mg = gamma.sum()
+            l1_gamma = gamma.sum()
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
 
             if divergence == "kl":
-                new_rho_s = rho_s * mg
-                new_rho_t = rho_t * mg
-                new_eps = mp * eps if reg_mode == "joint" else eps
+                new_rho_s, new_rho_t = rho_s * l1_gamma, rho_t * l1_gamma
+                new_eps = l1_gamma * eps if reg_mode == "joint" else eps
                 uot_params = (new_rho_s, new_rho_t, new_eps)
 
                 if solver == "sinkhorn":
@@ -383,23 +401,11 @@ class FUGWSolver(BaseSolver):
                     )
 
             elif divergence == "l2":
-                gamma1, gamma2 = gamma.sum(1), gamma.sum(0)
-                m1, m2 = (gamma2**2).sum(), (gamma2**2).sum()
-                m = (gamma**2).sum()
-
-                r_ws = gamma1.dot(ws) / m1
-                r_wt = gamma2.dot(wt) / m2
-                r_wst = (gamma * ws_dot_wt).sum() / m
-                tuple_weights = (r_ws * ws, r_wt * wt, r_wst * ws_dot_wt)
-
-                new_rho_s = rho_s * m1
-                new_rho_t = rho_t * m2
-                new_eps = eps * m if reg_mode == "joint" else eps
-                uot_params = (new_rho_s, new_rho_t, new_eps)
-
+                tuple_weights, uot_params = self_get_params_uot(gamma)
                 pi = self_solver_mm_l2(cost_pi, pi, uot_params, tuple_weights)
 
-            pi = (mg / pi.sum()).sqrt() * pi
+            # Rescale mass
+            pi = (l1_gamma / pi.sum()).sqrt() * pi
 
             # Update error
             err = (pi - pi_prev).abs().sum().item()

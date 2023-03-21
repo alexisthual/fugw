@@ -444,7 +444,7 @@ def solver_mm_l2(
     rho_s, rho_t, eps = uot_params
 
     thres = (
-        (rho_s * ws[:, None]) + (rho_t * wt[None, :]) + eps * ws_dot_wt - cost
+        rho_s * ws[:, None] + rho_t * wt[None, :] + eps * ws_dot_wt - cost
     )
     thres = torch.clamp(thres, min=0)
 
@@ -456,7 +456,7 @@ def solver_mm_l2(
 
         for idx in range(niters):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
-            denom = (rho_s * pi1[:, None]) + (rho_t * pi2[None, :]) + eps * pi
+            denom = rho_s * pi1[:, None] + rho_t * pi2[None, :] + eps * pi
             pi = thres * pi / denom
             pi1, pi2 = pi.sum(1), pi.sum(0)
 
