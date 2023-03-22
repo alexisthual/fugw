@@ -366,7 +366,7 @@ class FUGWSolver(BaseSolver):
                     )
                 elif solver == "mm":
                     gamma = self_solver_mm_kl(cost_gamma, gamma, uot_params)
-                if solver == "ibpp":
+                elif solver == "ibpp":
                     duals_gamma, gamma = self_solver_ibpp(
                         cost_gamma, gamma, duals_gamma, uot_params
                     )
