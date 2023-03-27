@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="🧠 Brain alignment" href="../01_brain_alignment/index.html" /><link rel="prev" title="Generate embeddings from mesh" href="plot_2_1_lmds.html" />
 
-    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+    <!-- Generated with Sphinx 5.3.0 and Furo 2023.03.27 -->
         <title>Transport distributions using sparse solvers - FUGW</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
@@ -268,7 +268,7 @@ have more than 10k points.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:250: UserWarning:
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:253: UserWarning:
 
 Singular sample detected.
 </pre></div>
@@ -322,8 +322,8 @@ of points from the source and target distributions,
 which we sample randomly in this example.
 You should carefully set the source and target <code class="docutils literal notranslate"><span class="pre">selection_radius</span></code>
 as they will greatly affect the sparsity of the computed mappings.
-They should usally be set using domain knowledge related to the distributions
-you are trying to align.</p>
+They should usually be set using domain knowledge related to the
+distributions you are trying to align.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sub-sample source and target distributions</span>
 <span class="n">source_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">n_points_source</span><span class="p">)[:</span><span class="n">n_samples_source</span><span class="p">]</span>
 <span class="n">target_sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">n_points_target</span><span class="p">)[:</span><span class="n">n_samples_target</span><span class="p">]</span>
@@ -354,7 +354,7 @@ you are trying to align.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[14:44:10] BCD step 1/10   FUGW loss:      0.03198949992656708      dense.py:360
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[16:01:53] BCD step 1/10   FUGW loss:      0.03198949992656708      dense.py:360
            (base)      0.032095134258270264 (entropic)
 
 
@@ -362,11 +362,11 @@ you are trying to align.</p>
            (base)     0.027612881734967232 (entropic)
 
 
-           BCD step 3/10   FUGW loss:      0.017961936071515083     dense.py:360
+[16:01:54] BCD step 3/10   FUGW loss:      0.017961936071515083     dense.py:360
            (base)     0.01844286173582077 (entropic)
 
 
-[14:44:11] BCD step 4/10   FUGW loss:      0.015194778330624104     dense.py:360
+           BCD step 4/10   FUGW loss:      0.015194778330624104     dense.py:360
            (base)     0.015796463936567307 (entropic)
 
 
@@ -374,67 +374,67 @@ you are trying to align.</p>
            (base)     0.015153813175857067 (entropic)
 
 
-           BCD step 6/10   FUGW loss:      0.014186171814799309     dense.py:360
+[16:01:55] BCD step 6/10   FUGW loss:      0.014186171814799309     dense.py:360
            (base)     0.014875920489430428 (entropic)
 
 
-[14:44:12] BCD step 7/10   FUGW loss:      0.014005331322550774     dense.py:360
+[16:01:56] BCD step 7/10   FUGW loss:      0.014005331322550774     dense.py:360
            (base)     0.01471529621630907 (entropic)
 
 
-[14:44:13] BCD step 8/10   FUGW loss:      0.013867946341633797     dense.py:360
+[16:01:57] BCD step 8/10   FUGW loss:      0.013867946341633797     dense.py:360
            (base)     0.014592503197491169 (entropic)
 
 
-[14:44:14] BCD step 9/10   FUGW loss:      0.013740603812038898     dense.py:360
+[16:01:58] BCD step 9/10   FUGW loss:      0.013740603812038898     dense.py:360
            (base)     0.014477620832622051 (entropic)
 
 
-[14:44:15] BCD step 10/10  FUGW loss:      0.013632165268063545     dense.py:360
+[16:01:59] BCD step 10/10  FUGW loss:      0.013632165268063545     dense.py:360
            (base)     0.014380687847733498 (entropic)
-/github/workspace/src/fugw/utils.py:60: UserWarning:
+/github/workspace/src/fugw/scripts/coarse_to_fine.py:412: UserWarning:
 
 Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
 
 
 
-[14:44:18] BCD step 1/10   FUGW loss:      0.020308256149291992    sparse.py:478
+[16:02:02] BCD step 1/10   FUGW loss:      0.020308256149291992    sparse.py:478
            (base)     0.020477615296840668 (entropic)
 
 
-[14:44:22] BCD step 2/10   FUGW loss:      0.013988880440592766    sparse.py:478
+[16:02:06] BCD step 2/10   FUGW loss:      0.013988880440592766    sparse.py:478
            (base)     0.014400288462638855 (entropic)
 
 
-[14:44:25] BCD step 3/10   FUGW loss:      0.01208634115755558     sparse.py:478
+[16:02:10] BCD step 3/10   FUGW loss:      0.01208634115755558     sparse.py:478
            (base)      0.012644429691135883 (entropic)
 
 
-[14:44:28] BCD step 4/10   FUGW loss:      0.011344446800649166    sparse.py:478
+[16:02:13] BCD step 4/10   FUGW loss:      0.011344446800649166    sparse.py:478
            (base)     0.011991022154688835 (entropic)
 
 
-[14:44:31] BCD step 5/10   FUGW loss:      0.010971869342029095    sparse.py:478
+[16:02:17] BCD step 5/10   FUGW loss:      0.010971869342029095    sparse.py:478
            (base)     0.011676927097141743 (entropic)
 
 
-[14:44:35] BCD step 6/10   FUGW loss:      0.010754159651696682    sparse.py:478
+[16:02:21] BCD step 6/10   FUGW loss:      0.010754159651696682    sparse.py:478
            (base)     0.01150030642747879 (entropic)
 
 
-[14:44:39] BCD step 7/10   FUGW loss:      0.010611843317747116    sparse.py:478
+[16:02:25] BCD step 7/10   FUGW loss:      0.010611843317747116    sparse.py:478
            (base)     0.011388429440557957 (entropic)
 
 
-[14:44:44] BCD step 8/10   FUGW loss:      0.010510009713470936    sparse.py:478
+[16:02:30] BCD step 8/10   FUGW loss:      0.010510009713470936    sparse.py:478
            (base)     0.011310222558677197 (entropic)
 
 
-[14:44:49] BCD step 9/10   FUGW loss:      0.01043227780610323     sparse.py:478
+[16:02:36] BCD step 9/10   FUGW loss:      0.01043227780610323     sparse.py:478
            (base)      0.011251525953412056 (entropic)
 
 
-[14:44:56] BCD step 10/10  FUGW loss:      0.01037062332034111     sparse.py:478
+[16:02:43] BCD step 10/10  FUGW loss:      0.01037062332034111     sparse.py:478
            (base)      0.011205591261386871 (entropic)
 
 (tensor([ 52, 229, 140, 249, 186, 210, 131, 128, 209, 227,   6,  75,  71, 217,
@@ -582,8 +582,8 @@ between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  54.436 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  151 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  58.700 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  157 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-2-2-coarse-to-fine-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/400739f84596661dbde0701b2a6ac605/plot_2_2_coarse_to_fine.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_2_2_coarse_to_fine.py</span></code></a></p>
