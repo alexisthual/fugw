@@ -89,7 +89,7 @@ fine_mapping_solver_params = {
 # which we sample randomly in this example.
 # You should carefully set the source and target ``selection_radius``
 # as they will greatly affect the sparsity of the computed mappings.
-# They should usally be set using domain knowledge related to the distributions
+# They should usually be set using domain knowledge related to the distributions
 # you are trying to align.
 
 # Sub-sample source and target distributions

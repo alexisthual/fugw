@@ -19,7 +19,7 @@ def random_normalizing(X, sample_size=100, repeats=10):
         Tensor to normalize.
     sample_size: int, optional, defaults to 100
         Number of vectors to sample from X at each iteration.
-    repeats: int, optinal, defaults to 10
+    repeats: int, optional, defaults to 10
         Number of iterations to run.
 
     Returns
@@ -292,11 +292,11 @@ def fit(
         target vertices
     source_weights: ndarray(n) or None
         Distribution weights of source nodes.
-        Should sum to 1. If None, eahc node's weight
+        Should sum to 1. If None, each node's weight
         will be set to 1 / n.
     target_weights: ndarray(n) or None
         Distribution weights of target nodes.
-        Should sum to 1. If None, eahc node's weight
+        Should sum to 1. If None, each node's weight
         will be set to 1 / m.
     device: "auto" or torch.device
         if "auto": use first available gpu if it's available,
@@ -380,7 +380,7 @@ def fit(
 
     elif coarse_pairs_selection_method == "topk":
         # Method 2: keep topk indices per line and per column
-        # (this should be prefered as it will keep vertices
+        # (this should be preferred as it will keep vertices
         # which are particularly unbalanced)
         rows = np.concatenate(
             [
