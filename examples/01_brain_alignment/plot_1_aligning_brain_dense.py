@@ -195,7 +195,7 @@ plt.show()
 # Features and geometries should be normalized before we can train a mapping.
 # Indeed, without this scaling, it's unclear whether the source and target
 # features would be comparable. Moreover, the hyper-parameter ``alpha`` would
-# depend on the scale of the respective matrices. Finally, it can empiracally
+# depend on the scale of the respective matrices. Finally, it can empirically
 # lead to having ``nan`` values in the computed transport plan.
 
 source_features_normalized = source_features / np.linalg.norm(

@@ -176,7 +176,7 @@ plt.show()
 # ``(m, m)``) won't fit in memory, even with a powerful GPU -
 # as a rule of thumb, this will typically be the case if ``n`` is greater
 # than 50k. Therefore, the source and target geometry matrices cannot be
-# explicitely computed. Instead, we derive an embedding ``X`` in dimension
+# explicitly computed. Instead, we derive an embedding ``X`` in dimension
 # ``k`` to approximate these matrices. Under the hood, this embedding
 # approximates the geodesic distance between all pairs of vertices by
 # computing the true geodesic distance to ``n_landmarks`` vertices
@@ -505,7 +505,7 @@ ax.legend()
 plt.show()
 
 # %%
-# Note how few iterations are neede for the fine-grained model to converge
+# Note how few iterations are needed for the fine-grained model to converge
 # compared to the coarse one, although the coarse model usually runs much
 # faster (in total time) than the fine-grained one.
 # It probably is a good strategy to invest computational time in deriving
@@ -537,7 +537,7 @@ plt.show()
 # However, we can visualize the sparse transport plan computed by the
 # fine-grained mapping, which is much more informative.
 # Indeed, it exhibits some structure because the source and target meshes
-# are the same: indeed, assuming vertex correspondance between the source
+# are the same: indeed, assuming vertex correspondence between the source
 # and target mesh should already yield a reasonable alignment,
 # we expected the diagonal of this matrix to be non-null.
 
