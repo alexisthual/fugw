@@ -21,7 +21,7 @@ class FUGWSolver(BaseSolver):
     """Solver computing dense solutions"""
 
     def local_biconvex_cost(
-        self, pi, transpose, data_const, tuple_weights, hyperparams, divergence
+        self, pi, transpose, data_const, tuple_weights, hyperparams,
     ):
         """
         Before each block coordinate descent (BCD) step,
@@ -33,7 +33,7 @@ class FUGWSolver(BaseSolver):
         which makes use of this cost to update the transport plans.
         """
 
-        rho_s, rho_t, eps, alpha, reg_mode = hyperparams
+        rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         X_sqr, Y_sqr, X, Y, D = data_const
         if transpose:
@@ -74,7 +74,7 @@ class FUGWSolver(BaseSolver):
         return cost
 
     def fugw_loss(
-        self, pi, gamma, data_const, tuple_weights, hyperparams, divergence
+        self, pi, gamma, data_const, tuple_weights, hyperparams,
     ):
         """
         Returns scalar fugw loss, which is a combination of:
@@ -84,7 +84,7 @@ class FUGWSolver(BaseSolver):
         - an entropic or L2 regularization
         """
 
-        rho_s, rho_t, eps, alpha, reg_mode = hyperparams
+        rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         X_sqr, Y_sqr, X, Y, D = data_const
 
@@ -129,7 +129,7 @@ class FUGWSolver(BaseSolver):
 
         return loss.item(), regularized_loss.item()
 
-    def get_parameters_uot(self, pi, tuple_weights, hyperparams):
+    def get_parameters_uot_l2(self, pi, tuple_weights, hyperparams):
         rho_s, rho_t, eps, reg_mode = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
 
@@ -288,16 +288,14 @@ class FUGWSolver(BaseSolver):
             self.local_biconvex_cost,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
-            divergence=divergence,
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence)
         )
 
         compute_fugw_loss = partial(
             self.fugw_loss,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
-            divergence=divergence,
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence)
         )
 
         # If divergence is L2
@@ -306,8 +304,8 @@ class FUGWSolver(BaseSolver):
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
         )
 
-        self_get_params_uot = partial(
-            self.get_parameters_uot,
+        self_get_params_uot_l2 = partial(
+            self.get_parameters_uot_l2,
             tuple_weights=(ws, wt, ws_dot_wt),
             hyperparams=(rho_s, rho_t, eps, reg_mode)
         )
@@ -372,7 +370,7 @@ class FUGWSolver(BaseSolver):
                     )
 
             elif divergence == "l2":
-                tuple_weights, uot_params = self_get_params_uot(pi)
+                tuple_weights, uot_params = self_get_params_uot_l2(pi)
                 gamma = self_solver_mm_l2(
                     cost_gamma, gamma, uot_params, tuple_weights
                 )
@@ -401,7 +399,7 @@ class FUGWSolver(BaseSolver):
                     )
 
             elif divergence == "l2":
-                tuple_weights, uot_params = self_get_params_uot(gamma)
+                tuple_weights, uot_params = self_get_params_uot_l2(gamma)
                 pi = self_solver_mm_l2(cost_pi, pi, uot_params, tuple_weights)
 
             # Rescale mass
