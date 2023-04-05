@@ -7,11 +7,12 @@ import torch
 from fugw.solvers.utils import (
     BaseSolver,
     compute_approx_kl,
-    compute_kl,
-    compute_quad_kl,
+    compute_quad_divergence,
+    compute_divergence,
     solver_ibpp,
     solver_mm,
     solver_sinkhorn,
+    solver_mm_l2,
 )
 from fugw.utils import console
 
@@ -20,7 +21,7 @@ class FUGWSolver(BaseSolver):
     """Solver computing dense solutions"""
 
     def local_biconvex_cost(
-        self, pi, transpose, data_const, tuple_weights, hyperparams
+        self, pi, transpose, data_const, tuple_weights, hyperparams,
     ):
         """
         Before each block coordinate descent (BCD) step,
@@ -32,7 +33,7 @@ class FUGWSolver(BaseSolver):
         which makes use of this cost to update the transport plans.
         """
 
-        rho_s, rho_t, eps, alpha, reg_mode = hyperparams
+        rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         X_sqr, Y_sqr, X, Y, D = data_const
         if transpose:
@@ -57,30 +58,33 @@ class FUGWSolver(BaseSolver):
 
             cost += alpha * gromov_wasserstein_cost
 
-        # or when cost is balanced
-        if rho_s != float("inf") and rho_s != 0:
-            marginal_cost_dim1 = compute_approx_kl(pi1, ws)
-            cost += rho_s * marginal_cost_dim1
-        if rho_t != float("inf") and rho_t != 0:
-            marginal_cost_dim2 = compute_approx_kl(pi2, wt)
-            cost += rho_t * marginal_cost_dim2
+        if divergence == "kl":
+            # or when cost is balanced
+            if rho_s != float("inf") and rho_s != 0:
+                marginal_cost_dim1 = compute_approx_kl(pi1, ws)
+                cost += rho_s * marginal_cost_dim1
+            if rho_t != float("inf") and rho_t != 0:
+                marginal_cost_dim2 = compute_approx_kl(pi2, wt)
+                cost += rho_t * marginal_cost_dim2
 
-        if reg_mode == "joint":
-            entropic_cost = compute_approx_kl(pi, ws_dot_wt)
-            cost += eps * entropic_cost
+            if reg_mode == "joint":
+                entropic_cost = compute_approx_kl(pi, ws_dot_wt)
+                cost += eps * entropic_cost
 
         return cost
 
-    def fugw_loss(self, pi, gamma, data_const, tuple_weights, hyperparams):
+    def fugw_loss(
+        self, pi, gamma, data_const, tuple_weights, hyperparams,
+    ):
         """
         Returns scalar fugw loss, which is a combination of:
         - a Wasserstein loss on features
         - a Gromow-Wasserstein loss on geometries
         - marginal constraints on the computed OT plan
-        - an entropic regularisation
+        - an entropic or L2 regularization
         """
 
-        rho_s, rho_t, eps, alpha, reg_mode = hyperparams
+        rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         X_sqr, Y_sqr, X, Y, D = data_const
 
@@ -101,24 +105,52 @@ class FUGWSolver(BaseSolver):
             loss += alpha * gromov_wasserstein_loss
 
         if rho_s != float("inf") and rho_s != 0:
-            marginal_constraint_dim1 = compute_quad_kl(pi1, gamma1, ws, ws)
+            marginal_constraint_dim1 = compute_quad_divergence(
+                pi1, gamma1, ws, ws, divergence
+            )
             loss += rho_s * marginal_constraint_dim1
         if rho_t != float("inf") and rho_t != 0:
-            marginal_constraint_dim2 = compute_quad_kl(pi2, gamma2, wt, wt)
+            marginal_constraint_dim2 = compute_quad_divergence(
+                pi2, gamma2, wt, wt, divergence
+            )
             loss += rho_t * marginal_constraint_dim2
 
-        if reg_mode == "joint":
-            entropic_regularization = compute_quad_kl(
-                pi, gamma, ws_dot_wt, ws_dot_wt
-            )
-        elif reg_mode == "independent":
-            entropic_regularization = compute_kl(pi, ws_dot_wt) + compute_kl(
-                gamma, ws_dot_wt
-            )
+        regularized_loss = loss
+        if eps != 0:
+            if reg_mode == "joint":
+                regularization = compute_quad_divergence(
+                    pi, gamma, ws_dot_wt, ws_dot_wt, divergence
+                )
+            elif reg_mode == "independent":
+                regularization = compute_divergence(
+                    pi, ws_dot_wt, divergence
+                ) + compute_divergence(gamma, ws_dot_wt, divergence)
+            regularized_loss += eps * regularization
 
-        entropic_loss = loss + eps * entropic_regularization
+        return loss.item(), regularized_loss.item()
 
-        return loss.item(), entropic_loss.item()
+    def get_parameters_uot_l2(self, pi, tuple_weights, hyperparams):
+        rho_s, rho_t, eps, reg_mode = hyperparams
+        ws, wt, ws_dot_wt = tuple_weights
+
+        pi1, pi2 = pi.sum(1), pi.sum(0)
+        l2_pi1, l2_pi2 = (pi1**2).sum(), (pi2**2).sum()
+        l2_pi = (pi**2).sum()
+
+        weight_ws = pi1.dot(ws) / l2_pi1
+        weight_wt = pi2.dot(wt) / l2_pi2
+        weight_wst = (pi * ws_dot_wt).sum() / \
+            l2_pi if reg_mode == "joint" else 1
+        weighted_tuple_weights = (weight_ws * ws,
+                                  weight_wt * wt,
+                                  weight_wst * ws_dot_wt)
+
+        new_rho_s = rho_s * l2_pi1
+        new_rho_t = rho_t * l2_pi2
+        new_eps = eps * l2_pi if reg_mode == "joint" else eps
+        uot_params = (new_rho_s, new_rho_t, new_eps)
+
+        return weighted_tuple_weights, uot_params
 
     def solve(
         self,
@@ -135,6 +167,7 @@ class FUGWSolver(BaseSolver):
         init_plan=None,
         init_duals=None,
         solver="sinkhorn",
+        divergence="kl",
         verbose=False,
     ):
         """
@@ -156,9 +189,9 @@ class FUGWSolver(BaseSolver):
         wt: ndarray(m), None
             Measures assigned to target points.
         init_plan: matrix of size n x m if not None.
-            Initialisation matrix for coupling.
+            Initialization matrix for coupling.
         init_duals: tuple or None
-            Initialisation duals for coupling.
+            Initialization duals for coupling.
         solver: "sinkhorn", "mm", "ibpp"
             Solver to use.
         verbose: bool, optional, defaults to False
@@ -180,8 +213,8 @@ class FUGWSolver(BaseSolver):
                     BCD steps at the end of which the FUGW loss was evaluated
                 loss: list
                     Values of FUGW loss
-                loss_entropic: list
-                    Values of FUGW loss with entropy
+                loss_regularized: list
+                    Values of FUGW loss with entropy or L2 regularization
         """
 
         if rho_s == float("inf") and rho_t == float("inf") and eps == 0:
@@ -227,52 +260,64 @@ class FUGWSolver(BaseSolver):
             wt = torch.ones(m).to(device).to(dtype) / m
         ws_dot_wt = ws[:, None] * wt[None, :]
 
-        # initialise coupling and dual vectors
+        # initialization coupling
         pi = ws_dot_wt if init_plan is None else init_plan
         gamma = pi
 
-        if solver == "sinkhorn":
-            if init_duals is None:
-                duals_pi = (
-                    torch.zeros_like(ws),
-                    torch.zeros_like(wt),
-                )
-            else:
-                duals_pi = init_duals
-            duals_gamma = duals_pi
-        elif solver == "mm":
+        # initialization of dual vectors
+        if divergence == "l2" or solver == "mm":
             duals_pi, duals_gamma = None, None
-        elif solver == "ibpp":
+        else:
             if init_duals is None:
-                duals_pi = (
-                    torch.ones_like(ws),
-                    torch.ones_like(wt),
-                )
+                if solver == "sinkhorn":
+                    duals_pi = (
+                        torch.zeros_like(ws),
+                        torch.zeros_like(wt),
+                    )
+                elif solver == "ibpp":
+                    duals_pi = (
+                        torch.ones_like(ws),
+                        torch.ones_like(wt),
+                    )
             else:
                 duals_pi = init_duals
             duals_gamma = duals_pi
 
+        # Global shortcuts
         compute_local_biconvex_cost = partial(
             self.local_biconvex_cost,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence)
         )
 
         compute_fugw_loss = partial(
             self.fugw_loss,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence)
         )
 
+        # If divergence is L2
+        self_solver_mm_l2 = partial(
+            solver_mm_l2,
+            train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+        )
+
+        self_get_params_uot_l2 = partial(
+            self.get_parameters_uot_l2,
+            tuple_weights=(ws, wt, ws_dot_wt),
+            hyperparams=(rho_s, rho_t, eps, reg_mode)
+        )
+
+        # If divergence is KL
         self_solver_sinkhorn = partial(
             solver_sinkhorn,
             tuple_weights=(ws, wt, ws_dot_wt),
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
         )
 
-        self_solver_mm = partial(
+        self_solver_mm_kl = partial(
             solver_mm,
             tuple_weights=(ws, wt),
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
@@ -292,10 +337,10 @@ class FUGWSolver(BaseSolver):
         )
 
         # Initialize loss
-        current_loss, current_loss_entropic = compute_fugw_loss(pi, gamma)
+        current_loss, current_loss_regularized = compute_fugw_loss(pi, gamma)
         loss_steps = [0]
         loss = [current_loss]
-        loss_entropic = [current_loss_entropic]
+        loss_regularized = [current_loss_regularized]
         loss_times = [0]
         idx = 0
         err = None
@@ -305,67 +350,83 @@ class FUGWSolver(BaseSolver):
             pi_prev = pi.detach().clone()
 
             # Update gamma
-            mp = pi.sum()
-            new_rho_s = rho_s * mp
-            new_rho_t = rho_t * mp
-            new_eps = mp * eps if reg_mode == "joint" else eps
-            uot_params = (new_rho_s, new_rho_t, new_eps)
-
+            l1_pi = pi.sum()
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
-            if solver == "sinkhorn":
-                duals_gamma, gamma = self_solver_sinkhorn(
-                    cost_gamma, duals_gamma, uot_params
+
+            if divergence == "kl":
+                new_rho_s, new_rho_t = rho_s * l1_pi, rho_t * l1_pi
+                new_eps = l1_pi * eps if reg_mode == "joint" else eps
+                uot_params = (new_rho_s, new_rho_t, new_eps)
+
+                if solver == "sinkhorn":
+                    duals_gamma, gamma = self_solver_sinkhorn(
+                        cost_gamma, duals_gamma, uot_params
+                    )
+                elif solver == "mm":
+                    gamma = self_solver_mm_kl(cost_gamma, gamma, uot_params)
+                elif solver == "ibpp":
+                    duals_gamma, gamma = self_solver_ibpp(
+                        cost_gamma, gamma, duals_gamma, uot_params
+                    )
+
+            elif divergence == "l2":
+                tuple_weights, uot_params = self_get_params_uot_l2(pi)
+                gamma = self_solver_mm_l2(
+                    cost_gamma, gamma, uot_params, tuple_weights
                 )
-            elif solver == "mm":
-                gamma = self_solver_mm(cost_gamma, gamma, uot_params)
-            if solver == "ibpp":
-                duals_gamma, gamma = self_solver_ibpp(
-                    cost_gamma, gamma, duals_gamma, uot_params
-                )
-            gamma = (mp / gamma.sum()).sqrt() * gamma
+
+            # Rescale mass
+            gamma = (l1_pi / gamma.sum()).sqrt() * gamma
 
             # Update pi
-            mg = gamma.sum()
-            new_rho_s = rho_s * mg
-            new_rho_t = rho_t * mg
-            new_eps = mp * eps if reg_mode == "joint" else eps
-            uot_params = (new_rho_s, new_rho_t, new_eps)
-
+            l1_gamma = gamma.sum()
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
-            if solver == "sinkhorn":
-                duals_pi, pi = self_solver_sinkhorn(
-                    cost_pi, duals_pi, uot_params
-                )
-            elif solver == "mm":
-                pi = self_solver_mm(cost_pi, pi, uot_params)
-            elif solver == "ibpp":
-                duals_pi, pi = self_solver_ibpp(
-                    cost_pi, pi, duals_pi, uot_params
-                )
-            pi = (mg / pi.sum()).sqrt() * pi
+
+            if divergence == "kl":
+                new_rho_s, new_rho_t = rho_s * l1_gamma, rho_t * l1_gamma
+                new_eps = l1_gamma * eps if reg_mode == "joint" else eps
+                uot_params = (new_rho_s, new_rho_t, new_eps)
+
+                if solver == "sinkhorn":
+                    duals_pi, pi = self_solver_sinkhorn(
+                        cost_pi, duals_pi, uot_params
+                    )
+                elif solver == "mm":
+                    pi = self_solver_mm_kl(cost_pi, pi, uot_params)
+                elif solver == "ibpp":
+                    duals_pi, pi = self_solver_ibpp(
+                        cost_pi, pi, duals_pi, uot_params
+                    )
+
+            elif divergence == "l2":
+                tuple_weights, uot_params = self_get_params_uot_l2(gamma)
+                pi = self_solver_mm_l2(cost_pi, pi, uot_params, tuple_weights)
+
+            # Rescale mass
+            pi = (l1_gamma / pi.sum()).sqrt() * pi
 
             # Update error
             err = (pi - pi_prev).abs().sum().item()
             if idx % self.eval_bcd == 0:
-                current_loss, current_loss_entropic = compute_fugw_loss(
+                current_loss, current_loss_regularized = compute_fugw_loss(
                     pi, gamma
                 )
 
                 loss_steps.append(idx + 1)
                 loss.append(current_loss)
-                loss_entropic.append(current_loss_entropic)
+                loss_regularized.append(current_loss_regularized)
                 loss_times.append(time.time() - t0)
 
                 if verbose:
                     console.log(
                         f"BCD step {idx+1}/{self.nits_bcd}\t"
                         f"FUGW loss:\t{current_loss} (base)\t"
-                        f"{current_loss_entropic} (entropic)"
+                        f"{current_loss_regularized} (regularized)"
                     )
 
                 if (
-                    len(loss_entropic) >= 2
-                    and abs(loss_entropic[-2] - loss_entropic[-1])
+                    len(loss_regularized) >= 2
+                    and abs(loss_regularized[-2] - loss_regularized[-1])
                     < self.early_stopping_threshold
                 ):
                     break
@@ -382,6 +443,6 @@ class FUGWSolver(BaseSolver):
             "duals_gamma": duals_gamma,
             "loss_steps": loss_steps,
             "loss": loss,
-            "loss_entropic": loss_entropic,
+            "loss_entropic": loss_regularized,
             "loss_times": loss_times,
         }
