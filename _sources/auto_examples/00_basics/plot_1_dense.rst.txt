@@ -235,44 +235,44 @@ using a sinkhorn solver
 
 
 
-    [16:01:36] BCD step 1/10   FUGW loss:      0.028000006452202797     dense.py:360
-               (base)     0.02861664816737175 (entropic)                            
+    [17:43:04] BCD step 1/10   FUGW loss:      0.02861676551401615      dense.py:421
+               (base)      0.02861676551401615 (regularized)                        
 
 
-               BCD step 2/10   FUGW loss:      0.02218690887093544      dense.py:360
-               (base)      0.022839007899165154 (entropic)                          
+    [17:43:05] BCD step 2/10   FUGW loss:      0.022839196026325226     dense.py:421
+               (base)     0.022839196026325226 (regularized)                        
 
 
-               BCD step 3/10   FUGW loss:      0.021671757102012634     dense.py:360
-               (base)     0.022318946197628975 (entropic)                           
+    [17:43:06] BCD step 3/10   FUGW loss:      0.022318508476018906     dense.py:421
+               (base)     0.022318508476018906 (regularized)                        
 
 
-    [16:01:37] BCD step 4/10   FUGW loss:      0.020506752654910088     dense.py:360
-               (base)     0.02114957384765148 (entropic)                            
+               BCD step 4/10   FUGW loss:      0.021145274862647057     dense.py:421
+               (base)     0.021145274862647057 (regularized)                        
 
 
-               BCD step 5/10   FUGW loss:      0.019838696345686913     dense.py:360
-               (base)     0.020485999062657356 (entropic)                           
+    [17:43:07] BCD step 5/10   FUGW loss:      0.02049073576927185      dense.py:421
+               (base)      0.02049073576927185 (regularized)                        
 
 
-    [16:01:38] BCD step 6/10   FUGW loss:      0.019212042912840843     dense.py:360
-               (base)     0.019857466220855713 (entropic)                           
+    [17:43:08] BCD step 6/10   FUGW loss:      0.01987534575164318      dense.py:421
+               (base)      0.01987534575164318 (regularized)                        
 
 
-               BCD step 7/10   FUGW loss:      0.018401773646473885     dense.py:360
-               (base)     0.019050441682338715 (entropic)                           
+    [17:43:09] BCD step 7/10   FUGW loss:      0.019204813987016678     dense.py:421
+               (base)     0.019204813987016678 (regularized)                        
 
 
-    [16:01:39] BCD step 8/10   FUGW loss:      0.018040582537651062     dense.py:360
-               (base)     0.01869758404791355 (entropic)                            
+               BCD step 8/10   FUGW loss:      0.018737901002168655     dense.py:421
+               (base)     0.018737901002168655 (regularized)                        
 
 
-               BCD step 9/10   FUGW loss:      0.017871618270874023     dense.py:360
-               (base)     0.018533602356910706 (entropic)                           
+    [17:43:10] BCD step 9/10   FUGW loss:      0.018532782793045044     dense.py:421
+               (base)     0.018532782793045044 (regularized)                        
 
 
-    [16:01:40] BCD step 10/10  FUGW loss:      0.017864057794213295     dense.py:360
-               (base)     0.01852637529373169 (entropic)                            
+    [17:43:11] BCD step 10/10  FUGW loss:      0.018525412306189537     dense.py:421
+               (base)     0.018525412306189537 (regularized)                        
 
 
 
@@ -296,7 +296,7 @@ The transport plan can be accessed after the model has been fitted
 
  .. code-block:: none
 
-    Transport plan's total mass: 0.99568
+    Transport plan's total mass: 0.99566
 
 
 
@@ -461,7 +461,7 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.385 seconds)
+   **Total running time of the script:** ( 0 minutes  12.113 seconds)
 
 **Estimated memory usage:**  303 MB
 

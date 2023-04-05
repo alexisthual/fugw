@@ -241,88 +241,88 @@ distributions you are trying to align.
 
 
 
-    [16:01:53] BCD step 1/10   FUGW loss:      0.03198949992656708      dense.py:360
-               (base)      0.032095134258270264 (entropic)                          
+    [17:43:27] BCD step 1/10   FUGW loss:      0.03209483623504639      dense.py:421
+               (base)      0.03209483623504639 (regularized)                        
 
 
-               BCD step 2/10   FUGW loss:      0.027364276349544525     dense.py:360
-               (base)     0.027612881734967232 (entropic)                           
+    [17:43:28] BCD step 2/10   FUGW loss:      0.02761232666671276      dense.py:421
+               (base)      0.02761232666671276 (regularized)                        
 
 
-    [16:01:54] BCD step 3/10   FUGW loss:      0.017961936071515083     dense.py:360
-               (base)     0.01844286173582077 (entropic)                            
+               BCD step 3/10   FUGW loss:      0.018442558124661446     dense.py:421
+               (base)     0.018442558124661446 (regularized)                        
 
 
-               BCD step 4/10   FUGW loss:      0.015194778330624104     dense.py:360
-               (base)     0.015796463936567307 (entropic)                           
+    [17:43:29] BCD step 4/10   FUGW loss:      0.015796467661857605     dense.py:421
+               (base)     0.015796467661857605 (regularized)                        
 
 
-               BCD step 5/10   FUGW loss:      0.014496020041406155     dense.py:360
-               (base)     0.015153813175857067 (entropic)                           
+               BCD step 5/10   FUGW loss:      0.01515364833176136      dense.py:421
+               (base)      0.01515364833176136 (regularized)                        
 
 
-    [16:01:55] BCD step 6/10   FUGW loss:      0.014186171814799309     dense.py:360
-               (base)     0.014875920489430428 (entropic)                           
+    [17:43:30] BCD step 6/10   FUGW loss:      0.01487585436552763      dense.py:421
+               (base)      0.01487585436552763 (regularized)                        
 
 
-    [16:01:56] BCD step 7/10   FUGW loss:      0.014005331322550774     dense.py:360
-               (base)     0.01471529621630907 (entropic)                            
+    [17:43:31] BCD step 7/10   FUGW loss:      0.014715107157826424     dense.py:421
+               (base)     0.014715107157826424 (regularized)                        
 
 
-    [16:01:57] BCD step 8/10   FUGW loss:      0.013867946341633797     dense.py:360
-               (base)     0.014592503197491169 (entropic)                           
+    [17:43:32] BCD step 8/10   FUGW loss:      0.014592442661523819     dense.py:421
+               (base)     0.014592442661523819 (regularized)                        
 
 
-    [16:01:58] BCD step 9/10   FUGW loss:      0.013740603812038898     dense.py:360
-               (base)     0.014477620832622051 (entropic)                           
+    [17:43:34] BCD step 9/10   FUGW loss:      0.014477348886430264     dense.py:421
+               (base)     0.014477348886430264 (regularized)                        
 
 
-    [16:01:59] BCD step 10/10  FUGW loss:      0.013632165268063545     dense.py:360
-               (base)     0.014380687847733498 (entropic)                           
+    [17:43:35] BCD step 10/10  FUGW loss:      0.014380527660250664     dense.py:421
+               (base)     0.014380527660250664 (regularized)                        
     /github/workspace/src/fugw/scripts/coarse_to_fine.py:412: UserWarning:
 
     Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
 
 
 
-    [16:02:02] BCD step 1/10   FUGW loss:      0.020308256149291992    sparse.py:478
-               (base)     0.020477615296840668 (entropic)                           
+    [17:43:40] BCD step 1/10   FUGW loss:      0.020308472216129303    sparse.py:478
+               (base)     0.02047782950103283 (entropic)                            
 
 
-    [16:02:06] BCD step 2/10   FUGW loss:      0.013988880440592766    sparse.py:478
-               (base)     0.014400288462638855 (entropic)                           
+    [17:43:45] BCD step 2/10   FUGW loss:      0.013988977298140526    sparse.py:478
+               (base)     0.01440038438886404 (entropic)                            
 
 
-    [16:02:10] BCD step 3/10   FUGW loss:      0.01208634115755558     sparse.py:478
-               (base)      0.012644429691135883 (entropic)                          
+    [17:43:51] BCD step 3/10   FUGW loss:      0.012086370959877968    sparse.py:478
+               (base)     0.012644458562135696 (entropic)                           
 
 
-    [16:02:13] BCD step 4/10   FUGW loss:      0.011344446800649166    sparse.py:478
-               (base)     0.011991022154688835 (entropic)                           
+    [17:43:56] BCD step 4/10   FUGW loss:      0.011344734579324722    sparse.py:478
+               (base)     0.011991309933364391 (entropic)                           
 
 
-    [16:02:17] BCD step 5/10   FUGW loss:      0.010971869342029095    sparse.py:478
-               (base)     0.011676927097141743 (entropic)                           
+    [17:44:01] BCD step 5/10   FUGW loss:      0.01097163837403059     sparse.py:478
+               (base)      0.011676696129143238 (entropic)                          
 
 
-    [16:02:21] BCD step 6/10   FUGW loss:      0.010754159651696682    sparse.py:478
-               (base)     0.01150030642747879 (entropic)                            
+    [17:44:06] BCD step 6/10   FUGW loss:      0.010753980837762356    sparse.py:478
+               (base)     0.01150012668222189 (entropic)                            
 
 
-    [16:02:25] BCD step 7/10   FUGW loss:      0.010611843317747116    sparse.py:478
-               (base)     0.011388429440557957 (entropic)                           
+    [17:44:12] BCD step 7/10   FUGW loss:      0.010611926205456257    sparse.py:478
+               (base)     0.011388511396944523 (entropic)                           
 
 
-    [16:02:30] BCD step 8/10   FUGW loss:      0.010510009713470936    sparse.py:478
-               (base)     0.011310222558677197 (entropic)                           
+    [17:44:19] BCD step 8/10   FUGW loss:      0.010510187596082687    sparse.py:478
+               (base)     0.011310400441288948 (entropic)                           
 
 
-    [16:02:36] BCD step 9/10   FUGW loss:      0.01043227780610323     sparse.py:478
-               (base)      0.011251525953412056 (entropic)                          
+    [17:44:26] BCD step 9/10   FUGW loss:      0.01043248362839222     sparse.py:478
+               (base)      0.011251731775701046 (entropic)                          
 
 
-    [16:02:43] BCD step 10/10  FUGW loss:      0.01037062332034111     sparse.py:478
-               (base)      0.011205591261386871 (entropic)                          
+    [17:44:35] BCD step 10/10  FUGW loss:      0.010370488278567791    sparse.py:478
+               (base)     0.011205455288290977 (entropic)                           
 
     (tensor([ 52, 229, 140, 249, 186, 210, 131, 128, 209, 227,   6,  75,  71, 217,
             164, 291,  58, 109, 116, 118,  66, 206, 189, 212,  15, 286,  14, 268,
@@ -605,9 +605,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  58.700 seconds)
+   **Total running time of the script:** ( 1 minutes  18.746 seconds)
 
-**Estimated memory usage:**  157 MB
+**Estimated memory usage:**  152 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_2_coarse_to_fine.py:

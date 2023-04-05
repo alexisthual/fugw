@@ -6,12 +6,12 @@
 
 Computation times
 =================
-**01:17.687** total execution time for **auto_examples_00_basics** files:
+**01:43.586** total execution time for **auto_examples_00_basics** files:
 
 +-----------------------------------------------------------------------------------------------------+-----------+----------+
-| :ref:`sphx_glr_auto_examples_00_basics_plot_2_2_coarse_to_fine.py` (``plot_2_2_coarse_to_fine.py``) | 00:58.700 | 157.2 MB |
+| :ref:`sphx_glr_auto_examples_00_basics_plot_2_2_coarse_to_fine.py` (``plot_2_2_coarse_to_fine.py``) | 01:18.746 | 152.2 MB |
 +-----------------------------------------------------------------------------------------------------+-----------+----------+
-| :ref:`sphx_glr_auto_examples_00_basics_plot_2_1_lmds.py` (``plot_2_1_lmds.py``)                     | 00:10.601 | 158.7 MB |
+| :ref:`sphx_glr_auto_examples_00_basics_plot_2_1_lmds.py` (``plot_2_1_lmds.py``)                     | 00:12.727 | 152.9 MB |
 +-----------------------------------------------------------------------------------------------------+-----------+----------+
-| :ref:`sphx_glr_auto_examples_00_basics_plot_1_dense.py` (``plot_1_dense.py``)                       | 00:08.385 | 303.1 MB |
+| :ref:`sphx_glr_auto_examples_00_basics_plot_1_dense.py` (``plot_1_dense.py``)                       | 00:12.113 | 302.8 MB |
 +-----------------------------------------------------------------------------------------------------+-----------+----------+

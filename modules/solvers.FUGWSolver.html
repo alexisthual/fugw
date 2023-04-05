@@ -239,13 +239,22 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fugw.solvers.FUGWSolver.fugw_loss" title="fugw.solvers.FUGWSolver.fugw_loss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fugw_loss</span></code></a>(pi, gamma, data_const, ...)</p></td>
-<td><p>Returns scalar fugw loss, which is a combination of: - a Wasserstein loss on features - a Gromow-Wasserstein loss on geometries - marginal constraints on the computed OT plan - an entropic regularisation</p></td>
+<td><p>Returns scalar fugw loss, which is a combination of: - a Wasserstein loss on features - a Gromow-Wasserstein loss on geometries - marginal constraints on the computed OT plan - an entropic or L2 regularization</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fugw.solvers.FUGWSolver.local_biconvex_cost" title="fugw.solvers.FUGWSolver.local_biconvex_cost"><code class="xref py py-obj docutils literal notranslate"><span class="pre">local_biconvex_cost</span></code></a>(pi, transpose, ...)</p></td>
 <td><p>Before each block coordinate descent (BCD) step, the local cost matrix is updated.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fugw.solvers.FUGWSolver.solve" title="fugw.solvers.FUGWSolver.solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve</span></code></a>([alpha, rho_s, rho_t, eps, reg_mode, ...])</p></td>
 <td><p>Function running the BCD iterations.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>get_parameters_uot_l2</strong></p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -296,7 +305,7 @@ within each uot iteration of the ibpp solver.</p>
 - a Wasserstein loss on features
 - a Gromow-Wasserstein loss on geometries
 - marginal constraints on the computed OT plan
-- an entropic regularisation</p>
+- an entropic or L2 regularization</p>
 </dd></dl>
 
 <dl class="py method">
@@ -313,7 +322,7 @@ which makes use of this cost to update the transport plans.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fugw.solvers.FUGWSolver.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_duals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sinkhorn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver.solve" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_duals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sinkhorn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">divergence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kl'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver.solve" title="Permalink to this definition">#</a></dt>
 <dd><p>Function running the BCD iterations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -331,9 +340,9 @@ which makes use of this cost to update the transport plans.</p>
 </dd>
 <dt><strong>wt: ndarray(m), None</strong></dt><dd><p>Measures assigned to target points.</p>
 </dd>
-<dt><strong>init_plan: matrix of size n x m if not None.</strong></dt><dd><p>Initialisation matrix for coupling.</p>
+<dt><strong>init_plan: matrix of size n x m if not None.</strong></dt><dd><p>Initialization matrix for coupling.</p>
 </dd>
-<dt><strong>init_duals: tuple or None</strong></dt><dd><p>Initialisation duals for coupling.</p>
+<dt><strong>init_duals: tuple or None</strong></dt><dd><p>Initialization duals for coupling.</p>
 </dd>
 <dt><strong>solver: “sinkhorn”, “mm”, “ibpp”</strong></dt><dd><p>Solver to use.</p>
 </dd>
@@ -357,7 +366,7 @@ which makes use of this cost to update the transport plans.</p>
 </dd>
 <dt>loss: list</dt><dd><p>Values of FUGW loss</p>
 </dd>
-<dt>loss_entropic: list</dt><dd><p>Values of FUGW loss with entropy</p>
+<dt>loss_regularized: list</dt><dd><p>Values of FUGW loss with entropy or L2 regularization</p>
 </dd>
 </dl>
 </dd>
