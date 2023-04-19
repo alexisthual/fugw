@@ -117,7 +117,7 @@ class FUGWSparseSolver(BaseSolver):
         - a Wasserstein loss on features
         - a Gromow-Wasserstein loss on geometries
         - marginal constraints on the computed OT plan
-        - an entropic regularisation
+        - a regularisation term (KL, ie entropic, or L2)
         """
 
         rho_s, rho_t, eps, alpha, reg_mode = hyperparams
@@ -169,17 +169,17 @@ class FUGWSparseSolver(BaseSolver):
             loss += rho_t * marginal_constraint_dim2
 
         if reg_mode == "joint":
-            entropic_regularization = compute_quad_kl_sparse(
+            regularization_term = compute_quad_kl_sparse(
                 pi, gamma, ws_dot_wt, ws_dot_wt
             )
         elif reg_mode == "independent":
-            entropic_regularization = compute_kl_sparse(
+            regularization_term = compute_kl_sparse(
                 pi, ws_dot_wt
             ) + compute_kl_sparse(gamma, ws_dot_wt)
 
-        entropic_loss = loss + eps * entropic_regularization
+        regularized_loss = loss + eps * regularization_term
 
-        return loss.item(), entropic_loss.item()
+        return loss.item(), regularized_loss.item()
 
     def solve(
         self,
@@ -240,7 +240,7 @@ class FUGWSparseSolver(BaseSolver):
                     BCD steps at the end of which the FUGW loss was evaluated
                 loss: list
                     Values of FUGW loss
-                loss_entropic: list
+                loss_regularized: list
                     Values of FUGW loss with entropy
         """
 
@@ -394,10 +394,10 @@ class FUGWSparseSolver(BaseSolver):
         )
 
         # Initialise loss
-        current_loss, current_loss_entropic = compute_fugw_loss(pi, gamma)
+        current_loss, current_loss_regularized = compute_fugw_loss(pi, gamma)
         loss_steps = [0]
         loss = [current_loss]
-        loss_entropic = [current_loss_entropic]
+        loss_regularized = [current_loss_regularized]
         loss_times = [0]
         idx = 0
         err = self.tol_bcd + 1e-3
@@ -465,25 +465,25 @@ class FUGWSparseSolver(BaseSolver):
             # Update error
             err = (pi.values() - pi_prev.values()).abs().sum().item()
             if idx % self.eval_bcd == 0:
-                current_loss, current_loss_entropic = compute_fugw_loss(
+                current_loss, current_loss_regularized = compute_fugw_loss(
                     pi, gamma
                 )
 
                 loss_steps.append(idx + 1)
                 loss.append(current_loss)
-                loss_entropic.append(current_loss_entropic)
+                loss_regularized.append(current_loss_regularized)
                 loss_times.append(time.time() - t0)
 
                 if verbose:
                     console.log(
                         f"BCD step {idx+1}/{self.nits_bcd}\t"
                         f"FUGW loss:\t{current_loss} (base)\t"
-                        f"{current_loss_entropic} (entropic)"
+                        f"{current_loss_regularized} (regularized)"
                     )
 
                 if (
-                    len(loss_entropic) >= 2
-                    and abs(loss_entropic[-2] - loss_entropic[-1])
+                    len(loss_regularized) >= 2
+                    and abs(loss_regularized[-2] - loss_regularized[-1])
                     < self.early_stopping_threshold
                 ):
                     break
@@ -500,6 +500,6 @@ class FUGWSparseSolver(BaseSolver):
             "duals_gamma": duals_gamma,
             "loss_steps": loss_steps,
             "loss": loss,
-            "loss_entropic": loss_entropic,
+            "loss_regularized": loss_regularized,
             "loss_times": loss_times,
         }

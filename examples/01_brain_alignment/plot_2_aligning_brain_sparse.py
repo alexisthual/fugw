@@ -471,7 +471,7 @@ t1 = time.time()
 
 # %%
 # Here is the evolution of the FUGW loss while traning of the coarse mapping,
-# with and without the entropic term. As you can see, we most likely
+# with and without the regularized term. As you can see, we most likely
 # stopped fitting the coarse mapping too early, yet it is probably enough
 # for this example.
 
@@ -482,8 +482,8 @@ ax.set_xlabel("BCD step")
 ax.plot(coarse_mapping.loss_steps, coarse_mapping.loss, label="FUGW loss")
 ax.plot(
     coarse_mapping.loss_steps,
-    coarse_mapping.loss_entropic,
-    label="FUGW entropic loss",
+    coarse_mapping.loss_regularized,
+    label="FUGW regularized loss",
 )
 ax.legend()
 plt.show()
@@ -498,8 +498,8 @@ ax.set_xlabel("BCD step")
 ax.plot(fine_mapping.loss_steps, fine_mapping.loss, label="FUGW loss")
 ax.plot(
     fine_mapping.loss_steps,
-    fine_mapping.loss_entropic,
-    label="FUGW entropic loss",
+    fine_mapping.loss_regularized,
+    label="FUGW regularized loss",
 )
 ax.legend()
 plt.show()

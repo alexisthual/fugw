@@ -36,7 +36,7 @@ class BaseMapping:
 
         self.loss_steps = []
         self.loss = []
-        self.loss_entropic = []
+        self.loss_regularized = []
         self.loss_times = []
 
     def fit(self):

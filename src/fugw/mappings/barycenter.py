@@ -163,7 +163,7 @@ class FUGWBarycenter:
                 (
                     mapping.loss_steps,
                     mapping.loss,
-                    mapping.loss_entropic,
+                    mapping.loss_regularized,
                     mapping.loss_times,
                 )
             )
@@ -220,7 +220,11 @@ class FUGWBarycenter:
         plans: list of arrays
         duals: list of (array, array)
         losses_each_bar_step: list such that l[s][i]
-            is a tuple containing (loss_steps, loss, loss_entropic, loss_times)
+            is a tuple containing:
+                - loss_steps
+                - loss
+                - loss_regularized
+                - loss_times
             for individual i at barycenter computation step s
         """
         if device == "auto":

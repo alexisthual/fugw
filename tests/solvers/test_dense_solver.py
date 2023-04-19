@@ -65,7 +65,7 @@ def test_dense_solvers(solver):
     duals_gamma = res["duals_gamma"]
     loss_steps = res["loss_steps"]
     loss = res["loss"]
-    loss_entropic = res["loss_entropic"]
+    loss_regularized = res["loss_regularized"]
     loss_times = res["loss_times"]
 
     assert pi.shape == (ns, nt)
@@ -84,7 +84,7 @@ def test_dense_solvers(solver):
 
     assert len(loss_steps) - 1 <= nits_bcd // eval_bcd + 1
     assert len(loss) == len(loss_steps)
-    assert len(loss_entropic) == len(loss_steps)
+    assert len(loss_regularized) == len(loss_steps)
     assert len(loss_times) == len(loss_steps)
     # Loss should decrease
     assert np.all(np.sign(np.array(loss[1:]) - np.array(loss[:-1])) == -1)
@@ -146,7 +146,7 @@ def test_dense_solvers_l2(reg_mode):
     duals_gamma = res["duals_gamma"]
     loss_steps = res["loss_steps"]
     loss = res["loss"]
-    loss_entropic = res["loss_entropic"]
+    loss_regularized = res["loss_regularized"]
     loss_times = res["loss_times"]
 
     assert pi.shape == (ns, ns)
@@ -157,7 +157,7 @@ def test_dense_solvers_l2(reg_mode):
 
     assert len(loss_steps) - 1 <= nits_bcd // eval_bcd + 1
     assert len(loss) == len(loss_steps)
-    assert len(loss_entropic) == len(loss_steps)
+    assert len(loss_regularized) == len(loss_steps)
     assert len(loss_times) == len(loss_steps)
     # Loss should decrease
     # assert np.all(np.sign(np.array(loss[1:]) - np.array(loss[:-1])) == -1)

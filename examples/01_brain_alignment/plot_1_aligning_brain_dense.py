@@ -214,8 +214,9 @@ target_geometry_normalized = target_geometry / np.max(target_geometry)
 # as interested in matching vertices with similar features as we are in
 # preserving the anatomical geometries of the source and target subjects.
 # We leave ``rho`` to its default value, and finally set a value of ``eps``
-# which is low enough for the computed transport plan to not be too entropic.
-# High values of ``eps`` lead to faster computations and more entropic plans.
+# which is low enough for the computed transport plan to not be too
+# regularized. High values of ``eps`` lead to faster computations
+# and more regularized (ie blurry) plans.
 # Low values of ``eps`` lead to solwer computations, but finer-grained plans.
 # Note that this package is meant to be used with GPUs ; fitting mappings
 # on CPUs in about 100x slower.
@@ -243,7 +244,7 @@ _ = mapping.fit(
 
 # %%
 # Here is the evolution of the FUGW loss during training,
-# with and without the entropic term:
+# with and without the regularized term:
 
 fig, ax = plt.subplots(figsize=(4, 4))
 ax.set_title(
@@ -253,7 +254,9 @@ ax.set_title(
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
 ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
-ax.plot(mapping.loss_steps, mapping.loss_entropic, label="FUGW entropic loss")
+ax.plot(
+    mapping.loss_steps, mapping.loss_regularized, label="FUGW regularized loss"
+)
 ax.legend()
 plt.show()
 
@@ -313,7 +316,7 @@ with open("./mapping.pkl", "rb") as f:
 
 # %%
 # Here is the evolution of the FUGW loss during training,
-# without the entropic term. Note how, in this case,
+# without the regularized term. Note how, in this case,
 # even though ``mm`` and ``ibpp`` needed more block-coordinate-descent steps
 # to converge, they were about 2 to 3 times faster to reach the same final
 # FUGW training loss as ``sinkhorn``.

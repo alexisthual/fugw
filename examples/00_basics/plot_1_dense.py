@@ -103,14 +103,16 @@ print(f"Transport plan's total mass: {pi.sum():.5f}")
 
 # %%
 # Here is the evolution of the FUGW loss during training,
-# with and without the entropic term:
+# with and without the regularized term:
 
 fig, ax = plt.subplots(figsize=(4, 4))
 ax.set_title("Mapping training loss")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
 ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
-ax.plot(mapping.loss_steps, mapping.loss_entropic, label="FUGW entropic loss")
+ax.plot(
+    mapping.loss_steps, mapping.loss_regularized, label="FUGW regularized loss"
+)
 ax.legend()
 plt.show()
 
@@ -131,7 +133,7 @@ plt.show()
 
 # %%
 # The previous figure of the transport plan tells us it is very sparse
-# and not very entropic.
+# and not very regularized.
 # Another informative way to look at the plan consists in checking
 # which points of the source and target distributions
 # were matched together in the feature space.

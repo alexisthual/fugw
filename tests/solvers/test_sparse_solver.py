@@ -84,7 +84,7 @@ def test_sparse_solvers(solver, device):
     duals_gamma = res["duals_gamma"]
     loss_steps = res["loss_steps"]
     loss = res["loss"]
-    loss_entropic = res["loss_entropic"]
+    loss_regularized = res["loss_regularized"]
     loss_times = res["loss_times"]
 
     assert pi.size() == (ns, nt)
@@ -100,7 +100,7 @@ def test_sparse_solvers(solver, device):
 
     assert len(loss_steps) - 1 <= nits_bcd // eval_bcd + 1
     assert len(loss) == len(loss_steps)
-    assert len(loss_entropic) == len(loss_steps)
+    assert len(loss_regularized) == len(loss_steps)
     assert len(loss_times) == len(loss_steps)
     # Loss should decrease
     print(f"loss: {loss}")

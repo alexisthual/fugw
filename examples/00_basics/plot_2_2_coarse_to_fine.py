@@ -132,7 +132,7 @@ print(
 
 # %%
 # Here is the evolution of the FUGW loss during training
-# of the coarse mapping, with and without the entropic term:
+# of the coarse mapping, with and without the regularized term:
 
 fig, ax = plt.subplots(figsize=(4, 4))
 ax.set_title("Coarse mapping training loss")
@@ -141,8 +141,8 @@ ax.set_xlabel("BCD step")
 ax.plot(coarse_mapping.loss_steps, coarse_mapping.loss, label="FUGW loss")
 ax.plot(
     coarse_mapping.loss_steps,
-    coarse_mapping.loss_entropic,
-    label="FUGW entropic loss",
+    coarse_mapping.loss_regularized,
+    label="FUGW regularized loss",
 )
 ax.legend()
 plt.show()
@@ -157,8 +157,8 @@ ax.set_xlabel("BCD step")
 ax.plot(fine_mapping.loss_steps, fine_mapping.loss, label="FUGW loss")
 ax.plot(
     fine_mapping.loss_steps,
-    fine_mapping.loss_entropic,
-    label="FUGW entropic loss",
+    fine_mapping.loss_regularized,
+    label="FUGW regularized loss",
 )
 ax.legend()
 plt.show()

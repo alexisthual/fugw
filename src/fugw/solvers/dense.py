@@ -21,7 +21,12 @@ class FUGWSolver(BaseSolver):
     """Solver computing dense solutions"""
 
     def local_biconvex_cost(
-        self, pi, transpose, data_const, tuple_weights, hyperparams,
+        self,
+        pi,
+        transpose,
+        data_const,
+        tuple_weights,
+        hyperparams,
     ):
         """
         Before each block coordinate descent (BCD) step,
@@ -68,20 +73,25 @@ class FUGWSolver(BaseSolver):
                 cost += rho_t * marginal_cost_dim2
 
             if reg_mode == "joint":
-                entropic_cost = compute_approx_kl(pi, ws_dot_wt)
-                cost += eps * entropic_cost
+                regularized_cost = compute_approx_kl(pi, ws_dot_wt)
+                cost += eps * regularized_cost
 
         return cost
 
     def fugw_loss(
-        self, pi, gamma, data_const, tuple_weights, hyperparams,
+        self,
+        pi,
+        gamma,
+        data_const,
+        tuple_weights,
+        hyperparams,
     ):
         """
         Returns scalar fugw loss, which is a combination of:
         - a Wasserstein loss on features
         - a Gromow-Wasserstein loss on geometries
         - marginal constraints on the computed OT plan
-        - an entropic or L2 regularization
+        - a regularization term (KL, ie entropic, or L2)
         """
 
         rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
@@ -139,11 +149,14 @@ class FUGWSolver(BaseSolver):
 
         weight_ws = pi1.dot(ws) / l2_pi1
         weight_wt = pi2.dot(wt) / l2_pi2
-        weight_wst = (pi * ws_dot_wt).sum() / \
-            l2_pi if reg_mode == "joint" else 1
-        weighted_tuple_weights = (weight_ws * ws,
-                                  weight_wt * wt,
-                                  weight_wst * ws_dot_wt)
+        weight_wst = (
+            (pi * ws_dot_wt).sum() / l2_pi if reg_mode == "joint" else 1
+        )
+        weighted_tuple_weights = (
+            weight_ws * ws,
+            weight_wt * wt,
+            weight_wst * ws_dot_wt,
+        )
 
         new_rho_s = rho_s * l2_pi1
         new_rho_t = rho_t * l2_pi2
@@ -288,14 +301,14 @@ class FUGWSolver(BaseSolver):
             self.local_biconvex_cost,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence)
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
         compute_fugw_loss = partial(
             self.fugw_loss,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence)
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
         # If divergence is L2
@@ -307,7 +320,7 @@ class FUGWSolver(BaseSolver):
         self_get_params_uot_l2 = partial(
             self.get_parameters_uot_l2,
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, reg_mode)
+            hyperparams=(rho_s, rho_t, eps, reg_mode),
         )
 
         # If divergence is KL
@@ -443,6 +456,6 @@ class FUGWSolver(BaseSolver):
             "duals_gamma": duals_gamma,
             "loss_steps": loss_steps,
             "loss": loss,
-            "loss_entropic": loss_regularized,
+            "loss_regularized": loss_regularized,
             "loss_times": loss_times,
         }
