@@ -48,6 +48,10 @@ class BaseSolver:
         ibpp_nits_sinkhorn: int,
             Number of sinkhorn iterations to run
             within each uot iteration of the ibpp solver.
+
+        Attributes
+        ----------
+        Same as parameters.
         """
 
         self.nits_bcd = nits_bcd

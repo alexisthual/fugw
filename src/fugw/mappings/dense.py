@@ -7,7 +7,7 @@ from fugw.utils import make_tensor
 
 
 class FUGW(BaseMapping):
-    """Class computing dense transport plans"""
+    """Class computing dense transport plans."""
 
     def fit(
         self,

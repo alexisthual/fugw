@@ -270,7 +270,8 @@ class FUGWSparseSolver(BaseSolver):
                     Duals of gamma
                 loss: dict of lists
                     Dictionary containing the loss and its unweighted
-                    components for each step of the block-coordinate-descent.
+                    components for each step of the block-coordinate-descent
+                    for which the FUGW loss was evaluated.
                     Keys are: "wasserstein", "gromov_wasserstein",
                     "marginal_constraint_dim1", "marginal_constraint_dim2",
                     "regularization", "total".
@@ -278,7 +279,8 @@ class FUGWSparseSolver(BaseSolver):
                 loss_steps: list
                     BCD steps at the end of which the FUGW loss was evaluated
                 loss_times: list
-                    Duration of each BCD step
+                    Elapsed time at the end of each BCD step for which the
+                    FUGW loss was evaluated.
         """
         if rho_s == float("inf") and rho_t == float("inf") and eps == 0:
             raise ValueError(
