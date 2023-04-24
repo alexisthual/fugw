@@ -20,7 +20,7 @@ from fugw.solvers.utils import (
     solver_ibpp_sparse,
     solver_mm_sparse,
 )
-from fugw.utils import console, make_csr_matrix
+from fugw.utils import add_dict, console, make_csr_matrix
 
 
 class FUGWSparseSolver(BaseSolver):
@@ -111,15 +111,31 @@ class FUGWSparseSolver(BaseSolver):
         return cost
 
     def fugw_loss(self, pi, gamma, data_const, tuple_weights, hyperparams):
-        """
-        Returns a scalar which is a lower bound on the fugw loss.
-        This lower bound is a combination of:
+        """Compute FUGW loss and each of its components.
+
+        Computes scalar fugw loss, which is a combination of:
         - a Wasserstein loss on features
         - a Gromow-Wasserstein loss on geometries
         - marginal constraints on the computed OT plan
-        - a regularisation term (KL, ie entropic, or L2)
-        """
+        - a regularization term (KL, ie entropic, or L2)
 
+        Parameters
+        ----------
+        pi: torch.Tensor
+        gamma: torch.Tensor
+        data_const: tuple
+        tuple_weights: tuple
+        hyperparams: tuple
+
+        Returns
+        -------
+        l: dict
+            Dictionary containing the loss and its unweighted components.
+            Keys are: "wasserstein", "gromov_wasserstein",
+            "marginal_constraint_dim1", "marginal_constraint_dim2",
+            "regularization", "total".
+            Values are float or None.
+        """
         rho_s, rho_t, eps, alpha, reg_mode = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         (
@@ -139,6 +155,11 @@ class FUGWSparseSolver(BaseSolver):
             csr_sum(gamma, dim=0),
         )
 
+        loss_wasserstein = None
+        loss_gromov_wasserstein = None
+        loss_marginal_constraint_dim1 = None
+        loss_marginal_constraint_dim2 = None
+        loss_regularization = None
         loss = 0
 
         if alpha != 1 and K1 is not None and K2 is not None:
@@ -147,10 +168,10 @@ class FUGWSparseSolver(BaseSolver):
             # when adding 2 CSR matrices together.
             # This could become problematic for sparse matrices
             # with more non-null elements than an int can store.
-            wasserstein_loss = csr_sum(
+            loss_wasserstein = csr_sum(
                 elementwise_prod_fact_sparse(K1, K2, pi + gamma)
             )
-            loss += (1 - alpha) / 2 * wasserstein_loss
+            loss += (1 - alpha) / 2 * loss_wasserstein
 
         if alpha != 0:
             A = (Ds_sqr_1 @ (Ds_sqr_2.T @ gamma1)).dot(pi1)
@@ -158,28 +179,40 @@ class FUGWSparseSolver(BaseSolver):
             C = elementwise_prod_fact_sparse(
                 Ds1, ((Ds2.T @ torch.sparse.mm(gamma, Dt2)) @ Dt1.T).T, pi
             )
-            gromov_wasserstein_loss = A + B - 2 * csr_sum(C)
-            loss += alpha * gromov_wasserstein_loss
+            loss_gromov_wasserstein = A + B - 2 * csr_sum(C)
+            loss += alpha * loss_gromov_wasserstein
 
         if rho_s != float("inf") and rho_s != 0:
-            marginal_constraint_dim1 = compute_quad_kl(pi1, gamma1, ws, ws)
-            loss += rho_s * marginal_constraint_dim1
-        if rho_t != float("inf") and rho_t != 0:
-            marginal_constraint_dim2 = compute_quad_kl(pi2, gamma2, wt, wt)
-            loss += rho_t * marginal_constraint_dim2
-
-        if reg_mode == "joint":
-            regularization_term = compute_quad_kl_sparse(
-                pi, gamma, ws_dot_wt, ws_dot_wt
+            loss_marginal_constraint_dim1 = compute_quad_kl(
+                pi1, gamma1, ws, ws
             )
-        elif reg_mode == "independent":
-            regularization_term = compute_kl_sparse(
-                pi, ws_dot_wt
-            ) + compute_kl_sparse(gamma, ws_dot_wt)
+            loss += rho_s * loss_marginal_constraint_dim1
+        if rho_t != float("inf") and rho_t != 0:
+            loss_marginal_constraint_dim2 = compute_quad_kl(
+                pi2, gamma2, wt, wt
+            )
+            loss += rho_t * loss_marginal_constraint_dim2
 
-        regularized_loss = loss + eps * regularization_term
+        if eps != 0:
+            if reg_mode == "joint":
+                loss_regularization = compute_quad_kl_sparse(
+                    pi, gamma, ws_dot_wt, ws_dot_wt
+                )
+            elif reg_mode == "independent":
+                loss_regularization = compute_kl_sparse(
+                    pi, ws_dot_wt
+                ) + compute_kl_sparse(gamma, ws_dot_wt)
 
-        return loss.item(), regularized_loss.item()
+            loss = loss + eps * loss_regularization
+
+        return {
+            "wasserstein": loss_wasserstein.item(),
+            "gromov_wasserstein": loss_gromov_wasserstein.item(),
+            "marginal_constraint_dim1": loss_marginal_constraint_dim1.item(),
+            "marginal_constraint_dim2": loss_marginal_constraint_dim2.item(),
+            "regularization": loss_regularization.item(),
+            "total": loss.item(),
+        }
 
     def solve(
         self,
@@ -198,8 +231,7 @@ class FUGWSparseSolver(BaseSolver):
         solver="ibpp",
         verbose=False,
     ):
-        """
-        Function running the BCD iterations.
+        """Run BCD iterations.
 
         Parameters
         ----------
@@ -236,14 +268,18 @@ class FUGWSparseSolver(BaseSolver):
                     Duals of pi
                 duals_gamma: tuple of torch.Tensor of size
                     Duals of gamma
+                loss: dict of lists
+                    Dictionary containing the loss and its unweighted
+                    components for each step of the block-coordinate-descent.
+                    Keys are: "wasserstein", "gromov_wasserstein",
+                    "marginal_constraint_dim1", "marginal_constraint_dim2",
+                    "regularization", "total".
+                    Values are float or None.
                 loss_steps: list
                     BCD steps at the end of which the FUGW loss was evaluated
-                loss: list
-                    Values of FUGW loss
-                loss_regularized: list
-                    Values of FUGW loss with entropy
+                loss_times: list
+                    Duration of each BCD step
         """
-
         if rho_s == float("inf") and rho_t == float("inf") and eps == 0:
             raise ValueError(
                 "This package does not handle balanced cases "
@@ -394,10 +430,9 @@ class FUGWSparseSolver(BaseSolver):
         )
 
         # Initialise loss
-        current_loss, current_loss_regularized = compute_fugw_loss(pi, gamma)
+        current_loss = compute_fugw_loss(pi, gamma)
+        loss = add_dict({}, current_loss)
         loss_steps = [0]
-        loss = [current_loss]
-        loss_regularized = [current_loss_regularized]
         loss_times = [0]
         idx = 0
         err = self.tol_bcd + 1e-3
@@ -465,25 +500,21 @@ class FUGWSparseSolver(BaseSolver):
             # Update error
             err = (pi.values() - pi_prev.values()).abs().sum().item()
             if idx % self.eval_bcd == 0:
-                current_loss, current_loss_regularized = compute_fugw_loss(
-                    pi, gamma
-                )
+                current_loss = compute_fugw_loss(pi, gamma)
 
                 loss_steps.append(idx + 1)
-                loss.append(current_loss)
-                loss_regularized.append(current_loss_regularized)
+                loss = add_dict(loss, current_loss)
                 loss_times.append(time.time() - t0)
 
                 if verbose:
                     console.log(
                         f"BCD step {idx+1}/{self.nits_bcd}\t"
-                        f"FUGW loss:\t{current_loss} (base)\t"
-                        f"{current_loss_regularized} (regularized)"
+                        f"FUGW loss:\t{current_loss['total']}"
                     )
 
                 if (
-                    len(loss_regularized) >= 2
-                    and abs(loss_regularized[-2] - loss_regularized[-1])
+                    len(loss["total"]) >= 2
+                    and abs(loss["total"][-2] - loss["total"][-1])
                     < self.early_stopping_threshold
                 ):
                     break
@@ -498,8 +529,7 @@ class FUGWSparseSolver(BaseSolver):
             "gamma": gamma,
             "duals_pi": duals_pi,
             "duals_gamma": duals_gamma,
-            "loss_steps": loss_steps,
             "loss": loss,
-            "loss_regularized": loss_regularized,
+            "loss_steps": loss_steps,
             "loss_times": loss_times,
         }

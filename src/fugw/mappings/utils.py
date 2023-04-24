@@ -34,9 +34,8 @@ class BaseMapping:
 
         self.pi = None
 
-        self.loss_steps = []
         self.loss = []
-        self.loss_regularized = []
+        self.loss_steps = []
         self.loss_times = []
 
     def fit(self):

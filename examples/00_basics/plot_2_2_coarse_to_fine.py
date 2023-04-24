@@ -11,6 +11,7 @@ have more than 10k points.
 
 # sphinx_gallery_thumbnail_number = 4
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 
 from fugw.mappings import FUGW, FUGWSparse
@@ -70,13 +71,19 @@ target_embeddings_normalized, target_d_max = coarse_to_fine.random_normalizing(
 # %%
 # Let us define the coarse and fine-grained optimization problems to solve.
 # We also specify which solver to use at each of the 2 steps:
-coarse_mapping = FUGW(alpha=0.5, eps=1e-4)
+alpha_coarse = 0.5
+rho_coarse = 1
+eps_coarse = 1e-4
+coarse_mapping = FUGW(alpha=alpha_coarse, rho=rho_coarse, eps=eps_coarse)
 coarse_mapping_solver = "mm"
 coarse_mapping_solver_params = {
     "tol_uot": 1e-10,
 }
 
-fine_mapping = FUGWSparse(alpha=0.5, eps=1e-4)
+alpha_fine = 0.5
+rho_fine = 1
+eps_fine = 1e-4
+fine_mapping = FUGWSparse(alpha=alpha_fine, rho=rho_fine, eps=eps_fine)
 fine_mapping_solver = "mm"
 fine_mapping_solver_params = {
     "tol_uot": 1e-10,
@@ -132,33 +139,57 @@ print(
 
 # %%
 # Here is the evolution of the FUGW loss during training
-# of the coarse mapping, with and without the regularized term:
+# of the coarse mapping, as well as the contribution of each loss term:
 
-fig, ax = plt.subplots(figsize=(4, 4))
+fig, ax = plt.subplots(figsize=(10, 4))
 ax.set_title("Coarse mapping training loss")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(coarse_mapping.loss_steps, coarse_mapping.loss, label="FUGW loss")
-ax.plot(
+ax.stackplot(
     coarse_mapping.loss_steps,
-    coarse_mapping.loss_regularized,
-    label="FUGW regularized loss",
+    [
+        (1 - alpha_coarse) * np.array(coarse_mapping.loss["wasserstein"]),
+        alpha_coarse * np.array(coarse_mapping.loss["gromov_wasserstein"]),
+        rho_coarse * np.array(coarse_mapping.loss["marginal_constraint_dim1"]),
+        rho_coarse * np.array(coarse_mapping.loss["marginal_constraint_dim2"]),
+        eps_coarse * np.array(coarse_mapping.loss["regularization"]),
+    ],
+    labels=[
+        "wasserstein",
+        "gromov_wasserstein",
+        "marginal_constraint_dim1",
+        "marginal_constraint_dim2",
+        "regularization",
+    ],
+    alpha=0.8,
 )
 ax.legend()
 plt.show()
 
 # %%
-# And here is that of the fine-grained mapping:
+# And here is a similar plot for the fine-grained mapping:
 
-fig, ax = plt.subplots(figsize=(4, 4))
+fig, ax = plt.subplots(figsize=(10, 4))
 ax.set_title("Fine-grained mapping training loss")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(fine_mapping.loss_steps, fine_mapping.loss, label="FUGW loss")
-ax.plot(
+ax.stackplot(
     fine_mapping.loss_steps,
-    fine_mapping.loss_regularized,
-    label="FUGW regularized loss",
+    [
+        (1 - alpha_fine) * np.array(fine_mapping.loss["wasserstein"]),
+        alpha_fine * np.array(fine_mapping.loss["gromov_wasserstein"]),
+        rho_fine * np.array(fine_mapping.loss["marginal_constraint_dim1"]),
+        rho_fine * np.array(fine_mapping.loss["marginal_constraint_dim2"]),
+        eps_fine * np.array(fine_mapping.loss["regularization"]),
+    ],
+    labels=[
+        "wasserstein",
+        "gromov_wasserstein",
+        "marginal_constraint_dim1",
+        "marginal_constraint_dim2",
+        "regularization",
+    ],
+    alpha=0.8,
 )
 ax.legend()
 plt.show()

@@ -221,7 +221,10 @@ target_geometry_normalized = target_geometry / np.max(target_geometry)
 # Note that this package is meant to be used with GPUs ; fitting mappings
 # on CPUs in about 100x slower.
 
-mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
+alpha = 0.5
+rho = 1
+eps = 1e-4
+mapping = FUGW(alpha=alpha, rho=rho, eps=eps)
 
 # %%
 # Let's fit our mapping! 🚀
@@ -246,16 +249,30 @@ _ = mapping.fit(
 # Here is the evolution of the FUGW loss during training,
 # with and without the regularized term:
 
-fig, ax = plt.subplots(figsize=(4, 4))
+fig, ax = plt.subplots(figsize=(10, 4))
 ax.set_title(
     "Sinkhorn mapping training loss\n"
     f"Total training time = {mapping.loss_times[-1]:.1f}s"
 )
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
-ax.plot(
-    mapping.loss_steps, mapping.loss_regularized, label="FUGW regularized loss"
+ax.stackplot(
+    mapping.loss_steps,
+    [
+        (1 - alpha) * np.array(mapping.loss["wasserstein"]),
+        alpha * np.array(mapping.loss["gromov_wasserstein"]),
+        rho * np.array(mapping.loss["marginal_constraint_dim1"]),
+        rho * np.array(mapping.loss["marginal_constraint_dim2"]),
+        eps * np.array(mapping.loss["regularization"]),
+    ],
+    labels=[
+        "wasserstein",
+        "gromov_wasserstein",
+        "marginal_constraint_dim1",
+        "marginal_constraint_dim2",
+        "regularization",
+    ],
+    alpha=0.8,
 )
 ax.legend()
 plt.show()
@@ -269,7 +286,7 @@ plt.show()
 # a maximize-minimization approach to approximate a solution and is
 # used by default in ``fugw.mappings``:
 
-mm_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
+mm_mapping = FUGW(alpha=alpha, rho=rho, eps=eps)
 
 _ = mm_mapping.fit(
     source_features_normalized[:n_training_contrasts],
@@ -287,7 +304,7 @@ _ = mm_mapping.fit(
 
 # %%
 # And now with the ``ibpp`` solver:
-ibpp_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
+ibpp_mapping = FUGW(alpha=alpha, rho=rho, eps=eps)
 
 _ = ibpp_mapping.fit(
     source_features_normalized[:n_training_contrasts],
@@ -329,17 +346,21 @@ fig.suptitle("Training loss comparison\nSinkhorn vs MM vs IBPP")
 ax = fig.add_subplot(121)
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(mapping.loss_steps, mapping.loss, label="Sinkhorn FUGW loss")
-ax.plot(mm_mapping.loss_steps, mm_mapping.loss, label="MM FUGW loss")
-ax.plot(ibpp_mapping.loss_steps, ibpp_mapping.loss, label="IBPP FUGW loss")
+ax.plot(mapping.loss_steps, mapping.loss["total"], label="Sinkhorn FUGW loss")
+ax.plot(mm_mapping.loss_steps, mm_mapping.loss["total"], label="MM FUGW loss")
+ax.plot(
+    ibpp_mapping.loss_steps, ibpp_mapping.loss["total"], label="IBPP FUGW loss"
+)
 ax.legend()
 
 ax = fig.add_subplot(122)
 ax.set_ylabel("Loss")
 ax.set_xlabel("Time (in seconds)")
-ax.plot(mapping.loss_times, mapping.loss, label="FUGW loss")
-ax.plot(mm_mapping.loss_times, mm_mapping.loss, label="MM FUGW loss")
-ax.plot(ibpp_mapping.loss_times, ibpp_mapping.loss, label="IBPP FUGW loss")
+ax.plot(mapping.loss_times, mapping.loss["total"], label="FUGW loss")
+ax.plot(mm_mapping.loss_times, mm_mapping.loss["total"], label="MM FUGW loss")
+ax.plot(
+    ibpp_mapping.loss_times, ibpp_mapping.loss["total"], label="IBPP FUGW loss"
+)
 ax.legend()
 
 fig.tight_layout()

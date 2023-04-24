@@ -161,9 +161,8 @@ class FUGWBarycenter:
             new_plans.append(mapping.pi)
             new_losses.append(
                 (
-                    mapping.loss_steps,
                     mapping.loss,
-                    mapping.loss_regularized,
+                    mapping.loss_steps,
                     mapping.loss_times,
                 )
             )
@@ -221,9 +220,8 @@ class FUGWBarycenter:
         duals: list of (array, array)
         losses_each_bar_step: list such that l[s][i]
             is a tuple containing:
-                - loss_steps
                 - loss
-                - loss_regularized
+                - loss_steps
                 - loss_times
             for individual i at barycenter computation step s
         """

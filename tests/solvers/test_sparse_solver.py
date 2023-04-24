@@ -82,9 +82,8 @@ def test_sparse_solvers(solver, device):
     gamma = res["gamma"]
     duals_pi = res["duals_pi"]
     duals_gamma = res["duals_gamma"]
-    loss_steps = res["loss_steps"]
     loss = res["loss"]
-    loss_regularized = res["loss_regularized"]
+    loss_steps = res["loss_steps"]
     loss_times = res["loss_times"]
 
     assert pi.size() == (ns, nt)
@@ -99,9 +98,18 @@ def test_sparse_solvers(solver, device):
         assert duals_pi[1].shape == (nt,)
 
     assert len(loss_steps) - 1 <= nits_bcd // eval_bcd + 1
-    assert len(loss) == len(loss_steps)
-    assert len(loss_regularized) == len(loss_steps)
     assert len(loss_times) == len(loss_steps)
+    for key in [
+        "wasserstein",
+        "gromov_wasserstein",
+        "marginal_constraint_dim1",
+        "marginal_constraint_dim2",
+        "regularization",
+        "total",
+    ]:
+        assert len(loss[key]) == len(loss_steps)
     # Loss should decrease
-    print(f"loss: {loss}")
-    assert np.all(np.sign(np.array(loss[1:]) - np.array(loss[:-1])) == -1)
+    assert np.all(
+        np.sign(np.array(loss["total"][1:]) - np.array(loss["total"][:-1]))
+        == -1
+    )

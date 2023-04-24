@@ -11,6 +11,7 @@ have less than 10k points.
 
 # sphinx_gallery_thumbnail_number = 4
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 
 from fugw.mappings import FUGW
@@ -82,7 +83,10 @@ target_geometry_normalized = target_geometry / target_geometry.max()
 
 # %%
 # Let us define the optimization problem to solve
-mapping = FUGW(alpha=0.5, eps=1e-4)
+alpha = 0.5
+rho = 1000
+eps = 1e-4
+mapping = FUGW(alpha=alpha, rho=rho, eps=eps)
 
 # %%
 # Now, we fit a transport plan between source and target distributions
@@ -103,15 +107,29 @@ print(f"Transport plan's total mass: {pi.sum():.5f}")
 
 # %%
 # Here is the evolution of the FUGW loss during training,
-# with and without the regularized term:
+# as well as the contribution of each loss term:
 
-fig, ax = plt.subplots(figsize=(4, 4))
+fig, ax = plt.subplots(figsize=(10, 4))
 ax.set_title("Mapping training loss")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
-ax.plot(
-    mapping.loss_steps, mapping.loss_regularized, label="FUGW regularized loss"
+ax.stackplot(
+    mapping.loss_steps,
+    [
+        (1 - alpha) * np.array(mapping.loss["wasserstein"]),
+        alpha * np.array(mapping.loss["gromov_wasserstein"]),
+        rho * np.array(mapping.loss["marginal_constraint_dim1"]),
+        rho * np.array(mapping.loss["marginal_constraint_dim2"]),
+        eps * np.array(mapping.loss["regularization"]),
+    ],
+    labels=[
+        "wasserstein",
+        "gromov_wasserstein",
+        "marginal_constraint_dim1",
+        "marginal_constraint_dim2",
+        "regularization",
+    ],
+    alpha=0.8,
 )
 ax.legend()
 plt.show()

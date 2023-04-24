@@ -173,3 +173,10 @@ def init_mock_distribution(
         return tuple(map(lambda x: x.numpy(), distribution))
     else:
         return distribution
+
+
+def add_dict(d, new_d):
+    """Add values of dictionary new_d to dictionary d."""
+    for key, value in new_d.items():
+        d.setdefault(key, []).append(value)
+    return d
