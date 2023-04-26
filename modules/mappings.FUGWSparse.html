@@ -274,6 +274,29 @@ the entropy loss</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>alpha: float</strong></dt><dd></dd>
+<dt><strong>rho: float</strong></dt><dd></dd>
+<dt><strong>eps: float</strong></dt><dd></dd>
+<dt><strong>reg_mode: “joint” or “independent”</strong></dt><dd></dd>
+<dt><strong>pi: numpy.ndarray or None</strong></dt><dd><p>Transport plan computed with <code class="docutils literal notranslate"><span class="pre">.fit()</span></code></p>
+</dd>
+<dt><strong>loss: dict of lists</strong></dt><dd><p>Dictionary containing the loss and its unweighted
+components for each step of the block-coordinate-descent
+for which the FUGW loss was evaluated.
+Keys are: “wasserstein”, “gromov_wasserstein”,
+“marginal_constraint_dim1”, “marginal_constraint_dim2”,
+“regularization”, “total”.
+Values are float or None.</p>
+</dd>
+<dt><strong>loss_steps: list</strong></dt><dd><p>BCD steps at the end of which the FUGW loss was evaluated</p>
+</dd>
+<dt><strong>loss_times: list</strong></dt><dd><p>Elapsed time at the end of each BCD step for which the
+FUGW loss was evaluated.</p>
+</dd>
+</dl>
+</dd>
 </dl>
 </dd></dl>
 

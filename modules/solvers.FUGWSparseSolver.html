@@ -239,13 +239,13 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fugw.solvers.FUGWSparseSolver.fugw_loss" title="fugw.solvers.FUGWSparseSolver.fugw_loss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fugw_loss</span></code></a>(pi, gamma, data_const, ...)</p></td>
-<td><p>Returns a scalar which is a lower bound on the fugw loss.</p></td>
+<td><p>Compute FUGW loss and each of its components.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fugw.solvers.FUGWSparseSolver.local_biconvex_cost" title="fugw.solvers.FUGWSparseSolver.local_biconvex_cost"><code class="xref py py-obj docutils literal notranslate"><span class="pre">local_biconvex_cost</span></code></a>(pi, transpose, ...)</p></td>
 <td><p>Before each block coordinate descent (BCD) step, the local cost matrix is updated.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fugw.solvers.FUGWSparseSolver.solve" title="fugw.solvers.FUGWSparseSolver.solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve</span></code></a>([alpha, rho_s, rho_t, eps, reg_mode, ...])</p></td>
-<td><p>Function running the BCD iterations.</p></td>
+<td><p>Run BCD iterations.</p></td>
 </tr>
 </tbody>
 </table>
@@ -286,18 +286,44 @@ within each uot iteration of the ibpp solver.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Same as parameters.</strong></dt><dd></dd>
+</dl>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fugw.solvers.FUGWSparseSolver.fugw_loss">
 <span class="sig-name descname"><span class="pre">fugw_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_const</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuple_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyperparams</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSparseSolver.fugw_loss" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns a scalar which is a lower bound on the fugw loss.
-This lower bound is a combination of:
+<dd><p>Compute FUGW loss and each of its components.</p>
+<p>Computes scalar fugw loss, which is a combination of:
 - a Wasserstein loss on features
 - a Gromow-Wasserstein loss on geometries
 - marginal constraints on the computed OT plan
-- an entropic regularisation</p>
+- a regularization term (KL, ie entropic, or L2)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pi: torch.Tensor</strong></dt><dd></dd>
+<dt><strong>gamma: torch.Tensor</strong></dt><dd></dd>
+<dt><strong>data_const: tuple</strong></dt><dd></dd>
+<dt><strong>tuple_weights: tuple</strong></dt><dd></dd>
+<dt><strong>hyperparams: tuple</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>l: dict</dt><dd><p>Dictionary containing the loss and its unweighted components.
+Keys are: “wasserstein”, “gromov_wasserstein”,
+“marginal_constraint_dim1”, “marginal_constraint_dim2”,
+“regularization”, “total”.
+Values are float or None.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -315,7 +341,7 @@ which makes use of this cost to update the transport plans.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fugw.solvers.FUGWSparseSolver.solve">
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'joint'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_duals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ibpp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSparseSolver.solve" title="Permalink to this definition">#</a></dt>
-<dd><p>Function running the BCD iterations.</p>
+<dd><p>Run BCD iterations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -353,11 +379,18 @@ which makes use of this cost to update the transport plans.</p>
 </dd>
 <dt>duals_gamma: tuple of torch.Tensor of size</dt><dd><p>Duals of gamma</p>
 </dd>
+<dt>loss: dict of lists</dt><dd><p>Dictionary containing the loss and its unweighted
+components for each step of the block-coordinate-descent
+for which the FUGW loss was evaluated.
+Keys are: “wasserstein”, “gromov_wasserstein”,
+“marginal_constraint_dim1”, “marginal_constraint_dim2”,
+“regularization”, “total”.
+Values are float or None.</p>
+</dd>
 <dt>loss_steps: list</dt><dd><p>BCD steps at the end of which the FUGW loss was evaluated</p>
 </dd>
-<dt>loss: list</dt><dd><p>Values of FUGW loss</p>
-</dd>
-<dt>loss_entropic: list</dt><dd><p>Values of FUGW loss with entropy</p>
+<dt>loss_times: list</dt><dd><p>Elapsed time at the end of each BCD step for which the
+FUGW loss was evaluated.</p>
 </dd>
 </dl>
 </dd>

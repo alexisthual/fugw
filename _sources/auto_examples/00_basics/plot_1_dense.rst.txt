@@ -26,12 +26,13 @@ a dense fugw alignment between them.
 Dense alignments are typically used when both aligned distributions
 have less than 10k points.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-19
+.. GENERATED FROM PYTHON SOURCE LINES 11-20
 
 .. code-block:: default
 
 
     import matplotlib.pyplot as plt
+    import numpy as np
     import torch
 
     from fugw.mappings import FUGW
@@ -45,7 +46,7 @@ have less than 10k points.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-28
+.. GENERATED FROM PYTHON SOURCE LINES 22-29
 
 .. code-block:: default
 
@@ -63,11 +64,11 @@ have less than 10k points.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-30
+.. GENERATED FROM PYTHON SOURCE LINES 30-31
 
 Let us generate random training data for the source and target distributions
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-38
+.. GENERATED FROM PYTHON SOURCE LINES 31-39
 
 .. code-block:: default
 
@@ -96,11 +97,11 @@ Let us generate random training data for the source and target distributions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-40
+.. GENERATED FROM PYTHON SOURCE LINES 40-41
 
 We can visualize the generated features:
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-49
+.. GENERATED FROM PYTHON SOURCE LINES 41-50
 
 .. code-block:: default
 
@@ -125,11 +126,11 @@ We can visualize the generated features:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-51
+.. GENERATED FROM PYTHON SOURCE LINES 51-52
 
 And embeddings:
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-71
+.. GENERATED FROM PYTHON SOURCE LINES 52-72
 
 .. code-block:: default
 
@@ -165,11 +166,11 @@ And embeddings:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-73
+.. GENERATED FROM PYTHON SOURCE LINES 73-74
 
 Features and geometries should be normalized before calling the solver
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-83
+.. GENERATED FROM PYTHON SOURCE LINES 74-84
 
 .. code-block:: default
 
@@ -190,15 +191,18 @@ Features and geometries should be normalized before calling the solver
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-85
+.. GENERATED FROM PYTHON SOURCE LINES 85-86
 
 Let us define the optimization problem to solve
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-87
+.. GENERATED FROM PYTHON SOURCE LINES 86-91
 
 .. code-block:: default
 
-    mapping = FUGW(alpha=0.5, eps=1e-4)
+    alpha = 0.5
+    rho = 1000
+    eps = 1e-4
+    mapping = FUGW(alpha=alpha, rho=rho, eps=eps)
 
 
 
@@ -207,12 +211,12 @@ Let us define the optimization problem to solve
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-90
+.. GENERATED FROM PYTHON SOURCE LINES 92-94
 
 Now, we fit a transport plan between source and target distributions
 using a sinkhorn solver
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-99
+.. GENERATED FROM PYTHON SOURCE LINES 94-103
 
 .. code-block:: default
 
@@ -235,53 +239,43 @@ using a sinkhorn solver
 
 
 
-    [17:43:04] BCD step 1/10   FUGW loss:      0.02861676551401615      dense.py:421
-               (base)      0.02861676551401615 (regularized)                        
+    [14:34:18] BCD step 1/10   FUGW loss:      0.029017694294452667     dense.py:464
 
 
-    [17:43:05] BCD step 2/10   FUGW loss:      0.022839196026325226     dense.py:421
-               (base)     0.022839196026325226 (regularized)                        
+    [14:34:19] BCD step 2/10   FUGW loss:      0.04671149328351021      dense.py:464
 
 
-    [17:43:06] BCD step 3/10   FUGW loss:      0.022318508476018906     dense.py:421
-               (base)     0.022318508476018906 (regularized)                        
+               BCD step 3/10   FUGW loss:      0.022675596177577972     dense.py:464
 
 
-               BCD step 4/10   FUGW loss:      0.021145274862647057     dense.py:421
-               (base)     0.021145274862647057 (regularized)                        
+    [14:34:20] BCD step 4/10   FUGW loss:      0.022144610062241554     dense.py:464
 
 
-    [17:43:07] BCD step 5/10   FUGW loss:      0.02049073576927185      dense.py:421
-               (base)      0.02049073576927185 (regularized)                        
+               BCD step 5/10   FUGW loss:      0.04954808950424194      dense.py:464
 
 
-    [17:43:08] BCD step 6/10   FUGW loss:      0.01987534575164318      dense.py:421
-               (base)      0.01987534575164318 (regularized)                        
+    [14:34:21] BCD step 6/10   FUGW loss:      0.0239147637039423       dense.py:464
 
 
-    [17:43:09] BCD step 7/10   FUGW loss:      0.019204813987016678     dense.py:421
-               (base)     0.019204813987016678 (regularized)                        
+               BCD step 7/10   FUGW loss:      0.01939348317682743      dense.py:464
 
 
-               BCD step 8/10   FUGW loss:      0.018737901002168655     dense.py:421
-               (base)     0.018737901002168655 (regularized)                        
+    [14:34:22] BCD step 8/10   FUGW loss:      0.018673155456781387     dense.py:464
 
 
-    [17:43:10] BCD step 9/10   FUGW loss:      0.018532782793045044     dense.py:421
-               (base)     0.018532782793045044 (regularized)                        
+               BCD step 9/10   FUGW loss:      0.018613629043102264     dense.py:464
 
 
-    [17:43:11] BCD step 10/10  FUGW loss:      0.018525412306189537     dense.py:421
-               (base)     0.018525412306189537 (regularized)                        
+    [14:34:23] BCD step 10/10  FUGW loss:      0.018613623455166817     dense.py:464
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-101
+.. GENERATED FROM PYTHON SOURCE LINES 104-105
 
 The transport plan can be accessed after the model has been fitted
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-104
+.. GENERATED FROM PYTHON SOURCE LINES 105-108
 
 .. code-block:: default
 
@@ -296,27 +290,43 @@ The transport plan can be accessed after the model has been fitted
 
  .. code-block:: none
 
-    Transport plan's total mass: 0.99566
+    Transport plan's total mass: 0.99999
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-107
+.. GENERATED FROM PYTHON SOURCE LINES 109-111
 
 Here is the evolution of the FUGW loss during training,
-with and without the entropic term:
+as well as the contribution of each loss term:
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-117
+.. GENERATED FROM PYTHON SOURCE LINES 111-137
 
 .. code-block:: default
 
 
-    fig, ax = plt.subplots(figsize=(4, 4))
+    fig, ax = plt.subplots(figsize=(10, 4))
     ax.set_title("Mapping training loss")
     ax.set_ylabel("Loss")
     ax.set_xlabel("BCD step")
-    ax.plot(mapping.loss_steps, mapping.loss, label="FUGW loss")
-    ax.plot(mapping.loss_steps, mapping.loss_entropic, label="FUGW entropic loss")
+    ax.stackplot(
+        mapping.loss_steps,
+        [
+            (1 - alpha) * np.array(mapping.loss["wasserstein"]),
+            alpha * np.array(mapping.loss["gromov_wasserstein"]),
+            rho * np.array(mapping.loss["marginal_constraint_dim1"]),
+            rho * np.array(mapping.loss["marginal_constraint_dim2"]),
+            eps * np.array(mapping.loss["regularization"]),
+        ],
+        labels=[
+            "wasserstein",
+            "gromov_wasserstein",
+            "marginal_constraint_dim1",
+            "marginal_constraint_dim2",
+            "regularization",
+        ],
+        alpha=0.8,
+    )
     ax.legend()
     plt.show()
 
@@ -332,7 +342,7 @@ with and without the entropic term:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-123
+.. GENERATED FROM PYTHON SOURCE LINES 138-143
 
 Using the computed mapping
 --------------------------
@@ -340,7 +350,7 @@ The computed mapping is stored in ``mapping.pi`` as a ``torch.Tensor``.
 In this example, the transport plan is small enough that we can display
 it altogether.
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-132
+.. GENERATED FROM PYTHON SOURCE LINES 143-152
 
 .. code-block:: default
 
@@ -365,15 +375,15 @@ it altogether.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-138
+.. GENERATED FROM PYTHON SOURCE LINES 153-158
 
 The previous figure of the transport plan tells us it is very sparse
-and not very entropic.
+and not very regularized.
 Another informative way to look at the plan consists in checking
 which points of the source and target distributions
 were matched together in the feature space.
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-167
+.. GENERATED FROM PYTHON SOURCE LINES 158-187
 
 .. code-block:: default
 
@@ -418,12 +428,12 @@ were matched together in the feature space.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-170
+.. GENERATED FROM PYTHON SOURCE LINES 188-190
 
 Finally, the fitted model can transport unseen data
 between source and target
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-175
+.. GENERATED FROM PYTHON SOURCE LINES 190-195
 
 .. code-block:: default
 
@@ -445,7 +455,7 @@ between source and target
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-178
+.. GENERATED FROM PYTHON SOURCE LINES 196-198
 
 .. code-block:: default
 
@@ -461,9 +471,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.113 seconds)
+   **Total running time of the script:** ( 0 minutes  10.183 seconds)
 
-**Estimated memory usage:**  303 MB
+**Estimated memory usage:**  305 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_1_dense.py:
