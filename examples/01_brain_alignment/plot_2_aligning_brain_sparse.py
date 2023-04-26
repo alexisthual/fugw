@@ -256,14 +256,20 @@ target_embeddings_normalized, target_distance_max = (
 # information gathered during the coarse step.
 # Note that the 2 solvers can use different parameters.
 
-coarse_mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
+alpha_coarse = 0.5
+rho_coarse = 1
+eps_coarse = 1e-4
+coarse_mapping = FUGW(alpha=alpha_coarse, rho=rho_coarse, eps=eps_coarse)
 coarse_mapping_solver = "mm"
 coarse_mapping_solver_params = {
     "nits_bcd": 5,
     "tol_uot": 1e-10,
 }
 
-fine_mapping = FUGWSparse(alpha=0.5, rho=1, eps=1e-4)
+alpha_fine = 0.5
+rho_fine = 1
+eps_fine = 1e-4
+fine_mapping = FUGWSparse(alpha=alpha_fine, rho=rho_fine, eps=eps_fine)
 fine_mapping_solver = "mm"
 fine_mapping_solver_params = {
     "nits_bcd": 3,
@@ -470,36 +476,58 @@ coarse_to_fine.fit(
 t1 = time.time()
 
 # %%
-# Here is the evolution of the FUGW loss while traning of the coarse mapping,
-# with and without the entropic term. As you can see, we most likely
-# stopped fitting the coarse mapping too early, yet it is probably enough
-# for this example.
+# Here is the evolution of the FUGW loss during training
+# of the coarse mapping, as well as the contribution of each loss term:
 
-fig, ax = plt.subplots(figsize=(4, 4))
-ax.set_title("Coarse mapping's training loss")
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.set_title("Coarse mapping training loss")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(coarse_mapping.loss_steps, coarse_mapping.loss, label="FUGW loss")
-ax.plot(
+ax.stackplot(
     coarse_mapping.loss_steps,
-    coarse_mapping.loss_entropic,
-    label="FUGW entropic loss",
+    [
+        (1 - alpha_coarse) * np.array(coarse_mapping.loss["wasserstein"]),
+        alpha_coarse * np.array(coarse_mapping.loss["gromov_wasserstein"]),
+        rho_coarse * np.array(coarse_mapping.loss["marginal_constraint_dim1"]),
+        rho_coarse * np.array(coarse_mapping.loss["marginal_constraint_dim2"]),
+        eps_coarse * np.array(coarse_mapping.loss["regularization"]),
+    ],
+    labels=[
+        "wasserstein",
+        "gromov_wasserstein",
+        "marginal_constraint_dim1",
+        "marginal_constraint_dim2",
+        "regularization",
+    ],
+    alpha=0.8,
 )
 ax.legend()
 plt.show()
 
 # %%
-# Here is that of the fine-grained mapping:
+# And here is a similar plot for the fine-grained mapping:
 
-fig, ax = plt.subplots(figsize=(4, 4))
-ax.set_title("Fine mapping's training loss")
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.set_title("Fine-grained mapping training loss")
 ax.set_ylabel("Loss")
 ax.set_xlabel("BCD step")
-ax.plot(fine_mapping.loss_steps, fine_mapping.loss, label="FUGW loss")
-ax.plot(
+ax.stackplot(
     fine_mapping.loss_steps,
-    fine_mapping.loss_entropic,
-    label="FUGW entropic loss",
+    [
+        (1 - alpha_fine) * np.array(fine_mapping.loss["wasserstein"]),
+        alpha_fine * np.array(fine_mapping.loss["gromov_wasserstein"]),
+        rho_fine * np.array(fine_mapping.loss["marginal_constraint_dim1"]),
+        rho_fine * np.array(fine_mapping.loss["marginal_constraint_dim2"]),
+        eps_fine * np.array(fine_mapping.loss["regularization"]),
+    ],
+    labels=[
+        "wasserstein",
+        "gromov_wasserstein",
+        "marginal_constraint_dim1",
+        "marginal_constraint_dim2",
+        "regularization",
+    ],
+    alpha=0.8,
 )
 ax.legend()
 plt.show()

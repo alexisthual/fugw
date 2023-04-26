@@ -48,6 +48,10 @@ class BaseSolver:
         ibpp_nits_sinkhorn: int,
             Number of sinkhorn iterations to run
             within each uot iteration of the ibpp solver.
+
+        Attributes
+        ----------
+        Same as parameters.
         """
 
         self.nits_bcd = nits_bcd
@@ -364,8 +368,7 @@ def solver_sinkhorn_sparse(
 def solver_mm(
     cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
 ):
-    """
-    Solve (entropic) UOT using the majorization-minimization algorithm.
+    """Solve (regularized) UOT using the majorization-minimization algorithm.
 
     Allow epsilon to be 0 but rho_s and rho_t can't be infinity.
 
@@ -443,9 +446,7 @@ def solver_mm_l2(
     ws, wt, ws_dot_wt = tuple_weights
     rho_s, rho_t, eps = uot_params
 
-    thres = (
-        rho_s * ws[:, None] + rho_t * wt[None, :] + eps * ws_dot_wt - cost
-    )
+    thres = rho_s * ws[:, None] + rho_t * wt[None, :] + eps * ws_dot_wt - cost
     thres = torch.clamp(thres, min=0)
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
@@ -480,8 +481,7 @@ def solver_mm_l2(
 def solver_mm_sparse(
     cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
 ):
-    """
-    Solve (entropic) UOT using the majorization-minimization algorithm.
+    """Solve (regularized) UOT using the majorization-minimization algorithm.
 
     Allow epsilon to be 0 but rho_s and rho_t can't be infinity.
 

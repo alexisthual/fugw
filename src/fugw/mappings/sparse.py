@@ -174,9 +174,8 @@ class FUGWSparse(BaseMapping):
         )
 
         self.pi = res["pi"].to_sparse_coo().detach().cpu()
-        self.loss_steps = res["loss_steps"]
         self.loss = res["loss"]
-        self.loss_entropic = res["loss_entropic"]
+        self.loss_steps = res["loss_steps"]
         self.loss_times = res["loss_times"]
 
         # Free allocated GPU memory

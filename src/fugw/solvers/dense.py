@@ -14,14 +14,19 @@ from fugw.solvers.utils import (
     solver_sinkhorn,
     solver_mm_l2,
 )
-from fugw.utils import console
+from fugw.utils import add_dict, console
 
 
 class FUGWSolver(BaseSolver):
     """Solver computing dense solutions"""
 
     def local_biconvex_cost(
-        self, pi, transpose, data_const, tuple_weights, hyperparams,
+        self,
+        pi,
+        transpose,
+        data_const,
+        tuple_weights,
+        hyperparams,
     ):
         """
         Before each block coordinate descent (BCD) step,
@@ -68,22 +73,44 @@ class FUGWSolver(BaseSolver):
                 cost += rho_t * marginal_cost_dim2
 
             if reg_mode == "joint":
-                entropic_cost = compute_approx_kl(pi, ws_dot_wt)
-                cost += eps * entropic_cost
+                regularized_cost = compute_approx_kl(pi, ws_dot_wt)
+                cost += eps * regularized_cost
 
         return cost
 
     def fugw_loss(
-        self, pi, gamma, data_const, tuple_weights, hyperparams,
+        self,
+        pi,
+        gamma,
+        data_const,
+        tuple_weights,
+        hyperparams,
     ):
-        """
-        Returns scalar fugw loss, which is a combination of:
+        """Compute the FUGW loss and each of its components.
+
+        Computes scalar fugw loss, which is a combination of:
         - a Wasserstein loss on features
         - a Gromow-Wasserstein loss on geometries
         - marginal constraints on the computed OT plan
-        - an entropic or L2 regularization
-        """
+        - a regularization term (KL, ie entropic, or L2)
 
+        Parameters
+        ----------
+        pi: torch.Tensor
+        gamma: torch.Tensor
+        data_const: tuple
+        tuple_weights: tuple
+        hyperparams: tuple
+
+        Returns
+        -------
+        l: dict
+            Dictionary containing the loss and its unweighted components.
+            Keys are: "wasserstein", "gromov_wasserstein",
+            "marginal_constraint_dim1", "marginal_constraint_dim2",
+            "regularization", "total".
+            Values are float or None.
+        """
         rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         X_sqr, Y_sqr, X, Y, D = data_const
@@ -91,45 +118,57 @@ class FUGWSolver(BaseSolver):
         pi1, pi2 = pi.sum(1), pi.sum(0)
         gamma1, gamma2 = gamma.sum(1), gamma.sum(0)
 
+        loss_wasserstein = None
+        loss_gromov_wasserstein = None
+        loss_marginal_constraint_dim1 = None
+        loss_marginal_constraint_dim2 = None
+        loss_regularization = None
         loss = 0
 
         if alpha != 1 and D is not None:
-            wasserstein_loss = (D * pi).sum() + (D * gamma).sum()
-            loss += (1 - alpha) / 2 * wasserstein_loss
+            loss_wasserstein = (D * pi).sum() + (D * gamma).sum()
+            loss += (1 - alpha) / 2 * loss_wasserstein
 
         if alpha != 0:
             A = (X_sqr @ gamma1).dot(pi1)
             B = (Y_sqr @ gamma2).dot(pi2)
             C = (X @ gamma @ Y.T) * pi
-            gromov_wasserstein_loss = A + B - 2 * C.sum()
-            loss += alpha * gromov_wasserstein_loss
+            loss_gromov_wasserstein = A + B - 2 * C.sum()
+            loss += alpha * loss_gromov_wasserstein
 
         if rho_s != float("inf") and rho_s != 0:
-            marginal_constraint_dim1 = compute_quad_divergence(
+            loss_marginal_constraint_dim1 = compute_quad_divergence(
                 pi1, gamma1, ws, ws, divergence
             )
-            loss += rho_s * marginal_constraint_dim1
+            loss += rho_s * loss_marginal_constraint_dim1
         if rho_t != float("inf") and rho_t != 0:
-            marginal_constraint_dim2 = compute_quad_divergence(
+            loss_marginal_constraint_dim2 = compute_quad_divergence(
                 pi2, gamma2, wt, wt, divergence
             )
-            loss += rho_t * marginal_constraint_dim2
+            loss += rho_t * loss_marginal_constraint_dim2
 
-        regularized_loss = loss
         if eps != 0:
             if reg_mode == "joint":
-                regularization = compute_quad_divergence(
+                loss_regularization = compute_quad_divergence(
                     pi, gamma, ws_dot_wt, ws_dot_wt, divergence
                 )
             elif reg_mode == "independent":
-                regularization = compute_divergence(
+                loss_regularization = compute_divergence(
                     pi, ws_dot_wt, divergence
                 ) + compute_divergence(gamma, ws_dot_wt, divergence)
-            regularized_loss += eps * regularization
+            loss += eps * loss_regularization
 
-        return loss.item(), regularized_loss.item()
+        return {
+            "wasserstein": loss_wasserstein.item(),
+            "gromov_wasserstein": loss_gromov_wasserstein.item(),
+            "marginal_constraint_dim1": loss_marginal_constraint_dim1.item(),
+            "marginal_constraint_dim2": loss_marginal_constraint_dim2.item(),
+            "regularization": loss_regularization.item(),
+            "total": loss.item(),
+        }
 
     def get_parameters_uot_l2(self, pi, tuple_weights, hyperparams):
+        """Compute parameters of the L2 loss."""
         rho_s, rho_t, eps, reg_mode = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
 
@@ -139,11 +178,14 @@ class FUGWSolver(BaseSolver):
 
         weight_ws = pi1.dot(ws) / l2_pi1
         weight_wt = pi2.dot(wt) / l2_pi2
-        weight_wst = (pi * ws_dot_wt).sum() / \
-            l2_pi if reg_mode == "joint" else 1
-        weighted_tuple_weights = (weight_ws * ws,
-                                  weight_wt * wt,
-                                  weight_wst * ws_dot_wt)
+        weight_wst = (
+            (pi * ws_dot_wt).sum() / l2_pi if reg_mode == "joint" else 1
+        )
+        weighted_tuple_weights = (
+            weight_ws * ws,
+            weight_wt * wt,
+            weight_wst * ws_dot_wt,
+        )
 
         new_rho_s = rho_s * l2_pi1
         new_rho_t = rho_t * l2_pi2
@@ -170,8 +212,7 @@ class FUGWSolver(BaseSolver):
         divergence="kl",
         verbose=False,
     ):
-        """
-        Function running the BCD iterations.
+        """Run BCD iterations.
 
         Parameters
         ----------
@@ -209,14 +250,20 @@ class FUGWSolver(BaseSolver):
                     Duals of pi
                 duals_gamma: tuple of torch.Tensor of size
                     Duals of gamma
+                loss: dict of lists
+                    Dictionary containing the loss and its unweighted
+                    components for each step of the block-coordinate-descent
+                    for which the FUGW loss was evaluated.
+                    Keys are: "wasserstein", "gromov_wasserstein",
+                    "marginal_constraint_dim1", "marginal_constraint_dim2",
+                    "regularization", "total".
+                    Values are float or None.
                 loss_steps: list
                     BCD steps at the end of which the FUGW loss was evaluated
-                loss: list
-                    Values of FUGW loss
-                loss_regularized: list
-                    Values of FUGW loss with entropy or L2 regularization
+                loss_times: list
+                    Elapsed time at the end of each BCD step for which the
+                    FUGW loss was evaluated.
         """
-
         if rho_s == float("inf") and rho_t == float("inf") and eps == 0:
             raise ValueError(
                 "This package does not handle balanced cases "
@@ -288,14 +335,14 @@ class FUGWSolver(BaseSolver):
             self.local_biconvex_cost,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence)
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
         compute_fugw_loss = partial(
             self.fugw_loss,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence)
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
         # If divergence is L2
@@ -307,7 +354,7 @@ class FUGWSolver(BaseSolver):
         self_get_params_uot_l2 = partial(
             self.get_parameters_uot_l2,
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, reg_mode)
+            hyperparams=(rho_s, rho_t, eps, reg_mode),
         )
 
         # If divergence is KL
@@ -337,10 +384,9 @@ class FUGWSolver(BaseSolver):
         )
 
         # Initialize loss
-        current_loss, current_loss_regularized = compute_fugw_loss(pi, gamma)
+        current_loss = compute_fugw_loss(pi, gamma)
+        loss = add_dict({}, current_loss)
         loss_steps = [0]
-        loss = [current_loss]
-        loss_regularized = [current_loss_regularized]
         loss_times = [0]
         idx = 0
         err = None
@@ -408,25 +454,21 @@ class FUGWSolver(BaseSolver):
             # Update error
             err = (pi - pi_prev).abs().sum().item()
             if idx % self.eval_bcd == 0:
-                current_loss, current_loss_regularized = compute_fugw_loss(
-                    pi, gamma
-                )
+                current_loss = compute_fugw_loss(pi, gamma)
 
                 loss_steps.append(idx + 1)
-                loss.append(current_loss)
-                loss_regularized.append(current_loss_regularized)
+                loss = add_dict(loss, current_loss)
                 loss_times.append(time.time() - t0)
 
                 if verbose:
                     console.log(
                         f"BCD step {idx+1}/{self.nits_bcd}\t"
-                        f"FUGW loss:\t{current_loss} (base)\t"
-                        f"{current_loss_regularized} (regularized)"
+                        f"FUGW loss:\t{current_loss['total']}"
                     )
 
                 if (
-                    len(loss_regularized) >= 2
-                    and abs(loss_regularized[-2] - loss_regularized[-1])
+                    len(loss["total"]) >= 2
+                    and abs(loss["total"][-2] - loss["total"][-1])
                     < self.early_stopping_threshold
                 ):
                     break
@@ -441,8 +483,7 @@ class FUGWSolver(BaseSolver):
             "gamma": gamma,
             "duals_pi": duals_pi,
             "duals_gamma": duals_gamma,
-            "loss_steps": loss_steps,
             "loss": loss,
-            "loss_entropic": loss_regularized,
+            "loss_steps": loss_steps,
             "loss_times": loss_times,
         }
