@@ -130,6 +130,7 @@ class FUGWSolver(BaseSolver):
         F=None,
         Ds=None,
         Dt=None,
+        F_val=None,
         ws=None,
         wt=None,
         init_plan=None,
@@ -266,6 +267,13 @@ class FUGWSolver(BaseSolver):
             hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
         )
 
+        compute_fugw_val_loss = partial(
+            self.fugw_loss,
+            data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F_val),
+            tuple_weights=(ws, wt, ws_dot_wt),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+        )
+
         self_solver_sinkhorn = partial(
             solver_sinkhorn,
             tuple_weights=(ws, wt, ws_dot_wt),
@@ -293,10 +301,12 @@ class FUGWSolver(BaseSolver):
 
         # Initialize loss
         current_loss, current_loss_entropic = compute_fugw_loss(pi, gamma)
+        current_loss_val, _ = compute_fugw_val_loss(pi, gamma)
         loss_steps = [0]
         loss = [current_loss]
         loss_entropic = [current_loss_entropic]
         loss_times = [0]
+        loss_val = [current_loss_val]
         idx = 0
         err = None
 
@@ -351,15 +361,21 @@ class FUGWSolver(BaseSolver):
                     pi, gamma
                 )
 
+                current_loss_val, current_loss_entropic_val = (
+                    compute_fugw_val_loss(pi, gamma)
+                )
+
                 loss_steps.append(idx + 1)
                 loss.append(current_loss)
                 loss_entropic.append(current_loss_entropic)
+                loss_val.append(current_loss_val)
                 loss_times.append(time.time() - t0)
 
                 if verbose:
                     console.log(
                         f"BCD step {idx+1}/{self.nits_bcd}\t"
                         f"FUGW loss:\t{current_loss} (base)\t"
+                        f"Validation loss:\t{current_loss_val} (base)\t"
                         f"{current_loss_entropic} (entropic)"
                     )
 
@@ -383,5 +399,6 @@ class FUGWSolver(BaseSolver):
             "loss_steps": loss_steps,
             "loss": loss,
             "loss_entropic": loss_entropic,
+            "loss_val": loss_val,
             "loss_times": loss_times,
         }

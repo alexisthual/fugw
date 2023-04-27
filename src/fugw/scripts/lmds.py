@@ -93,9 +93,13 @@ def compute_geodesic_distances_from_graph(graph, coordinates, index):
     return torch.from_numpy(geodesic_distances)
 
 
+def compute_euclidean_distance(coordinates, index):
+    return (coordinates - coordinates[index, :]).norm(dim=1)
+
+
 def compute_lmds(
     coordinates,
-    triangles,
+    triangles=None,
     n_landmarks=100,
     k=3,
     n_jobs=2,
@@ -110,7 +114,7 @@ def compute_lmds(
     ----------
     coordinates: array of size (n, 3)
         Coordinates of vertices
-    triangles: array of size (t, 3)
+    triangles: array of size (t, 3), optional, defaults to None
         Triplets of indices indicating faces
     n_landmarks: int, optional, defaults to 100
         Number of vertices to sample on mesh to approximate embedding
@@ -134,31 +138,47 @@ def compute_lmds(
     invert_indices[indices] = torch.arange(n_voxels)
     basis_indices = indices[:n_landmarks]
 
-    adjacency = adjacency_matrix_from_triangles(
-        coordinates.shape[0], triangles
-    )
-    graph = nx.Graph(adjacency)
-
-    with rich_progress_joblib(
-        "Geodesic_distances for landmarks",
-        total=basis_indices.shape[0],
-        verbose=verbose,
-    ):
-        basis_distance = torch.vstack(
-            Parallel(n_jobs=n_jobs)(
-                # delayed(compute_geodesic_distances)(
-                #     coordinates,
-                #     triangles,
-                #     index,
-                # )
-                delayed(compute_geodesic_distances_from_graph)(
-                    graph,
-                    coordinates,
-                    index,
+    if triangles is None:
+        with rich_progress_joblib(
+            "Euclidean_distances for landmarks",
+            total=basis_indices.shape[0],
+            verbose=verbose,
+        ):
+            basis_distance = torch.vstack(
+                Parallel(n_jobs=n_jobs)(
+                    delayed(compute_euclidean_distance)(
+                        coordinates,
+                        index,
+                    )
+                    for index in basis_indices
                 )
-                for index in basis_indices
-            )
-        )[:, indices]
+            )[:, indices]
+
+    elif torch.is_tensor(triangles) or isinstance(triangles, np.ndarray):
+        adjacency = adjacency_matrix_from_triangles(
+            coordinates.shape[0], triangles
+        )
+        graph = nx.Graph(adjacency)
+
+        with rich_progress_joblib(
+            "Geodesic_distances for landmarks",
+            total=basis_indices.shape[0],
+            verbose=verbose,
+        ):
+            basis_distance = torch.vstack(
+                Parallel(n_jobs=n_jobs)(
+                    delayed(compute_geodesic_distances_from_graph)(
+                        graph,
+                        coordinates,
+                        index,
+                    )
+                    for index in basis_indices
+                )
+            )[:, indices]
+
+    else:
+        raise TypeError(f"Unknown type for triangles: {type(triangles)}")
+
     basis_distance = basis_distance.type(torch.float32)
 
     E = basis_distance[:, :n_landmarks]
