@@ -18,7 +18,7 @@ class BaseMapping:
             Value in ]0, +inf[, controls the relative importance of
             the marginal constraints. High values force the mass of
             each point to be transported ;
-            low values allow for some mass loss
+            low values allow for soxxme mass loss
         eps: float, optional, defaults to 1e-2
             Value in ]0, +inf[, controls the relative importance of
             the entropy loss

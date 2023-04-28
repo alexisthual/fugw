@@ -120,6 +120,10 @@ class FUGWSolver(BaseSolver):
 
         return loss.item(), entropic_loss.item()
 
+    def validation_loss(self, pi, gamma, input, output):
+        X = pi @ input
+        return self.val_loss(X, output).numpy(), 0
+
     def solve(
         self,
         alpha=0.5,
@@ -128,6 +132,8 @@ class FUGWSolver(BaseSolver):
         eps=1e-2,
         reg_mode="joint",
         F=None,
+        Fs_val=None,
+        Ft_val=None,
         Ds=None,
         Dt=None,
         F_val=None,
@@ -267,12 +273,20 @@ class FUGWSolver(BaseSolver):
             hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
         )
 
-        compute_fugw_val_loss = partial(
-            self.fugw_loss,
-            data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F_val),
-            tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
-        )
+        if self.val_loss == "fugw":
+            compute_val_loss = partial(
+                self.fugw_loss,
+                data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F_val),
+                tuple_weights=(ws, wt, ws_dot_wt),
+                hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+            )
+
+        else:
+            compute_val_loss = partial(
+                self.validation_loss,
+                input=Fs_val,
+                output=Ft_val,
+            )
 
         self_solver_sinkhorn = partial(
             solver_sinkhorn,
@@ -301,7 +315,7 @@ class FUGWSolver(BaseSolver):
 
         # Initialize loss
         current_loss, current_loss_entropic = compute_fugw_loss(pi, gamma)
-        current_loss_val, _ = compute_fugw_val_loss(pi, gamma)
+        current_loss_val, _ = compute_val_loss(pi, gamma)
         loss_steps = [0]
         loss = [current_loss]
         loss_entropic = [current_loss_entropic]
@@ -361,9 +375,7 @@ class FUGWSolver(BaseSolver):
                     pi, gamma
                 )
 
-                current_loss_val, current_loss_entropic_val = (
-                    compute_fugw_val_loss(pi, gamma)
-                )
+                current_loss_val, _ = compute_val_loss(pi, gamma)
 
                 loss_steps.append(idx + 1)
                 loss.append(current_loss)

@@ -13,6 +13,7 @@ class BaseSolver:
         early_stopping_threshold=1e-6,
         eval_bcd=1,
         eval_uot=10,
+        val_loss="fugw",
         # ibpp-specific parameters
         ibpp_eps_base=1,
         ibpp_nits_sinkhorn=1,
@@ -43,6 +44,9 @@ class BaseSolver:
         eval_uot: int,
             During .fit(), at every eval_uot step:
             1. consider stopping early
+        val_loss: str,
+            During .fit(), at every eval_bcd step:
+            Compute the chosen loss on the validation set
         ibpp_eps_base: int,
             Regularization parameter specific to the ibpp solver
         ibpp_nits_sinkhorn: int,
@@ -57,6 +61,7 @@ class BaseSolver:
         self.early_stopping_threshold = early_stopping_threshold
         self.eval_bcd = eval_bcd
         self.eval_uot = eval_uot
+        self.val_loss = val_loss
         self.ibpp_eps_base = ibpp_eps_base
         self.ibpp_nits_sinkhorn = ibpp_nits_sinkhorn
 

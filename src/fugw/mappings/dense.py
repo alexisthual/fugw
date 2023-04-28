@@ -146,6 +146,8 @@ class FUGW(BaseMapping):
             eps=self.eps,
             reg_mode=self.reg_mode,
             F=F,
+            Fs_val=Fs_val,
+            Ft_val=Ft_val,
             F_val=F_val,
             Ds=Ds,
             Dt=Dt,
