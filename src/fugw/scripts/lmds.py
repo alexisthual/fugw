@@ -10,6 +10,7 @@ import torch
 from fugw.utils import get_progress
 from joblib import delayed, Parallel
 from scipy.sparse import coo_matrix
+from dijkstra3d import euclidean_distance_field
 
 
 @contextlib.contextmanager
@@ -93,6 +94,27 @@ def compute_geodesic_distances_from_graph(graph, coordinates, index):
     return torch.from_numpy(geodesic_distances)
 
 
+def compute_distance_field(coordinates):
+    # Create a mask from the coordinates
+    mask = np.zeros(coordinates.max(axis=0) + 1, dtype=np.uint8)
+    mask[coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]] = 1
+
+    return mask
+
+
+def compute_geodesic_distances_from_volume(
+    field, coordinates, index, anisotropy=(1, 1, 1)
+):
+    source = coordinates[index]
+
+    # Compute the distance field
+    df = euclidean_distance_field(field, source=source, anisotropy=anisotropy)
+
+    # Retrieve only the non-infinite distances
+    dists = df[coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]]
+    return torch.from_numpy(dists).to(torch.float64)
+
+
 def compute_euclidean_distance(coordinates, index):
     return (coordinates - coordinates[index, :]).norm(dim=1)
 
@@ -100,8 +122,10 @@ def compute_euclidean_distance(coordinates, index):
 def compute_lmds(
     coordinates,
     triangles=None,
+    method="geodesic",
     n_landmarks=100,
     k=3,
+    anisotropy=(1, 1, 1),
     n_jobs=2,
     tol=1e-3,
     verbose=False,
@@ -116,10 +140,14 @@ def compute_lmds(
         Coordinates of vertices
     triangles: array of size (t, 3), optional, defaults to None
         Triplets of indices indicating faces
+    method: str, optional, defaults to "geodesic"
+        Method used to compute distances, either "geodesic" or "euclidean"
     n_landmarks: int, optional, defaults to 100
         Number of vertices to sample on mesh to approximate embedding
     k: int, optional, defaults to 3
         Dimension of embedding
+    anisotropy: tuple of size 3, optional, defaults to (1,1,1)
+        Anisotropy of the voxels
     n_jobs: int, optional, defaults to 2
         Number of CPUs to use to parallelise computation
     tol: float, optional, defaults to 1e-3
@@ -139,20 +167,42 @@ def compute_lmds(
     basis_indices = indices[:n_landmarks]
 
     if triangles is None:
-        with rich_progress_joblib(
-            "Euclidean_distances for landmarks",
-            total=basis_indices.shape[0],
-            verbose=verbose,
-        ):
-            basis_distance = torch.vstack(
-                Parallel(n_jobs=n_jobs)(
-                    delayed(compute_euclidean_distance)(
-                        coordinates,
-                        index,
+        if method == "euclidean":
+            with rich_progress_joblib(
+                "Euclidean_distances for coordinates",
+                total=basis_indices.shape[0],
+                verbose=verbose,
+            ):
+                basis_distance = torch.vstack(
+                    Parallel(n_jobs=n_jobs)(
+                        delayed(compute_euclidean_distance)(
+                            coordinates,
+                            index,
+                        )
+                        for index in basis_indices
                     )
-                    for index in basis_indices
-                )
-            )[:, indices]
+                )[:, indices]
+
+        if method == "geodesic":
+            np_coords = torch.Tensor(coordinates).numpy().astype(int)
+            field = compute_distance_field(np_coords)
+
+            with rich_progress_joblib(
+                "Geodesic_distance for coordinates",
+                total=basis_indices.shape[0],
+                verbose=verbose,
+            ):
+                basis_distance = torch.vstack(
+                    Parallel(n_jobs=n_jobs)(
+                        delayed(compute_geodesic_distances_from_volume)(
+                            field,
+                            np_coords,
+                            index,
+                            anisotropy,
+                        )
+                        for index in basis_indices
+                    )
+                )[:, indices]
 
     elif torch.is_tensor(triangles) or isinstance(triangles, np.ndarray):
         adjacency = adjacency_matrix_from_triangles(

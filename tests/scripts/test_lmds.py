@@ -41,6 +41,18 @@ def test_compute_geodesic_distances_edges():
     assert distances.dtype == torch.float64
 
 
+def test_compute_geodesic_distances_from_volume():
+    coordinates = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0]])
+    field = lmds.compute_distance_field(coordinates)
+
+    distance_field = lmds.compute_geodesic_distances_from_volume(
+        field, coordinates, 0
+    )
+
+    assert distance_field.shape == (3,)
+    assert distance_field.dtype == torch.float64
+
+
 @pytest.mark.parametrize("numpy_inputs", numpy_inputs)
 def test_lmds(numpy_inputs):
     fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
