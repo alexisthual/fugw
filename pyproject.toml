@@ -26,6 +26,7 @@ dependencies = [
   "scikit-learn",
   "scipy",
   "tvb-gdist>=2.1.1",
+  "dijkstra3d>=1.12.1",
 ]
 
 [project.optional-dependencies]
