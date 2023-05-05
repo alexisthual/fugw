@@ -44,8 +44,8 @@ source_im = image.load_img(source_imgs_paths)
 target_im = image.load_img(target_imgs_paths)
 
 # %%
-# We then downsample the images by 3 to reduce the computational cost.
-SCALE_FACTOR = 1
+# Let's use a geometry of 7633 voxels.
+SCALE_FACTOR = 2
 
 source_maps = np.nan_to_num(
     source_im.get_fdata()[::SCALE_FACTOR, ::SCALE_FACTOR, ::SCALE_FACTOR]
@@ -75,45 +75,14 @@ ax.set_axis_off()
 plt.show()
 
 # %%
-# We then compute the distance matrix between the coordinates of the voxels.
+# We then compute the distance embedding between the coordinates of the voxels.
 source_geometry_embeddings = lmds.compute_lmds_volume(
     segmentation_coarse
 ).nan_to_num()
 target_geometry_embeddings = source_geometry_embeddings.clone()
-source_geometry_embeddings.shape
 
-# %%
-fig = plt.figure()
-ax = fig.add_subplot(projection="3d")
-ax.scatter(
-    coordinates[1:, 0],
-    coordinates[1:, 1],
-    coordinates[1:, 2],
-    marker=".",
-    c=source_geometry_embeddings[1:, 0],
-)
-ax.scatter(
-    coordinates[0, 0],
-    coordinates[0, 1],
-    coordinates[0, 2],
-    marker="o",
-    c="red",
-)
-ax.text(
-    coordinates[0, 0],
-    coordinates[0, 1],
-    coordinates[0, 2] - 2,
-    "Source point",
-    color="red",
-)
-ax.view_init(10, 135)
-ax.set_axis_off()
-fig.colorbar(
-    plt.cm.ScalarMappable(cmap="viridis"),
-    ax=ax,
-    label="Distance to source point",
-)
-plt.show()
+# Show the embedding shape
+print(source_geometry_embeddings.shape)
 
 # %%
 # In order to avoid numerical errors when fitting the mapping, we normalize
@@ -155,6 +124,7 @@ fine_mapping_solver_params = {
 }
 
 # %%
+# Let's subsample the vertices.
 source_sample = coarse_to_fine.sample_volume_uniformly(
     segmentation_coarse,
     embeddings=source_geometry_embeddings,
@@ -167,7 +137,7 @@ target_sample = coarse_to_fine.sample_volume_uniformly(
 )
 
 # %%
-# Train mapping
+# Train both the coarse and the fine mapping.
 coarse_to_fine.fit(
     # Source and target's features and embeddings
     source_features=source_features_normalized[:n_training_contrasts, :],
@@ -230,7 +200,7 @@ fig.colorbar(plt.cm.ScalarMappable(cmap="twilight"), ax=ax)
 plt.show()
 
 # %%
-# We can now align the test contrasts using the fitted mapping.
+# We can now align the test contrasts using the fitted fine mapping.
 contrast_index = -1
 predicted_target_features = fine_mapping.transform(
     source_features[contrast_index, :]
