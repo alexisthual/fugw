@@ -21,6 +21,7 @@ plt.rcParams["font.family"] = "Helvetica"
 plt.rcParams["figure.dpi"] = 300
 
 # %%
+# We first fetch 5 contrasts for each subject from the localizer dataset.
 n_subjects = 2
 
 contrasts = [
@@ -45,6 +46,7 @@ source_im = image.load_img(source_imgs_paths)
 target_im = image.load_img(target_imgs_paths)
 
 # %%
+# We then downsample the images by 3 to reduce the computational cost.
 SCALE_FACTOR = 3
 
 source_maps = np.nan_to_num(
@@ -75,6 +77,7 @@ ax.set_axis_off()
 plt.show()
 
 # %%
+# We then compute the distance matrix between the coordinates of the voxels.
 source_geometry = distance_matrix(coordinates, coordinates)
 target_geometry = source_geometry.copy()
 plt.imshow(source_geometry)
@@ -114,7 +117,8 @@ fig.colorbar(
 plt.show()
 
 # %%
-# Normalization
+# In order to avoid numerical errors when fitting the mapping, we normalize
+# both the features and the geometry.
 source_features_normalized = source_features / np.linalg.norm(
     source_features, axis=1
 ).reshape(-1, 1)
@@ -125,7 +129,7 @@ source_geometry_normalized = source_geometry / np.max(source_geometry)
 target_geometry_normalized = target_geometry / np.max(target_geometry)
 
 # %%
-# Mapping training
+# We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 _ = mapping.fit(
     source_features_normalized[:n_training_contrasts],
@@ -140,6 +144,8 @@ _ = mapping.fit(
 )
 
 # %%
+# Let's plot the probability map of the target voxels being matched with
+# the 300th source voxel.
 pi = mapping.pi
 vertex_index = 300
 probability_map = pi[vertex_index, :] / np.sqrt(
@@ -174,7 +180,7 @@ fig.colorbar(plt.cm.ScalarMappable(cmap="twilight"), ax=ax)
 plt.show()
 
 # %%
-# Predict target features
+# We can now align the test contrasts using the fitted mapping.
 contrast_index = -1
 predicted_target_features = mapping.transform(
     source_features[contrast_index, :]
@@ -182,6 +188,7 @@ predicted_target_features = mapping.transform(
 predicted_target_features.shape
 
 # %%
+# Let's compare the Pearson correlation between the source and target features.
 corr_pre_mapping = np.corrcoef(
     source_features[contrast_index, :], target_features[contrast_index, :]
 )[0, 1]
@@ -197,6 +204,7 @@ print(
 
 
 # %%
+# Let's plot the transporting feature maps of the test set.
 fig = plt.figure(figsize=plt.figaspect(0.3))
 fig.suptitle("Transporting feature maps of the test set", size=16)
 ax = fig.add_subplot(1, 2, 1, projection="3d")
