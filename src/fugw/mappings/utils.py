@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 class BaseMapping:
     def __init__(
         self,
@@ -68,3 +71,22 @@ class BaseMapping:
 
     def transform(self, source_data):
         return None
+
+    def __getstate__(self):
+        print(
+            "FUGW customizes pickle exports to separate hyperparams and "
+            "weights. Please check the documentation to make sure "
+            "what is happening is the behaviour you expect."
+        )
+        state = deepcopy(self.__dict__)
+        state["pi"] = None
+        return state
+
+    def __setstate__(self, state):
+        print(
+            "FUGW customizes pickle exports to separate hyperparams and "
+            "weights. Please check the documentation to make sure "
+            "what is happening is the behaviour you expect."
+        )
+        self.__dict__.update(state)
+        self.pi = None

@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 import torch
 
@@ -180,3 +182,42 @@ def add_dict(d, new_d):
     for key, value in new_d.items():
         d.setdefault(key, []).append(value)
     return d
+
+
+def save_mapping(mapping, fname):
+    """Save mapping in pickle file, separating hyperparams and weights.
+
+    Parameters
+    ----------
+    mapping: fugw.mappings
+        FUGW mapping to save
+    fname: str or pathlib.Path
+        Path to pickle file to save
+    """
+    with open(fname, "wb") as f:
+        # Dump hyperparams first
+        pickle.dump(mapping, f)
+        # Dump mapping weights
+        pickle.dump(mapping.pi, f)
+
+
+def load_mapping(fname, load_weights=True):
+    """Load mapping from pickle file, optionally loading weights.
+
+    Parameters
+    ----------
+    fname: str or pathlib.Path
+        Path to pickle file to load
+    load_weights: bool, optional, defaults to True
+        If True, load mapping weights from pickle file.
+
+    Returns
+    -------
+    mapping: fugw.mappings
+    """
+    with open(fname, "rb") as f:
+        mapping = pickle.load(f)
+        if load_weights:
+            mapping.pi = pickle.load(f)
+
+    return mapping
