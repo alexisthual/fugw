@@ -5,9 +5,9 @@ import warnings
 from fugw.mappings.utils import BaseMapping
 from fugw.solvers.sparse import FUGWSparseSolver
 from fugw.utils import (
-    low_rank_squared_l2,
-    make_sparse_csr_tensor,
-    make_tensor,
+    _low_rank_squared_l2,
+    _make_sparse_csr_tensor,
+    _make_tensor,
 )
 
 
@@ -112,7 +112,7 @@ class FUGWSparse(BaseMapping):
                 / source_features.shape[1]
             )
         else:
-            ws = make_tensor(source_weights, device=device)
+            ws = _make_tensor(source_weights, device=device)
 
         if target_weights is None:
             wt = (
@@ -120,26 +120,26 @@ class FUGWSparse(BaseMapping):
                 / target_features.shape[1]
             )
         else:
-            wt = make_tensor(target_weights, device=device)
+            wt = _make_tensor(target_weights, device=device)
 
         # Compute distance matrix between features
-        Fs = make_tensor(source_features.T, device=device)
-        Ft = make_tensor(target_features.T, device=device)
-        F1, F2 = low_rank_squared_l2(Fs, Ft)
-        F1 = make_tensor(F1, device=device)
-        F2 = make_tensor(F2, device=device)
+        Fs = _make_tensor(source_features.T, device=device)
+        Ft = _make_tensor(target_features.T, device=device)
+        F1, F2 = _low_rank_squared_l2(Fs, Ft)
+        F1 = _make_tensor(F1, device=device)
+        F2 = _make_tensor(F2, device=device)
 
         # Load anatomical kernels to GPU
-        Ds1, Ds2 = low_rank_squared_l2(
+        Ds1, Ds2 = _low_rank_squared_l2(
             source_geometry_embedding, source_geometry_embedding
         )
-        Ds1 = make_tensor(Ds1, device=device)
-        Ds2 = make_tensor(Ds2, device=device)
-        Dt1, Dt2 = low_rank_squared_l2(
+        Ds1 = _make_tensor(Ds1, device=device)
+        Ds2 = _make_tensor(Ds2, device=device)
+        Dt1, Dt2 = _low_rank_squared_l2(
             target_geometry_embedding, target_geometry_embedding
         )
-        Dt1 = make_tensor(Dt1, device=device)
-        Dt2 = make_tensor(Dt2, device=device)
+        Dt1 = _make_tensor(Dt1, device=device)
+        Dt2 = _make_tensor(Dt2, device=device)
 
         # Check that all init_plan is valid
         if init_plan is None:
@@ -150,7 +150,7 @@ class FUGWSparse(BaseMapping):
                 "by fugw.FUGW"
             )
         else:
-            init_plan = make_sparse_csr_tensor(init_plan, device=device)
+            init_plan = _make_sparse_csr_tensor(init_plan, device=device)
 
         # Create model
         model = FUGWSparseSolver(**solver_params)
@@ -213,7 +213,7 @@ class FUGWSparse(BaseMapping):
             raise Exception("Model should be fitted before calling transform")
 
         # Set correct type and device
-        source_features_tensor = make_tensor(source_features, device=device)
+        source_features_tensor = _make_tensor(source_features, device=device)
 
         is_one_dimensional = False
         if source_features_tensor.ndim == 1:
@@ -287,7 +287,7 @@ class FUGWSparse(BaseMapping):
             raise Exception("Model should be fitted before calling transform")
 
         # Set correct type and device
-        target_features_tensor = make_tensor(target_features, device=device)
+        target_features_tensor = _make_tensor(target_features, device=device)
 
         is_one_dimensional = False
         if target_features_tensor.ndim == 1:

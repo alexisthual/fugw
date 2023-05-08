@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from fugw.mappings import FUGW
-from fugw.utils import init_mock_distribution
+from fugw.utils import _init_mock_distribution
 
 np.random.seed(0)
 torch.manual_seed(0)
@@ -29,10 +29,10 @@ solvers = ["sinkhorn", "mm", "ibpp"]
 )
 def test_dense_mapping(device, return_numpy, solver):
     # Generate random training data for source and target
-    _, source_features_train, source_geometry, _ = init_mock_distribution(
+    _, source_features_train, source_geometry, _ = _init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
     )
-    _, target_features_train, target_geometry, _ = init_mock_distribution(
+    _, target_features_train, target_geometry, _ = _init_mock_distribution(
         n_features_train, n_voxels_target, return_numpy=return_numpy
     )
 

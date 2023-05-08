@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from fugw.solvers import FUGWSparseSolver
-from fugw.utils import low_rank_squared_l2
+from fugw.utils import _low_rank_squared_l2
 
 
 devices = [torch.device("cpu")]
@@ -33,9 +33,9 @@ def test_sparse_solvers(solver, device):
     source_embeddings = torch.rand(ns, ds).to(device)
     target_embeddings = torch.rand(nt, dt).to(device)
 
-    F = low_rank_squared_l2(source_features, target_features)
-    Ds = low_rank_squared_l2(source_embeddings, source_embeddings)
-    Dt = low_rank_squared_l2(target_embeddings, target_embeddings)
+    F = _low_rank_squared_l2(source_features, target_features)
+    Ds = _low_rank_squared_l2(source_embeddings, source_embeddings)
+    Dt = _low_rank_squared_l2(target_embeddings, target_embeddings)
 
     F_norm = (F[0] @ F[1].T).max()
     Ds_norm = (Ds[0] @ Ds[1].T).max()

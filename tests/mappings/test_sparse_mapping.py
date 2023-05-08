@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from fugw.mappings import FUGWSparse
-from fugw.utils import init_mock_distribution
+from fugw.utils import _init_mock_distribution
 
 np.random.seed(0)
 torch.manual_seed(0)
@@ -30,10 +30,10 @@ solvers = ["sinkhorn", "mm", "ibpp"]
 )
 def test_sparse_mapping(device, return_numpy, solver):
     # Generate random training data for source and target
-    _, source_features_train, _, source_embeddings = init_mock_distribution(
+    _, source_features_train, _, source_embeddings = _init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
     )
-    _, target_features_train, _, target_embeddings = init_mock_distribution(
+    _, target_features_train, _, target_embeddings = _init_mock_distribution(
         n_features_train, n_voxels_target, return_numpy=return_numpy
     )
 
@@ -97,10 +97,10 @@ def test_sparse_mapping(device, return_numpy, solver):
 )
 def test_fugw_sparse_with_init(device, sparse_layout, return_numpy):
     # Generate random training data for source and target
-    _, source_features_train, _, source_embeddings = init_mock_distribution(
+    _, source_features_train, _, source_embeddings = _init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
     )
-    _, target_features_train, _, target_embeddings = init_mock_distribution(
+    _, target_features_train, _, target_embeddings = _init_mock_distribution(
         n_features_train, n_voxels_target, return_numpy=return_numpy
     )
 
