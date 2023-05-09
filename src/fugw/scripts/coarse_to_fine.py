@@ -4,6 +4,7 @@ import torch
 from fugw.utils import make_tensor
 from scipy.sparse import coo_matrix
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.feature_extraction.image import grid_to_graph
 
 
 def random_normalizing(X, sample_size=100, repeats=10):
@@ -110,6 +111,53 @@ def sample_mesh_uniformly(
         embeddings = np.ones(coordinates.shape[0]).reshape(-1, 1)
 
     connectivity = mesh_connectivity_matrix(coordinates, triangles)
+
+    ward = AgglomerativeClustering(
+        n_clusters=n_samples,
+        connectivity=connectivity,
+        linkage="ward",
+    )
+    ward.fit_predict(embeddings)
+
+    naive_samples = np.hstack(
+        [
+            np.random.choice(np.argwhere(ward.labels_ == label).flatten(), 1)
+            for label in range(n_samples)
+        ]
+    ).astype(np.int32)
+
+    return naive_samples
+
+
+def sample_volume_uniformly(segmentation, embeddings=None, n_samples=100):
+    """
+    Returns random indices on a volume/segmentation such that they are
+    approximately uniformly spread over the volume.
+    It leverages Ward's algorithm to build same-size clusters
+    from ``embeddings`` and then samples in these clusters.
+
+    Parameters
+    ----------
+    segmentation: np.ndarray of size (x, y, z)
+        Segmentation mask of the region of interest
+    embeddings: np.ndarray of size (n, d)
+        Embeddings approximating the geodesic distance in the volume
+    n_samples: int
+        Number of points to sample
+
+    Returns
+    -------
+    samples: np.ndarray of size (s)
+        Indices of sampled points
+    """
+
+    coordinates = np.array(np.nonzero(segmentation)).T
+
+    if embeddings is None:
+        embeddings = np.ones(coordinates.shape[0]).reshape(-1, 1)
+
+    x, y, z = segmentation.shape
+    connectivity = grid_to_graph(x, y, z, mask=segmentation)
 
     ward = AgglomerativeClustering(
         n_clusters=n_samples,

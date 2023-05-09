@@ -8,6 +8,7 @@ import torch
 
 from fugw.utils import get_progress
 from joblib import delayed, Parallel
+from dijkstra3d import euclidean_distance_field
 
 
 @contextlib.contextmanager
@@ -55,64 +56,77 @@ def compute_gdist(coordinates, triangles, index):
     return geodesic_distances
 
 
-def compute_lmds(
-    coordinates,
-    triangles,
-    n_landmarks=100,
-    k=3,
-    n_jobs=2,
-    tol=1e-3,
-    verbose=False,
+def compute_distance_field(coordinates):
+    """Create a binary mask from array of integer coordinates."""
+    mask = np.zeros(coordinates.max(axis=0) + 1, dtype=np.uint8)
+    mask[coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]] = 1
+
+    return mask
+
+
+def compute_geodesic_distances_from_volume(
+    field, coordinates, index, anisotropy=(1, 1, 1)
 ):
     """
-    Compute embedding in k-dimension approximating
-    the matrix D of geodesic distances on a given mesh
+    Computes the list of geodesic distances from a given index
+    in the point cloud.
 
     Parameters
     ----------
-    coordinates: array of size (n, 3)
-        Coordinates of vertices
-    triangles: array of size (t, 3)
-        Triplets of indices indicating faces
-    n_landmarks: int, optional, defaults to 100
-        Number of vertices to sample on mesh to approximate embedding
-    k: int, optional, defaults to 3
-        Dimension of embedding
-    n_jobs: int, optional, defaults to 2
-        Number of CPUs to use to parallelise computation
-    tol: float, optional, defaults to 1e-3
-        Relative tolerance used to check intermediate results
-    verbose: bool, optional, defaults to False
-        Log solving process
+        field: ndarray of size (x, y, z)
+            3D binary mask of the region of interest
+        coordinates: ndarray of size (n, 3)
+            Array of 3D coordinates of the point cloud
+        index: int
+            Index of the source point in the point cloud
+        anisotropy: tuple, optional, defaults to (1, 1, 1).
+            (x, y, z)-anisotropy of the voxels
 
-    Returns
-    -------
-    X: torch.Tensor of size (n, k)
-        Embedding such that cdist(X, X) approximates D
+    Returns:
+    --------
+        torch.Tensor of size (n,)
+            Tensor of geodesic distances from the source point
     """
-    n_voxels = coordinates.shape[0]
-    indices = torch.randperm(n_voxels)
-    invert_indices = torch.empty_like(indices)
-    invert_indices[indices] = torch.arange(n_voxels)
-    basis_indices = indices[:n_landmarks]
+    source = coordinates[index]
 
-    with rich_progress_joblib(
-        "Geodesic_distances for landmarks",
-        total=basis_indices.shape[0],
-        verbose=verbose,
-    ):
-        basis_distance = torch.vstack(
-            Parallel(n_jobs=n_jobs)(
-                delayed(compute_gdist)(
-                    coordinates,
-                    triangles,
-                    index,
-                )
-                for index in basis_indices
-            )
-        )[:, indices]
-    basis_distance = basis_distance.type(torch.float32)
+    # Compute the distance field
+    distance_field = euclidean_distance_field(
+        field, source=source, anisotropy=anisotropy
+    )
 
+    # Retrieve only the non-infinite distances
+    dists = distance_field[
+        coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]
+    ]
+    return torch.from_numpy(dists).to(torch.float64)
+
+
+def compute_euclidean_distance(coordinates, index):
+    """Compute pairwise euclidean distance between coordinates."""
+    return (
+        torch.cdist(coordinates, coordinates[index].unsqueeze(0))
+        .flatten()
+        .to(torch.float64)
+    )
+
+
+def _compute_lmds(
+    basis_distance,
+    n_landmarks,
+    n_voxels,
+    k,
+    tol,
+    invert_indices,
+):
+    """Compute LMDS embedding from precomputed geodesic
+    distances between landmarks.
+
+    This implementation follows a method described in
+    Platt, John. ‘FastMap, MetricMap, and Landmark MDS
+    Are All Nystrom Algorithms’, 1 January 2005.
+    https://www.microsoft.com/en-us/research/publication/
+    fastmap-metricmap-and-landmark-mds-are-all-nystrom-algorithms/.
+    """
     E = basis_distance[:, :n_landmarks]
     F = basis_distance[:, n_landmarks:]
 
@@ -195,3 +209,149 @@ def compute_lmds(
     X = X[invert_indices]
 
     return X
+
+
+def compute_lmds_mesh(
+    coordinates,
+    triangles,
+    n_landmarks=100,
+    k=3,
+    n_jobs=2,
+    tol=1e-3,
+    verbose=False,
+):
+    """
+    Compute embedding in k-dimension approximating
+    the matrix D of geodesic distances on a given mesh
+
+    Parameters
+    ----------
+    coordinates: array of size (n, 3)
+        Coordinates of vertices
+    triangles: array of size (t, 3)
+        Triplets of indices indicating faces
+    n_landmarks: int, optional, defaults to 100
+        Number of vertices to sample on mesh to approximate embedding
+    k: int, optional, defaults to 3
+        Dimension of embedding
+    n_jobs: int, optional, defaults to 2
+        Number of CPUs to use to parallelise computation
+    tol: float, optional, defaults to 1e-3
+        Relative tolerance used to check intermediate results
+    verbose: bool, optional, defaults to False
+        Log solving process
+
+    Returns
+    -------
+    X: torch.Tensor of size (n, k)
+        Embedding such that cdist(X, X) approximates D
+    """
+    n_voxels = coordinates.shape[0]
+    indices = torch.randperm(n_voxels)
+    invert_indices = torch.empty_like(indices)
+    invert_indices[indices] = torch.arange(n_voxels)
+    basis_indices = indices[:n_landmarks]
+
+    with rich_progress_joblib(
+        "Geodesic distances (landmarks)",
+        total=basis_indices.shape[0],
+        verbose=verbose,
+    ):
+        basis_distance = torch.vstack(
+            Parallel(n_jobs=n_jobs)(
+                delayed(compute_gdist)(
+                    coordinates,
+                    triangles,
+                    index,
+                )
+                for index in basis_indices
+            )
+        )[:, indices]
+    basis_distance = basis_distance.type(torch.float32)
+
+    return _compute_lmds(
+        basis_distance, n_landmarks, n_voxels, k, tol, invert_indices
+    )
+
+
+def compute_lmds_volume(
+    segmentation,
+    method="geodesic",
+    anisotropy=(1, 1, 1),
+    n_landmarks=100,
+    k=3,
+    n_jobs=2,
+    tol=1e-3,
+    verbose=False,
+):
+    """
+    Compute embedding in k-dimension approximating
+    the matrix D of geodesic distances on a given volume
+
+    Parameters
+    ----------
+    segmentation: ndarray of size (n, 3)
+        Binary mask of the ROI
+    anisotropy: tuple of size 3, optional, defaults to (1,1,1)
+        Anisotropy of the voxels
+    method: str, optional, defaults to "geodesic"
+        Method used to compute distances, either "geodesic" or "euclidean"
+    n_landmarks: int, optional, defaults to 100
+        Number of vertices to sample on mesh to approximate embedding
+    k: int, optional, defaults to 3
+        Dimension of embedding
+    n_jobs: int, optional, defaults to 2
+        Number of CPUs to use to parallelise computation
+    tol: float, optional, defaults to 1e-3
+        Relative tolerance used to check intermediate results
+    verbose: bool, optional, defaults to False
+        Log solving process
+
+    Returns
+    -------
+    X: torch.Tensor of size (n, k)
+        Embedding such that cdist(X, X) approximates D
+    """
+
+    coordinates = np.array(np.nonzero(segmentation)).T
+    field = compute_distance_field(coordinates)
+    n_voxels = coordinates.shape[0]
+    indices = torch.randperm(n_voxels)
+    invert_indices = torch.empty_like(indices)
+    invert_indices[indices] = torch.arange(n_voxels)
+    basis_indices = indices[:n_landmarks]
+
+    with rich_progress_joblib(
+        "Geodesic distances (landmarks)",
+        total=basis_indices.shape[0],
+        verbose=verbose,
+    ):
+        if method == "geodesic":
+            basis_distance = torch.vstack(
+                Parallel(n_jobs=n_jobs)(
+                    delayed(compute_geodesic_distances_from_volume)(
+                        field,
+                        coordinates,
+                        index,
+                        anisotropy,
+                    )
+                    for index in basis_indices
+                )
+            )[:, indices]
+
+        elif method == "euclidean":
+            basis_distance = torch.vstack(
+                Parallel(n_jobs=n_jobs)(
+                    delayed(compute_euclidean_distance)(
+                        torch.from_numpy(coordinates).to(torch.float64),
+                        index,
+                    )
+                    for index in basis_indices
+                )
+            )[:, indices]
+
+    basis_distance = basis_distance.type(torch.float32)
+
+    return _compute_lmds(
+        basis_distance, n_landmarks, n_voxels, k, tol, invert_indices
+    )
