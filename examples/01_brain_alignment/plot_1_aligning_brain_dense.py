@@ -8,8 +8,6 @@ In this example, we align 2 low-resolution left hemispheres
 using 4 fMRI feature maps (z-score contrast maps).
 """
 # sphinx_gallery_thumbnail_number = 6
-import pickle
-
 import gdist
 import matplotlib as mpl
 import matplotlib.gridspec as gridspec
@@ -17,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from fugw.mappings import FUGW
+from fugw.utils import load_mapping, save_mapping
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from nilearn import datasets, image, plotting, surface
 
@@ -321,15 +320,21 @@ _ = ibpp_mapping.fit(
 )
 
 # %%
-# Computed mappings can easily be saved on disk and loaded back:
+# Computed mappings can easily be saved on disk and loaded back.
+# Note that `fugw.mappings` overwrite functions used by `pickle`
+# so that hyper-parameters and model weights are stored separately.
+# This is handy if you want to quickly load a mapping without
+# its weights.
 
 # Save mappings
-with open("./mapping.pkl", "wb") as f:
-    pickle.dump(mapping, f)
+save_mapping(mapping, "./mapping.pkl")
 
 # Load mappings
-with open("./mapping.pkl", "rb") as f:
-    mapping = pickle.load(f)
+mapping = load_mapping("./mapping.pkl")
+print(mapping.pi.shape)
+# Load mappings hyper-parameters only
+mapping_without_weights = load_mapping("./mapping.pkl", load_weights=False)
+print(mapping_without_weights.pi)
 
 # %%
 # Here is the evolution of the FUGW loss during training,

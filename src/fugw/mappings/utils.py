@@ -74,9 +74,8 @@ class BaseMapping:
 
     def __getstate__(self):
         print(
-            "FUGW customizes pickle exports to separate hyperparams and "
-            "weights. Please check the documentation to make sure "
-            "what is happening is the behaviour you expect."
+            "FUGW customizes pickle dumps to separate hyperparams and "
+            "weights. Please check the documentation."
         )
         state = deepcopy(self.__dict__)
         state["pi"] = None
@@ -84,9 +83,8 @@ class BaseMapping:
 
     def __setstate__(self, state):
         print(
-            "FUGW customizes pickle exports to separate hyperparams and "
-            "weights. Please check the documentation to make sure "
-            "what is happening is the behaviour you expect."
+            "FUGW customizes pickle dumps to separate hyperparams and "
+            "weights. Please check the documentation."
         )
         self.__dict__.update(state)
         self.pi = None
