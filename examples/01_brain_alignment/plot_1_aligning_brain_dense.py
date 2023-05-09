@@ -331,10 +331,11 @@ save_mapping(mapping, "./mapping.pkl")
 
 # Load mappings
 mapping = load_mapping("./mapping.pkl")
-print(mapping.pi.shape)
 # Load mappings hyper-parameters only
 mapping_without_weights = load_mapping("./mapping.pkl", load_weights=False)
-print(mapping_without_weights.pi)
+
+print(f"With weights: pi = tensor of size {mapping.pi.shape}")
+print(f"Without weights: pi = {mapping_without_weights.pi}")
 
 # %%
 # Here is the evolution of the FUGW loss during training,

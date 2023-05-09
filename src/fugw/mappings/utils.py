@@ -1,5 +1,7 @@
 from copy import deepcopy
 
+from fugw.utils import console
+
 
 class BaseMapping:
     def __init__(
@@ -73,7 +75,7 @@ class BaseMapping:
         return None
 
     def __getstate__(self):
-        print(
+        console.log(
             "FUGW customizes pickle dumps to separate hyperparams and "
             "weights. Please check the documentation."
         )
@@ -82,7 +84,7 @@ class BaseMapping:
         return state
 
     def __setstate__(self, state):
-        print(
+        console.log(
             "FUGW customizes pickle dumps to separate hyperparams and "
             "weights. Please check the documentation."
         )
