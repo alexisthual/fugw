@@ -17,7 +17,6 @@ from scipy.spatial import distance_matrix
 
 from fugw.mappings import FUGW
 
-plt.rcParams["font.family"] = "Helvetica"
 plt.rcParams["figure.dpi"] = 300
 
 # %%
@@ -77,7 +76,7 @@ ax.set_axis_off()
 plt.show()
 
 # %%
-# We then compute the distance matrix between the coordinates of the voxels.
+# We then compute the distance matrix between voxel coordinates.
 source_geometry = distance_matrix(coordinates, coordinates)
 target_geometry = source_geometry.copy()
 plt.imshow(source_geometry)
@@ -144,7 +143,7 @@ _ = mapping.fit(
 )
 
 # %%
-# Let's plot the probability map of the target voxels being matched with
+# Let's plot the probability map of target voxels being matched with
 # the 300th source voxel.
 pi = mapping.pi
 vertex_index = 300
@@ -172,7 +171,7 @@ ax.text(
 )
 ax.view_init(10, 135, 2)
 ax.set_title(
-    "Probability map of target vertices\n"
+    "Probability map of target voxels\n"
     f"being matched with source point {vertex_index}"
 )
 ax.set_axis_off()
@@ -180,7 +179,7 @@ fig.colorbar(plt.cm.ScalarMappable(cmap="twilight"), ax=ax)
 plt.show()
 
 # %%
-# We can now align the test contrasts using the fitted mapping.
+# We can now align test contrasts using the fitted mapping.
 contrast_index = -1
 predicted_target_features = mapping.transform(
     source_features[contrast_index, :]
@@ -188,7 +187,7 @@ predicted_target_features = mapping.transform(
 predicted_target_features.shape
 
 # %%
-# Let's compare the Pearson correlation between the source and target features.
+# Let's compare the Pearson correlation between source and target features.
 corr_pre_mapping = np.corrcoef(
     source_features[contrast_index, :], target_features[contrast_index, :]
 )[0, 1]

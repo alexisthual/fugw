@@ -131,17 +131,17 @@ def sample_mesh_uniformly(
 
 def sample_volume_uniformly(segmentation, embeddings=None, n_samples=100):
     """
-    Returns random indices on a mesh such that their are
-    approximately uniformly spead over the surface.
+    Returns random indices on a volume/segmentation such that they are
+    approximately uniformly spread over the volume.
     It leverages Ward's algorithm to build same-size clusters
     from ``embeddings`` and then samples in these clusters.
 
     Parameters
     ----------
     segmentation: np.ndarray of size (x, y, z)
-        Segmentation mask of the ROI
+        Segmentation mask of the region of interest
     embeddings: np.ndarray of size (n, d)
-        Embeddings approximating the geodesic distance on the mesh
+        Embeddings approximating the geodesic distance in the volume
     n_samples: int
         Number of points to sample
 

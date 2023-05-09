@@ -57,7 +57,7 @@ def compute_gdist(coordinates, triangles, index):
 
 
 def compute_distance_field(coordinates):
-    # Create a mask from the coordinates
+    """Create a binary mask from array of integer coordinates."""
     mask = np.zeros(coordinates.max(axis=0) + 1, dtype=np.uint8)
     mask[coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]] = 1
 
@@ -67,17 +67,42 @@ def compute_distance_field(coordinates):
 def compute_geodesic_distances_from_volume(
     field, coordinates, index, anisotropy=(1, 1, 1)
 ):
+    """
+    Computes the list of geodesic distances from a given index
+    in the point cloud.
+
+    Parameters
+    ----------
+        field: ndarray of size (x, y, z)
+            3D binary mask of the region of interest
+        coordinates: ndarray of size (n, 3)
+            Array of 3D coordinates of the point cloud
+        index: int
+            Index of the source point in the point cloud
+        anisotropy: tuple, optional, defaults to (1, 1, 1).
+            (x, y, z)-anisotropy of the voxels
+
+    Returns:
+    --------
+        torch.Tensor of size (n,)
+            Tensor of geodesic distances from the source point
+    """
     source = coordinates[index]
 
     # Compute the distance field
-    df = euclidean_distance_field(field, source=source, anisotropy=anisotropy)
+    distance_field = euclidean_distance_field(
+        field, source=source, anisotropy=anisotropy
+    )
 
     # Retrieve only the non-infinite distances
-    dists = df[coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]]
+    dists = distance_field[
+        coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]
+    ]
     return torch.from_numpy(dists).to(torch.float64)
 
 
 def compute_euclidean_distance(coordinates, index):
+    """Compute pairwise euclidean distance between coordinates."""
     return (
         torch.cdist(coordinates, coordinates[index].unsqueeze(0))
         .flatten()
@@ -85,7 +110,7 @@ def compute_euclidean_distance(coordinates, index):
     )
 
 
-def _compute_embedding(
+def _compute_lmds(
     basis_distance,
     n_landmarks,
     n_voxels,
@@ -93,6 +118,15 @@ def _compute_embedding(
     tol,
     invert_indices,
 ):
+    """Compute LMDS embedding from precomputed geodesic
+    distances between landmarks.
+
+    This implementation follows a method described in
+    Platt, John. ‘FastMap, MetricMap, and Landmark MDS
+    Are All Nystrom Algorithms’, 1 January 2005.
+    https://www.microsoft.com/en-us/research/publication/
+    fastmap-metricmap-and-landmark-mds-are-all-nystrom-algorithms/.
+    """
     E = basis_distance[:, :n_landmarks]
     F = basis_distance[:, n_landmarks:]
 
@@ -219,7 +253,7 @@ def compute_lmds_mesh(
     basis_indices = indices[:n_landmarks]
 
     with rich_progress_joblib(
-        "Geodesic_distances for landmarks",
+        "Geodesic distances (landmarks)",
         total=basis_indices.shape[0],
         verbose=verbose,
     ):
@@ -235,7 +269,7 @@ def compute_lmds_mesh(
         )[:, indices]
     basis_distance = basis_distance.type(torch.float32)
 
-    return _compute_embedding(
+    return _compute_lmds(
         basis_distance, n_landmarks, n_voxels, k, tol, invert_indices
     )
 
@@ -288,7 +322,7 @@ def compute_lmds_volume(
     basis_indices = indices[:n_landmarks]
 
     with rich_progress_joblib(
-        "Geodesic_distances for landmarks",
+        "Geodesic distances (landmarks)",
         total=basis_indices.shape[0],
         verbose=verbose,
     ):
@@ -318,6 +352,6 @@ def compute_lmds_volume(
 
     basis_distance = basis_distance.type(torch.float32)
 
-    return _compute_embedding(
+    return _compute_lmds(
         basis_distance, n_landmarks, n_voxels, k, tol, invert_indices
     )

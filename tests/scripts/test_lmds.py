@@ -31,8 +31,11 @@ def test_compute_euclidean_distance():
     coordinates = torch.rand(642, 3)
     distance_field = lmds.compute_euclidean_distance(coordinates, 0)
 
+    cdist = torch.cdist(coordinates, coordinates[0].reshape(1, -1)).flatten()
+
     assert distance_field.shape == (642,)
     assert distance_field.dtype == torch.float64
+    assert torch.equal(distance_field, cdist)
 
 
 @pytest.mark.parametrize("numpy_inputs", numpy_inputs)
