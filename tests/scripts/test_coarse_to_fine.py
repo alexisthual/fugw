@@ -6,7 +6,7 @@ import torch
 
 from fugw.scripts import coarse_to_fine
 from fugw.mappings import FUGW, FUGWSparse
-from fugw.utils import init_mock_distribution
+from fugw.utils import _init_mock_distribution
 from nilearn import datasets, surface
 
 np.random.seed(0)
@@ -28,7 +28,7 @@ return_numpys = [False, True]
 
 @pytest.mark.parametrize("return_numpy", product(return_numpys))
 def test_random_normalizing(return_numpy):
-    _, _, _, embeddings = init_mock_distribution(
+    _, _, _, embeddings = _init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
     )
 
@@ -57,10 +57,10 @@ def test_uniform_mesh_sampling():
     "device,return_numpy", product(devices, return_numpys)
 )
 def test_coarse_to_fine(device, return_numpy):
-    _, source_features, _, source_embeddings = init_mock_distribution(
+    _, source_features, _, source_embeddings = _init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
     )
-    _, target_features, _, target_embeddings = init_mock_distribution(
+    _, target_features, _, target_embeddings = _init_mock_distribution(
         n_features_train, n_voxels_target, return_numpy=return_numpy
     )
 

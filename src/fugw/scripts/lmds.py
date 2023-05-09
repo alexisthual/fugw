@@ -6,7 +6,7 @@ import joblib
 import numpy as np
 import torch
 
-from fugw.utils import get_progress
+from fugw.utils import _get_progress
 from joblib import delayed, Parallel
 from dijkstra3d import euclidean_distance_field
 
@@ -16,7 +16,7 @@ def rich_progress_joblib(description=None, total=None, verbose=False):
     if description is None:
         description = "Processing..."
 
-    progress = get_progress()
+    progress = _get_progress()
     if verbose:
         task_id = progress.add_task(description, total=total)
 

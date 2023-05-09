@@ -11,7 +11,7 @@ doc/_build
 doc/auto_examples
 doc/gen_modules
 doc/generated
-doc/modules/generated
+doc/**/generated
 .vscode
 
 examples/**/*.pkl

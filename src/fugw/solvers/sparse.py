@@ -20,7 +20,7 @@ from fugw.solvers.utils import (
     solver_ibpp_sparse,
     solver_mm_sparse,
 )
-from fugw.utils import add_dict, console, make_csr_matrix
+from fugw.utils import _add_dict, console, _make_csr_matrix
 
 
 class FUGWSparseSolver(BaseSolver):
@@ -367,7 +367,7 @@ class FUGWSparseSolver(BaseSolver):
         row_indices = crow_indices_to_row_indices(crow_indices)
         ws_dot_wt_values = ws[row_indices] * wt[col_indices]
 
-        ws_dot_wt = make_csr_matrix(
+        ws_dot_wt = _make_csr_matrix(
             crow_indices, col_indices, ws_dot_wt_values, pi.size(), device
         )
 
@@ -433,7 +433,7 @@ class FUGWSparseSolver(BaseSolver):
 
         # Initialise loss
         current_loss = compute_fugw_loss(pi, gamma)
-        loss = add_dict({}, current_loss)
+        loss = _add_dict({}, current_loss)
         loss_steps = [0]
         loss_times = [0]
         idx = 0
@@ -505,7 +505,7 @@ class FUGWSparseSolver(BaseSolver):
                 current_loss = compute_fugw_loss(pi, gamma)
 
                 loss_steps.append(idx + 1)
-                loss = add_dict(loss, current_loss)
+                loss = _add_dict(loss, current_loss)
                 loss_times.append(time.time() - t0)
 
                 if verbose:

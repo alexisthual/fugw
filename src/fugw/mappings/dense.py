@@ -3,7 +3,7 @@ import torch
 
 from fugw.solvers.dense import FUGWSolver
 from fugw.mappings.utils import BaseMapping
-from fugw.utils import make_tensor
+from fugw.utils import _make_tensor
 
 
 class FUGW(BaseMapping):
@@ -106,7 +106,7 @@ class FUGW(BaseMapping):
                 / source_features.shape[1]
             )
         else:
-            ws = make_tensor(source_weights, device=device)
+            ws = _make_tensor(source_weights, device=device)
 
         if target_weights is None:
             wt = (
@@ -114,16 +114,16 @@ class FUGW(BaseMapping):
                 / target_features.shape[1]
             )
         else:
-            wt = make_tensor(target_weights, device=device)
+            wt = _make_tensor(target_weights, device=device)
 
         # Compute distance matrix between features
-        Fs = make_tensor(source_features.T, device=device)
-        Ft = make_tensor(target_features.T, device=device)
+        Fs = _make_tensor(source_features.T, device=device)
+        Ft = _make_tensor(target_features.T, device=device)
         F = torch.cdist(Fs, Ft, p=2) ** 2
 
         # Load anatomical kernels to GPU
-        Ds = make_tensor(source_geometry, device=device)
-        Dt = make_tensor(target_geometry, device=device)
+        Ds = _make_tensor(source_geometry, device=device)
+        Dt = _make_tensor(target_geometry, device=device)
 
         # Create model
         model = FUGWSolver(**solver_params)
@@ -197,8 +197,8 @@ class FUGW(BaseMapping):
             )
 
         # Move data to device if need be
-        pi = make_tensor(self.pi, device=device)
-        source_features_tensor = make_tensor(source_features, device=device)
+        pi = _make_tensor(self.pi, device=device)
+        source_features_tensor = _make_tensor(source_features, device=device)
 
         # Transform data
         transformed_data = (
@@ -260,8 +260,8 @@ class FUGW(BaseMapping):
             )
 
         # Move data to device if need be
-        pi = make_tensor(self.pi, device=device)
-        target_features_tensor = make_tensor(target_features, device=device)
+        pi = _make_tensor(self.pi, device=device)
+        target_features_tensor = _make_tensor(target_features, device=device)
 
         # Transform data
         transformed_data = (

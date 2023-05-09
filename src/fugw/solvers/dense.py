@@ -14,7 +14,7 @@ from fugw.solvers.utils import (
     solver_sinkhorn,
     solver_mm_l2,
 )
-from fugw.utils import add_dict, console
+from fugw.utils import _add_dict, console
 
 
 class FUGWSolver(BaseSolver):
@@ -385,7 +385,7 @@ class FUGWSolver(BaseSolver):
 
         # Initialize loss
         current_loss = compute_fugw_loss(pi, gamma)
-        loss = add_dict({}, current_loss)
+        loss = _add_dict({}, current_loss)
         loss_steps = [0]
         loss_times = [0]
         idx = 0
@@ -457,7 +457,7 @@ class FUGWSolver(BaseSolver):
                 current_loss = compute_fugw_loss(pi, gamma)
 
                 loss_steps.append(idx + 1)
-                loss = add_dict(loss, current_loss)
+                loss = _add_dict(loss, current_loss)
                 loss_times.append(time.time() - t0)
 
                 if verbose:

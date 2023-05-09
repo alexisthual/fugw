@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from fugw.utils import make_tensor
+from fugw.utils import _make_tensor
 from scipy.sparse import coo_matrix
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.feature_extraction.image import grid_to_graph
@@ -32,7 +32,7 @@ def random_normalizing(X, sample_size=100, repeats=10):
         of indices from X.
     """
     d_max = 0
-    X_tensor = make_tensor(X)
+    X_tensor = _make_tensor(X)
     for _ in range(repeats):
         idx = torch.randperm(X_tensor.shape[0])[:sample_size]
         distances = torch.cdist(X_tensor[idx, :], X_tensor[idx, :], p=2)
@@ -362,14 +362,14 @@ def fit(
         target so as to compute the coarse mapping.
     """
     # 0. Parse input tensors
-    source_sample = make_tensor(source_sample, dtype=torch.int64)
-    target_sample = make_tensor(target_sample, dtype=torch.int64)
+    source_sample = _make_tensor(source_sample, dtype=torch.int64)
+    target_sample = _make_tensor(target_sample, dtype=torch.int64)
 
-    source_features = make_tensor(source_features)
-    target_features = make_tensor(target_features)
+    source_features = _make_tensor(source_features)
+    target_features = _make_tensor(target_features)
 
-    source_geometry_embeddings = make_tensor(source_geometry_embeddings)
-    target_geometry_embeddings = make_tensor(target_geometry_embeddings)
+    source_geometry_embeddings = _make_tensor(source_geometry_embeddings)
+    target_geometry_embeddings = _make_tensor(target_geometry_embeddings)
 
     # Compute anatomical kernels
     source_geometry_kernel = torch.cdist(
@@ -393,11 +393,11 @@ def fit(
         m = target_features.shape[1]
         target_weights = torch.ones(m) / m
 
-    source_weights_sampled = make_tensor(source_weights)[source_sample]
+    source_weights_sampled = _make_tensor(source_weights)[source_sample]
     source_weights_sampled = (
         source_weights_sampled / source_weights_sampled.sum()
     )
-    target_weights_sampled = make_tensor(target_weights)[target_sample]
+    target_weights_sampled = _make_tensor(target_weights)[target_sample]
     target_weights_sampled = (
         target_weights_sampled / target_weights_sampled.sum()
     )

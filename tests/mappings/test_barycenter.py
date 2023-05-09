@@ -3,7 +3,7 @@ import pytest
 import torch
 
 from fugw.mappings import FUGWBarycenter
-from fugw.utils import init_mock_distribution
+from fugw.utils import _init_mock_distribution
 
 devices = [torch.device("cpu")]
 if torch.cuda.is_available():
@@ -23,7 +23,7 @@ def test_fugw_barycenter(device):
     weights_list = []
 
     for _ in range(n_subjects):
-        weights, features, geometry, _ = init_mock_distribution(
+        weights, features, geometry, _ = _init_mock_distribution(
             n_features, n_voxels
         )
         weights_list.append(weights)

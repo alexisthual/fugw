@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 import torch
 
@@ -18,7 +20,8 @@ console = Console()
 
 
 # `rich` progress bar used throughout the codebase
-def get_progress(**kwargs):
+def _get_progress(**kwargs):
+    """Return a custom `rich` progress bar."""
     return Progress(
         SpinnerColumn(),
         TaskProgressColumn(),
@@ -32,7 +35,8 @@ def get_progress(**kwargs):
     )
 
 
-def make_tensor(x, device=None, dtype=None):
+def _make_tensor(x, device=None, dtype=None):
+    """Turn x into a torch.Tensor with suited type and device."""
     if isinstance(x, np.ndarray):
         tensor = torch.tensor(x)
     elif isinstance(x, torch.Tensor):
@@ -51,7 +55,8 @@ def make_tensor(x, device=None, dtype=None):
     return tensor.to(device=device, dtype=dtype)
 
 
-def make_sparse_csr_tensor(x, device=None, dtype=torch.float32):
+def _make_sparse_csr_tensor(x, device=None, dtype=torch.float32):
+    """Turn x into a sparse CSR torch.Tensor with suited type and device."""
     if x is None:
         return None
     elif isinstance(x, torch.Tensor):
@@ -76,7 +81,8 @@ def make_sparse_csr_tensor(x, device=None, dtype=torch.float32):
         raise Exception(f"Expected sparse torch.Tensor, got {type(x)}")
 
 
-def make_csr_matrix(crow_indices, col_indices, values, size, device):
+def _make_csr_matrix(crow_indices, col_indices, values, size, device):
+    """Make a sparse CSR torch.Tensor from its components."""
     return torch.sparse_csr_tensor(
         crow_indices.to(device),
         col_indices.to(device),
@@ -85,7 +91,7 @@ def make_csr_matrix(crow_indices, col_indices, values, size, device):
     )
 
 
-def low_rank_squared_l2(X, Y):
+def _low_rank_squared_l2(X, Y):
     """
     Write square euclidean distance matrix M
     (ie $M_{i, j} = ||X_i - Y_j||^2_{2}||$)
@@ -121,7 +127,7 @@ def low_rank_squared_l2(X, Y):
     return (A1, A2)
 
 
-def sample_multivariate_normal(n_dims=2, n_points=200):
+def _sample_multivariate_normal(n_dims=2, n_points=200):
     """
     Samples n_points from a multivariate normal distribution
     with random mean and covariance matrix
@@ -148,11 +154,12 @@ def sample_multivariate_normal(n_dims=2, n_points=200):
     return x
 
 
-def init_mock_distribution(
+def _init_mock_distribution(
     n_features, n_voxels, should_normalize=False, return_numpy=False
 ):
+    """Initialize mock distribution for testing."""
     weights = torch.ones(n_voxels) / n_voxels
-    features = sample_multivariate_normal(n_features, n_voxels)
+    features = _sample_multivariate_normal(n_features, n_voxels)
     embeddings = torch.rand(n_voxels, 3)
     geometry = torch.cdist(embeddings, embeddings)
 
@@ -175,8 +182,47 @@ def init_mock_distribution(
         return distribution
 
 
-def add_dict(d, new_d):
+def _add_dict(d, new_d):
     """Add values of dictionary new_d to dictionary d."""
     for key, value in new_d.items():
         d.setdefault(key, []).append(value)
     return d
+
+
+def save_mapping(mapping, fname):
+    """Save mapping in pickle file, separating hyperparams and weights.
+
+    Parameters
+    ----------
+    mapping: fugw.mappings
+        FUGW mapping to save
+    fname: str or pathlib.Path
+        Path to pickle file to save
+    """
+    with open(fname, "wb") as f:
+        # Dump hyperparams first
+        pickle.dump(mapping, f)
+        # Dump mapping weights
+        pickle.dump(mapping.pi, f)
+
+
+def load_mapping(fname, load_weights=True):
+    """Load mapping from pickle file, optionally loading weights.
+
+    Parameters
+    ----------
+    fname: str or pathlib.Path
+        Path to pickle file to load
+    load_weights: bool, optional, defaults to True
+        If True, load mapping weights from pickle file.
+
+    Returns
+    -------
+    mapping: fugw.mappings
+    """
+    with open(fname, "rb") as f:
+        mapping = pickle.load(f)
+        if load_weights:
+            mapping.pi = pickle.load(f)
+
+    return mapping

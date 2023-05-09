@@ -1,7 +1,7 @@
 import torch
 
 from fugw.mappings.dense import FUGW
-from fugw.utils import make_tensor
+from fugw.utils import _make_tensor
 
 
 class FUGWBarycenter:
@@ -32,9 +32,9 @@ class FUGWBarycenter:
         # pi_samp, pi_feat: both of size (ns, n)
         for i, (plans, weights) in enumerate(zip(plans_, weights_)):
             if len(geometry_) == 1 and len(weights_) > 1:
-                C = make_tensor(geometry_[0], device=device)
+                C = _make_tensor(geometry_[0], device=device)
             else:
-                C = make_tensor(geometry_[i], device=device)
+                C = _make_tensor(geometry_[i], device=device)
 
             pi_samp, pi_feat = plans
             pi1_samp, pi1_feat = pi_samp.sum(0), pi_feat.sum(0)
@@ -71,7 +71,7 @@ class FUGWBarycenter:
                         / (pi1_samp[:, None] * pi1_feat[None, :])
                     )  # shape (n, n)
 
-            w = make_tensor(weights, device=device)
+            w = _make_tensor(weights, device=device)
             barycenter_geometry = (
                 barycenter_geometry + w * term
             )  # shape (n, n)
@@ -84,8 +84,8 @@ class FUGWBarycenter:
         for i, (pi, weights, features) in enumerate(
             zip(plans, weights_list, features_list)
         ):
-            w = make_tensor(weights, device=device)
-            f = make_tensor(features, device=device)
+            w = _make_tensor(weights, device=device)
+            f = _make_tensor(features, device=device)
             if features is not None:
                 acc = w * pi.T @ f.T / pi.sum(0).reshape(-1, 1)
 
@@ -240,7 +240,7 @@ class FUGWBarycenter:
                 torch.ones(barycenter_size) / barycenter_size
             ).to(device)
         else:
-            barycenter_weights = make_tensor(
+            barycenter_weights = _make_tensor(
                 init_barycenter_weights, device=device
             )
 
@@ -252,7 +252,7 @@ class FUGWBarycenter:
                 barycenter_features, dim=1
             ).reshape(-1, 1)
         else:
-            barycenter_features = make_tensor(
+            barycenter_features = _make_tensor(
                 init_barycenter_features, device=device
             )
 
@@ -262,7 +262,7 @@ class FUGWBarycenter:
                 / barycenter_size
             )
         else:
-            barycenter_geometry = make_tensor(
+            barycenter_geometry = _make_tensor(
                 init_barycenter_geometry, device=device
             )
 

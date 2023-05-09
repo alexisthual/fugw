@@ -1,6 +1,6 @@
 import torch
 
-from fugw.utils import get_progress
+from fugw.utils import _get_progress
 
 
 class BaseSolver:
@@ -223,7 +223,7 @@ def solver_sinkhorn(
     tau_s = 1 if torch.isinf(rho_s) else rho_s / (rho_s + eps)
     tau_t = 1 if torch.isinf(rho_t) else rho_t / (rho_t + eps)
 
-    with get_progress(transient=True) as progress:
+    with _get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -297,7 +297,7 @@ def solver_sinkhorn_sparse(
     ).to_sparse_csr()
     csc_to_csr = T.values() - 1
 
-    with get_progress(transient=True) as progress:
+    with _get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -398,7 +398,7 @@ def solver_mm(
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    with get_progress(transient=True) as progress:
+    with _get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("MM-KL iterations", total=niters)
 
@@ -451,7 +451,7 @@ def solver_mm_l2(
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    with get_progress(transient=True) as progress:
+    with _get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("MM-L2 iterations", total=niters)
 
@@ -550,7 +550,7 @@ def solver_mm_sparse(
         size=(n_cols, n_pi_values),
     ).to_sparse_csr()
 
-    with get_progress(transient=True) as progress:
+    with _get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("MM iterations", total=niters)
 
@@ -621,7 +621,7 @@ def solver_ibpp(
 
     K = torch.exp(-cost / sum_eps)
 
-    with get_progress(transient=True) as progress:
+    with _get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
@@ -718,7 +718,7 @@ def solver_ibpp_sparse(
     # Remove previously added 1
     csr_values_to_transpose_values = T.values() - 1
 
-    with get_progress(transient=True) as progress:
+    with _get_progress(transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
