@@ -36,7 +36,7 @@ have less than 10k points.
     import torch
 
     from fugw.mappings import FUGW
-    from fugw.utils import _init_mock_distribution
+    from fugw.utils import init_mock_distribution
     from matplotlib.collections import LineCollection
 
 
@@ -73,10 +73,10 @@ Let us generate random training data for the source and target distributions
 .. code-block:: default
 
     _, source_features_train, source_geometry, source_embeddings = (
-        _init_mock_distribution(n_features_train, n_points_source)
+        init_mock_distribution(n_features_train, n_points_source)
     )
     _, target_features_train, target_geometry, target_embeddings = (
-        _init_mock_distribution(n_features_train, n_points_target)
+        init_mock_distribution(n_features_train, n_points_target)
     )
     source_features_train.shape
 
@@ -239,34 +239,31 @@ using a sinkhorn solver
 
 
 
-    [18:46:58] BCD step 1/10   FUGW loss:      0.029017694294452667     dense.py:464
+    [18:44:10] BCD step 1/10   FUGW loss:      0.029077230021357536     dense.py:464
 
 
-               BCD step 2/10   FUGW loss:      0.04671149328351021      dense.py:464
+    [18:44:11] BCD step 2/10   FUGW loss:      0.046711478382349014     dense.py:464
 
 
-               BCD step 3/10   FUGW loss:      0.022675596177577972     dense.py:464
+    [18:44:12] BCD step 3/10   FUGW loss:      0.02267550304532051      dense.py:464
 
 
-    [18:46:59] BCD step 4/10   FUGW loss:      0.022144610062241554     dense.py:464
+    [18:44:13] BCD step 4/10   FUGW loss:      0.02190692536532879      dense.py:464
 
 
-               BCD step 5/10   FUGW loss:      0.04954808950424194      dense.py:464
+               BCD step 5/10   FUGW loss:      0.04769175872206688      dense.py:464
 
 
-    [18:47:00] BCD step 6/10   FUGW loss:      0.0239147637039423       dense.py:464
+    [18:44:14] BCD step 6/10   FUGW loss:      0.023379186168313026     dense.py:464
 
 
-               BCD step 7/10   FUGW loss:      0.01939348317682743      dense.py:464
+    [18:44:15] BCD step 7/10   FUGW loss:      0.01915481500327587      dense.py:464
 
 
-    [18:47:01] BCD step 8/10   FUGW loss:      0.018673155456781387     dense.py:464
+    [18:44:16] BCD step 8/10   FUGW loss:      0.018553871661424637     dense.py:464
 
 
-               BCD step 9/10   FUGW loss:      0.018613629043102264     dense.py:464
-
-
-    [18:47:02] BCD step 10/10  FUGW loss:      0.018613623455166817     dense.py:464
+               BCD step 9/10   FUGW loss:      0.018553996458649635     dense.py:464
 
 
 
@@ -471,9 +468,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.930 seconds)
+   **Total running time of the script:** ( 0 minutes  11.325 seconds)
 
-**Estimated memory usage:**  44 MB
+**Estimated memory usage:**  306 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_1_dense.py:

@@ -16,7 +16,7 @@ import torch
 
 from fugw.mappings import FUGW, FUGWSparse
 from fugw.scripts import coarse_to_fine
-from fugw.utils import _init_mock_distribution
+from fugw.utils import init_mock_distribution
 from matplotlib.collections import LineCollection
 from scipy.sparse import coo_matrix
 
@@ -32,10 +32,10 @@ n_features_test = 2
 
 # %%
 # Let us generate random training data for the source and target distributions
-_, source_features_train, _, source_embeddings = _init_mock_distribution(
+_, source_features_train, _, source_embeddings = init_mock_distribution(
     n_features_train, n_points_source
 )
-_, target_features_train, _, target_embeddings = _init_mock_distribution(
+_, target_features_train, _, target_embeddings = init_mock_distribution(
     n_features_train, n_points_target
 )
 

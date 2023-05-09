@@ -182,17 +182,16 @@
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../pages/api_references.html">API references</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../pages/mappings.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../pages/generated/fugw.mappings.FUGW.html">fugw.mappings.FUGW</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pages/generated/fugw.mappings.FUGWSparse.html">fugw.mappings.FUGWSparse</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../modules/mappings.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/mappings.FUGW.html"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/mappings.FUGWSparse.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../pages/solvers.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../pages/generated/fugw.solvers.FUGWSolver.html">fugw.solvers.FUGWSolver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pages/generated/fugw.solvers.FUGWSparseSolver.html">fugw.solvers.FUGWSparseSolver</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../modules/solvers.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/solvers.FUGWSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSolver</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/solvers.FUGWSparseSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../pages/utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.utils</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -247,7 +246,7 @@ using 4 fMRI feature maps (z-score contrast maps).</p>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="kn">from</span> <span class="nn">nilearn</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">image</span>
-<span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">,</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGWSparse</span></a>
+<span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">,</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGWSparse</span></a>
 <span class="kn">from</span> <span class="nn">fugw.scripts</span> <span class="kn">import</span> <span class="n">coarse_to_fine</span><span class="p">,</span> <span class="n">lmds</span>
 
 <a href="https://matplotlib.org/stable/api/matplotlib_configuration_api.html#matplotlib.RcParams" title="matplotlib.RcParams" class="sphx-glr-backref-module-matplotlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span></a><span class="p">[</span><span class="s2">&quot;figure.dpi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">300</span>
@@ -348,7 +347,7 @@ both the features and the geometry.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alpha_coarse</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">rho_coarse</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">eps_coarse</span> <span class="o">=</span> <span class="mf">1e-4</span>
-<a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha_coarse</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">rho_coarse</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps_coarse</span><span class="p">)</span>
+<a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha_coarse</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">rho_coarse</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps_coarse</span><span class="p">)</span>
 <span class="n">coarse_mapping_solver</span> <span class="o">=</span> <span class="s2">&quot;mm&quot;</span>
 <span class="n">coarse_mapping_solver_params</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;nits_bcd&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
@@ -358,7 +357,7 @@ both the features and the geometry.</p>
 <span class="n">alpha_fine</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">rho_fine</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">eps_fine</span> <span class="o">=</span> <span class="mf">1e-4</span>
-<a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGWSparse</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha_fine</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">rho_fine</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps_fine</span><span class="p">)</span>
+<a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGWSparse</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha_fine</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">rho_fine</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps_fine</span><span class="p">)</span>
 <span class="n">fine_mapping_solver</span> <span class="o">=</span> <span class="s2">&quot;mm&quot;</span>
 <span class="n">fine_mapping_solver_params</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;nits_bcd&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
@@ -398,7 +397,7 @@ the number of connected components of the connectivity matrix is 3 &gt; 1. Compl
     <span class="c1"># Parametrize step 1 (coarse alignment between source and target)</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_sample</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_sample</span></a><span class="p">,</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_sample</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_sample</span></a><span class="p">,</span>
-    <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">=</span><a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="p">,</span>
+    <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="o">=</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a><span class="p">,</span>
     <span class="n">coarse_mapping_solver</span><span class="o">=</span><span class="n">coarse_mapping_solver</span><span class="p">,</span>
     <span class="n">coarse_mapping_solver_params</span><span class="o">=</span><span class="n">coarse_mapping_solver_params</span><span class="p">,</span>
     <span class="c1"># Parametrize step 2 (selection of pairs of indices present in</span>
@@ -407,7 +406,7 @@ the number of connected components of the connectivity matrix is 3 &gt; 1. Compl
     <span class="n">source_selection_radius</span><span class="o">=</span><span class="mi">3</span> <span class="o">/</span> <span class="n">source_distance_max</span><span class="p">,</span>
     <span class="n">target_selection_radius</span><span class="o">=</span><span class="mi">3</span> <span class="o">/</span> <span class="n">target_distance_max</span><span class="p">,</span>
     <span class="c1"># Parametrize step 3 (fine-grained alignment)</span>
-    <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">=</span><a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="p">,</span>
+    <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">=</span><a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="p">,</span>
     <span class="n">fine_mapping_solver</span><span class="o">=</span><span class="n">fine_mapping_solver</span><span class="p">,</span>
     <span class="n">fine_mapping_solver_params</span><span class="o">=</span><span class="n">fine_mapping_solver_params</span><span class="p">,</span>
     <span class="c1"># Misc</span>
@@ -415,49 +414,49 @@ the number of connected components of the connectivity matrix is 3 &gt; 1. Compl
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[19:10:21] BCD step 1/5    FUGW loss:      0.024476811289787292     dense.py:464
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[19:12:37] BCD step 1/5    FUGW loss:      0.02423551119863987      dense.py:464
 
 
-[19:10:32] BCD step 2/5    FUGW loss:      0.01855831779539585      dense.py:464
+[19:12:51] BCD step 2/5    FUGW loss:      0.01868680864572525      dense.py:464
 
 
-[19:10:42] BCD step 3/5    FUGW loss:      0.012353211641311646     dense.py:464
+[19:13:06] BCD step 3/5    FUGW loss:      0.012388878501951694     dense.py:464
 
 
-[19:10:53] BCD step 4/5    FUGW loss:      0.005771104712039232     dense.py:464
+[19:13:21] BCD step 4/5    FUGW loss:      0.006114030256867409     dense.py:464
 
 
-[19:11:10] BCD step 5/5    FUGW loss:      0.003976800944656134     dense.py:464
+[19:13:43] BCD step 5/5    FUGW loss:      0.004022807814180851     dense.py:464
 
 
-[19:13:26] BCD step 1/3    FUGW loss:      0.00429160799831152     sparse.py:512
+[19:16:40] BCD step 1/3    FUGW loss:      0.004291206132620573    sparse.py:512
 
 
-[19:15:41] BCD step 2/3    FUGW loss:      0.00320232380181551     sparse.py:512
+[19:19:37] BCD step 2/3    FUGW loss:      0.003227503038942814    sparse.py:512
 
 
-[19:17:53] BCD step 3/3    FUGW loss:      0.0028234650380909443   sparse.py:512
+[19:22:33] BCD step 3/3    FUGW loss:      0.0028412765823304653   sparse.py:512
 
 (tensor([6131, 1014, 4663, 7041, 5816, 7544,  499, 3353, 7189, 5401, 2610, 1091,
          651, 6805,  639, 3049, 1995, 1838, 2060, 1171,  409, 1898, 1376,  487,
         3907, 3897,  881, 6491, 3648,  969, 1936, 6644, 6319, 5345, 6360, 5271,
         7000, 4518, 3228, 6566, 2212, 6433,  902, 7013, 5205, 7043, 2910, 3473,
-        1085, 6231,  948,  834, 6310, 4076, 1342, 3547, 5047, 7427, 1199, 6264,
-        5356, 7191, 6278,   27, 6183, 1803,   26, 4373, 5850,   45, 7425,   89,
+        1085, 6231, 1652, 1317,  834, 6309, 3652, 1361, 3532, 5048, 7226, 1597,
+        6264, 5356, 6278,   27, 6183, 1803,   26, 4373, 5850,   45, 7425,   89,
         4050, 2686, 4014, 4358, 3595, 1348,  521, 3974, 6436, 4021, 4888, 4891,
         5171,   39, 1131, 7546,  242, 3884, 2784, 5595, 3889,  781,    3,  119,
         1324, 6337, 6515, 6486, 2421, 5294,  745, 5181, 4039, 5444, 6589, 2684,
         3241,  972, 2052, 2000, 4145, 5855, 4132, 1883, 3745, 7609, 2978, 4912,
         7263,  733, 1431, 2119, 2048, 2592, 1562, 4052, 7421, 6836, 3678, 2169,
         4983, 4686, 4025, 6882, 1078, 3788, 2794, 4763, 3359,  971, 2071,  470,
-        1763, 6110, 4472,  857, 5491,  551, 3650, 2024, 4183, 7223, 2005, 2496,
-        4989, 4579, 2800,  879, 1499, 6284, 3669, 1335, 5546, 2893, 2788, 4346,
-        6099,  913, 2697, 3069, 5011, 6270, 6995, 2844, 5016, 5216, 2804, 2993,
-        4343, 5698, 3755, 1612, 3330, 3849,   82,  859, 2793, 2235,  203, 4179,
-        2012,  983, 4277, 5134, 5426, 5609,  128, 2695, 7407, 5324, 6572,  673,
-        3196,   34, 6891, 2942, 4001, 4830, 3959, 7337, 3859, 6832, 2530,  828,
-        6338, 6243, 4698, 5361, 2749,  909, 6603, 4906, 4651, 1641, 4493,  800,
-        2126, 7156, 3385, 3336, 1124, 4806, 7254, 3108, 7133,  309, 4784, 1415,
+        1763, 4472,  857, 5491,  551, 3650, 2024, 4183, 7223, 2005, 2496, 4989,
+        4579, 2800,  879, 1499, 6284, 3669, 1335, 5546, 2893, 2788, 4346, 6099,
+         913, 2697, 3069, 5011, 6270, 6995, 2844, 5016, 5216, 2804, 2993, 4343,
+        5698, 3755, 1612, 3330, 3849,   82,  859, 2793, 2235,  203, 4179, 2012,
+         983, 4277, 5134, 5426, 5609,  128, 2695, 7407, 5324, 6572,  673, 3196,
+          34, 6891, 2942, 4001, 4830, 3959, 7337, 3859, 6832, 2530,  828, 6338,
+        6243, 4698, 5361, 2749,  909, 6603, 4906, 4651, 1641, 4493,  800, 2126,
+        7156, 3385, 3336, 2487, 1124, 4806, 7254, 3108, 7133,  309, 4784, 1415,
         4335, 4853,  585, 3534,  434,  456, 3312, 3087, 2999, 5515, 7074, 3759,
         5570, 3847,  931, 3289, 7463, 2214, 6091, 3275, 2489, 3656, 6130, 1892,
         6373, 4124, 6089, 7564, 3298, 4705, 6808, 2264,  636, 2564, 1219, 6660,
@@ -477,14 +476,14 @@ the number of connected components of the connectivity matrix is 3 &gt; 1. Compl
         6187, 3616, 3235, 4883,  868, 2186, 1937, 4624,  718, 1461, 3476,  482,
         1897, 5618,  704, 5141, 6581, 5749, 5995, 3807, 4961, 5117, 4008, 5840,
         5103, 5999,  224, 7497,  148,  159, 6076, 5542,  815, 7077, 4000,  504,
-        3721, 2680, 3361,  661, 2365, 5202, 3489, 6456,   92, 2308, 3928, 5927,
-        2738, 5254, 7554, 3176,  922,  440, 4973, 1306, 1143, 1033, 2520,  719,
-        3804, 4437, 1139, 4199, 5249, 1748, 6160, 4487, 5952, 6560, 1502, 1548,
-        7275, 3129, 4045,  926, 2717, 1626, 4539,  897, 1099, 2615, 2289, 6002,
-        6687, 4499, 2393, 2203,  145, 2770, 2851,  906, 3350, 6889, 3483, 1000,
-         701,  573, 1867, 3760, 6282, 3146, 2065, 1787, 7078, 7071, 5902, 2164,
-         244, 5050, 2861,  364, 5021, 4594, 5802, 6988, 6485, 5094, 1447,  519,
-        1908, 2439, 3560, 1625, 1927, 2462, 1603, 5536,  262, 5580, 4057, 4135,
+        3721, 2680, 3361,  661, 2365, 5202, 3489, 6456,   92, 2308, 6887, 3928,
+        5927, 2738, 5254, 7554, 3176,  922,  440, 4973, 1306, 1143, 1033, 2520,
+         719, 3804, 4437, 1139, 4199, 5249, 1748, 6160, 4487, 5952, 6560, 1502,
+        1548, 7275, 3129, 4045,  926, 2717, 1626, 4539,  897, 1099, 2615, 2289,
+        6002, 6687, 4499, 2393, 2203,  145, 2770, 2851,  906, 3350, 6889, 3483,
+        1000,  701,  573, 1867, 3760, 6282, 3146, 2065, 1787, 7078, 7071, 5902,
+        2164,  244, 5050, 2861,  364, 5021, 4594, 5802, 6988, 5518, 1059,  850,
+        1907, 2440, 3136, 1625, 2345, 2041, 1603, 5536,  262, 5580, 4057, 4135,
         2240,  401, 4417, 1031, 2768, 5097, 1552, 3813, 7480, 6947, 4368, 7286,
         2352, 7011, 3188,  900, 4536, 3903, 6537, 4913, 5394, 3886, 6907, 3375,
         7058, 7432, 6307,  116, 2215, 6261, 6834, 5474, 1671, 2437, 7129, 3639,
@@ -495,52 +494,52 @@ the number of connected components of the connectivity matrix is 3 &gt; 1. Compl
         3548, 6699, 4630,  818, 6737, 7470, 6232, 6312, 3677, 7295, 2618, 6478,
         7579,  247, 5843, 6557, 5884, 2502, 7032, 5127, 2162,  860, 1792, 4219,
         6606, 2847, 5286,  192, 3133, 4106, 3151, 3635, 4703, 7537, 1228, 7347,
-        1485, 1100, 4405, 5775, 6656, 6276, 6975, 5945, 1477, 1684, 2930, 5367,
-        2042,  266, 4653, 2121, 4868, 3930, 7284, 6782, 5860, 5947, 2558, 2927,
-        2579, 4644, 6066, 3825, 1674, 2195, 4708, 2072, 1369, 1600, 4355, 5292,
-        3337, 1962, 4380, 5031, 3400,  333, 2839, 1159, 4900, 1305, 3537, 2391,
-        5505,  671, 3622, 4150, 5577, 3876,  632, 4393, 4537, 6775, 1409, 6719,
-        2902, 2865, 6190,  891, 5838, 6613, 1852, 7007, 3947, 1283, 4033,  957,
-           9, 3521,  174, 4158, 5173,  700, 4112, 1167, 2915, 1531, 3728, 1192,
-        5732, 5299, 7547, 2623, 4565, 2761, 3244, 6969, 5130, 3654, 6362, 7196,
-        4114, 5251, 3169, 4168, 3842, 3992, 4401,  193, 5735, 3964, 2639, 6126,
-        6472, 1215, 7355,  219, 2445, 2099,  571, 1998, 1066, 5798, 5870, 4666,
-        6057, 6384, 5039, 4476, 2458,  599,   99, 5000,  692, 3206, 3441, 2742,
-        7612, 3852, 5218, 4485,  711, 1413,  830,  335, 3462, 7594, 3723, 2170,
-        6476, 3580, 1762, 3233, 7279,  126, 1333, 6226, 4542, 5920, 5769, 3701,
-        4719, 2878, 5853, 5551, 2299, 2108,  511, 3089, 7040, 4331, 1362, 1419,
-        6122, 5144, 6398, 5892,  727, 3389, 7560, 3883, 6196, 1621, 3422, 5063,
-        3890, 5691, 1508, 1678, 7200, 5200,  978, 6691, 5988,  171, 7170,   59,
-        2932,  187, 1564,  212, 4110, 3139, 5197, 3386, 3632, 4407, 1693, 4926,
-        7505, 5159,  821, 5808, 1973, 6238, 1943, 4196, 5115, 6919, 6219, 4559,
-        7429, 1388, 4514, 1107,   37, 4614, 3118, 3609, 3292, 3270, 6387, 7019,
-        1933, 1303, 1657, 2925, 6043, 2826, 4482,  123, 6728, 7142, 2256,  560,
-         643, 6912, 2658, 2651, 6212, 1052, 6341, 3278, 7063, 1760, 5428, 6494,
-        5630, 2572, 3602, 7514, 7361, 2184, 2663, 1073, 4146, 6169,  612, 4308,
-        5877, 1567, 7402, 4513,  998, 6109, 1309, 6184, 5206, 4385, 5467, 7163,
-        5076, 2246, 1970, 1096, 2291, 5208, 5649, 5337, 2094, 4811, 6015, 4491,
-        6760, 2704,   96, 4886, 3266,  779, 1392,   31, 5652, 1651, 5232,   52,
-        3222, 2723,  951,  580, 1524, 2659, 5169,  355, 5004, 4419, 4413, 5318,
-        2602, 6141, 2401, 2066]), tensor([6555, 1014, 4662, 7042, 5815, 7532,  499, 3354, 6875, 4971, 3039, 1090,
-         650, 7111,  657, 3049, 1996, 1437, 2039, 1171,  410, 1904, 1780,  487,
-        4338, 3898,  882, 6088, 3224,  969, 2354, 6644, 6301, 4915, 6361, 5695,
-        6667, 4080, 2809, 6914, 2228, 6433,  902, 6998, 5204, 7043, 2481, 3474,
-        1085, 5822, 1316,  834, 6309, 4076, 1360, 3110, 5048, 7426, 1199, 6246,
-        4942, 7191, 6658,   28, 6183, 1382,   15, 4824, 5831,   57, 7424,   83,
-        4051, 2701, 4014, 3910, 3604, 1347,  520, 3961, 6437, 4021, 4893, 4896,
-        5152,  152, 1131, 7545,  237, 4315, 3203, 5594, 3872,  484,   11,  118,
-        1343, 5933, 6880, 6486, 2002, 5294,  746, 5181, 4478, 5444, 6589, 2670,
-        3242,  667, 2053, 2402, 4145, 5855, 3683, 2301, 3745, 7484, 2957, 4912,
-        7466,  732, 1846, 2119, 2048, 2573, 1183, 3629, 7193, 6820, 3662, 2168,
-        5431, 4687, 4020, 6893, 1088, 3345, 2351, 4762, 3359,  953, 2071,  772,
-        1359, 6096, 4035,  543, 5491,  551, 4058, 1592, 4621, 7423, 2004, 2496,
-        4572, 4580, 2799,  879, 1495, 6665, 3685,  947, 5564, 2912, 2346, 4345,
-        6114, 1294, 3123, 3052, 5420, 6271, 6679, 3282, 5017, 5215, 2360, 2993,
-        4764, 5683, 3335, 1213, 3750, 4280,  217,  544, 2793, 1820,  202, 4179,
-        2013,  659, 4295, 5153, 5426, 5608,  128, 3135, 7563, 4894, 6189,  674,
-        3195,   33, 7201, 3381, 4001, 4395, 3960, 7336, 3439, 6831, 2106,  829,
-        6339, 6263, 4697, 5378, 2749, 1273, 6604, 4905, 4651, 1641, 4507, 1141,
-        1707, 7396, 2967, 2916, 1122, 5243, 7448, 3094, 7381,  125, 4800, 1817,
+        1485, 1100, 5776, 6676, 5867, 6977, 5945, 1477, 1684, 2930, 5367, 2042,
+         266, 4653, 2121, 4868, 3930, 7284, 6782, 5860, 5947, 2558, 2927, 2579,
+        4644, 6514, 5631, 3864, 2536, 2194, 4690, 2072,  980, 1600, 4355, 5292,
+        3799, 1168, 3918, 5459, 3399,  590, 2429, 1556, 4474, 1287, 3523, 2408,
+        5505,  672, 3624, 4172, 5973, 3417,  631, 4829, 4994, 6793, 1812, 6330,
+        2880, 2884, 5781, 1254, 5838, 6613, 1864, 6693, 3513,  904, 4468,  635,
+           1, 3521,  392, 4158, 5191, 1006, 4987,  810, 2895, 1135, 3708, 1590,
+        5675, 5724, 5299, 7398, 2623, 4566, 2329, 3243, 6968, 4695, 3215, 5957,
+        7203, 4097, 2741, 4628, 4731, 3979, 3983,  370, 6147, 3545, 2638, 5718,
+        6434, 1614, 7326,  698, 2874, 2543,  871, 2016, 1843, 6210, 5023, 4667,
+        6056, 6365, 4163, 4023, 2057,  327,  110, 4126,  693, 2817, 3879, 2743,
+        7632, 4266, 5235, 4898,  437, 1040,  830,  335, 3445, 7585, 2905, 1753,
+        6440, 2718, 2180, 3234, 7292,  297, 2174, 6960, 4979, 5503, 5350, 3281,
+        4736, 2841, 5833, 5549, 1870, 2090,  824, 3496, 7069, 3900,  993, 1403,
+        6123, 5143, 6398, 5892,  457, 2971, 7551, 3882, 5785, 2055, 3423, 6879,
+        5063, 3890, 1508, 2135, 6536, 5184,  942, 7020, 5969,   54, 6867,  164,
+        2504,   76, 1977,  222, 5006, 3995, 5603, 3388, 4055, 4845, 2130, 4941,
+        7335, 5158,  820, 5808, 1560, 5430, 1147, 4173, 4637, 6931, 5409, 4559,
+        7231, 1408, 4970, 1102,  176, 4197, 2677, 3618, 3694, 2852, 6351, 7019,
+        1932, 1723, 1658, 2925, 6044, 2395, 4496,  306, 6728, 7141, 3972, 2242,
+         291,  985, 6580, 3070, 2650, 6212, 1064, 6730, 3276, 7065,  967, 6275,
+        6105, 5629, 3003, 4018, 7331, 7539, 2165, 2664,  460, 3718, 6171,  365,
+        4291, 5857, 1138, 7174, 4949, 1387, 2132, 6915, 5237, 4371, 5906, 7176,
+        4638, 2233, 1955, 6499,  759, 1895, 5192, 6086, 5323, 1677, 4375, 6016,
+        4957, 6760, 3115,   95, 5319, 3670, 1542, 1023,  143, 5227, 1650, 5217,
+          42, 3237, 3160, 1703,  338, 1128, 2252, 5593,  645, 5024, 5290, 3951,
+        5318, 2602, 5296, 2366]), tensor([1893, 1014, 4663, 7026, 5815, 7544,  255, 2935, 7188, 5401, 3039, 1091,
+         651, 6787,  638, 3049, 1996, 1838, 2060, 1586,  395, 2322, 1376,  248,
+        3906, 3913,  865, 6087, 3223,  970, 2342, 6643, 6302, 4915, 6379, 5696,
+        6668, 4518, 2809, 6914, 2212, 6432,  887, 6999, 5187, 7043, 2911, 3892,
+        1451, 6231, 1652, 1317,  833, 6290, 3652, 1342, 3532, 5047, 7427, 1597,
+        6246, 4927, 6278,   28, 5774, 1785,   25, 4373, 6259,   57, 7424,   84,
+        3627, 2700, 4006, 3925, 3595, 1771,  520, 4406, 6436, 4458, 4893, 4897,
+        5151,  152, 1121, 7546,  242, 3884, 2771, 5594, 3872,  795,   10,  301,
+        1324, 6354, 6515, 6839, 2403, 5282,  754, 5198, 4039, 5443, 6573, 2684,
+        3241,  972, 2052, 2419, 4145, 5874, 3683, 2287, 3725, 7609, 3395, 5341,
+        7455,  733, 1430, 1682, 2029, 2573, 1165, 3619, 7422, 7139, 4105, 2169,
+        5002, 4664, 4025, 6882, 1078, 3367, 2351, 4326, 3379, 1321, 2050,  772,
+        1782, 4035,  543, 5491,  551, 4058, 1592, 4621, 7423, 2004, 2496, 4572,
+        4580, 2799,  879, 1495, 6665, 3685,  947, 5564, 2912, 2346, 4345, 6114,
+        1294, 3123, 3052, 5420, 6271, 6679, 3282, 5017, 5215, 2360, 2993, 4764,
+        5683, 3335, 1213, 3750, 4280,  217,  544, 2793, 1820,  202, 4179, 2013,
+         659, 4295, 5153, 5426, 5608,  128, 3135, 7563, 4894, 6189,  674, 3195,
+          33, 7201, 3381, 4001, 4395, 3960, 7336, 3439, 6831, 2106,  829, 6339,
+        6263, 4697, 5378, 2749, 1273, 6604, 4905, 4651, 1641, 4507, 1141, 1707,
+        7396, 2967, 2916, 2087, 1123, 5243, 7448, 3094, 7381,  125, 4800, 1817,
         4335, 4403,  328, 3534,  444,  736, 3311, 3509, 2568, 5514, 7074, 3759,
         5590, 3827,  931, 2890, 7573, 1797, 6092, 3715, 2470, 3656, 6118, 1881,
         6743, 4561, 6072, 7408, 3318, 4685, 7132, 1434,  655, 2563, 1618, 6660,
@@ -560,14 +559,14 @@ the number of connected components of the connectivity matrix is 3 &gt; 1. Compl
         5793, 3615, 3236, 4883,  851, 2187, 1917, 4624, 1060, 1449, 3911,  483,
         1903, 5600,  688, 5161, 6597, 5750, 5582, 3806, 5373, 4223, 4007, 5840,
         5103, 6000,  225, 7600,  160,  158, 5641, 5119, 1190, 6752, 3989,  504,
-        4152, 2667, 3361,  678, 2381, 5627, 3489, 6473,   91, 1901, 3914, 5489,
-        3167, 5694, 7384, 3589,  907,  450, 5804, 1307, 1158,  690, 2970,  442,
-        3804, 4446,  799, 3748, 5263, 1747, 6156, 4910, 5934, 6177, 1503, 1533,
-        7465, 3130, 4497,  928, 3143, 1210, 4101,  579,  755, 2615, 2289, 5964,
-        7016, 4500, 1958, 3038,  303, 2754, 2422,  905, 3391, 6898, 3482, 1371,
-         670,  890, 1866, 4191, 5872, 3146, 2086, 1787, 7078, 7070, 5902, 1744,
-         249, 5049, 2843,  351, 4583, 4594, 5384, 6988, 6498, 5113, 1432,  519,
-        2331, 2887, 3137, 1261, 2356, 2022, 1224, 5112,  253, 6014, 4042, 4136,
+        4152, 2667, 3361,  678, 2381, 5627, 3489, 6473,   91, 1901, 6887, 3914,
+        5489, 3167, 5694, 7384, 3589,  907,  450, 5804, 1307, 1158,  690, 2970,
+         442, 3804, 4446,  799, 3748, 5263, 1747, 6156, 4910, 5934, 6177, 1503,
+        1533, 7465, 3130, 4497,  928, 3143, 1210, 4101,  579,  755, 2615, 2289,
+        5964, 7016, 4500, 1958, 3038,  303, 2754, 2422,  905, 3391, 6898, 3482,
+        1371,  670,  890, 1866, 4191, 5872, 3146, 2086, 1787, 7078, 7070, 5902,
+        1744,  249, 5049, 2843,  351, 4583, 4594, 5384, 6988, 5538, 1432,  535,
+        1907, 2887, 3137, 1261, 2356, 2022, 1224, 5112,  253, 6014, 4042, 4136,
         2240,  684, 3566, 1032, 2768, 5098, 1570, 3813, 7606, 6948, 4368, 7285,
         2769, 6682, 3637,  582, 4098, 4348, 6548, 5333, 5395, 3887, 6551, 3816,
         7058, 7235, 6308,  116, 2198, 6622, 7165, 5495, 1671, 2848, 6789, 4049,
@@ -578,42 +577,42 @@ the number of connected components of the connectivity matrix is 3 &gt; 1. Compl
         3550, 6700, 5067,  835, 7081, 7458, 5387, 6292, 4102, 7037, 2618, 6462,
         7572,  475, 5424, 6166, 5465, 2522, 7032, 4711, 2586,  844, 2209, 4219,
         6605, 2847, 4848,  204, 3134, 3664, 2310, 3635, 4721, 7537, 1230, 7364,
-        1103,  757, 3958, 6172, 6297, 5867, 6975, 5567, 1879, 2084, 3349, 4939,
-        2062,  267, 4653, 1720, 4884, 3527, 7024, 6766, 6288, 5948, 2557, 2928,
-        2580, 4185, 5647, 3863, 2092, 1777, 4250, 2073, 1350, 1203, 4793, 5302,
+        1103,  757, 5358, 6991, 5470, 6958, 5567, 1889, 1684, 3348, 5367, 2062,
+         266, 4676, 1720, 4451, 3930, 7284, 7108, 5878, 6335, 2578, 2497, 2579,
+        4185, 6097, 5647, 3863, 2092, 1777, 4250, 2073, 1350, 1203, 4793, 5302,
         3378, 1169, 3932, 5030, 3840,  318, 2008, 1987, 4899, 1305, 3522, 2408,
         5505,  388, 4044, 4587, 5991, 3856,  386, 4377, 4118, 6793, 1409, 6329,
         2472, 2884, 5780, 1235, 5398, 6613, 1864, 7022, 3963,  918, 4469,  975,
            8, 3536,  185, 4575, 4768,  700, 4550, 1167, 2894, 1945, 3308, 1589,
-        5713, 5297, 7556, 2624, 4565, 2343, 3666, 6987, 4695, 3230, 6362, 6886,
-        4094, 4812, 3170, 5044, 3843, 3978, 3983,  400, 6158, 3965, 3080, 6137,
-        6454, 1234, 7107,  219, 2025, 2118,  871, 1602, 1842, 6192, 5452, 4209,
+        5675, 5289, 5712, 7562, 2622, 4546, 2762, 3245, 6970, 4257, 3215, 5957,
+        7197, 4114, 3581, 4168, 3843, 3978, 4851,  385, 6553, 3964, 3081, 5717,
+        6453, 1234, 7107,  219, 2025, 2118,  871, 1602, 1842, 6192, 5452, 4209,
         5604, 5997, 5060, 4038, 2479,  141,   98, 4982,  693, 2371, 3861, 3172,
         7622, 4265, 5235, 4922,  695, 1814,  830,  334, 3461, 7586, 3303, 1753,
         6476, 2718, 1358, 3234, 7278,  566, 1755, 6944, 4998, 6327, 5364, 3281,
         4738, 2450, 5833, 5532, 1858, 2108,  529, 3075, 7069, 3481, 1011, 1044,
-        6123, 5163, 6398, 5891,  464, 2951, 7392, 3883, 5784, 2054, 3822, 5063,
-        3033, 6098, 1501, 2115, 6536, 5607,  978, 6690, 6395,  184, 6866,   38,
+        6123, 5163, 6398, 5891,  464, 2951, 7392, 3883, 5784, 2054, 3822, 6513,
+        5063, 3033, 1500, 1715, 7207, 5201,  979, 6690, 5990,  183, 6866,   38,
         2526,   68, 1976,  221, 4110, 3993, 5180, 3386, 4055, 4409, 1710, 4956,
         7307, 4739,  507, 5807, 1974, 5848, 1529, 3744, 5095, 6931, 5810, 4977,
         7231, 1407, 4950, 1493,  150, 4656, 3118, 3205, 3713, 3253, 6725, 6688,
-        1920, 1303, 1657, 2945, 6025, 2395, 5346,  123, 6714, 6821, 2258,  304,
-         984, 6920, 3084, 2651, 5381, 1424, 6358, 3277, 6734, 1356, 5865, 6103,
-        5612, 2533, 4009, 7332, 7345, 2165, 3120,  751, 3717, 5751,  366, 4728,
-        5028, 1154, 7161, 4512, 1015, 6499, 2152, 6585, 5661, 3968, 6313, 6861,
-        5053, 2246, 1954,  766, 1875, 5209, 6069, 5337, 2076, 4390, 6420, 4084,
-        6389, 2278,  522, 5319, 3688,  778, 1004,  155, 5652, 1231, 5672,  181,
-        2389, 2721, 1704,  337, 1129, 2238, 5170,  383, 4547, 4841, 3966, 5311,
-        2177, 6141, 2400, 2508]))
+        1920, 1303, 1657, 2945, 6025, 2395, 5346,  123, 6714, 6821, 4418, 2256,
+         546,  643, 6934, 2673, 2635, 6211, 1424, 6325, 3278, 6754, 1354, 5427,
+        6103, 5630, 2983, 4009, 7332, 7345, 2165, 3120,  751, 3717, 5751,  366,
+        4728, 5028, 1154, 7161, 4512, 1015, 1328, 6925, 5662, 4372, 5488, 7187,
+        4639, 2247, 1955, 6096,  766, 1875, 5209, 6069, 5337, 2076, 4390, 6420,
+        4084, 6389, 2278,  522, 5319, 3688,  778, 1004,  155, 5652, 1231, 5672,
+         181, 2389, 2721, 1704,  337, 1129, 2238, 5170,  383, 4547, 4841, 3966,
+        5311, 2177, 6141, 2400]))
 </pre></div>
 </div>
 <p>Let’s plot the probability map of target voxels being matched with
 the 300th source voxel.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pi</span> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">pi</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pi</span> <span class="o">=</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">pi</span>
 <span class="n">vertex_index</span> <span class="o">=</span> <span class="mi">300</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">one_hot</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">one_hot</span></a><span class="p">[</span><span class="n">vertex_index</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">probability_map</span></a> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse.inverse_transform" title="fugw.mappings.FUGWSparse.inverse_transform" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">fine_mapping</span><span class="o">.</span><span class="n">inverse_transform</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">one_hot</span></a><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">probability_map</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse.inverse_transform" title="fugw.mappings.FUGWSparse.inverse_transform" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">fine_mapping</span><span class="o">.</span><span class="n">inverse_transform</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">one_hot</span></a><span class="p">)</span>
 
 <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.add_subplot" title="matplotlib.figure.Figure.add_subplot" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span></a><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
@@ -645,7 +644,7 @@ the 300th source voxel.</p>
 </div>
 <img src="../../_images/sphx_glr_plot_2_aligning_high_res_volumes_002.png" srcset="../../_images/sphx_glr_plot_2_aligning_high_res_volumes_002.png" alt="Probability map of target voxels being matched with source point 300" class = "sphx-glr-single-img"/><p>We can now align test contrasts using the fitted fine mapping.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contrast_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">predicted_target_features</span></a> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse.transform" title="fugw.mappings.FUGWSparse.transform" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">fine_mapping</span><span class="o">.</span><span class="n">transform</span></a><span class="p">(</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">predicted_target_features</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGWSparse.html#fugw.mappings.FUGWSparse.transform" title="fugw.mappings.FUGWSparse.transform" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">fine_mapping</span><span class="o">.</span><span class="n">transform</span></a><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a><span class="p">[</span><span class="n">contrast_index</span><span class="p">,</span> <span class="p">:]</span>
 <span class="p">)</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">predicted_target_features</span></a><span class="o">.</span><span class="n">shape</span>
@@ -671,7 +670,7 @@ the 300th source voxel.</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Pearson Correlation pre-mapping: 0.36
 Pearson Correlation post-mapping: 0.47
-Relative improvement: 29.65 %
+Relative improvement: 30.09 %
 </pre></div>
 </div>
 <p>Let’s plot the transporting feature maps of the test set.</p>
@@ -719,8 +718,8 @@ Relative improvement: 29.65 %
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_2_aligning_high_res_volumes_003.png" srcset="../../_images/sphx_glr_plot_2_aligning_high_res_volumes_003.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 7 minutes  52.019 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  713 MB</p>
+<img src="../../_images/sphx_glr_plot_2_aligning_high_res_volumes_003.png" srcset="../../_images/sphx_glr_plot_2_aligning_high_res_volumes_003.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 10 minutes  22.412 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  920 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-02-volumetric-alignment-plot-2-aligning-high-res-volumes-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/27620db1a3e529247a546ea2ff0f6b4d/plot_2_aligning_high_res_volumes.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_2_aligning_high_res_volumes.py</span></code></a></p>

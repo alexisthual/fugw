@@ -182,17 +182,16 @@
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../pages/api_references.html">API references</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../pages/mappings.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../pages/generated/fugw.mappings.FUGW.html">fugw.mappings.FUGW</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pages/generated/fugw.mappings.FUGWSparse.html">fugw.mappings.FUGWSparse</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../modules/mappings.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/mappings.FUGW.html"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/mappings.FUGWSparse.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../pages/solvers.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../pages/generated/fugw.solvers.FUGWSolver.html">fugw.solvers.FUGWSolver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pages/generated/fugw.solvers.FUGWSparseSolver.html">fugw.solvers.FUGWSparseSolver</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../modules/solvers.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/solvers.FUGWSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSolver</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/solvers.FUGWSparseSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../pages/utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.utils</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -249,8 +248,8 @@ have less than 10k points.</p>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
-<span class="kn">from</span> <span class="nn">fugw.utils</span> <span class="kn">import</span> <span class="n">_init_mock_distribution</span>
+<span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
+<span class="kn">from</span> <span class="nn">fugw.utils</span> <span class="kn">import</span> <span class="n">init_mock_distribution</span>
 <span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <a href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.LineCollection" title="matplotlib.collections.LineCollection" class="sphx-glr-backref-module-matplotlib-collections sphx-glr-backref-type-py-class"><span class="n">LineCollection</span></a>
 </pre></div>
 </div>
@@ -263,11 +262,11 @@ have less than 10k points.</p>
 </pre></div>
 </div>
 <p>Let us generate random training data for the source and target distributions</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a><span class="p">,</span> <span class="n">source_features_train</span><span class="p">,</span> <span class="n">source_geometry</span><span class="p">,</span> <span class="n">source_embeddings</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">_init_mock_distribution</span><span class="p">(</span><span class="n">n_features_train</span><span class="p">,</span> <span class="n">n_points_source</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a><span class="p">,</span> <span class="n">source_features_train</span><span class="p">,</span> <span class="n">source_geometry</span><span class="p">,</span> <span class="n">source_embeddings</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">init_mock_distribution</span><span class="p">(</span><span class="n">n_features_train</span><span class="p">,</span> <span class="n">n_points_source</span><span class="p">)</span>
 <span class="p">)</span>
-<a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a><span class="p">,</span> <span class="n">target_features_train</span><span class="p">,</span> <span class="n">target_geometry</span><span class="p">,</span> <span class="n">target_embeddings</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">_init_mock_distribution</span><span class="p">(</span><span class="n">n_features_train</span><span class="p">,</span> <span class="n">n_points_target</span><span class="p">)</span>
+<a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a><span class="p">,</span> <span class="n">target_features_train</span><span class="p">,</span> <span class="n">target_geometry</span><span class="p">,</span> <span class="n">target_embeddings</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">init_mock_distribution</span><span class="p">(</span><span class="n">n_features_train</span><span class="p">,</span> <span class="n">n_points_target</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">source_features_train</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
@@ -329,12 +328,12 @@ torch.Size([2, 50])
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">rho</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-4</span>
-<a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">rho</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>
+<a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">rho</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now, we fit a transport plan between source and target distributions
 using a sinkhorn solver</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW.fit" title="fugw.mappings.FUGW.fit" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">mapping</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a> <span class="o">=</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW.fit" title="fugw.mappings.FUGW.fit" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">mapping</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span>
     <span class="n">source_features_train_normalized</span><span class="p">,</span>
     <span class="n">target_features_train_normalized</span><span class="p">,</span>
     <span class="n">source_geometry</span><span class="o">=</span><span class="n">source_geometry_normalized</span><span class="p">,</span>
@@ -344,38 +343,35 @@ using a sinkhorn solver</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[18:46:58] BCD step 1/10   FUGW loss:      0.029017694294452667     dense.py:464
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[18:44:10] BCD step 1/10   FUGW loss:      0.029077230021357536     dense.py:464
 
 
-           BCD step 2/10   FUGW loss:      0.04671149328351021      dense.py:464
+[18:44:11] BCD step 2/10   FUGW loss:      0.046711478382349014     dense.py:464
 
 
-           BCD step 3/10   FUGW loss:      0.022675596177577972     dense.py:464
+[18:44:12] BCD step 3/10   FUGW loss:      0.02267550304532051      dense.py:464
 
 
-[18:46:59] BCD step 4/10   FUGW loss:      0.022144610062241554     dense.py:464
+[18:44:13] BCD step 4/10   FUGW loss:      0.02190692536532879      dense.py:464
 
 
-           BCD step 5/10   FUGW loss:      0.04954808950424194      dense.py:464
+           BCD step 5/10   FUGW loss:      0.04769175872206688      dense.py:464
 
 
-[18:47:00] BCD step 6/10   FUGW loss:      0.0239147637039423       dense.py:464
+[18:44:14] BCD step 6/10   FUGW loss:      0.023379186168313026     dense.py:464
 
 
-           BCD step 7/10   FUGW loss:      0.01939348317682743      dense.py:464
+[18:44:15] BCD step 7/10   FUGW loss:      0.01915481500327587      dense.py:464
 
 
-[18:47:01] BCD step 8/10   FUGW loss:      0.018673155456781387     dense.py:464
+[18:44:16] BCD step 8/10   FUGW loss:      0.018553871661424637     dense.py:464
 
 
-           BCD step 9/10   FUGW loss:      0.018613629043102264     dense.py:464
-
-
-[18:47:02] BCD step 10/10  FUGW loss:      0.018613623455166817     dense.py:464
+           BCD step 9/10   FUGW loss:      0.018553996458649635     dense.py:464
 </pre></div>
 </div>
 <p>The transport plan can be accessed after the model has been fitted</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pi</span> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">pi</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pi</span> <span class="o">=</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">pi</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Transport plan&#39;s total mass: </span><span class="si">{</span><span class="n">pi</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -389,13 +385,13 @@ as well as the contribution of each loss term:</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html#matplotlib.axes.Axes.set_ylabel" title="matplotlib.axes.Axes.set_ylabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span></a><span class="p">(</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html#matplotlib.axes.Axes.set_xlabel" title="matplotlib.axes.Axes.set_xlabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span></a><span class="p">(</span><span class="s2">&quot;BCD step&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.stackplot.html#matplotlib.axes.Axes.stackplot" title="matplotlib.axes.Axes.stackplot" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">stackplot</span></a><span class="p">(</span>
-    <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span>
+    <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss_steps</span><span class="p">,</span>
     <span class="p">[</span>
-        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;wasserstein&quot;</span><span class="p">]),</span>
-        <span class="n">alpha</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;gromov_wasserstein&quot;</span><span class="p">]),</span>
-        <span class="n">rho</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;marginal_constraint_dim1&quot;</span><span class="p">]),</span>
-        <span class="n">rho</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;marginal_constraint_dim2&quot;</span><span class="p">]),</span>
-        <span class="n">eps</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;regularization&quot;</span><span class="p">]),</span>
+        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;wasserstein&quot;</span><span class="p">]),</span>
+        <span class="n">alpha</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;gromov_wasserstein&quot;</span><span class="p">]),</span>
+        <span class="n">rho</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;marginal_constraint_dim1&quot;</span><span class="p">]),</span>
+        <span class="n">rho</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;marginal_constraint_dim2&quot;</span><span class="p">]),</span>
+        <span class="n">eps</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="s2">&quot;regularization&quot;</span><span class="p">]),</span>
     <span class="p">],</span>
     <span class="n">labels</span><span class="o">=</span><span class="p">[</span>
         <span class="s2">&quot;wasserstein&quot;</span><span class="p">,</span>
@@ -462,7 +458,7 @@ were matched together in the feature space.</p>
 between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source_features_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_features_test</span><span class="p">,</span> <span class="n">n_points_source</span><span class="p">)</span>
 <span class="n">target_features_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_features_test</span><span class="p">,</span> <span class="n">n_points_target</span><span class="p">)</span>
-<span class="n">transformed_data</span> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW.transform" title="fugw.mappings.FUGW.transform" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">mapping</span><span class="o">.</span><span class="n">transform</span></a><span class="p">(</span><span class="n">source_features_test</span><span class="p">)</span>
+<span class="n">transformed_data</span> <span class="o">=</span> <a href="../../modules/mappings.FUGW.html#fugw.mappings.FUGW.transform" title="fugw.mappings.FUGW.transform" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">mapping</span><span class="o">.</span><span class="n">transform</span></a><span class="p">(</span><span class="n">source_features_test</span><span class="p">)</span>
 <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
@@ -472,8 +468,8 @@ between source and target</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.930 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  44 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.325 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  306 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-1-dense-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a64fd8220c23833034dc49e205e032b8/plot_1_dense.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_1_dense.py</span></code></a></p>
