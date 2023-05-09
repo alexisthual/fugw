@@ -49,7 +49,7 @@ plt.show()
 
 # %%
 # Now, let's compute the embedding! This computation is easy to parallelize.
-X = lmds.compute_lmds(
+X = lmds.compute_lmds_mesh(
     coordinates,
     triangles,
     n_landmarks=n_landmarks,
