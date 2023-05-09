@@ -37,7 +37,7 @@ have more than 10k points.
 
     from fugw.mappings import FUGW, FUGWSparse
     from fugw.scripts import coarse_to_fine
-    from fugw.utils import init_mock_distribution
+    from fugw.utils import _init_mock_distribution
     from matplotlib.collections import LineCollection
     from scipy.sparse import coo_matrix
 
@@ -76,10 +76,10 @@ Let us generate random training data for the source and target distributions
 
 .. code-block:: default
 
-    _, source_features_train, _, source_embeddings = init_mock_distribution(
+    _, source_features_train, _, source_embeddings = _init_mock_distribution(
         n_features_train, n_points_source
     )
-    _, target_features_train, _, target_embeddings = init_mock_distribution(
+    _, target_features_train, _, target_embeddings = _init_mock_distribution(
         n_features_train, n_points_target
     )
 
@@ -248,68 +248,68 @@ distributions you are trying to align.
 
 
 
-    [14:34:39] BCD step 1/10   FUGW loss:      0.032094940543174744     dense.py:464
+    [18:47:16] BCD step 1/10   FUGW loss:      0.032094940543174744     dense.py:464
 
 
-    [14:34:40] BCD step 2/10   FUGW loss:      0.027612222358584404     dense.py:464
+               BCD step 2/10   FUGW loss:      0.027612222358584404     dense.py:464
 
 
                BCD step 3/10   FUGW loss:      0.01844257488846779      dense.py:464
 
 
-               BCD step 4/10   FUGW loss:      0.01579655334353447      dense.py:464
+    [18:47:17] BCD step 4/10   FUGW loss:      0.01579655334353447      dense.py:464
 
 
-    [14:34:41] BCD step 5/10   FUGW loss:      0.015153671614825726     dense.py:464
+               BCD step 5/10   FUGW loss:      0.015153671614825726     dense.py:464
 
 
                BCD step 6/10   FUGW loss:      0.014876014553010464     dense.py:464
 
 
-    [14:34:42] BCD step 7/10   FUGW loss:      0.014715280383825302     dense.py:464
+    [18:47:18] BCD step 7/10   FUGW loss:      0.014715280383825302     dense.py:464
 
 
-    [14:34:43] BCD step 8/10   FUGW loss:      0.014592691324651241     dense.py:464
+    [18:47:19] BCD step 8/10   FUGW loss:      0.014592691324651241     dense.py:464
 
 
-    [14:34:45] BCD step 9/10   FUGW loss:      0.014477581717073917     dense.py:464
+    [18:47:20] BCD step 9/10   FUGW loss:      0.014477581717073917     dense.py:464
 
 
-    [14:34:46] BCD step 10/10  FUGW loss:      0.014380956068634987     dense.py:464
-    /github/workspace/src/fugw/scripts/coarse_to_fine.py:412: UserWarning:
+    [18:47:21] BCD step 10/10  FUGW loss:      0.014380956068634987     dense.py:464
+    /github/workspace/src/fugw/scripts/coarse_to_fine.py:460: UserWarning:
 
     Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:54.)
 
 
 
-    [14:34:50] BCD step 1/10   FUGW loss:      0.020477615296840668    sparse.py:512
+    [18:47:25] BCD step 1/10   FUGW loss:      0.020477615296840668    sparse.py:512
 
 
-    [14:34:54] BCD step 2/10   FUGW loss:      0.014400288462638855    sparse.py:512
+    [18:47:28] BCD step 2/10   FUGW loss:      0.014400288462638855    sparse.py:512
 
 
-    [14:34:58] BCD step 3/10   FUGW loss:      0.012644429691135883    sparse.py:512
+    [18:47:31] BCD step 3/10   FUGW loss:      0.012644429691135883    sparse.py:512
 
 
-    [14:35:02] BCD step 4/10   FUGW loss:      0.011991022154688835    sparse.py:512
+    [18:47:35] BCD step 4/10   FUGW loss:      0.011991022154688835    sparse.py:512
 
 
-    [14:35:06] BCD step 5/10   FUGW loss:      0.011676927097141743    sparse.py:512
+    [18:47:38] BCD step 5/10   FUGW loss:      0.011676927097141743    sparse.py:512
 
 
-    [14:35:11] BCD step 6/10   FUGW loss:      0.01150030642747879     sparse.py:512
+    [18:47:42] BCD step 6/10   FUGW loss:      0.01150030642747879     sparse.py:512
 
 
-    [14:35:16] BCD step 7/10   FUGW loss:      0.011388429440557957    sparse.py:512
+    [18:47:46] BCD step 7/10   FUGW loss:      0.011388429440557957    sparse.py:512
 
 
-    [14:35:22] BCD step 8/10   FUGW loss:      0.011310222558677197    sparse.py:512
+    [18:47:51] BCD step 8/10   FUGW loss:      0.011310222558677197    sparse.py:512
 
 
-    [14:35:28] BCD step 9/10   FUGW loss:      0.011251525953412056    sparse.py:512
+    [18:47:57] BCD step 9/10   FUGW loss:      0.011251525953412056    sparse.py:512
 
 
-    [14:35:36] BCD step 10/10  FUGW loss:      0.011205591261386871    sparse.py:512
+    [18:48:03] BCD step 10/10  FUGW loss:      0.011205591261386871    sparse.py:512
 
     (tensor([ 52, 229, 140, 249, 186, 210, 131, 128, 209, 227,   6,  75,  71, 217,
             164, 291,  58, 109, 116, 118,  66, 206, 189, 212,  15, 286,  14, 268,
@@ -616,9 +616,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  8.582 seconds)
+   **Total running time of the script:** ( 0 minutes  57.337 seconds)
 
-**Estimated memory usage:**  151 MB
+**Estimated memory usage:**  152 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_2_coarse_to_fine.py:

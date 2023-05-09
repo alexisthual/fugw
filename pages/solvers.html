@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="FUGWSolver" href="solvers.FUGWSolver.html" /><link rel="prev" title="FUGWSparse" href="mappings.FUGWSparse.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="fugw.solvers.FUGWSolver" href="generated/fugw.solvers.FUGWSolver.html" /><link rel="prev" title="fugw.mappings.FUGWSparse" href="generated/fugw.mappings.FUGWSparse.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2023.03.27 -->
         <title>fugw.solvers - FUGW</title>
@@ -161,7 +161,7 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../pages/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../auto_examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/00_basics/index.html">📚 Basics</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/00_basics/plot_1_dense.html">Transport distributions using dense solvers</a></li>
@@ -174,25 +174,31 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/01_brain_alignment/plot_2_aligning_brain_sparse.html">Align high-resolution brain surfaces of 2 individuals with fMRI data</a></li>
 </ul>
 </li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/02_volumetric_alignment/index.html">🧊 Volumetric alignments</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/02_volumetric_alignment/plot_1_aligning_low_res_volumes.html">Align low-resolution brain volumes of 2 individuals with fMRI data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/02_volumetric_alignment/plot_2_aligning_high_res_volumes.html">Align low-resolution brain volumes of 2 individuals with fMRI data</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../pages/api_references.html">API references</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 has-children"><a class="reference internal" href="mappings.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="mappings.FUGW.html"><code class="docutils literal notranslate"><span class="pre">FUGW</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="mappings.FUGWSparse.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSolver</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSparseSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver</span></code></a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="api_references.html">API references</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="mappings.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/fugw.mappings.FUGW.html">fugw.mappings.FUGW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/fugw.mappings.FUGWSparse.html">fugw.mappings.FUGWSparse</a></li>
 </ul>
 </li>
+<li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/fugw.solvers.FUGWSolver.html">fugw.solvers.FUGWSolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/fugw.solvers.FUGWSparseSolver.html">fugw.solvers.FUGWSparseSolver</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.utils</span></code></a></li>
 </ul>
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pages/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/alexisthual/fugw">GitHub repository</a></li>
 </ul>
 
@@ -232,30 +238,17 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code><a class="headerlink" href="#fugw-solvers" title="Permalink to this heading">#</a></h1>
 <p>Under the hood, classes in <code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.mappings</span></code> call solvers
 implemented in <code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.solvers</span></code>.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="solvers.FUGWSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSolver</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="solvers.FUGWSolver.html#fugw.solvers.FUGWSolver"><code class="docutils literal notranslate"><span class="pre">FUGWSolver</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSolver.html#fugw.solvers.FUGWSolver.__init__"><code class="docutils literal notranslate"><span class="pre">FUGWSolver.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSolver.html#fugw.solvers.FUGWSolver.fugw_loss"><code class="docutils literal notranslate"><span class="pre">FUGWSolver.fugw_loss()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSolver.html#fugw.solvers.FUGWSolver.get_parameters_uot_l2"><code class="docutils literal notranslate"><span class="pre">FUGWSolver.get_parameters_uot_l2()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSolver.html#fugw.solvers.FUGWSolver.local_biconvex_cost"><code class="docutils literal notranslate"><span class="pre">FUGWSolver.local_biconvex_cost()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSolver.html#fugw.solvers.FUGWSolver.solve"><code class="docutils literal notranslate"><span class="pre">FUGWSolver.solve()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="solvers.FUGWSparseSolver.html"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="solvers.FUGWSparseSolver.html#fugw.solvers.FUGWSparseSolver"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSparseSolver.html#fugw.solvers.FUGWSparseSolver.__init__"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSparseSolver.html#fugw.solvers.FUGWSparseSolver.fugw_loss"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver.fugw_loss()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSparseSolver.html#fugw.solvers.FUGWSparseSolver.local_biconvex_cost"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver.local_biconvex_cost()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.FUGWSparseSolver.html#fugw.solvers.FUGWSparseSolver.solve"><code class="docutils literal notranslate"><span class="pre">FUGWSparseSolver.solve()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/fugw.solvers.FUGWSolver.html#fugw.solvers.FUGWSolver" title="fugw.solvers.FUGWSolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FUGWSolver</span></code></a>([nits_bcd, nits_uot, tol_bcd, ...])</p></td>
+<td><p>Solver computing dense solutions</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/fugw.solvers.FUGWSparseSolver.html#fugw.solvers.FUGWSparseSolver" title="fugw.solvers.FUGWSparseSolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FUGWSparseSolver</span></code></a>([nits_bcd, nits_uot, ...])</p></td>
+<td><p>Solver computing sparse solutions</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </section>
 
@@ -264,23 +257,23 @@ implemented in <code class="xref py py-mod docutils literal notranslate"><span c
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="solvers.FUGWSolver.html">
+          <a class="next-page" href="generated/fugw.solvers.FUGWSolver.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title"><code class="docutils literal notranslate"><span class="pre">FUGWSolver</span></code></div>
+                <div class="title">fugw.solvers.FUGWSolver</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="mappings.FUGWSparse.html">
+          <a class="prev-page" href="generated/fugw.mappings.FUGWSparse.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title"><code class="docutils literal notranslate"><span class="pre">FUGWSparse</span></code></div>
+                <div class="title">fugw.mappings.FUGWSparse</div>
                 
               </div>
             </a>

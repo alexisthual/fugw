@@ -130,6 +130,54 @@ Examples
 
     </div>
 
+========================
+🧊 Volumetric alignments
+========================
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
+
+.. only:: html
+
+  .. image:: /auto_examples/02_volumetric_alignment/images/thumb/sphx_glr_plot_1_aligning_low_res_volumes_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_02_volumetric_alignment_plot_1_aligning_low_res_volumes.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Align low-resolution brain volumes of 2 individuals with fMRI data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
+
+.. only:: html
+
+  .. image:: /auto_examples/02_volumetric_alignment/images/thumb/sphx_glr_plot_2_aligning_high_res_volumes_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_02_volumetric_alignment_plot_2_aligning_high_res_volumes.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Align low-resolution brain volumes of 2 individuals with fMRI data</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
 
 .. toctree::
    :hidden:
@@ -138,6 +186,7 @@ Examples
 
    /auto_examples/00_basics/index.rst
    /auto_examples/01_brain_alignment/index.rst
+   /auto_examples/02_volumetric_alignment/index.rst
 
 
 

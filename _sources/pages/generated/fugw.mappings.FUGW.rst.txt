@@ -1,0 +1,17 @@
+﻿fugw.mappings.FUGW
+==================
+
+.. currentmodule:: fugw.mappings
+
+.. autoclass:: FUGW
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+   
+
+.. include:: fugw.mappings.FUGW.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

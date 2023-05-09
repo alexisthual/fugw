@@ -1,0 +1,17 @@
+﻿fugw.mappings.FUGWSparse
+========================
+
+.. currentmodule:: fugw.mappings
+
+.. autoclass:: FUGWSparse
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+   
+
+.. include:: fugw.mappings.FUGWSparse.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

@@ -189,7 +189,7 @@ plt.show()
 
 
 (coordinates, triangles) = surface.load_surf_mesh(fsaverage5.pial_left)
-fs5_pial_left_geometry_embeddings = lmds.compute_lmds(
+fs5_pial_left_geometry_embeddings = lmds.compute_lmds_mesh(
     coordinates,
     triangles,
     n_landmarks=100,

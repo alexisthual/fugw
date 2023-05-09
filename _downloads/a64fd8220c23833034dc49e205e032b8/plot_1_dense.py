@@ -15,7 +15,7 @@ import numpy as np
 import torch
 
 from fugw.mappings import FUGW
-from fugw.utils import init_mock_distribution
+from fugw.utils import _init_mock_distribution
 from matplotlib.collections import LineCollection
 
 # %%
@@ -29,10 +29,10 @@ n_features_test = 2
 # %%
 # Let us generate random training data for the source and target distributions
 _, source_features_train, source_geometry, source_embeddings = (
-    init_mock_distribution(n_features_train, n_points_source)
+    _init_mock_distribution(n_features_train, n_points_source)
 )
 _, target_features_train, target_geometry, target_embeddings = (
-    init_mock_distribution(n_features_train, n_points_target)
+    _init_mock_distribution(n_features_train, n_points_target)
 )
 source_features_train.shape
 
