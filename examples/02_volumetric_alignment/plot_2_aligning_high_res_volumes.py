@@ -153,8 +153,8 @@ coarse_to_fine.fit(
     # Parametrize step 2 (selection of pairs of indices present in
     # fine-grained's sparsity mask)
     coarse_pairs_selection_method="topk",
-    source_selection_radius=10 / source_distance_max,
-    target_selection_radius=10 / target_distance_max,
+    source_selection_radius=3 / source_distance_max,
+    target_selection_radius=3 / target_distance_max,
     # Parametrize step 3 (fine-grained alignment)
     fine_mapping=fine_mapping,
     fine_mapping_solver=fine_mapping_solver,
