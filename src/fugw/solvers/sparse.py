@@ -337,7 +337,7 @@ class FUGWSparseSolver(BaseSolver):
         )
 
         # Same for validation data if provided
-        if Ds_val is not None and Dt_val is not None:
+        if Ds_val != (None, None) and Dt_val != (None, None):
             Ds1_val, Ds2_val = Ds_val
             Ds_sqr_val = (
                 torch.einsum("ij,il->ijl", Ds1_val, Ds1_val).reshape(
