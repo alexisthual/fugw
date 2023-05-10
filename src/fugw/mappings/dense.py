@@ -60,6 +60,20 @@ class FUGW(BaseMapping):
             between nodes of target mesh
             **This array should be normalized**, otherwise you will
             run into computational errors.
+        source_features_val: ndarray(n_features, n) or None
+            Feature maps for source subject used for validation.
+            If None, source_features will be used instead.
+        target_features_val: ndarray(n_features, m) or None
+            Feature maps for target subject used for validation.
+            If None, target_features will be used instead.
+        source_geometry_val: ndarray(n, n) or None
+            Kernel matrix of anatomical distances
+            between nodes of source mesh used for validation.
+            If None, source_geometry will be used instead.
+        target_geometry_val: ndarray(m, m) or None
+            Kernel matrix of anatomical distances
+            between nodes of target mesh used for validation.
+            If None, target_geometry will be used instead.
         source_weights: ndarray(n) or None
             Distribution weights of source nodes.
             Should sum to 1. If None, eahc node's weight
@@ -130,15 +144,19 @@ class FUGW(BaseMapping):
         Dt = _make_tensor(target_geometry, device=device)
 
         # Do the same for validation data if it was provided
-        if source_features_val is not None:
+        if source_features_val is not None and target_features_val is not None:
             Fs_val = _make_tensor(source_features_val.T, device=device)
             Ft_val = _make_tensor(target_features_val.T, device=device)
             F_val = torch.cdist(Fs_val, Ft_val, p=2) ** 2
+
+        else:
+            F_val = F
+
+        if source_geometry_val is not None and target_geometry_val is not None:
             Ds_val = _make_tensor(source_geometry_val, device=device)
             Dt_val = _make_tensor(target_geometry_val, device=device)
 
         else:
-            F_val = F
             Ds_val = Ds
             Dt_val = Dt
 
@@ -171,7 +189,7 @@ class FUGW(BaseMapping):
         self.loss = res["loss"]
         self.loss_steps = res["loss_steps"]
         self.loss_times = res["loss_times"]
-        self.validation_loss = res["validation_loss"]
+        self.loss_val = res["loss_val"]
 
         # Free allocated GPU memory
         del Fs, Ft, F, Ds, Dt

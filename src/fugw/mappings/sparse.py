@@ -20,6 +20,10 @@ class FUGWSparse(BaseMapping):
         target_features=None,
         source_geometry_embedding=None,
         target_geometry_embedding=None,
+        source_features_val=None,
+        target_features_val=None,
+        source_geometry_embedding_val=None,
+        target_geometry_embedding_val=None,
         source_weights=None,
         target_weights=None,
         init_plan=None,
@@ -63,6 +67,20 @@ class FUGWSparse(BaseMapping):
             of the target mesh
             **This array should be normalized**, otherwise you will
             run into computational errors.
+        source_features_val: ndarray(n_features, n) or None
+            Feature maps for source subject used for validation.
+            If None, source_features will be used instead.
+        target_features_val: ndarray(n_features, m) or None
+            Feature maps for target subject used for validation.
+            If None, target_features will be used instead.
+        source_geometry_embedding_val: ndarray(n, n) or None
+            Kernel matrix of anatomical distances
+            between nodes of source mesh used for validation.
+            If None, source_geometry will be used instead.
+        target_geometry_embedding_val: ndarray(m, m) or None
+            Kernel matrix of anatomical distances
+            between nodes of target mesh used for validation.
+            If None, target_geometry will be used instead.
         source_weights: ndarray(n) or None
             Distribution weights of source nodes.
             Should sum to 1. If None, each node's weight
@@ -141,6 +159,40 @@ class FUGWSparse(BaseMapping):
         Dt1 = _make_tensor(Dt1, device=device)
         Dt2 = _make_tensor(Dt2, device=device)
 
+        # Do the same for validation data if it was provided
+        if source_features_val is not None and target_features_val is not None:
+            Fs_val = _make_tensor(source_features_val.T, device=device)
+            Fs_val = _make_tensor(source_features.T, device=device)
+            Ft_val = _make_tensor(target_features.T, device=device)
+            F1_val, F2_val = _low_rank_squared_l2(Fs_val, Ft_val)
+            F1_val = _make_tensor(F1_val, device=device)
+            F2_val = _make_tensor(F2_val, device=device)
+
+        else:
+            F1_val = F1
+            F2_val = F2
+
+        if (
+            source_geometry_embedding_val is not None
+            and target_geometry_embedding_val is not None
+        ):
+            Ds1_val, Ds2_val = _low_rank_squared_l2(
+                source_geometry_embedding_val, source_geometry_embedding_val
+            )
+            Ds1_val = _make_tensor(Ds1, device=device)
+            Ds2_val = _make_tensor(Ds2, device=device)
+            Dt1_val, Dt2_val = _low_rank_squared_l2(
+                target_geometry_embedding, target_geometry_embedding
+            )
+            Dt1_val = _make_tensor(Dt1_val, device=device)
+            Dt2_val = _make_tensor(Dt2_val, device=device)
+
+        else:
+            Ds1_val = Ds1
+            Ds2_val = Ds2
+            Dt1_val = Dt1
+            Dt2_val = Dt2
+
         # Check that all init_plan is valid
         if init_plan is None:
             warnings.warn(
@@ -165,6 +217,9 @@ class FUGWSparse(BaseMapping):
             F=(F1, F2),
             Ds=(Ds1, Ds2),
             Dt=(Dt1, Dt2),
+            F_val=(F1_val, F2_val),
+            Ds_val=(Ds1_val, Ds2_val),
+            Dt_val=(Dt1_val, Dt2_val),
             ws=ws,
             wt=wt,
             init_plan=init_plan,

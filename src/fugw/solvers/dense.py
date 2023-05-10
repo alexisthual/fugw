@@ -225,9 +225,13 @@ class FUGWSolver(BaseSolver):
         eps: float
         reg_mode: str
         F: matrix of size n x m.
-            Kernel matrix between the source and target features.
+            Kernel matrix between the source and target training features.
         Ds: matrix of size n x n
         Dt: matrix of size m x m
+        F_val: matrix of size n x m, None
+            Kernel matrix between the source and target validation features.
+        Ds_val: matrix of size n x n, None
+        Dt_val: matrix of size m x m, None
         ws: ndarray(n), None
             Measures assigned to source points.
         wt: ndarray(m), None
@@ -296,8 +300,16 @@ class FUGWSolver(BaseSolver):
         # constant data variables
         Ds_sqr = Ds**2
         Dt_sqr = Dt**2
-        Ds_sqr_val = Ds_val**2
-        Dt_sqr_val = Dt_val**2
+
+        # Same for validation data if provided
+        if Ds_val is not None and Dt_val is not None:
+            Ds_sqr_val = Ds_val**2
+            Dt_sqr_val = Dt_val**2
+
+        else:
+            F_val = F
+            Ds_val, Dt_val = Ds, Dt
+            Ds_sqr_val, Dt_sqr_val = Ds_sqr, Dt_sqr
 
         if alpha == 1 or F is None:
             alpha = 1
@@ -399,7 +411,7 @@ class FUGWSolver(BaseSolver):
         current_loss = compute_fugw_loss(pi, gamma)
         current_loss_validation = compute_fugw_loss_validation(pi, gamma)
         loss = _add_dict({}, current_loss)
-        validation_loss = _add_dict({}, current_loss_validation)
+        loss_val = _add_dict({}, current_loss_validation)
         loss_steps = [0]
         loss_times = [0]
         idx = 0
@@ -475,9 +487,7 @@ class FUGWSolver(BaseSolver):
 
                 loss_steps.append(idx + 1)
                 loss = _add_dict(loss, current_loss)
-                validation_loss = _add_dict(
-                    validation_loss, current_loss_validation
-                )
+                loss_val = _add_dict(loss_val, current_loss_validation)
                 loss_times.append(time.time() - t0)
 
                 if verbose:
@@ -505,7 +515,7 @@ class FUGWSolver(BaseSolver):
             "duals_pi": duals_pi,
             "duals_gamma": duals_gamma,
             "loss": loss,
-            "validation_loss": validation_loss,
+            "loss_val": loss_val,
             "loss_steps": loss_steps,
             "loss_times": loss_times,
         }

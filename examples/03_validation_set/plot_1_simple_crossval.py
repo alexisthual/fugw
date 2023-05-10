@@ -45,7 +45,7 @@ target_im = image.load_img(target_imgs_paths)
 
 # %%
 # We then downsample the images by 3 to reduce the computational cost.
-SCALE_FACTOR = 4
+SCALE_FACTOR = 5
 
 source_maps = np.nan_to_num(
     source_im.get_fdata()[::SCALE_FACTOR, ::SCALE_FACTOR, ::SCALE_FACTOR]
@@ -126,7 +126,7 @@ color = "tab:orange"
 ax2.set_ylabel(
     "FUGW loss test", color=color
 )  # we already handled the x-label with ax1
-ax2.plot(mapping.loss_steps, mapping.validation_loss["total"], color=color)
+ax2.plot(mapping.loss_steps, mapping.loss_val["total"], color=color)
 ax2.tick_params(axis="y", labelcolor=color)
 
 plt.title("Training and validation losses")
