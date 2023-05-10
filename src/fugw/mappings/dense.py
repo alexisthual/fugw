@@ -15,6 +15,10 @@ class FUGW(BaseMapping):
         target_features=None,
         source_geometry=None,
         target_geometry=None,
+        source_features_val=None,
+        target_features_val=None,
+        source_geometry_val=None,
+        target_geometry_val=None,
         source_weights=None,
         target_weights=None,
         init_plan=None,
@@ -125,6 +129,19 @@ class FUGW(BaseMapping):
         Ds = _make_tensor(source_geometry, device=device)
         Dt = _make_tensor(target_geometry, device=device)
 
+        # Do the same for validation data if it was provided
+        if source_features_val is not None:
+            Fs_val = _make_tensor(source_features_val.T, device=device)
+            Ft_val = _make_tensor(target_features_val.T, device=device)
+            F_val = torch.cdist(Fs_val, Ft_val, p=2) ** 2
+            Ds_val = _make_tensor(source_geometry_val, device=device)
+            Dt_val = _make_tensor(target_geometry_val, device=device)
+
+        else:
+            F_val = F
+            Ds_val = Ds
+            Dt_val = Dt
+
         # Create model
         model = FUGWSolver(**solver_params)
 
@@ -138,6 +155,9 @@ class FUGW(BaseMapping):
             F=F,
             Ds=Ds,
             Dt=Dt,
+            F_val=F_val,
+            Ds_val=Ds_val,
+            Dt_val=Dt_val,
             ws=ws,
             wt=wt,
             init_plan=init_plan,
@@ -151,9 +171,12 @@ class FUGW(BaseMapping):
         self.loss = res["loss"]
         self.loss_steps = res["loss_steps"]
         self.loss_times = res["loss_times"]
+        self.validation_loss = res["validation_loss"]
 
         # Free allocated GPU memory
         del Fs, Ft, F, Ds, Dt
+        if source_features_val is not None:
+            del Fs_val, Ft_val, F_val, Ds_val, Dt_val
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 

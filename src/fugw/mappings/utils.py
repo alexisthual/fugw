@@ -62,6 +62,7 @@ class BaseMapping:
         self.pi = None
 
         self.loss = []
+        self.validation_loss = []
         self.loss_steps = []
         self.loss_times = []
 

@@ -204,6 +204,9 @@ class FUGWSolver(BaseSolver):
         F=None,
         Ds=None,
         Dt=None,
+        F_val=None,
+        Ds_val=None,
+        Dt_val=None,
         ws=None,
         wt=None,
         init_plan=None,
@@ -293,6 +296,8 @@ class FUGWSolver(BaseSolver):
         # constant data variables
         Ds_sqr = Ds**2
         Dt_sqr = Dt**2
+        Ds_sqr_val = Ds_val**2
+        Dt_sqr_val = Dt_val**2
 
         if alpha == 1 or F is None:
             alpha = 1
@@ -345,6 +350,13 @@ class FUGWSolver(BaseSolver):
             hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
+        compute_fugw_loss_validation = partial(
+            self.fugw_loss,
+            data_const=(Ds_sqr_val, Dt_sqr_val, Ds_val, Dt_val, F_val),
+            tuple_weights=(ws, wt, ws_dot_wt),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
+        )
+
         # If divergence is L2
         self_solver_mm_l2 = partial(
             solver_mm_l2,
@@ -385,7 +397,9 @@ class FUGWSolver(BaseSolver):
 
         # Initialize loss
         current_loss = compute_fugw_loss(pi, gamma)
+        current_loss_validation = compute_fugw_loss_validation(pi, gamma)
         loss = _add_dict({}, current_loss)
+        validation_loss = _add_dict({}, current_loss_validation)
         loss_steps = [0]
         loss_times = [0]
         idx = 0
@@ -455,15 +469,22 @@ class FUGWSolver(BaseSolver):
             err = (pi - pi_prev).abs().sum().item()
             if idx % self.eval_bcd == 0:
                 current_loss = compute_fugw_loss(pi, gamma)
+                current_loss_validation = compute_fugw_loss_validation(
+                    pi, gamma
+                )
 
                 loss_steps.append(idx + 1)
                 loss = _add_dict(loss, current_loss)
+                validation_loss = _add_dict(
+                    validation_loss, current_loss_validation
+                )
                 loss_times.append(time.time() - t0)
 
                 if verbose:
                     console.log(
                         f"BCD step {idx+1}/{self.nits_bcd}\t"
-                        f"FUGW loss:\t{current_loss['total']}"
+                        f"FUGW loss:\t{current_loss['total']}\t"
+                        f"Validation loss:\t{current_loss_validation['total']}"
                     )
 
                 if (
@@ -484,6 +505,7 @@ class FUGWSolver(BaseSolver):
             "duals_pi": duals_pi,
             "duals_gamma": duals_gamma,
             "loss": loss,
+            "validation_loss": validation_loss,
             "loss_steps": loss_steps,
             "loss_times": loss_times,
         }
