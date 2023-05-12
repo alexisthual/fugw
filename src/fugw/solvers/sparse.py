@@ -439,6 +439,7 @@ class FUGWSparseSolver(BaseSolver):
         idx = 0
         err = self.tol_bcd + 1e-3
 
+        # Run block coordinate descent (BCD) iterations
         t0 = time.time()
         while (err > self.tol_bcd) and (idx < self.nits_bcd):
             pi_prev = pi.detach().clone()
@@ -520,6 +521,29 @@ class FUGWSparseSolver(BaseSolver):
                     < self.early_stopping_threshold
                 ):
                     break
+
+            # Run custom BCD callback
+            variables = []
+            for obj in list(globals().values()):
+                if torch.is_tensor(obj) and obj.device == device:
+                    variables.append(obj)
+
+            # Print the variables and their sizes
+            memory_allocated = 0
+            console.log("Variable\tSize\tMemory allocated")
+            for var in variables:
+                size = var.size()
+                elem_size = var.element_size()
+                var_memory_allocated = size.numel() * elem_size
+                memory_allocated += var_memory_allocated
+                console.log(f"{var}\t{size}\t{var_memory_allocated}")
+
+            console.log(
+                f"Sum memory used: {torch.cuda.memory_allocated(device)}"
+            )
+            console.log(
+                f"Total memory used: {torch.cuda.memory_allocated(device)}"
+            )
 
             idx += 1
 
