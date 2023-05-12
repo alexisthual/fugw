@@ -21,6 +21,7 @@ class FUGW(BaseMapping):
         init_duals=None,
         solver="mm",
         solver_params={},
+        callback_bcd=None,
         device="auto",
         verbose=False,
     ):
@@ -143,6 +144,7 @@ class FUGW(BaseMapping):
             init_plan=init_plan,
             init_duals=init_duals,
             solver=solver,
+            callback_bcd=callback_bcd,
             verbose=verbose,
         )
 

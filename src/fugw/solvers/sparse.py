@@ -229,6 +229,7 @@ class FUGWSparseSolver(BaseSolver):
         init_plan=None,
         init_duals=None,
         solver="ibpp",
+        callback_bcd=None,
         verbose=False,
     ):
         """Run BCD iterations.
@@ -522,28 +523,8 @@ class FUGWSparseSolver(BaseSolver):
                 ):
                     break
 
-            # Run custom BCD callback
-            variables = []
-            for obj in list(globals().values()):
-                if torch.is_tensor(obj) and obj.device == device:
-                    variables.append(obj)
-
-            # Print the variables and their sizes
-            memory_allocated = 0
-            console.log("Variable\tSize\tMemory allocated")
-            for var in variables:
-                size = var.size()
-                elem_size = var.element_size()
-                var_memory_allocated = size.numel() * elem_size
-                memory_allocated += var_memory_allocated
-                console.log(f"{var}\t{size}\t{var_memory_allocated}")
-
-            console.log(
-                f"Sum memory used: {torch.cuda.memory_allocated(device)}"
-            )
-            console.log(
-                f"Total memory used: {torch.cuda.memory_allocated(device)}"
-            )
+            if callback_bcd is not None:
+                callback_bcd()
 
             idx += 1
 

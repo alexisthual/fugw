@@ -209,6 +209,7 @@ class FUGWSolver(BaseSolver):
         init_plan=None,
         init_duals=None,
         solver="sinkhorn",
+        callback_bcd=None,
         divergence="kl",
         verbose=False,
     ):
@@ -472,6 +473,9 @@ class FUGWSolver(BaseSolver):
                     < self.early_stopping_threshold
                 ):
                     break
+
+            if callback_bcd is not None:
+                callback_bcd()
 
             idx += 1
 

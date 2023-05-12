@@ -26,6 +26,7 @@ class FUGWSparse(BaseMapping):
         init_duals=None,
         solver="mm",
         solver_params={},
+        callback_bcd=None,
         device="auto",
         verbose=False,
     ):
@@ -78,6 +79,8 @@ class FUGWSparse(BaseMapping):
             Solver to use.
         solver_params: fugw.solvers.utils.BaseSolver params
             Parameters given to the solver.
+        callback_bcd: callable or None, optional
+            A function which will be called after each BCD step.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
@@ -170,6 +173,7 @@ class FUGWSparse(BaseMapping):
             init_plan=init_plan,
             init_duals=init_duals,
             solver=solver,
+            callback_bcd=callback_bcd,
             verbose=verbose,
         )
 

@@ -268,12 +268,14 @@ def fit(
     coarse_mapping=None,
     coarse_mapping_solver="mm",
     coarse_mapping_solver_params={},
+    coarse_callback_bcd=None,
     coarse_pairs_selection_method="topk",
     source_selection_radius=1,
     target_selection_radius=1,
     fine_mapping=None,
     fine_mapping_solver="mm",
     fine_mapping_solver_params={},
+    fine_callback_bcd=None,
     source_sample=None,
     target_sample=None,
     source_features=None,
@@ -412,6 +414,7 @@ def fit(
         target_weights=target_weights_sampled,
         solver=coarse_mapping_solver,
         solver_params=coarse_mapping_solver_params,
+        callback_bcd=coarse_callback_bcd,
         device=device,
         verbose=verbose,
     )
@@ -482,6 +485,7 @@ def fit(
         verbose=verbose,
         solver=fine_mapping_solver,
         solver_params=fine_mapping_solver_params,
+        callback_bcd=fine_callback_bcd,
     )
 
     return source_sample, target_sample
