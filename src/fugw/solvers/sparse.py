@@ -524,7 +524,7 @@ class FUGWSparseSolver(BaseSolver):
                     break
 
             if callback_bcd is not None:
-                callback_bcd()
+                callback_bcd(locals())
 
             idx += 1
 
