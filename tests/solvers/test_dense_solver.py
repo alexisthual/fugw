@@ -1,3 +1,5 @@
+from itertools import product
+
 import numpy as np
 import pytest
 import torch
@@ -5,8 +7,11 @@ import torch
 from fugw.solvers import FUGWSolver
 
 
-@pytest.mark.parametrize("solver", ["sinkhorn", "mm", "ibpp"])
-def test_dense_solvers(solver):
+callbacks = [None, lambda x: x["gamma"]]
+
+
+@pytest.mark.parametrize("solver,callback", product(["sinkhorn", "mm", "ibpp"], callbacks))
+def test_dense_solvers(solver, callback):
     torch.manual_seed(0)
 
     use_cuda = torch.cuda.is_available()
@@ -56,6 +61,7 @@ def test_dense_solvers(solver):
         Dt=Dt_normalized,
         init_plan=None,
         solver=solver,
+        callback_bcd=callback,
         verbose=True,
     )
 
