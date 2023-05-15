@@ -27,7 +27,8 @@ callbacks = [None, lambda x: x["gamma"]]
 
 
 @pytest.mark.parametrize(
-    "device,return_numpy,solver,callback", product(devices, return_numpys, solvers, callbacks)
+    "device,return_numpy,solver,callback",
+    product(devices, return_numpys, solvers, callbacks),
 )
 def test_dense_mapping(device, return_numpy, solver, callback):
     # Generate random training data for source and target

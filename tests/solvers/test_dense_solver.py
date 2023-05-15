@@ -10,7 +10,9 @@ from fugw.solvers import FUGWSolver
 callbacks = [None, lambda x: x["gamma"]]
 
 
-@pytest.mark.parametrize("solver,callback", product(["sinkhorn", "mm", "ibpp"], callbacks))
+@pytest.mark.parametrize(
+    "solver,callback", product(["sinkhorn", "mm", "ibpp"], callbacks)
+)
 def test_dense_solvers(solver, callback):
     torch.manual_seed(0)
 
