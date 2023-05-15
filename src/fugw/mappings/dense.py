@@ -73,6 +73,10 @@ class FUGW(BaseMapping):
             Solver to use.
         solver_params: fugw.solvers.utils.BaseSolver params
             Parameters given to the solver.
+        callback_bcd: callable or None
+            Callback function called at the end of each BCD step.
+            It will be called with the following arguments:
+                - locals (dictionary containing all local variables)
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
