@@ -169,8 +169,7 @@ class FUGWSparse(BaseMapping):
             F2_val = _make_tensor(F2_val, device=device)
 
         else:
-            F1_val = F1
-            F2_val = F2
+            F1_val, F2_val = None, None
 
         if (
             source_geometry_embedding_val is not None
@@ -188,10 +187,8 @@ class FUGWSparse(BaseMapping):
             Dt2_val = _make_tensor(Dt2_val, device=device)
 
         else:
-            Ds1_val = Ds1
-            Ds2_val = Ds2
-            Dt1_val = Dt1
-            Dt2_val = Dt2
+            Ds1_val, Ds2_val = Ds1, Ds2
+            Dt1_val, Dt2_val = Dt1, Dt2
 
         # Check that all init_plan is valid
         if init_plan is None:

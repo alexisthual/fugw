@@ -150,15 +150,15 @@ class FUGW(BaseMapping):
             F_val = torch.cdist(Fs_val, Ft_val, p=2) ** 2
 
         else:
-            F_val = F
+            F_val = None
 
         if source_geometry_val is not None and target_geometry_val is not None:
             Ds_val = _make_tensor(source_geometry_val, device=device)
             Dt_val = _make_tensor(target_geometry_val, device=device)
 
         else:
-            Ds_val = Ds
-            Dt_val = Dt
+            Ds_val = None
+            Dt_val = None
 
         # Create model
         model = FUGWSolver(**solver_params)

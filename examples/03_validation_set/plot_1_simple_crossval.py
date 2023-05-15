@@ -13,7 +13,7 @@ a validation loss on 2 low-resolution brain volumes.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from nilearn import datasets, image
+from nilearn import datasets, image, plotting
 from scipy.spatial import distance_matrix
 from fugw.mappings import FUGW
 
@@ -136,3 +136,11 @@ ax2.tick_params(axis="y", labelcolor=color)
 plt.title("Training and validation losses")
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 plt.show()
+
+# %%
+# Plot the transformation of the first feature map.
+example_array = np.nan_to_num(source_im_resized.slicer[..., 0].get_fdata())
+example_array /= np.max(np.abs(example_array))
+example = image.new_img_like(source_im_resized, example_array)
+plotting.view_img_on_surf(example, threshold="90%", surf_mesh="fsaverage5")
+# %%

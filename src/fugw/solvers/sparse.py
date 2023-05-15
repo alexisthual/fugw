@@ -359,7 +359,6 @@ class FUGWSparseSolver(BaseSolver):
             )
 
         else:
-            F_val = F
             Ds_val, Dt_val = Ds, Dt
             Ds_sqr_val, Dt_sqr_val = Ds_sqr, Dt_sqr
 
@@ -474,7 +473,12 @@ class FUGWSparseSolver(BaseSolver):
         # Initialise loss
         current_loss = compute_fugw_loss(pi, gamma)
         loss = _add_dict({}, current_loss)
-        loss_val = _add_dict({}, compute_fugw_loss_validation(pi, gamma))
+
+        if F_val != (None, None):
+            loss_val = _add_dict({}, compute_fugw_loss_validation(pi, gamma))
+        else:
+            loss_val = loss
+
         loss_steps = [0]
         loss_times = [0]
         idx = 0
@@ -544,9 +548,12 @@ class FUGWSparseSolver(BaseSolver):
             err = (pi.values() - pi_prev.values()).abs().sum().item()
             if idx % self.eval_bcd == 0:
                 current_loss = compute_fugw_loss(pi, gamma)
-                current_loss_validation = compute_fugw_loss_validation(
-                    pi, gamma
-                )
+                if F_val != (None, None):
+                    current_loss_validation = compute_fugw_loss_validation(
+                        pi, gamma
+                    )
+                else:
+                    current_loss_validation = current_loss
 
                 loss_steps.append(idx + 1)
                 loss = _add_dict(loss, current_loss)

@@ -307,7 +307,6 @@ class FUGWSolver(BaseSolver):
             Dt_sqr_val = Dt_val**2
 
         else:
-            F_val = F
             Ds_val, Dt_val = Ds, Dt
             Ds_sqr_val, Dt_sqr_val = Ds_sqr, Dt_sqr
 
@@ -409,7 +408,12 @@ class FUGWSolver(BaseSolver):
 
         # Initialize loss
         current_loss = compute_fugw_loss(pi, gamma)
-        current_loss_validation = compute_fugw_loss_validation(pi, gamma)
+
+        if F_val is not None:
+            current_loss_validation = compute_fugw_loss_validation(pi, gamma)
+        else:
+            current_loss_validation = current_loss
+
         loss = _add_dict({}, current_loss)
         loss_val = _add_dict({}, current_loss_validation)
         loss_steps = [0]
@@ -481,9 +485,12 @@ class FUGWSolver(BaseSolver):
             err = (pi - pi_prev).abs().sum().item()
             if idx % self.eval_bcd == 0:
                 current_loss = compute_fugw_loss(pi, gamma)
-                current_loss_validation = compute_fugw_loss_validation(
-                    pi, gamma
-                )
+                if F_val is not None:
+                    current_loss_validation = compute_fugw_loss_validation(
+                        pi, gamma
+                    )
+                else:
+                    current_loss_validation = current_loss
 
                 loss_steps.append(idx + 1)
                 loss = _add_dict(loss, current_loss)
