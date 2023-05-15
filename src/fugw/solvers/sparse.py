@@ -469,10 +469,11 @@ class FUGWSparseSolver(BaseSolver):
                 )
 
             gamma_scaling_factor = (mp / csr_sum(gamma)).sqrt()
+            new_gamma_values = gamma.values() * gamma_scaling_factor
             gamma = torch.sparse_csr_tensor(
-                gamma.crow_indices(),
-                gamma.col_indices(),
-                gamma.values() * gamma_scaling_factor,
+                crow_indices,
+                col_indices,
+                new_gamma_values,
                 size=gamma.size(),
                 device=device,
             )
@@ -497,10 +498,11 @@ class FUGWSparseSolver(BaseSolver):
                 )
 
             pi_scaling_factor = (mg / csr_sum(pi)).sqrt()
+            new_pi_values = pi.values() * pi_scaling_factor
             pi = torch.sparse_csr_tensor(
-                pi.crow_indices(),
-                pi.col_indices(),
-                pi.values() * pi_scaling_factor,
+                crow_indices,
+                col_indices,
+                new_pi_values,
                 size=pi.size(),
                 device=device,
             )
