@@ -12,8 +12,8 @@ devices = [torch.device("cpu")]
 if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
-
 callbacks = [None, lambda x: x["gamma"]]
+
 
 # TODO: need to test sinkhorn
 @pytest.mark.parametrize(
