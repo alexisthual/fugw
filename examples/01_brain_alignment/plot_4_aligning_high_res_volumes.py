@@ -1,8 +1,8 @@
 # %%
 """
-===================================================================
-Align low-resolution brain volumes of 2 individuals with fMRI data
-===================================================================
+================================================================
+High-resolution volume alignment of 2 individuals with fMRI data
+================================================================
 
 In this example, we align 2 low-resolution brain volumes
 using 4 fMRI feature maps (z-score contrast maps).
@@ -10,15 +10,13 @@ using 4 fMRI feature maps (z-score contrast maps).
 # sphinx_gallery_thumbnail_number = 3
 
 import numpy as np
+import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from nilearn import datasets, image
-from scipy.spatial import distance_matrix
-
-from fugw.mappings import FUGW
-
-plt.rcParams["figure.dpi"] = 300
+from fugw.mappings import FUGW, FUGWSparse
+from fugw.scripts import coarse_to_fine, lmds
 
 # %%
 # We first fetch 5 contrasts for each subject from the localizer dataset.
@@ -46,9 +44,9 @@ source_im = image.load_img(source_imgs_paths)
 target_im = image.load_img(target_imgs_paths)
 
 # %%
-# We greatly downsample all image to reduce the computational cost
-# so that this example will run on a CPU.
-SCALE_FACTOR = 5
+# Let's use a resolution of 2000 voxels so that computations
+# can easily run on a single CPU.
+SCALE_FACTOR = 3
 
 source_maps = np.nan_to_num(
     source_im.get_fdata()[::SCALE_FACTOR, ::SCALE_FACTOR, ::SCALE_FACTOR]
@@ -69,63 +67,29 @@ source_features = source_maps[
 target_features = target_maps[
     coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]
 ].T
+source_features.shape
 
 # %%
 fig = plt.figure(figsize=(5, 5))
+
 ax = fig.add_subplot(projection="3d")
-ax.scatter(coordinates[:, 0], coordinates[:, 1], coordinates[:, 2], marker="o")
+ax.set_title("Voxel coordinates")
+ax.scatter(coordinates[:, 0], coordinates[:, 1], coordinates[:, 2], marker=".")
+
 ax.view_init(10, 135)
 ax.set_axis_off()
+plt.tight_layout()
 plt.show()
 
 # %%
 # We then compute the distance matrix between voxel coordinates.
-source_geometry = distance_matrix(coordinates, coordinates)
-target_geometry = source_geometry.copy()
-fig = plt.figure(figsize=(5, 5))
-plt.imshow(source_geometry)
-plt.show()
+source_geometry_embeddings = lmds.compute_lmds_volume(
+    segmentation_coarse
+).nan_to_num()
+target_geometry_embeddings = source_geometry_embeddings.clone()
 
-# %%
-fig = plt.figure(figsize=(5, 5))
-ax = fig.add_subplot(111, projection="3d")
-
-# Plot brain geometry
-im = ax.scatter(
-    coordinates[1:, 0],
-    coordinates[1:, 1],
-    coordinates[1:, 2],
-    marker=".",
-    c=source_geometry[0, 1:],
-)
-
-# Add source point label
-ax.scatter(
-    coordinates[0, 0],
-    coordinates[0, 1],
-    coordinates[0, 2],
-    marker="o",
-    c="black",
-)
-ax.text(
-    coordinates[0, 0],
-    coordinates[0, 1],
-    coordinates[0, 2] - 2,
-    "Source point",
-    color="black",
-)
-
-# Add colorbar
-colorbar = fig.colorbar(
-    plt.cm.ScalarMappable(cmap="viridis"),
-    ax=ax,
-    label="Distance to source point",
-)
-colorbar.ax.set_position([0.9, 0.15, 0.03, 0.7])
-
-ax.view_init(10, 135)
-ax.set_axis_off()
-plt.show()
+# Show the embedding shape
+print(source_geometry_embeddings.shape)
 
 # %%
 # In order to avoid numerical errors when fitting the mapping, we normalize
@@ -136,69 +100,129 @@ source_features_normalized = source_features / np.linalg.norm(
 target_features_normalized = target_features / np.linalg.norm(
     target_features, axis=1
 ).reshape(-1, 1)
-source_geometry_normalized = source_geometry / np.max(source_geometry)
-target_geometry_normalized = target_geometry / np.max(target_geometry)
+
+source_embeddings_normalized, source_distance_max = (
+    coarse_to_fine.random_normalizing(source_geometry_embeddings)
+)
+target_embeddings_normalized, target_distance_max = (
+    coarse_to_fine.random_normalizing(target_geometry_embeddings)
+)
 
 # %%
 # We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
-mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
-_ = mapping.fit(
-    source_features_normalized[:n_training_contrasts],
-    target_features_normalized[:n_training_contrasts],
-    source_geometry=source_geometry_normalized,
-    target_geometry=target_geometry_normalized,
-    solver="sinkhorn",
-    solver_params={
-        "nits_bcd": 4,
-    },
+alpha_coarse = 0.5
+rho_coarse = 1
+eps_coarse = 1e-4
+coarse_mapping = FUGW(alpha=alpha_coarse, rho=rho_coarse, eps=eps_coarse)
+coarse_mapping_solver = "mm"
+coarse_mapping_solver_params = {
+    "nits_bcd": 5,
+    "tol_uot": 1e-10,
+}
+
+alpha_fine = 0.5
+rho_fine = 1
+eps_fine = 1e-4
+fine_mapping = FUGWSparse(alpha=alpha_fine, rho=rho_fine, eps=eps_fine)
+fine_mapping_solver = "mm"
+fine_mapping_solver_params = {
+    "nits_bcd": 3,
+    "tol_uot": 1e-10,
+}
+
+# %%
+# Let's subsample the vertices.
+source_sample = coarse_to_fine.sample_volume_uniformly(
+    segmentation_coarse,
+    embeddings=source_geometry_embeddings,
+    n_samples=1000,
+)
+target_sample = coarse_to_fine.sample_volume_uniformly(
+    segmentation_coarse,
+    embeddings=target_geometry_embeddings,
+    n_samples=1000,
+)
+
+# %%
+# Train both the coarse and the fine mapping.
+# We set the selection radius to 3mm for both source and target
+# (don't forget to divide by the distance returned by
+# `coarse_to_fine.random_normalizing()` so that geometries
+# and selection radia have the same units).
+
+_ = coarse_to_fine.fit(
+    # Source and target's features and embeddings
+    source_features=source_features_normalized[:n_training_contrasts, :],
+    target_features=target_features_normalized[:n_training_contrasts, :],
+    source_geometry_embeddings=source_embeddings_normalized,
+    target_geometry_embeddings=target_embeddings_normalized,
+    # Parametrize step 1 (coarse alignment between source and target)
+    source_sample=source_sample,
+    target_sample=target_sample,
+    coarse_mapping=coarse_mapping,
+    coarse_mapping_solver=coarse_mapping_solver,
+    coarse_mapping_solver_params=coarse_mapping_solver_params,
+    # Parametrize step 2 (selection of pairs of indices present in
+    # fine-grained's sparsity mask)
+    coarse_pairs_selection_method="topk",
+    source_selection_radius=3 / source_distance_max,
+    target_selection_radius=3 / target_distance_max,
+    # Parametrize step 3 (fine-grained alignment)
+    fine_mapping=fine_mapping,
+    fine_mapping_solver=fine_mapping_solver,
+    fine_mapping_solver_params=fine_mapping_solver_params,
+    # Misc
     verbose=True,
 )
 
 # %%
 # Let's plot the probability map of target voxels being matched with
 # the 300th source voxel.
-pi = mapping.pi
+pi = fine_mapping.pi
 vertex_index = 300
-probability_map = pi[vertex_index, :] / np.sqrt(
-    np.linalg.norm(pi[vertex_index, :])
+one_hot = np.zeros(source_features.shape[1])
+one_hot[vertex_index] = 1.0
+probability_map = fine_mapping.inverse_transform(one_hot)
+
+fig = plt.figure(figsize=(7, 5))
+
+ax = fig.add_subplot(projection="3d")
+ax.set_title(
+    "Probability map of target voxels\n"
+    f"being matched with source voxel {vertex_index}"
 )
 
-fig = plt.figure(figsize=(5, 5))
-ax = fig.add_subplot(projection="3d")
-
-ax.scatter(
+s = ax.scatter(
     coordinates[:, 0],
     coordinates[:, 1],
     coordinates[:, 2],
     marker="o",
     c=probability_map,
-    cmap="twilight",
     alpha=0.75,
+    cmap="Reds",
 )
+
 ax.text(
     coordinates[vertex_index, 0],
     coordinates[vertex_index, 1],
     coordinates[vertex_index, 2] - 2,
-    "Source point",
+    "x Source voxel",
     color="black",
+    size=12,
 )
 
-ax.set_title(
-    "Probability map of target voxels\n"
-    f"being matched with source point {vertex_index}"
-)
-
-colorbar = fig.colorbar(plt.cm.ScalarMappable(cmap="twilight"), ax=ax)
+colorbar = fig.colorbar(s, ax=ax, alpha=1)
 colorbar.ax.set_position([0.9, 0.15, 0.03, 0.7])
 
 ax.view_init(10, 135, 2)
 ax.set_axis_off()
+plt.tight_layout()
 plt.show()
 
 # %%
-# We can now align test contrasts using the fitted mapping.
+# We can now align test contrasts using the fitted fine mapping.
 contrast_index = -1
-predicted_target_features = mapping.transform(
+predicted_target_features = fine_mapping.transform(
     source_features[contrast_index, :]
 )
 predicted_target_features.shape
@@ -221,20 +245,19 @@ print(
 
 # %%
 # Let's plot the transporting feature maps of the test set.
-fig = plt.figure(figsize=plt.figaspect(0.3))
-
-fig.suptitle("Transporting feature maps of the test set", size=16)
+fig = plt.figure(figsize=(12, 4))
+fig.suptitle("Transporting feature maps of the test set")
 
 ax = fig.add_subplot(1, 3, 1, projection="3d")
-ax.scatter(
+s = ax.scatter(
     coordinates[:, 0],
     coordinates[:, 1],
     coordinates[:, 2],
     marker="o",
     c=source_features_normalized[-1, :],
-    cmap="twilight",
+    cmap="coolwarm",
+    norm=colors.CenteredNorm(),
 )
-
 ax.view_init(10, 135, 2)
 ax.set_title("Source features")
 ax.set_axis_off()
@@ -246,9 +269,9 @@ ax.scatter(
     coordinates[:, 2],
     marker="o",
     c=predicted_target_features,
-    cmap="twilight",
+    cmap="coolwarm",
+    norm=colors.CenteredNorm(),
 )
-
 ax.view_init(10, 135, 2)
 ax.set_title("Predicted target features")
 ax.set_axis_off()
@@ -260,18 +283,18 @@ ax.scatter(
     coordinates[:, 2],
     marker="o",
     c=target_features_normalized[-1, :],
-    cmap="twilight",
+    cmap="coolwarm",
+    norm=colors.CenteredNorm(),
 )
-
 ax.view_init(10, 135, 2)
 ax.set_title("Actual target features")
 ax.set_axis_off()
 
-
-ax = fig.add_subplot(1, 1, 1, )
+ax = fig.add_subplot(1, 1, 1)
 ax.set_axis_off()
 divider = make_axes_locatable(ax)
-cax = divider.append_axes("right", size="1%", pad="2%")
-fig.colorbar(plt.cm.ScalarMappable(cmap="twilight"), cax=cax)
+cax = divider.append_axes("right", size="1%")
+fig.colorbar(s, cax=cax)
 
+plt.tight_layout()
 plt.show()
