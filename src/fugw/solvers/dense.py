@@ -265,6 +265,11 @@ class FUGWSolver(BaseSolver):
                     "marginal_constraint_dim1", "marginal_constraint_dim2",
                     "regularization", "total".
                     Values are float or None.
+                loss_val: dict of lists
+                    Dictionary containing the loss and its unweighted
+                    components for each step of the block-coordinate-descent
+                    for which the FUGW loss was evaluated on the validation
+                    set.
                 loss_steps: list
                     BCD steps at the end of which the FUGW loss was evaluated
                 loss_times: list

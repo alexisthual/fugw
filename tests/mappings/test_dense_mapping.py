@@ -88,3 +88,100 @@ def test_dense_mapping(device, return_numpy, solver):
     target_features_on_source = fugw.inverse_transform(target_features_test)
     assert target_features_on_source.shape == source_features_test.shape
     assert isinstance(target_features_on_source, torch.Tensor)
+
+
+@pytest.mark.parametrize(
+    "validation", ["None", "features", "geometries", "Both"]
+)
+def test_validation_mapping(validation):
+    # Generate random training data for source and target
+    # and random validation data for source and target
+    _, source_features_train, source_geometry, _ = _init_mock_distribution(
+        n_features_train, n_voxels_source, return_numpy=False
+    )
+
+    _, target_features_train, target_geometry, _ = _init_mock_distribution(
+        n_features_train, n_voxels_target, return_numpy=False
+    )
+
+    _, source_features_train_val, source_geometry_val, _ = (
+        _init_mock_distribution(
+            n_features_train, n_voxels_source, return_numpy=False
+        )
+    )
+
+    _, target_features_train_val, target_geometry_val, _ = (
+        _init_mock_distribution(
+            n_features_train, n_voxels_target, return_numpy=False
+        )
+    )
+
+    fugw = FUGW()
+
+    if validation == "None":
+        fugw.fit(
+            source_features=source_features_train,
+            target_features=target_features_train,
+            source_geometry=source_geometry,
+            target_geometry=target_geometry,
+            solver="sinkhorn",
+            solver_params={
+                "nits_bcd": 3,
+                "ibpp_eps_base": 1e8,
+            },
+            device="cpu",
+        )
+        assert len(fugw.loss_val) == len(fugw.loss)
+
+    elif validation == "features":
+        fugw.fit(
+            source_features=source_features_train,
+            target_features=target_features_train,
+            source_geometry=source_geometry,
+            target_geometry=target_geometry,
+            source_features_val=source_features_train_val,
+            target_features_val=target_features_train_val,
+            solver="sinkhorn",
+            solver_params={
+                "nits_bcd": 3,
+                "ibpp_eps_base": 1e8,
+            },
+            device="cpu",
+        )
+        assert len(fugw.loss_val) == len(fugw.loss)
+
+    elif validation == "geometries":
+        fugw.fit(
+            source_features=source_features_train,
+            target_features=target_features_train,
+            source_geometry=source_geometry,
+            target_geometry=target_geometry,
+            source_geometry_val=source_geometry_val,
+            target_geometry_val=target_geometry_val,
+            solver="sinkhorn",
+            solver_params={
+                "nits_bcd": 3,
+                "ibpp_eps_base": 1e8,
+            },
+            device="cpu",
+        )
+        assert len(fugw.loss_val) == len(fugw.loss)
+
+    elif validation == "Both":
+        fugw.fit(
+            source_features=source_features_train,
+            target_features=target_features_train,
+            source_geometry=source_geometry,
+            target_geometry=target_geometry,
+            source_features_val=source_features_train_val,
+            target_features_val=target_features_train_val,
+            source_geometry_val=source_geometry_val,
+            target_geometry_val=target_geometry_val,
+            solver="sinkhorn",
+            solver_params={
+                "nits_bcd": 3,
+                "ibpp_eps_base": 1e8,
+            },
+            device="cpu",
+        )
+        assert len(fugw.loss_val) == len(fugw.loss)
