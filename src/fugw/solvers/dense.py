@@ -239,6 +239,7 @@ class FUGWSolver(BaseSolver):
         callback_bcd: callable or None
             Callback function called at the end of each BCD step.
             It will be called with the following arguments:
+
                 - locals (dictionary containing all local variables)
         verbose: bool, optional, defaults to False
             Log solving process.

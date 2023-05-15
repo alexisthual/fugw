@@ -76,6 +76,7 @@ class FUGW(BaseMapping):
         callback_bcd: callable or None
             Callback function called at the end of each BCD step.
             It will be called with the following arguments:
+
                 - locals (dictionary containing all local variables)
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
