@@ -227,6 +227,7 @@ class FUGWSparse(BaseMapping):
 
         self.pi = res["pi"].to_sparse_coo().detach().cpu()
         self.loss = res["loss"]
+        self.loss_val = res["loss_val"]
         self.loss_steps = res["loss_steps"]
         self.loss_times = res["loss_times"]
 

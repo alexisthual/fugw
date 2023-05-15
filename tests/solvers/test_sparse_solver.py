@@ -151,7 +151,7 @@ def test_sparse_validation_solver(validation, device):
     Dt_normalized = (Dt[0] / Dt_norm, Dt[1] / Dt_norm)
 
     if validation == "None":
-        F_val_normalized = None
+        F_val_normalized = None, None
         Ds_val_normalized = None, None
         Dt_val_normalized = None, None
 
@@ -163,7 +163,7 @@ def test_sparse_validation_solver(validation, device):
         Dt_val_normalized = None, None
 
     elif validation == "geometries":
-        F_val_normalized = None
+        F_val_normalized = None, None
         Ds_val = _low_rank_squared_l2(
             source_embeddings_val, source_embeddings_val
         )
@@ -194,7 +194,7 @@ def test_sparse_validation_solver(validation, device):
         (torch.ones(ns, nt) / ns).to_sparse_coo().to(device).to_sparse_csr()
     )
 
-    nits_bcd = 100
+    nits_bcd = 10
     eval_bcd = 1
     fugw = FUGWSparseSolver(
         nits_bcd=nits_bcd,

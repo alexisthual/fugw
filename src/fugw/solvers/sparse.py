@@ -584,6 +584,7 @@ class FUGWSparseSolver(BaseSolver):
             "duals_pi": duals_pi,
             "duals_gamma": duals_gamma,
             "loss": loss,
+            "loss_val": loss_val,
             "loss_steps": loss_steps,
             "loss_times": loss_times,
         }
