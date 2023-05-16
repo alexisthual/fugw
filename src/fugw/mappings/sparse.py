@@ -168,8 +168,26 @@ class FUGWSparse(BaseMapping):
             F1_val = _make_tensor(F1_val, device=device)
             F2_val = _make_tensor(F2_val, device=device)
 
+        elif source_features_val is not None and target_features_val is None:
+            raise ValueError(
+                "Source features validation data provided but not target"
+                " features validation data."
+            )
+
+        elif source_features_val is None and target_features_val is not None:
+            raise ValueError(
+                "Target features validation data provided but not source"
+                " features validation data."
+            )
+
         else:
             F1_val, F2_val = None, None
+
+            # Raise warning if validation feature maps are not provided
+            warnings.warn(
+                "Validation data for feature maps is not provided."
+                " Using training data instead."
+            )
 
         if (
             source_geometry_embedding_val is not None
@@ -186,9 +204,33 @@ class FUGWSparse(BaseMapping):
             Dt1_val = _make_tensor(Dt1_val, device=device)
             Dt2_val = _make_tensor(Dt2_val, device=device)
 
+        elif (
+            source_geometry_embedding_val is not None
+            and target_geometry_embedding_val is None
+        ):
+            raise ValueError(
+                "Source geometry validation data provided but not target"
+                " geometry validation data."
+            )
+
+        elif (
+            source_geometry_embedding_val is None
+            and target_geometry_embedding_val is not None
+        ):
+            raise ValueError(
+                "Target geometry validation data provided but not source"
+                " geometry validation data."
+            )
+
         else:
             Ds1_val, Ds2_val = Ds1, Ds2
             Dt1_val, Dt2_val = Dt1, Dt2
+
+            # Raise warning if validation anatomical kernels are not provided
+            warnings.warn(
+                "Validation data for anatomical kernels is not provided."
+                " Using training data instead."
+            )
 
         # Check that all init_plan is valid
         if init_plan is None:

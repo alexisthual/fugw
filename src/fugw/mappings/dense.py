@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import warnings
 
 from fugw.solvers.dense import FUGWSolver
 from fugw.mappings.utils import BaseMapping
@@ -149,16 +150,52 @@ class FUGW(BaseMapping):
             Ft_val = _make_tensor(target_features_val.T, device=device)
             F_val = torch.cdist(Fs_val, Ft_val, p=2) ** 2
 
+        elif source_features_val is not None and target_features_val is None:
+            raise ValueError(
+                "Source features validation data provided but not target"
+                " features validation data."
+            )
+
+        elif source_features_val is None and target_features_val is not None:
+            raise ValueError(
+                "Target features validation data provided but not source"
+                " features validation data."
+            )
+
         else:
             F_val = None
+
+            # Raise warning if validation feature maps are not provided
+            warnings.warn(
+                "Validation data for feature maps is not provided."
+                " Using training data instead."
+            )
 
         if source_geometry_val is not None and target_geometry_val is not None:
             Ds_val = _make_tensor(source_geometry_val, device=device)
             Dt_val = _make_tensor(target_geometry_val, device=device)
 
+        elif source_geometry_val is not None and target_geometry_val is None:
+            raise ValueError(
+                "Source geometry validation data provided but not target"
+                " geometry validation data."
+            )
+
+        elif source_geometry_val is None and target_geometry_val is not None:
+            raise ValueError(
+                "Target geometry validation data provided but not source"
+                " geometry validation data."
+            )
+
         else:
             Ds_val = None
             Dt_val = None
+
+            # Raise warning if validation anatomical kernels are not provided
+            warnings.warn(
+                "Validation data for anatomical kernels is not provided."
+                " Using training data instead."
+            )
 
         # Create model
         model = FUGWSolver(**solver_params)

@@ -138,9 +138,10 @@ fig.tight_layout()  # otherwise the right y-label is slightly clipped
 plt.show()
 
 # %%
-# Plot the transformation of the first feature map.
-example_array = np.nan_to_num(source_im_resized.slicer[..., 0].get_fdata())
+# Plot the alignment of the second validation feature map
+# and project it on the fsaverage5 surface.
+example_array = np.nan_to_num(source_im_resized.slicer[..., -1].get_fdata())
 example_array /= np.max(np.abs(example_array))
 example = image.new_img_like(source_im_resized, example_array)
-plotting.view_img_on_surf(example, threshold="90%", surf_mesh="fsaverage5")
+plotting.view_img_on_surf(example, threshold="50%", surf_mesh="fsaverage5")
 # %%

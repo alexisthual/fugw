@@ -1,4 +1,5 @@
 from functools import partial
+from copy import deepcopy
 
 import time
 
@@ -477,7 +478,7 @@ class FUGWSparseSolver(BaseSolver):
         if F_val != (None, None):
             loss_val = _add_dict({}, compute_fugw_loss_validation(pi, gamma))
         else:
-            loss_val = loss
+            loss_val = _add_dict({}, current_loss)
 
         loss_steps = [0]
         loss_times = [0]
@@ -553,7 +554,7 @@ class FUGWSparseSolver(BaseSolver):
                         pi, gamma
                     )
                 else:
-                    current_loss_validation = current_loss
+                    current_loss_validation = deepcopy(current_loss)
 
                 loss_steps.append(idx + 1)
                 loss = _add_dict(loss, current_loss)
