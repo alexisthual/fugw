@@ -1,9 +1,8 @@
 import numpy as np
 import torch
-import warnings
 
 from fugw.solvers.dense import FUGWSolver
-from fugw.mappings.utils import BaseMapping
+from fugw.mappings.utils import BaseMapping, console
 from fugw.utils import _make_tensor
 
 
@@ -166,7 +165,7 @@ class FUGW(BaseMapping):
             F_val = None
 
             # Raise warning if validation feature maps are not provided
-            warnings.warn(
+            console.log(
                 "Validation data for feature maps is not provided."
                 " Using training data instead."
             )
@@ -192,7 +191,7 @@ class FUGW(BaseMapping):
             Dt_val = None
 
             # Raise warning if validation anatomical kernels are not provided
-            warnings.warn(
+            console.log(
                 "Validation data for anatomical kernels is not provided."
                 " Using training data instead."
             )

@@ -8,6 +8,7 @@ from fugw.utils import (
     _low_rank_squared_l2,
     _make_sparse_csr_tensor,
     _make_tensor,
+    console,
 )
 
 
@@ -184,7 +185,7 @@ class FUGWSparse(BaseMapping):
             F1_val, F2_val = None, None
 
             # Raise warning if validation feature maps are not provided
-            warnings.warn(
+            console.log(
                 "Validation data for feature maps is not provided."
                 " Using training data instead."
             )
@@ -227,7 +228,7 @@ class FUGWSparse(BaseMapping):
             Dt1_val, Dt2_val = Dt1, Dt2
 
             # Raise warning if validation anatomical kernels are not provided
-            warnings.warn(
+            console.log(
                 "Validation data for anatomical kernels is not provided."
                 " Using training data instead."
             )
