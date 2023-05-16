@@ -165,10 +165,11 @@ class FUGW(BaseMapping):
             F_val = None
 
             # Raise warning if validation feature maps are not provided
-            console.log(
-                "Validation data for feature maps is not provided."
-                " Using training data instead."
-            )
+            if verbose:
+                console.log(
+                    "Validation data for feature maps is not provided."
+                    " Using training data instead."
+                )
 
         if source_geometry_val is not None and target_geometry_val is not None:
             Ds_val = _make_tensor(source_geometry_val, device=device)
@@ -190,11 +191,12 @@ class FUGW(BaseMapping):
             Ds_val = None
             Dt_val = None
 
-            # Raise warning if validation anatomical kernels are not provided
-            console.log(
-                "Validation data for anatomical kernels is not provided."
-                " Using training data instead."
-            )
+            # Raise warning if validation anatomical kernelsare not provided
+            if verbose:
+                console.log(
+                    "Validation data for anatomical kernels is not provided."
+                    " Using training data instead."
+                )
 
         # Create model
         model = FUGWSolver(**solver_params)

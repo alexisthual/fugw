@@ -185,10 +185,11 @@ class FUGWSparse(BaseMapping):
             F1_val, F2_val = None, None
 
             # Raise warning if validation feature maps are not provided
-            console.log(
-                "Validation data for feature maps is not provided."
-                " Using training data instead."
-            )
+            if verbose:
+                console.log(
+                    "Validation data for feature maps is not provided."
+                    " Using training data instead."
+                )
 
         if (
             source_geometry_embedding_val is not None
@@ -228,10 +229,11 @@ class FUGWSparse(BaseMapping):
             Dt1_val, Dt2_val = Dt1, Dt2
 
             # Raise warning if validation anatomical kernels are not provided
-            console.log(
-                "Validation data for anatomical kernels is not provided."
-                " Using training data instead."
-            )
+            if verbose:
+                console.log(
+                    "Validation data for anatomical kernels is not provided."
+                    " Using training data instead."
+                )
 
         # Check that all init_plan is valid
         if init_plan is None:
