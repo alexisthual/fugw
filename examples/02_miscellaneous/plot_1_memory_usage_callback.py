@@ -1,7 +1,7 @@
 # %%
 """
-Memory usage at each BCD iteration
-==================================
+Monitor memory usage at each BCD iteration with callbacks
+=========================================================
 
 In this example, we use a callback function to monitor memory usage
 at each iteration of the block-coordinate descent (BCD) algorithm.
@@ -31,11 +31,11 @@ n_features_test = 2
 
 # %%
 # Let us generate random training data for the source and target distributions
-_, source_features_train, source_geometry, source_embeddings = (
-    _init_mock_distribution(n_features_train, n_points_source)
+_, source_features_train, source_geometry, _ = _init_mock_distribution(
+    n_features_train, n_points_source
 )
-_, target_features_train, target_geometry, target_embeddings = (
-    _init_mock_distribution(n_features_train, n_points_target)
+_, target_features_train, target_geometry, _ = _init_mock_distribution(
+    n_features_train, n_points_target
 )
 
 # %%
@@ -54,6 +54,11 @@ target_geometry_normalized = target_geometry / target_geometry.max()
 # %%
 # We define a function to check memory usage at each iteration of the BCD
 # algorithm, as well as util functions to print relevant information.
+# In short, fugw callback functions receive `locals()`, which is a dictionary
+# of all local variables in the current scope.
+# This allows us to access the tensors that are used in the BCD algorithm.
+# In particular, we filter our tensors that are on our device of interest,
+# and we compute their respective memory usage.
 def is_sparse(t):
     return str(t.layout).find("sparse") >= 0
 
@@ -157,7 +162,7 @@ _ = mapping.fit(
 )
 
 # %%
-# In this example, we see that the memory usage is constant.
+# In this example, we see that fugw's memory usage is constant.
 fig = plt.figure(figsize=(5, 5))
 fig.suptitle("Memory usage at each BCD iteration")
 
