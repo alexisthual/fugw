@@ -161,3 +161,93 @@ def test_fugw_sparse_with_init(device, sparse_layout, return_numpy):
     target_features_on_source = fugw.inverse_transform(target_features_test)
     assert target_features_on_source.shape == source_features_test.shape
     assert isinstance(target_features_on_source, torch.Tensor)
+
+
+@pytest.mark.parametrize(
+    "validation", ["None", "features", "geometries", "Both"]
+)
+def test_sparse_validation_mapping(validation):
+    # Generate random training data for source and target
+    # and random validation data for source and target
+    device = torch.device("cpu")
+
+    _, source_features_train, _, source_embeddings = _init_mock_distribution(
+        n_features_train, n_voxels_source, return_numpy=False
+    )
+    _, target_features_train, _, target_embeddings = _init_mock_distribution(
+        n_features_train, n_voxels_target, return_numpy=False
+    )
+    _, source_features_val, _, source_embeddings_val = _init_mock_distribution(
+        n_features_train, n_voxels_source, return_numpy=False
+    )
+    _, target_features_val, _, target_embeddings_val = _init_mock_distribution(
+        n_features_train, n_voxels_target, return_numpy=False
+    )
+
+    rows = []
+    cols = []
+    items_per_row = 3
+    for i in range(n_voxels_source):
+        for _ in range(items_per_row):
+            rows.append(i)
+        cols.extend(np.random.permutation(n_voxels_target)[:items_per_row])
+
+    init_plan = torch.sparse_coo_tensor(
+        np.array([rows, cols]),
+        np.ones(len(rows)) / len(rows),
+        size=(n_voxels_source, n_voxels_target),
+    ).to(device)
+
+    fugw = FUGWSparse()
+
+    if validation == "None":
+        fugw.fit(
+            source_features=source_features_train,
+            target_features=target_features_train,
+            source_geometry_embedding=source_embeddings,
+            target_geometry_embedding=target_embeddings,
+            init_plan=init_plan,
+            device=device,
+        )
+        assert fugw.loss_val == fugw.loss
+
+    elif validation == "features":
+        fugw.fit(
+            source_features=source_features_train,
+            target_features=target_features_train,
+            source_geometry_embedding=source_embeddings,
+            target_geometry_embedding=target_embeddings,
+            source_features_val=source_features_val,
+            target_features_val=target_features_val,
+            init_plan=init_plan,
+            device=device,
+        )
+        assert len(fugw.loss_val) == len(fugw.loss)
+
+    elif validation == "geometries":
+        fugw.fit(
+            source_features=source_features_train,
+            target_features=target_features_train,
+            source_geometry_embedding=source_embeddings,
+            target_geometry_embedding=target_embeddings,
+            source_geometry_embedding_val=source_embeddings_val,
+            target_geometry_embedding_val=target_embeddings_val,
+            init_plan=init_plan,
+            device=device,
+        )
+        assert len(fugw.loss_val) == len(fugw.loss)
+
+    elif validation == "Both":
+        fugw.fit(
+            source_features=source_features_train,
+            target_features=target_features_train,
+            source_geometry_embedding=source_embeddings,
+            target_geometry_embedding=target_embeddings,
+            source_features_val=source_features_val,
+            target_features_val=target_features_val,
+            source_geometry_embedding_val=source_embeddings_val,
+            target_geometry_embedding_val=target_embeddings_val,
+            init_plan=init_plan,
+            device=device,
+        )
+        assert len(fugw.loss_val) == len(fugw.loss)

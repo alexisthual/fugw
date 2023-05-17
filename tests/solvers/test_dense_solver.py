@@ -191,3 +191,108 @@ def test_dense_solvers_l2(reg_mode):
     gamma_np = gamma.cpu().detach().numpy()
     np.testing.assert_allclose(pi_true, pi_np, atol=1e-04)
     np.testing.assert_allclose(pi_true, gamma_np, atol=1e-04)
+
+
+@pytest.mark.parametrize(
+    "validation", ["None", "features", "geometries", "Both"]
+)
+def test_validation_solver(validation):
+    torch.manual_seed(0)
+
+    use_cuda = torch.cuda.is_available()
+    device = torch.device("cuda:0" if use_cuda else "cpu")
+    torch.backends.cudnn.benchmark = True
+
+    ns = 104
+    ds = 3
+    nt = 151
+    dt = 7
+    nf = 10
+
+    source_features = torch.rand(ns, nf).to(device)
+    target_features = torch.rand(nt, nf).to(device)
+    source_embeddings = torch.rand(ns, ds).to(device)
+    target_embeddings = torch.rand(nt, dt).to(device)
+
+    F = torch.cdist(source_features, target_features)
+    Ds = torch.cdist(source_embeddings, source_embeddings)
+    Dt = torch.cdist(target_embeddings, target_embeddings)
+
+    Ds_normalized = Ds / Ds.max()
+    Dt_normalized = Dt / Dt.max()
+    F_normalized = F / F.max()
+
+    if validation == "None":
+        F_val = None
+        Ds_val = None
+        Dt_val = None
+
+    elif validation == "features":
+        source_features_val = torch.rand(ns, nf).to(device)
+        target_features_val = torch.rand(nt, nf).to(device)
+        F_val = torch.cdist(source_features_val, target_features_val)
+        Ds_val = None
+        Dt_val = None
+
+    elif validation == "geometries":
+        source_embeddings_val = torch.rand(ns, ds).to(device)
+        target_embeddings_val = torch.rand(nt, dt).to(device)
+        F_val = None
+        Ds_val = torch.cdist(source_embeddings_val, source_embeddings_val)
+        Dt_val = torch.cdist(target_embeddings_val, target_embeddings_val)
+
+    elif validation == "Both":
+        source_features_val = torch.rand(ns, nf).to(device)
+        target_features_val = torch.rand(nt, nf).to(device)
+        F_val = torch.cdist(source_features_val, target_features_val)
+        source_embeddings_val = torch.rand(ns, ds).to(device)
+        target_embeddings_val = torch.rand(nt, dt).to(device)
+        Ds_val = torch.cdist(source_embeddings_val, source_embeddings_val)
+        Dt_val = torch.cdist(target_embeddings_val, target_embeddings_val)
+
+    nits_bcd = 100
+    eval_bcd = 2
+    fugw = FUGWSolver(
+        nits_bcd=nits_bcd,
+        nits_uot=1000,
+        tol_bcd=1e-7,
+        tol_uot=1e-7,
+        early_stopping_threshold=1e-5,
+        eval_bcd=eval_bcd,
+        eval_uot=10,
+        ibpp_eps_base=1e2,
+    )
+
+    res = fugw.solve(
+        alpha=0.8,
+        rho_s=2,
+        rho_t=3,
+        eps=0.02,
+        reg_mode="independent",
+        F=F_normalized,
+        Ds=Ds_normalized,
+        Dt=Dt_normalized,
+        F_val=F_val,
+        Ds_val=Ds_val,
+        Dt_val=Dt_val,
+        init_plan=None,
+        solver="sinkhorn",
+        verbose=True,
+    )
+
+    loss = res["loss"]
+    loss_steps = res["loss_steps"]
+    loss_val = res["loss_val"]
+
+    if validation == "None":
+        assert loss_val["total"] == loss["total"]
+
+    for key in [
+        "wasserstein",
+        "gromov_wasserstein",
+        "marginal_constraint_dim1",
+        "marginal_constraint_dim2",
+        "regularization",
+        "total",
+    ]:
+        assert len(loss_val[key]) == len(loss_steps)
