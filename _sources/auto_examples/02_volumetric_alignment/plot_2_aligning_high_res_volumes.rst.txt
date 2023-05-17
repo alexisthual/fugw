@@ -317,30 +317,43 @@ Train both the coarse and the fine mapping.
 
  .. code-block:: none
 
+    [11:37:31] Validation data for feature maps is not provided. Using  dense.py:169
+               training data instead.                                               
+               Validation data for anatomical kernels is not provided.  dense.py:196
+               Using training data instead.                                         
 
 
-    [19:12:37] BCD step 1/5    FUGW loss:      0.02423551119863987      dense.py:464
+    [11:37:45] BCD step 1/5    FUGW loss:      0.02423551119863987      dense.py:506
+               Validation loss:        0.02423551119863987                          
 
 
-    [19:12:51] BCD step 2/5    FUGW loss:      0.01868680864572525      dense.py:464
+    [11:38:00] BCD step 2/5    FUGW loss:      0.01868680864572525      dense.py:506
+               Validation loss:        0.01868680864572525                          
 
 
-    [19:13:06] BCD step 3/5    FUGW loss:      0.012388878501951694     dense.py:464
+    [11:38:14] BCD step 3/5    FUGW loss:      0.012388878501951694     dense.py:506
+               Validation loss:        0.012388878501951694                         
 
 
-    [19:13:21] BCD step 4/5    FUGW loss:      0.006114030256867409     dense.py:464
+    [11:38:28] BCD step 4/5    FUGW loss:      0.006114030256867409     dense.py:506
+               Validation loss:        0.006114030256867409                         
 
 
-    [19:13:43] BCD step 5/5    FUGW loss:      0.004022807814180851     dense.py:464
+    [11:38:50] BCD step 5/5    FUGW loss:      0.004022807814180851     dense.py:506
+               Validation loss:        0.004022807814180851                         
+    [11:38:51] Validation data for feature maps is not provided. Using sparse.py:189
+               training data instead.                                               
+               Validation data for anatomical kernels is not provided. sparse.py:233
+               Using training data instead.                                         
 
 
-    [19:16:40] BCD step 1/3    FUGW loss:      0.004291206132620573    sparse.py:512
+    [11:41:42] BCD step 1/3    FUGW loss:      0.004291206132620573    sparse.py:565
 
 
-    [19:19:37] BCD step 2/3    FUGW loss:      0.003227503038942814    sparse.py:512
+    [11:44:33] BCD step 2/3    FUGW loss:      0.003227503038942814    sparse.py:565
 
 
-    [19:22:33] BCD step 3/3    FUGW loss:      0.0028412765823304653   sparse.py:512
+    [11:47:23] BCD step 3/3    FUGW loss:      0.0028412765823304653   sparse.py:565
 
     (tensor([6131, 1014, 4663, 7041, 5816, 7544,  499, 3353, 7189, 5401, 2610, 1091,
              651, 6805,  639, 3049, 1995, 1838, 2060, 1171,  409, 1898, 1376,  487,
@@ -695,9 +708,9 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 10 minutes  22.412 seconds)
+   **Total running time of the script:** ( 10 minutes  4.794 seconds)
 
-**Estimated memory usage:**  920 MB
+**Estimated memory usage:**  882 MB
 
 
 .. _sphx_glr_download_auto_examples_02_volumetric_alignment_plot_2_aligning_high_res_volumes.py:

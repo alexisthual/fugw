@@ -1,0 +1,17 @@
+﻿fugw.solvers.FUGWSolver
+=======================
+
+.. currentmodule:: fugw.solvers
+
+.. autoclass:: FUGWSolver
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+   
+
+.. include:: fugw.solvers.FUGWSolver.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

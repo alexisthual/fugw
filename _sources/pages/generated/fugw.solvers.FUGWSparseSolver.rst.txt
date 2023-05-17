@@ -1,0 +1,17 @@
+﻿fugw.solvers.FUGWSparseSolver
+=============================
+
+.. currentmodule:: fugw.solvers
+
+.. autoclass:: FUGWSparseSolver
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+   
+
+.. include:: fugw.solvers.FUGWSparseSolver.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>
