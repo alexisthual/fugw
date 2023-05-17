@@ -1,4 +1,5 @@
 from functools import partial
+from copy import deepcopy
 
 import time
 
@@ -224,6 +225,9 @@ class FUGWSparseSolver(BaseSolver):
         F=(None, None),
         Ds=(None, None),
         Dt=(None, None),
+        F_val=(None, None),
+        Ds_val=(None, None),
+        Dt_val=(None, None),
         ws=None,
         wt=None,
         init_plan=None,
@@ -243,6 +247,9 @@ class FUGWSparseSolver(BaseSolver):
         F: (ndarray(n, d+2), ndarray(m, d+2)) or (None, None)
         Ds: (ndarray(n, k+2), ndarray(n, k+2)), or (None, None)
         Dt: (ndarray(m, k+2), ndarray(m, k+2)), or (None, None)
+        F_val: (ndarray(n, d+2), ndarray(m, d+2)) or (None, None)
+        Ds_val: (ndarray(n, k+2), ndarray(n, k+2)), or (None, None)
+        Dt_val: (ndarray(m, k+2), ndarray(m, k+2)), or (None, None)
         ws: ndarray(n), None
             Measures assigned to source points.
         wt: ndarray(m), None
@@ -330,6 +337,32 @@ class FUGWSparseSolver(BaseSolver):
             ),
         )
 
+        # Same for validation data if provided
+        if Ds_val != (None, None) and Dt_val != (None, None):
+            Ds1_val, Ds2_val = Ds_val
+            Ds_sqr_val = (
+                torch.einsum("ij,il->ijl", Ds1_val, Ds1_val).reshape(
+                    Ds1_val.shape[0], Ds1_val.shape[1] ** 2
+                ),
+                torch.einsum("ij,il->ijl", Ds2, Ds2).reshape(
+                    Ds2_val.shape[0], Ds2_val.shape[1] ** 2
+                ),
+            )
+
+            Dt1_val, Dt2_val = Dt_val
+            Dt_sqr_val = (
+                torch.einsum("ij,il->ijl", Dt1_val, Dt1_val).reshape(
+                    Dt1_val.shape[0], Dt1_val.shape[1] ** 2
+                ),
+                torch.einsum("ij,il->ijl", Dt2_val, Dt2_val).reshape(
+                    Dt2_val.shape[0], Dt2_val.shape[1] ** 2
+                ),
+            )
+
+        else:
+            Ds_val, Dt_val = Ds, Dt
+            Ds_sqr_val, Dt_sqr_val = Ds_sqr, Dt_sqr
+
         if alpha == 1 or F[0] is None or F[1] is None:
             alpha = 1
             F = (None, None)
@@ -406,6 +439,13 @@ class FUGWSparseSolver(BaseSolver):
             hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
         )
 
+        compute_fugw_loss_validation = partial(
+            self.fugw_loss,
+            data_const=(Ds_sqr_val, Dt_sqr_val, Ds_val, Dt_val, F_val),
+            tuple_weights=(ws, wt, ws_dot_wt),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+        )
+
         self_solver_sinkhorn = partial(
             solver_sinkhorn_sparse,
             tuple_weights=(ws, wt, ws_dot_wt),
@@ -434,6 +474,12 @@ class FUGWSparseSolver(BaseSolver):
         # Initialise loss
         current_loss = compute_fugw_loss(pi, gamma)
         loss = _add_dict({}, current_loss)
+
+        if F_val != (None, None):
+            loss_val = _add_dict({}, compute_fugw_loss_validation(pi, gamma))
+        else:
+            loss_val = _add_dict({}, current_loss)
+
         loss_steps = [0]
         loss_times = [0]
         idx = 0
@@ -503,9 +549,16 @@ class FUGWSparseSolver(BaseSolver):
             err = (pi.values() - pi_prev.values()).abs().sum().item()
             if idx % self.eval_bcd == 0:
                 current_loss = compute_fugw_loss(pi, gamma)
+                if F_val != (None, None):
+                    current_loss_validation = compute_fugw_loss_validation(
+                        pi, gamma
+                    )
+                else:
+                    current_loss_validation = deepcopy(current_loss)
 
                 loss_steps.append(idx + 1)
                 loss = _add_dict(loss, current_loss)
+                loss_val = _add_dict(loss_val, current_loss_validation)
                 loss_times.append(time.time() - t0)
 
                 if verbose:
@@ -532,6 +585,7 @@ class FUGWSparseSolver(BaseSolver):
             "duals_pi": duals_pi,
             "duals_gamma": duals_gamma,
             "loss": loss,
+            "loss_val": loss_val,
             "loss_steps": loss_steps,
             "loss_times": loss_times,
         }
