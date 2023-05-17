@@ -15,10 +15,16 @@ Examples
 
     </div>
 
-=========
-📚 Basics
-=========
+======
+Basics
+======
 
+This section will cover the basic ideas behind this package.
+We introduce the Fused Unbalanced Gromov Wasserstein loss and
+its dense solvers. Then we show how a large, low-rank geometry
+can be approximated with by computing an embedding, resulting in
+much less memory usage. Finally, we show how these embeddings
+can be used in combination with sparse solvers for the FUGW loss.
 
 
 .. raw:: html
@@ -81,10 +87,11 @@ Examples
 
     </div>
 
-==================
-🧠 Brain alignment
-==================
+===============
+Brain alignment
+===============
 
+This subsection gives an exhaustive overview of brain alignment pipelines which cover 4 cases: volumetric or surface data, low or high resolution. 
 
 
 .. raw:: html
@@ -105,7 +112,7 @@ Examples
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Align low-resolution brain surfaces of 2 individuals with fMRI data</div>
+      <div class="sphx-glr-thumbnail-title">Low-resolution surface alignment of 2 individuals with fMRI data</div>
     </div>
 
 
@@ -122,38 +129,7 @@ Examples
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Align high-resolution brain surfaces of 2 individuals with fMRI data</div>
-    </div>
-
-
-.. raw:: html
-
-    </div>
-
-========================
-🧊 Volumetric alignments
-========================
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbnails">
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
-
-.. only:: html
-
-  .. image:: /auto_examples/02_volumetric_alignment/images/thumb/sphx_glr_plot_1_aligning_low_res_volumes_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_02_volumetric_alignment_plot_1_aligning_low_res_volumes.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Align low-resolution brain volumes of 2 individuals with fMRI data</div>
+      <div class="sphx-glr-thumbnail-title">High-resolution surface alignment of 2 individuals with fMRI data</div>
     </div>
 
 
@@ -163,14 +139,31 @@ Examples
 
 .. only:: html
 
-  .. image:: /auto_examples/02_volumetric_alignment/images/thumb/sphx_glr_plot_2_aligning_high_res_volumes_thumb.png
+  .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_3_aligning_low_res_volumes_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_02_volumetric_alignment_plot_2_aligning_high_res_volumes.py`
+  :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_3_aligning_low_res_volumes.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Align low-resolution brain volumes of 2 individuals with fMRI data</div>
+      <div class="sphx-glr-thumbnail-title">Low-resolution volume alignment of 2 individuals with fMRI data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
+
+.. only:: html
+
+  .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_4_aligning_high_res_volumes_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">High-resolution volume alignment of 2 individuals with fMRI data</div>
     </div>
 
 
@@ -178,9 +171,13 @@ Examples
 
     </div>
 
-==================
-📉 Validation loss
-==================
+=============
+Miscellaneous
+=============
+
+This section contains a series of miscellaneous tools
+that are not directly related to the main functionality of the package,
+but that can be useful in some cases.
 
 
 .. raw:: html
@@ -194,14 +191,31 @@ Examples
 
 .. only:: html
 
-  .. image:: /auto_examples/03_validation_set/images/thumb/sphx_glr_plot_1_simple_crossval_thumb.png
+  .. image:: /auto_examples/02_miscellaneous/images/thumb/sphx_glr_plot_1_simple_crossval_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_03_validation_set_plot_1_simple_crossval.py`
+  :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_1_simple_crossval.py`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Using a validation set to monitor the convergence of the fugw loss</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor memory usage at each iteration of the bl...">
+
+.. only:: html
+
+  .. image:: /auto_examples/02_miscellaneous/images/thumb/sphx_glr_plot_2_memory_usage_callback_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_2_memory_usage_callback.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Monitor memory usage at each BCD iteration with callbacks</div>
     </div>
 
 
@@ -217,8 +231,7 @@ Examples
 
    /auto_examples/00_basics/index.rst
    /auto_examples/01_brain_alignment/index.rst
-   /auto_examples/02_volumetric_alignment/index.rst
-   /auto_examples/03_validation_set/index.rst
+   /auto_examples/02_miscellaneous/index.rst
 
 
 

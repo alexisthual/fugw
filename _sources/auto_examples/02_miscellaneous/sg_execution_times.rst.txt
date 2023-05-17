@@ -1,0 +1,15 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_02_miscellaneous_sg_execution_times:
+
+
+Computation times
+=================
+**02:22.481** total execution time for **auto_examples_02_miscellaneous** files:
+
++----------------------------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_1_simple_crossval.py` (``plot_1_simple_crossval.py``)             | 02:21.114 | 8.1 MB |
++----------------------------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_2_memory_usage_callback.py` (``plot_2_memory_usage_callback.py``) | 00:01.367 | 8.1 MB |
++----------------------------------------------------------------------------------------------------------------------+-----------+--------+

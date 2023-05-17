@@ -103,7 +103,7 @@ fine_mapping_solver_params = {
 source_sample = torch.randperm(n_points_source)[:n_samples_source]
 target_sample = torch.randperm(n_points_target)[:n_samples_target]
 
-coarse_to_fine.fit(
+_ = coarse_to_fine.fit(
     # Source and target's features and embeddings
     source_features=source_features_train_normalized,
     target_features=target_features_train_normalized,

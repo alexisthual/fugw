@@ -1,8 +1,8 @@
 # %%
 """
-====================================================================
-Align high-resolution brain surfaces of 2 individuals with fMRI data
-====================================================================
+=================================================================
+High-resolution surface alignment of 2 individuals with fMRI data
+=================================================================
 
 In this example, we show how to use this package to align 2
 high-resolution left hemispheres using fMRI feature maps

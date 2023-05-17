@@ -2,10 +2,11 @@
 
 .. _sphx_glr_auto_examples_01_brain_alignment:
 
-==================
-🧠 Brain alignment
-==================
+===============
+Brain alignment
+===============
 
+This subsection gives an exhaustive overview of brain alignment pipelines which cover 4 cases: volumetric or surface data, low or high resolution. 
 
 
 .. raw:: html
@@ -26,7 +27,7 @@
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Align low-resolution brain surfaces of 2 individuals with fMRI data</div>
+      <div class="sphx-glr-thumbnail-title">Low-resolution surface alignment of 2 individuals with fMRI data</div>
     </div>
 
 
@@ -43,7 +44,41 @@
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Align high-resolution brain surfaces of 2 individuals with fMRI data</div>
+      <div class="sphx-glr-thumbnail-title">High-resolution surface alignment of 2 individuals with fMRI data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
+
+.. only:: html
+
+  .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_3_aligning_low_res_volumes_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_3_aligning_low_res_volumes.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Low-resolution volume alignment of 2 individuals with fMRI data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
+
+.. only:: html
+
+  .. image:: /auto_examples/01_brain_alignment/images/thumb/sphx_glr_plot_4_aligning_high_res_volumes_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">High-resolution volume alignment of 2 individuals with fMRI data</div>
     </div>
 
 
@@ -57,4 +92,6 @@
 
    /auto_examples/01_brain_alignment/plot_1_aligning_brain_dense
    /auto_examples/01_brain_alignment/plot_2_aligning_brain_sparse
+   /auto_examples/01_brain_alignment/plot_3_aligning_low_res_volumes
+   /auto_examples/01_brain_alignment/plot_4_aligning_high_res_volumes
 
