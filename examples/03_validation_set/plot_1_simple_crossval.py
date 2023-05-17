@@ -8,7 +8,7 @@ In this example, we use 3 fMRI feature maps for training and 2 independant
 fMRI feature maps for testing to examine the evolutions of a training and
 a validation loss on 2 low-resolution brain volumes.
 """
-# sphinx_gallery_thumbnail_number = 9
+# sphinx_gallery_thumbnail_number = 2
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,8 +16,6 @@ import matplotlib.pyplot as plt
 from nilearn import datasets, image, plotting
 from scipy.spatial import distance_matrix
 from fugw.mappings import FUGW
-
-plt.rcParams["figure.dpi"] = 300
 
 # %%
 # We first fetch 5 contrasts for each subject from the localizer dataset.
@@ -75,7 +73,15 @@ fig = plt.figure()
 ax = fig.add_subplot(projection="3d")
 ax.scatter(coordinates[:, 0], coordinates[:, 1], coordinates[:, 2], marker="o")
 ax.view_init(10, 135)
-ax.set_axis_off()
+# make the panes transparent
+ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+# make the grid lines transparent
+ax.xaxis._axinfo["grid"]["color"] = (1, 1, 1, 0)
+ax.yaxis._axinfo["grid"]["color"] = (1, 1, 1, 0)
+ax.zaxis._axinfo["grid"]["color"] = (1, 1, 1, 0)
+ax.set_title("3D voxel coordinates")
 plt.show()
 
 # %%
@@ -96,7 +102,10 @@ source_geometry_normalized = source_geometry / np.max(source_geometry)
 target_geometry_normalized = target_geometry / np.max(target_geometry)
 
 # %%
-# We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
+# We now fit the mapping using the sinkhorn solver and 10 BCD iterations.
+# We use the first 3 feature maps for training and the last 2 for validation.
+# Anatomical kernels are kept identical for both training and validation,
+# as it will usually be the case in practice when aligning real fMRI data.
 mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 _ = mapping.fit(
     source_features=source_features_normalized[:n_training_contrasts],
@@ -105,8 +114,6 @@ _ = mapping.fit(
     target_geometry=target_geometry_normalized,
     source_features_val=source_features_normalized[n_training_contrasts:],
     target_features_val=target_features_normalized[n_training_contrasts:],
-    source_geometry_val=source_geometry_normalized,
-    target_geometry_val=target_geometry_normalized,
     solver="sinkhorn",
     solver_params={
         "nits_bcd": 10,
@@ -117,23 +124,15 @@ _ = mapping.fit(
 # %%
 # Plot the evolution of losses on train and test datasets.
 fig, ax1 = plt.subplots()
-
-color = "tab:blue"
 ax1.set_xlabel("BCD Step")
-ax1.set_ylabel("FUGW loss train", color=color)
-ax1.plot(mapping.loss_steps, mapping.loss["total"], color=color)
-ax1.tick_params(axis="y", labelcolor=color)
+ax1.set_ylabel("FUGW loss", color="black")
+ax1.tick_params(axis="y", labelcolor="black")
 
-ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
-
-color = "tab:orange"
-ax2.set_ylabel(
-    "FUGW loss test", color=color
-)  # we already handled the x-label with ax1
-ax2.plot(mapping.loss_steps, mapping.loss_val["total"], color=color)
-ax2.tick_params(axis="y", labelcolor=color)
+ax1.plot(mapping.loss_steps, mapping.loss["total"], color="blue")
+ax1.plot(mapping.loss_steps, mapping.loss_val["total"], color="red")
 
 plt.title("Training and validation losses")
+plt.legend(["Train", "Validation"])
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 plt.show()
 

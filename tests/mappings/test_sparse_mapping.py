@@ -205,7 +205,7 @@ def test_sparse_validation_mapping(validation):
             init_plan=init_plan,
             device=device,
         )
-        assert len(fugw.loss_val) == len(fugw.loss)
+        assert fugw.loss_val == fugw.loss
 
     elif validation == "features":
         fugw.fit(

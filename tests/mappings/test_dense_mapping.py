@@ -131,7 +131,7 @@ def test_validation_mapping(validation):
             },
             device="cpu",
         )
-        assert len(fugw.loss_val) == len(fugw.loss)
+        assert fugw.loss_val == fugw.loss
 
     elif validation == "features":
         fugw.fit(
