@@ -12,13 +12,15 @@ devices = [torch.device("cpu")]
 if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
+callbacks = [None, lambda x: x["gamma"]]
+
 
 # TODO: need to test sinkhorn
 @pytest.mark.parametrize(
-    "solver,device",
-    product(["mm", "ibpp"], devices),
+    "solver,device,callback",
+    product(["mm", "ibpp"], devices, callbacks),
 )
-def test_sparse_solvers(solver, device):
+def test_sparse_solvers(solver, device, callback):
     torch.manual_seed(1)
     torch.backends.cudnn.benchmark = True
 
@@ -75,6 +77,7 @@ def test_sparse_solvers(solver, device):
         Dt=Dt_normalized,
         init_plan=init_plan,
         solver=solver,
+        callback_bcd=callback,
         verbose=True,
     )
 

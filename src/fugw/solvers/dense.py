@@ -212,6 +212,7 @@ class FUGWSolver(BaseSolver):
         init_plan=None,
         init_duals=None,
         solver="sinkhorn",
+        callback_bcd=None,
         divergence="kl",
         verbose=False,
     ):
@@ -242,6 +243,11 @@ class FUGWSolver(BaseSolver):
             Initialization duals for coupling.
         solver: "sinkhorn", "mm", "ibpp"
             Solver to use.
+        callback_bcd: callable or None
+            Callback function called at the end of each BCD step.
+            It will be called with the following arguments:
+
+                - locals (dictionary containing all local variables)
         verbose: bool, optional, defaults to False
             Log solving process.
 
@@ -515,6 +521,9 @@ class FUGWSolver(BaseSolver):
                     < self.early_stopping_threshold
                 ):
                     break
+
+            if callback_bcd is not None:
+                callback_bcd(locals())
 
             idx += 1
 

@@ -233,6 +233,7 @@ class FUGWSparseSolver(BaseSolver):
         init_plan=None,
         init_duals=None,
         solver="ibpp",
+        callback_bcd=None,
         verbose=False,
     ):
         """Run BCD iterations.
@@ -260,6 +261,11 @@ class FUGWSparseSolver(BaseSolver):
             Initialisation matrix for sample coupling.
         solver: "sinkhorn", "mm", "ibpp"
             Solver to use.
+        callback_bcd: callable or None
+            Callback function called at the end of each BCD step.
+            It will be called with the following arguments:
+
+                - locals (dictionary containing all local variables)
         verbose: bool, optional, defaults to False
             Log solving process.
 
@@ -485,6 +491,7 @@ class FUGWSparseSolver(BaseSolver):
         idx = 0
         err = self.tol_bcd + 1e-3
 
+        # Run block coordinate descent (BCD) iterations
         t0 = time.time()
         while (err > self.tol_bcd) and (idx < self.nits_bcd):
             pi_prev = pi.detach().clone()
@@ -509,10 +516,11 @@ class FUGWSparseSolver(BaseSolver):
                 )
 
             gamma_scaling_factor = (mp / csr_sum(gamma)).sqrt()
+            new_gamma_values = gamma.values() * gamma_scaling_factor
             gamma = torch.sparse_csr_tensor(
-                gamma.crow_indices(),
-                gamma.col_indices(),
-                gamma.values() * gamma_scaling_factor,
+                crow_indices,
+                col_indices,
+                new_gamma_values,
                 size=gamma.size(),
                 device=device,
             )
@@ -537,10 +545,11 @@ class FUGWSparseSolver(BaseSolver):
                 )
 
             pi_scaling_factor = (mg / csr_sum(pi)).sqrt()
+            new_pi_values = pi.values() * pi_scaling_factor
             pi = torch.sparse_csr_tensor(
-                pi.crow_indices(),
-                pi.col_indices(),
-                pi.values() * pi_scaling_factor,
+                crow_indices,
+                col_indices,
+                new_pi_values,
                 size=pi.size(),
                 device=device,
             )
@@ -573,6 +582,9 @@ class FUGWSparseSolver(BaseSolver):
                     < self.early_stopping_threshold
                 ):
                     break
+
+            if callback_bcd is not None:
+                callback_bcd(locals())
 
             idx += 1
 

@@ -110,7 +110,7 @@ pre {
 }
 
 /* Correct font-size for admonitions and code */
-.admonition, .admonition-title, code.literal {
+.admonition, .admonition-title {
   font-size: var(--font-size-normal) !important;
 }
 

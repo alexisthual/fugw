@@ -1,22 +1,22 @@
 # %%
 """
-===================================================================
-Align low-resolution brain volumes of 2 individuals with fMRI data
-===================================================================
+================================================================
+High-resolution volume alignment of 2 individuals with fMRI data
+================================================================
 
 In this example, we align 2 low-resolution brain volumes
 using 4 fMRI feature maps (z-score contrast maps).
 """
-# sphinx_gallery_thumbnail_number = 8
+# sphinx_gallery_thumbnail_number = 3
 
 import numpy as np
+import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from nilearn import datasets, image
 from fugw.mappings import FUGW, FUGWSparse
 from fugw.scripts import coarse_to_fine, lmds
-
-plt.rcParams["figure.dpi"] = 300
 
 # %%
 # We first fetch 5 contrasts for each subject from the localizer dataset.
@@ -44,8 +44,9 @@ source_im = image.load_img(source_imgs_paths)
 target_im = image.load_img(target_imgs_paths)
 
 # %%
-# Let's use a geometry of 7633 voxels.
-SCALE_FACTOR = 2
+# Let's use a resolution of 2000 voxels so that computations
+# can easily run on a single CPU.
+SCALE_FACTOR = 3
 
 source_maps = np.nan_to_num(
     source_im.get_fdata()[::SCALE_FACTOR, ::SCALE_FACTOR, ::SCALE_FACTOR]
@@ -66,12 +67,18 @@ source_features = source_maps[
 target_features = target_maps[
     coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]
 ].T
+source_features.shape
 
-fig = plt.figure()
+# %%
+fig = plt.figure(figsize=(5, 5))
+
 ax = fig.add_subplot(projection="3d")
-ax.scatter(coordinates[:, 0], coordinates[:, 1], coordinates[:, 2], marker="o")
+ax.set_title("Voxel coordinates")
+ax.scatter(coordinates[:, 0], coordinates[:, 1], coordinates[:, 2], marker=".")
+
 ax.view_init(10, 135)
 ax.set_axis_off()
+plt.tight_layout()
 plt.show()
 
 # %%
@@ -138,7 +145,12 @@ target_sample = coarse_to_fine.sample_volume_uniformly(
 
 # %%
 # Train both the coarse and the fine mapping.
-coarse_to_fine.fit(
+# We set the selection radius to 3mm for both source and target
+# (don't forget to divide by the distance returned by
+# `coarse_to_fine.random_normalizing()` so that geometries
+# and selection radia have the same units).
+
+_ = coarse_to_fine.fit(
     # Source and target's features and embeddings
     source_features=source_features_normalized[:n_training_contrasts, :],
     target_features=target_features_normalized[:n_training_contrasts, :],
@@ -172,31 +184,39 @@ one_hot = np.zeros(source_features.shape[1])
 one_hot[vertex_index] = 1.0
 probability_map = fine_mapping.inverse_transform(one_hot)
 
-fig = plt.figure()
+fig = plt.figure(figsize=(7, 5))
+
 ax = fig.add_subplot(projection="3d")
-ax.scatter(
+ax.set_title(
+    "Probability map of target voxels\n"
+    f"being matched with source voxel {vertex_index}"
+)
+
+s = ax.scatter(
     coordinates[:, 0],
     coordinates[:, 1],
     coordinates[:, 2],
     marker="o",
     c=probability_map,
-    cmap="twilight",
     alpha=0.75,
+    cmap="Reds",
 )
+
 ax.text(
     coordinates[vertex_index, 0],
     coordinates[vertex_index, 1],
     coordinates[vertex_index, 2] - 2,
-    "x Source point",
-    color="red",
+    "x Source voxel",
+    color="black",
+    size=12,
 )
+
+colorbar = fig.colorbar(s, ax=ax, alpha=1)
+colorbar.ax.set_position([0.9, 0.15, 0.03, 0.7])
+
 ax.view_init(10, 135, 2)
-ax.set_title(
-    "Probability map of target voxels\n"
-    f"being matched with source point {vertex_index}"
-)
 ax.set_axis_off()
-fig.colorbar(plt.cm.ScalarMappable(cmap="twilight"), ax=ax)
+plt.tight_layout()
 plt.show()
 
 # %%
@@ -225,45 +245,56 @@ print(
 
 # %%
 # Let's plot the transporting feature maps of the test set.
-fig = plt.figure(figsize=plt.figaspect(0.3))
-fig.suptitle("Transporting feature maps of the test set", size=16)
-ax = fig.add_subplot(1, 2, 1, projection="3d")
-ax.scatter(
+fig = plt.figure(figsize=(12, 4))
+fig.suptitle("Transporting feature maps of the test set")
+
+ax = fig.add_subplot(1, 3, 1, projection="3d")
+s = ax.scatter(
     coordinates[:, 0],
     coordinates[:, 1],
     coordinates[:, 2],
     marker="o",
     c=source_features_normalized[-1, :],
-    cmap="twilight",
+    cmap="coolwarm",
+    norm=colors.CenteredNorm(),
 )
 ax.view_init(10, 135, 2)
 ax.set_title("Source features")
 ax.set_axis_off()
 
-ax = fig.add_subplot(1, 1, 1, projection="3d")
+ax = fig.add_subplot(1, 3, 2, projection="3d")
 ax.scatter(
     coordinates[:, 0],
     coordinates[:, 1],
     coordinates[:, 2],
     marker="o",
     c=predicted_target_features,
-    cmap="twilight",
+    cmap="coolwarm",
+    norm=colors.CenteredNorm(),
 )
 ax.view_init(10, 135, 2)
 ax.set_title("Predicted target features")
 ax.set_axis_off()
 
-ax = fig.add_subplot(1, 2, 2, projection="3d")
+ax = fig.add_subplot(1, 3, 3, projection="3d")
 ax.scatter(
     coordinates[:, 0],
     coordinates[:, 1],
     coordinates[:, 2],
     marker="o",
     c=target_features_normalized[-1, :],
-    cmap="twilight",
+    cmap="coolwarm",
+    norm=colors.CenteredNorm(),
 )
 ax.view_init(10, 135, 2)
 ax.set_title("Actual target features")
 ax.set_axis_off()
-fig.colorbar(plt.cm.ScalarMappable(cmap="twilight"), ax=ax)
+
+ax = fig.add_subplot(1, 1, 1)
+ax.set_axis_off()
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="1%")
+fig.colorbar(s, cax=cax)
+
+plt.tight_layout()
 plt.show()

@@ -23,11 +23,14 @@ if torch.cuda.is_available():
 
 solvers = ["sinkhorn", "mm", "ibpp"]
 
+callbacks = [None, lambda x: x["gamma"]]
+
 
 @pytest.mark.parametrize(
-    "device,return_numpy,solver", product(devices, return_numpys, solvers)
+    "device,return_numpy,solver,callback",
+    product(devices, return_numpys, solvers, callbacks),
 )
-def test_dense_mapping(device, return_numpy, solver):
+def test_dense_mapping(device, return_numpy, solver, callback):
     # Generate random training data for source and target
     _, source_features_train, source_geometry, _ = _init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
@@ -47,6 +50,7 @@ def test_dense_mapping(device, return_numpy, solver):
             "nits_bcd": 3,
             "ibpp_eps_base": 1e8,
         },
+        callback_bcd=callback,
         device=device,
     )
 
