@@ -108,8 +108,8 @@ def pearson_corr(x, y):
         torch.sum(vx * vy)
         / (
             torch.sqrt(torch.sum(vx**2)) * torch.sqrt(torch.sum(vy**2))
-        ).numpy()
-    )
+        )
+    ).numpy()
 
     return corr
 
