@@ -9,6 +9,7 @@ the block-coordinate descent (BCD) algorithm.
 This can be useful to detect numerical errors, or to check that the
 mapping is fitting the data correctly.
 """
+# sphinx_gallery_thumbnail_number = 1
 
 import torch
 import numpy as np
@@ -93,8 +94,9 @@ target_geometry_normalized = target_geometry / np.max(target_geometry)
 
 
 # %%
-# We first define a function to compute the Pearson correlation between two tensors.
-# Such function is not available in PyTorch, but it is easy to implement.
+# We first define a function to compute the Pearson correlation
+# between two tensors. Such function is not available in PyTorch,
+# but it is easy to implement.
 def pearson_corr(x, y):
     """Compute the Pearson correlation between two tensors."""
     if not torch.is_tensor(x) or not torch.is_tensor(y):
@@ -106,19 +108,19 @@ def pearson_corr(x, y):
 
     corr = (
         torch.sum(vx * vy)
-        / (
-            torch.sqrt(torch.sum(vx**2)) * torch.sqrt(torch.sum(vy**2))
-        )
+        / (torch.sqrt(torch.sum(vx**2)) * torch.sqrt(torch.sum(vy**2)))
     ).numpy()
 
     return corr
 
 
 # %%
-# We then define a callback function that computes the Pearson correlation
-# between the transformed features and the target features at each BCD iteration.
+# We then define a callback function that computes the
+# Pearson correlation between the transformed features and
+# the target features at each BCD iteration.
 
-# Initialize the list of Pearson correlations with the original untansformed features
+# Initialize the list of Pearson correlations with the original
+# untansformed features
 corr_bcd_steps = [
     pearson_corr(source_features_normalized, target_features_normalized)
 ]
@@ -175,10 +177,12 @@ _ = mapping.fit(
 )
 
 # %%
-# We finally plot the evolution of the Pearson correlation and the training loss
-# at each BCD iteration. We can see that the Pearson correlation dips at the first
-# iteration, but quickly increases and stabilizes at the second iteration. This
-# is due to the initialization of the transport plan, which is filled with ones.
+# We finally plot the evolution of the Pearson correlation and
+# the training loss at each BCD iteration. We can see that the
+# Pearson correlation dips at the first iteration, but quickly
+# increases and stabilizes at the second iteration. This
+# is due to the initialization of the transport plan, which
+# is filled with ones.
 fig, ax1 = plt.subplots()
 
 color = "tab:red"
