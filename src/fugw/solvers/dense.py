@@ -520,6 +520,8 @@ class FUGWSolver(BaseSolver):
                     and abs(loss["total"][-2] - loss["total"][-1])
                     < self.early_stopping_threshold
                 ):
+                    if callback_bcd is not None:
+                        callback_bcd(locals())
                     break
 
             if callback_bcd is not None:
