@@ -90,7 +90,7 @@ We first fetch 5 contrasts for each subject from the localizer dataset.
     Downloading data from https://osf.io/download/5d27cdcaa26b340018084b30/ ...
      ...done. (2 seconds, 0 min)
     Downloading data from https://osf.io/download/5d27d80c114a420016058f7d/ ...
-     ...done. (2 seconds, 0 min)
+     ...done. (1 seconds, 0 min)
     /usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:893: UserWarning:
 
     `legacy_format` will default to `False` in release 0.11. Dataset fetchers will then return pandas dataframes by default instead of recarrays.
@@ -282,43 +282,43 @@ as it will usually be the case in practice when aligning real fMRI data.
 
  .. code-block:: none
 
-    [14:09:36] Validation data for anatomical kernels is not provided.  dense.py:202
+    [15:16:40] Validation data for anatomical kernels is not provided.  dense.py:202
                Using training data instead.                                         
 
 
-    [14:09:45] BCD step 1/10   FUGW loss:      0.024832315742969513     dense.py:512
+    [15:16:49] BCD step 1/10   FUGW loss:      0.024832315742969513     dense.py:512
                Validation loss:        0.026611780747771263                         
 
 
-    [14:10:01] BCD step 2/10   FUGW loss:      0.007541899103671312     dense.py:512
+    [15:17:05] BCD step 2/10   FUGW loss:      0.007541899103671312     dense.py:512
                Validation loss:        0.007889322005212307                         
 
 
-    [14:10:17] BCD step 3/10   FUGW loss:      0.006806281860917807     dense.py:512
+    [15:17:20] BCD step 3/10   FUGW loss:      0.006806281860917807     dense.py:512
                Validation loss:        0.0068863932974636555                        
 
 
-    [14:10:32] BCD step 4/10   FUGW loss:      0.006414642557501793     dense.py:512
+    [15:17:35] BCD step 4/10   FUGW loss:      0.006414642557501793     dense.py:512
                Validation loss:        0.006308848038315773                         
 
 
-    [14:10:48] BCD step 5/10   FUGW loss:      0.0062024896033108234    dense.py:512
+    [15:17:51] BCD step 5/10   FUGW loss:      0.0062024896033108234    dense.py:512
                Validation loss:        0.005969317629933357                         
 
 
-    [14:11:03] BCD step 6/10   FUGW loss:      0.0059875245206058025    dense.py:512
+    [15:18:06] BCD step 6/10   FUGW loss:      0.0059875245206058025    dense.py:512
                Validation loss:        0.005596095230430365                         
 
 
-    [14:11:19] BCD step 7/10   FUGW loss:      0.005855212919414043     dense.py:512
+    [15:18:21] BCD step 7/10   FUGW loss:      0.005855212919414043     dense.py:512
                Validation loss:        0.0053304582834243774                        
 
 
-    [14:11:34] BCD step 8/10   FUGW loss:      0.00584545498713851      dense.py:512
+    [15:18:37] BCD step 8/10   FUGW loss:      0.00584545498713851      dense.py:512
                Validation loss:        0.005313127767294645                         
 
 
-    [14:11:50] BCD step 9/10   FUGW loss:      0.005844560451805592     dense.py:512
+    [15:18:52] BCD step 9/10   FUGW loss:      0.005844560451805592     dense.py:512
                Validation loss:        0.005311604589223862                         
 
 
@@ -693,7 +693,7 @@ and project it on the fsaverage5 surface.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  21.114 seconds)
+   **Total running time of the script:** ( 2 minutes  18.484 seconds)
 
 **Estimated memory usage:**  8 MB
 

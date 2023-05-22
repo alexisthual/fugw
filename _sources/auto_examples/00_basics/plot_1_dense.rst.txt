@@ -237,29 +237,29 @@ using a sinkhorn solver
 
  .. code-block:: none
 
-    [13:57:26] Validation data for feature maps is not provided. Using  dense.py:175
+    [15:04:02] Validation data for feature maps is not provided. Using  dense.py:175
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:202
                Using training data instead.                                         
 
 
-               BCD step 1/10   FUGW loss:      0.029017694294452667     dense.py:512
+    [15:04:03] BCD step 1/10   FUGW loss:      0.029017694294452667     dense.py:512
                Validation loss:        0.029017694294452667                         
 
 
-    [13:57:27] BCD step 2/10   FUGW loss:      0.04671149328351021      dense.py:512
+               BCD step 2/10   FUGW loss:      0.04671149328351021      dense.py:512
                Validation loss:        0.04671149328351021                          
 
 
-               BCD step 3/10   FUGW loss:      0.022675596177577972     dense.py:512
+    [15:04:04] BCD step 3/10   FUGW loss:      0.022675596177577972     dense.py:512
                Validation loss:        0.022675596177577972                         
 
 
-    [13:57:28] BCD step 4/10   FUGW loss:      0.022144610062241554     dense.py:512
+               BCD step 4/10   FUGW loss:      0.022144610062241554     dense.py:512
                Validation loss:        0.022144610062241554                         
 
 
-               BCD step 5/10   FUGW loss:      0.04954808950424194      dense.py:512
+    [15:04:05] BCD step 5/10   FUGW loss:      0.04954808950424194      dense.py:512
                Validation loss:        0.04954808950424194                          
 
 
@@ -267,7 +267,7 @@ using a sinkhorn solver
                Validation loss:        0.0239147637039423                           
 
 
-    [13:57:29] BCD step 7/10   FUGW loss:      0.01939348317682743      dense.py:512
+    [15:04:06] BCD step 7/10   FUGW loss:      0.01939348317682743      dense.py:512
                Validation loss:        0.01939348317682743                          
 
 
@@ -275,7 +275,7 @@ using a sinkhorn solver
                Validation loss:        0.018673155456781387                         
 
 
-    [13:57:30] BCD step 9/10   FUGW loss:      0.018613629043102264     dense.py:512
+    [15:04:07] BCD step 9/10   FUGW loss:      0.018613629043102264     dense.py:512
                Validation loss:        0.018613629043102264                         
 
 
@@ -485,9 +485,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.357 seconds)
+   **Total running time of the script:** ( 0 minutes  6.804 seconds)
 
-**Estimated memory usage:**  45 MB
+**Estimated memory usage:**  43 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_1_dense.py:
