@@ -4,24 +4,24 @@ Monitor the Pearson correlation during training with callbacks
 ==============================================================
 
 In this example, we use a callback function to monitor the Pearson correlation
-between the transformed features and the target features at each iteration of
+between transformed and target features at each iteration of
 the block-coordinate descent (BCD) algorithm.
 This can be useful to detect numerical errors, or to check that the
-mapping is fitting the data correctly.
+mapping is not over-fitting training data.
 """
 # sphinx_gallery_thumbnail_number = 1
 
-import torch
-import numpy as np
-import matplotlib.pyplot as plt
-
 from functools import partial
 
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
 from nilearn import datasets, image
+from rich.console import Console
 from scipy.spatial import distance_matrix
+
 from fugw.mappings import FUGW
 from fugw.utils import _make_tensor
-from rich.console import Console
 
 # %%
 # We first fetch 5 contrasts for each subject from the localizer dataset.
@@ -82,7 +82,7 @@ target_geometry = source_geometry.copy()
 
 # %%
 # In order to avoid numerical errors when fitting the mapping, we normalize
-# both the features and the geometry.
+# all feature and geometry arrays.
 source_features_normalized = source_features / np.linalg.norm(
     source_features, axis=1
 ).reshape(-1, 1)
@@ -97,18 +97,26 @@ target_geometry_normalized = target_geometry / np.max(target_geometry)
 # We first define a function to compute the Pearson correlation
 # between two tensors. Such function is not available in PyTorch,
 # but it is easy to implement.
-def pearson_corr(x, y):
-    """Compute the Pearson correlation between two tensors."""
+def pearson_corr(x, y, plan):
+    """
+    Compute the Pearson correlation between transformed
+    source features and target features.
+    """
     if not torch.is_tensor(x) or not torch.is_tensor(y):
-        x = torch.tensor(x)
-        y = torch.tensor(y)
+        x = torch.tensor(x).to(torch.float64)
+        y = torch.tensor(y).to(torch.float64)
 
-    vx = x - torch.mean(x)
+    # Compute the transformed features
+    x_transformed = (
+        (plan @ x.T / plan.sum(dim=1).reshape(-1, 1)).T.detach().cpu()
+    )
+
+    vx = x_transformed - torch.mean(x_transformed)
     vy = y - torch.mean(y)
 
     corr = (
         torch.sum(vx * vy)
-        / (torch.sqrt(torch.sum(vx**2)) * torch.sqrt(torch.sum(vy**2)))
+        / (torch.sqrt(torch.sum(vx**2) * torch.sum(vy**2)))
     ).numpy()
 
     return corr
@@ -116,13 +124,24 @@ def pearson_corr(x, y):
 
 # %%
 # We then define a callback function that computes the
-# Pearson correlation between the transformed features and
-# the target features at each BCD iteration.
+# Pearson correlation between transformed features and
+# target features at each BCD iteration.
 
-# Initialize the list of Pearson correlations with the original
-# untansformed features
+
+# Initialize the transport plan with ones and normalize it
+init_plan = torch.ones(
+    (source_features_normalized.shape[1], source_features_normalized.shape[1])
+).to(float)
+init_plan_normalized = init_plan / init_plan.sum()
+
+# Initialize the list of Pearson correlations by fitting
+# source features with the initial plan
 corr_bcd_steps = [
-    pearson_corr(source_features_normalized, target_features_normalized)
+    pearson_corr(
+        source_features_normalized,
+        target_features_normalized,
+        init_plan_normalized,
+    )
 ]
 
 
@@ -134,20 +153,13 @@ def correlation_callback(
 ):
     console = Console()
 
-    # Get the current transport plan and tensorize the features
+    # Get current transport plan and tensorize features
     pi = locals["pi"]
     source_features_tensor = _make_tensor(source_features, device)
     target_features_tensor = _make_tensor(target_features, device)
 
-    # Compute the transformed features
-    transformed_features = (
-        (pi @ source_features_tensor.T / pi.sum(dim=1).reshape(-1, 1))
-        .T.detach()
-        .cpu()
-    )
-
     # Compute the Pearson correlation and append it to the list
-    corr = pearson_corr(transformed_features, target_features_tensor)
+    corr = pearson_corr(source_features_tensor, target_features_tensor, pi)
     corr_bcd_steps.append(corr)
 
     console.log("Pearson correlation: ", corr)
@@ -177,12 +189,10 @@ _ = mapping.fit(
 )
 
 # %%
-# We finally plot the evolution of the Pearson correlation and
-# the training loss at each BCD iteration. We can see that the
-# Pearson correlation dips at the first iteration, but quickly
-# increases and stabilizes at the second iteration. This
-# is due to the initialization of the transport plan, which
-# is filled with ones.
+# The Pearson correlation and training loss evolution are then plotted for
+# each BCD iteration. As we begin over-fitting the training data, the
+# correlation rises during the initial iterations before gradually
+# falling down.
 fig, ax1 = plt.subplots()
 
 color = "tab:red"
