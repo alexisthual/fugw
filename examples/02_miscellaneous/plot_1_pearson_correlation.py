@@ -8,6 +8,8 @@ between transformed and target features at each iteration of
 the block-coordinate descent (BCD) algorithm.
 This can be useful to detect numerical errors, or to check that the
 mapping is not over-fitting training data.
+Note that in this example, we don't use a proper validation dataset.
+Instead, we simply compute more metrics on our training dataset.
 """
 # sphinx_gallery_thumbnail_number = 1
 
@@ -103,8 +105,8 @@ def pearson_corr(x, y, plan):
     source features and target features.
     """
     if not torch.is_tensor(x) or not torch.is_tensor(y):
-        x = torch.tensor(x).to(torch.float64)
-        y = torch.tensor(y).to(torch.float64)
+        x = torch.tensor(x).to(torch.float32)
+        y = torch.tensor(y).to(torch.float32)
 
     # Compute the transformed features
     x_transformed = (
@@ -131,7 +133,7 @@ def pearson_corr(x, y, plan):
 # Initialize the transport plan with ones and normalize it
 init_plan = torch.ones(
     (source_features_normalized.shape[1], source_features_normalized.shape[1])
-).to(float)
+).to(torch.float32)
 init_plan_normalized = init_plan / init_plan.sum()
 
 # Initialize the list of Pearson correlations by fitting
@@ -175,6 +177,7 @@ _ = mapping.fit(
     target_features=target_features_normalized,
     source_geometry=source_geometry_normalized,
     target_geometry=target_geometry_normalized,
+    init_plan=init_plan_normalized,
     solver="sinkhorn",
     solver_params={
         "nits_bcd": 10,
@@ -190,9 +193,8 @@ _ = mapping.fit(
 
 # %%
 # The Pearson correlation and training loss evolution are then plotted for
-# each BCD iteration. As we begin over-fitting the training data, the
-# correlation rises during the initial iterations before gradually
-# falling down.
+# each BCD iteration. Notice how the correlation only improves upon a
+# certain number of iterations, even though the fugw loss keeps decreasing.
 fig, ax1 = plt.subplots()
 
 color = "tab:red"
