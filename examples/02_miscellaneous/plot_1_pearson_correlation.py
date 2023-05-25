@@ -18,9 +18,11 @@ from functools import partial
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+import time
 from nilearn import datasets, image
 from rich.console import Console
 from scipy.spatial import distance_matrix
+from scipy.linalg import norm
 
 from fugw.mappings import FUGW
 from fugw.utils import _make_tensor
@@ -99,29 +101,96 @@ target_geometry_normalized = target_geometry / np.max(target_geometry)
 # We first define a function to compute the Pearson correlation
 # between two tensors. Such function is not available in PyTorch,
 # but it is easy to implement.
-def pearson_corr(x, y, plan):
+def pearson_corr(a, b, plan):
     """
     Compute the Pearson correlation between transformed
     source features and target features.
     """
-    if not torch.is_tensor(x) or not torch.is_tensor(y):
-        x = torch.tensor(x).to(torch.float32)
-        y = torch.tensor(y).to(torch.float32)
+    # if not torch.is_tensor(x) or not torch.is_tensor(y):
+    #    x = torch.tensor(x)
+    #    y = torch.tensor(y)
+
+    if torch.is_tensor(a):
+        x = a.detach().cpu().numpy()
+    elif isinstance(a, np.ndarray):
+        x = a
+    elif isinstance(a, list):
+        x = np.array(a)
+    else:
+        raise ValueError("a must be a list, np.ndarray or torch.Tensor")
+
+    if torch.is_tensor(b):
+        y = b.detach().cpu().numpy()
+    elif isinstance(b, np.ndarray):
+        y = b
+    elif isinstance(b, list):
+        y = np.array(b)
+    else:
+        raise ValueError("b must be a list, np.ndarray or torch.Tensor")
 
     # Compute the transformed features
     x_transformed = (
-        (plan @ x.T / plan.sum(dim=1).reshape(-1, 1)).T.detach().cpu()
+        (plan.T @ x.T / plan.sum(dim=0).reshape(-1, 1)).T.detach().cpu()
     )
 
-    vx = x_transformed - torch.mean(x_transformed)
-    vy = y - torch.mean(y)
+    return pearson_r(x_transformed, y)
 
-    corr = (
-        torch.sum(vx * vy)
-        / (torch.sqrt(torch.sum(vx**2) * torch.sum(vy**2)))
-    ).numpy()
 
-    return corr
+def pearson_r(a, b):
+    """Compute Pearson correlation between x and y.
+
+    Compute Pearson correlation between 2d arrays x and y
+    along the samples axis.
+    Adapted from scipy.stats.pearsonr.
+
+    Parameters
+    ----------
+    a: np.ndarray of size (n_samples, n_features)
+    b: np.ndarray of size (n_samples, n_features)
+
+    Returns
+    -------
+    r: np.ndarray of size (n_samples,)
+    """
+    if torch.is_tensor(a):
+        x = a.detach().cpu().numpy()
+    elif isinstance(a, np.ndarray):
+        x = a
+    elif isinstance(a, list):
+        x = np.array(a)
+    else:
+        raise ValueError("a must be a list, np.ndarray or torch.Tensor")
+
+    if torch.is_tensor(b):
+        y = b.detach().cpu().numpy()
+    elif isinstance(b, np.ndarray):
+        y = b
+    elif isinstance(b, list):
+        y = np.array(b)
+    else:
+        raise ValueError("b must be a list, np.ndarray or torch.Tensor")
+
+    dtype = type(1.0 + x[0, 0] + y[0, 0])
+
+    xmean = x.mean(axis=1, dtype=dtype)
+    ymean = y.mean(axis=1, dtype=dtype)
+
+    # By using `astype(dtype)`, we ensure that the intermediate calculations
+    # use at least 64 bit floating point.
+    xm = x.astype(dtype) - xmean[:, np.newaxis]
+    ym = y.astype(dtype) - ymean[:, np.newaxis]
+
+    # Unlike np.linalg.norm or the expression sqrt((xm*xm).sum()),
+    # scipy.linalg.norm(xm) does not overflow if xm is, for example,
+    # [-5e210, 5e210, 3e200, -3e200]
+    normxm = norm(xm, axis=1)
+    normym = norm(ym, axis=1)
+
+    r = np.sum(
+        (xm / normxm[:, np.newaxis]) * (ym / normym[:, np.newaxis]), axis=1
+    )
+
+    return r
 
 
 # %%
@@ -132,8 +201,12 @@ def pearson_corr(x, y, plan):
 
 # Initialize the transport plan with ones and normalize it
 init_plan = torch.ones(
-    (source_features_normalized.shape[1], source_features_normalized.shape[1])
-).to(torch.float32)
+    (
+        source_features_normalized.shape[1],
+        source_features_normalized.shape[1],
+    )
+)
+# init_plan = torch.eye(source_features_normalized.shape[1])
 init_plan_normalized = init_plan / init_plan.sum()
 
 # Initialize the list of Pearson correlations by fitting
@@ -171,6 +244,7 @@ def correlation_callback(
 # We now fit the mapping using the sinkhorn solver and 10 BCD iterations.
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+start_time = time.time()
 mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 _ = mapping.fit(
     source_features=source_features_normalized,
@@ -181,6 +255,9 @@ _ = mapping.fit(
     solver="sinkhorn",
     solver_params={
         "nits_bcd": 10,
+        "tol_bcd": 1e-16,
+        "tol_uot": 1e-16,
+        "early_stopping_threshold": 1e-16,
     },
     callback_bcd=partial(
         correlation_callback,
@@ -190,11 +267,18 @@ _ = mapping.fit(
     ),
     verbose=True,
 )
+total_time = time.time() - start_time
 
 # %%
 # The Pearson correlation and training loss evolution are then plotted for
 # each BCD iteration. Notice how the correlation only improves upon a
 # certain number of iterations, even though the fugw loss keeps decreasing.
+
+corr_bcd_steps = np.array(corr_bcd_steps)
+
+mean_corr = np.mean(corr_bcd_steps, axis=1)
+std_corr = np.std(corr_bcd_steps, axis=1)
+
 fig, ax1 = plt.subplots()
 
 color = "tab:red"
@@ -207,13 +291,35 @@ ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
 color = "tab:blue"
 ax2.set_ylabel("Pearson correlation", color=color)
-ax2.plot(
-    mapping.loss_steps[: len(corr_bcd_steps)], corr_bcd_steps, color=color
-)
-ax2.tick_params(axis="y", labelcolor=color)
+for i in range(len(contrasts)):
+    ax2.plot(
+        mapping.loss_steps[: len(corr_bcd_steps)],
+        corr_bcd_steps[:, i],
+        color=color,
+        alpha=0.5,
+        linestyle="dashed",
+    )
+    ax2.text(
+        len(corr_bcd_steps) - 0.95,
+        corr_bcd_steps[-1, i],
+        f"Contrast {i+1}",
+        color=color,
+        fontsize=10,
+        va="center",
+    )
 
-plt.title("Evolution of training loss and Pearson correlation")
+ax2.plot(mapping.loss_steps[: len(corr_bcd_steps)], mean_corr, color="blue")
+ax2.fill_between(
+    mapping.loss_steps[: len(corr_bcd_steps)],
+    mean_corr - std_corr,
+    mean_corr + std_corr,
+    color=color,
+    alpha=0.2,
+)
+ax2.set_ylim(0, 1)
+ax2.tick_params(axis="y", labelcolor=color)
+plt.title(
+    f"Sinkhorn mapping training loss\n Total training time = {total_time:.2f}s"
+)
 fig.tight_layout()
 plt.show()
-
-# %%
