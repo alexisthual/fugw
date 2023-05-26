@@ -172,7 +172,7 @@ class FUGWSparseSolver(BaseSolver):
             loss_wasserstein = csr_sum(
                 elementwise_prod_fact_sparse(K1, K2, pi + gamma)
             )
-            loss += (1 - alpha) / 2 * loss_wasserstein
+            loss += (1 - alpha) * loss_wasserstein
 
         if alpha != 0:
             A = (Ds_sqr_1 @ (Ds_sqr_2.T @ gamma1)).dot(pi1)

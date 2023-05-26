@@ -127,7 +127,7 @@ class FUGWSolver(BaseSolver):
 
         if alpha != 1 and D is not None:
             loss_wasserstein = (D * pi).sum() + (D * gamma).sum()
-            loss += (1 - alpha) / 2 * loss_wasserstein
+            loss += (1 - alpha) * loss_wasserstein
 
         if alpha != 0:
             A = (X_sqr @ gamma1).dot(pi1)
