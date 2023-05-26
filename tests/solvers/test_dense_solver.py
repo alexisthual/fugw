@@ -52,11 +52,16 @@ def test_dense_solvers(solver, callback):
         ibpp_eps_base=1e2,
     )
 
+    alpha = 0.8
+    rho_s = 2
+    rho_t = 3
+    eps = 0.02
+
     res = fugw.solve(
-        alpha=0.8,
-        rho_s=2,
-        rho_t=3,
-        eps=0.02,
+        alpha=alpha,
+        rho_s=rho_s,
+        rho_t=rho_t,
+        eps=eps,
         reg_mode="independent",
         F=F_normalized,
         Ds=Ds_normalized,
@@ -100,6 +105,23 @@ def test_dense_solvers(solver, callback):
         "total",
     ]:
         assert len(loss[key]) == len(loss_steps)
+
+    # Check that weighted components sum to total loss
+    components = [
+        ((1 - alpha), "wasserstein"),
+        (alpha, "gromov_wasserstein"),
+        (rho_s, "marginal_constraint_dim1"),
+        (rho_t, "marginal_constraint_dim2"),
+        (eps, "regularization"),
+    ]
+    np.testing.assert_allclose(
+        loss["total"],
+        np.sum(
+            np.stack([c * np.array(loss[k]) for (c, k) in components]), axis=0
+        ),
+        rtol=1e-4,
+    )
+
     # Loss should decrease
     assert np.all(
         np.sign(np.array(loss["total"][1:]) - np.array(loss["total"][:-1]))
