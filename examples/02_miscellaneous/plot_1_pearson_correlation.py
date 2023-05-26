@@ -106,10 +106,6 @@ def pearson_corr(a, b, plan):
     Compute the Pearson correlation between transformed
     source features and target features.
     """
-    # if not torch.is_tensor(x) or not torch.is_tensor(y):
-    #    x = torch.tensor(x)
-    #    y = torch.tensor(y)
-
     if torch.is_tensor(a):
         x = a.detach().cpu().numpy()
     elif isinstance(a, np.ndarray):
@@ -266,6 +262,7 @@ _ = mapping.fit(
         device=device,
     ),
     verbose=True,
+    device=device,
 )
 total_time = time.time() - start_time
 
