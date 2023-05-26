@@ -75,7 +75,7 @@ class FUGWSparseSolver(BaseSolver):
             wasserstein_cost_values = batch_elementwise_prod_and_sum(
                 K1, K2, row_indices, col_indices, 1
             )
-            cost_values += (1 - alpha) / 2 * wasserstein_cost_values
+            cost_values += (1 - alpha) * wasserstein_cost_values
 
         # or UOT when alpha = 1
         if alpha != 0:

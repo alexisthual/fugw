@@ -51,7 +51,7 @@ class FUGWSolver(BaseSolver):
         # Avoid unnecessary calculation of UGW when alpha = 0
         if alpha != 1 and D is not None:
             wasserstein_cost = D
-            cost += (1 - alpha) / 2 * wasserstein_cost
+            cost += (1 - alpha) * wasserstein_cost
 
         # or UOT when alpha = 1
         if alpha != 0:
