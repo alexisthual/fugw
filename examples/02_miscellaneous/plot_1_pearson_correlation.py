@@ -238,7 +238,7 @@ def correlation_callback(
 
 # %%
 # We now fit the mapping using the sinkhorn solver and 10 BCD iterations.
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = "cpu"
 
 start_time = time.time()
 mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
