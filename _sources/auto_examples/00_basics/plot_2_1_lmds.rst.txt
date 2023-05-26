@@ -255,9 +255,9 @@ is well approximated by the kernel matrix derived from the embeddings:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.671 seconds)
+   **Total running time of the script:** ( 0 minutes  11.237 seconds)
 
-**Estimated memory usage:**  150 MB
+**Estimated memory usage:**  148 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_1_lmds.py:
