@@ -147,9 +147,10 @@ class FUGWSparse(BaseMapping):
         else:
             wt = _make_tensor(target_weights, device=device)
 
-        # If initial plan is provided, move it to device
+        # If initial plan is provided, move it to device.
+        # Convert it to sparse CSR if it's not already.
         pi_init = (
-            _make_tensor(init_plan, device=device)
+            _make_tensor(init_plan.to_sparse_csr(), device=device)
             if init_plan is not None
             else None
         )
