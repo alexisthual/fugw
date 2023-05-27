@@ -229,7 +229,10 @@ def init_plan_dense(
     """
 
     if method == "identity":
-        assert n_source == n_target
+        assert n_source == n_target, (
+            "Number of source and target points must be equal "
+            "when using identity initialization."
+        )
         plan = torch.eye(n_source, dtype=torch.float32)
         plan = plan / plan.sum()
     elif method == "entropic":

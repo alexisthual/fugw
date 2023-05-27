@@ -170,6 +170,15 @@ def test_init_plan(method):
         with pytest.raises(Exception, match="Unknown initialisation method.*"):
             init_plan_dense(n_source, n_target, method=method)
     else:
+        if method == "identity":
+            with pytest.raises(
+                AssertionError, match="Number of source and target.*"
+            ):
+                init_plan_dense(n_source, n_target, method=method)
+
+            n_source = 100
+            n_target = 100
+
         plan = init_plan_dense(n_source, n_target, method=method)
         assert plan.shape == (n_source, n_target)
         # Check that plan satisfies marginal constraints
