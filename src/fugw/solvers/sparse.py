@@ -489,11 +489,21 @@ class FUGWSparseSolver(BaseSolver):
         loss_steps = [0]
         loss_times = [0]
         idx = 0
-        err = self.tol_bcd + 1e-3
+
+        # Track difference between two consecutive plans and losses
+        # to potentially stop early
+        pi_diff = None
+        loss_diff = None
 
         # Run block coordinate descent (BCD) iterations
         t0 = time.time()
-        while (err > self.tol_bcd) and (idx < self.nits_bcd):
+        while (
+            (pi_diff is None or pi_diff > self.tol_bcd)
+            and (
+                loss_diff is None or loss_diff > self.tol_loss
+            )
+            and (self.nits_bcd is None or idx < self.nits_bcd)
+        ):
             pi_prev = pi.detach().clone()
 
             # Update gamma
@@ -554,8 +564,6 @@ class FUGWSparseSolver(BaseSolver):
                 device=device,
             )
 
-            # Update error
-            err = (pi.values() - pi_prev.values()).abs().sum().item()
             if idx % self.eval_bcd == 0:
                 current_loss = compute_fugw_loss(pi, gamma)
                 if F_val != (None, None):
@@ -576,14 +584,16 @@ class FUGWSparseSolver(BaseSolver):
                         f"FUGW loss:\t{current_loss['total']}"
                     )
 
+                # Update plan difference for potential early stopping
+                if self.tol_bcd is not None:
+                    pi_diff = (pi.values() - pi_prev.values()).abs().sum().item()
+
+                # Update loss difference for potential early stopping
                 if (
-                    len(loss["total"]) >= 2
-                    and abs(loss["total"][-2] - loss["total"][-1])
-                    < self.early_stopping_threshold
+                    self.tol_loss is not None
+                    and len(loss["total"]) >= 2
                 ):
-                    if callback_bcd is not None:
-                        callback_bcd(locals())
-                    break
+                    loss_diff = abs(loss["total"][-2] - loss["total"][-1])
 
             if callback_bcd is not None:
                 callback_bcd(locals())

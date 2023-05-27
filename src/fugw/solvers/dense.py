@@ -430,10 +430,18 @@ class FUGWSolver(BaseSolver):
         loss_steps = [0]
         loss_times = [0]
         idx = 0
-        err = None
+
+        pi_diff = None
+        loss_diff = None
 
         t0 = time.time()
-        while (err is None or err > self.tol_bcd) and (idx < self.nits_bcd):
+        while (
+            (pi_diff is None or pi_diff > self.tol_bcd)
+            and (
+                loss_diff is None or loss_diff > self.tol_loss
+            )
+            and (self.nits_bcd is None or idx < self.nits_bcd)
+        ):
             pi_prev = pi.detach().clone()
 
             # Update gamma
@@ -492,8 +500,6 @@ class FUGWSolver(BaseSolver):
             # Rescale mass
             pi = (l1_gamma / pi.sum()).sqrt() * pi
 
-            # Update error
-            err = (pi - pi_prev).abs().sum().item()
             if idx % self.eval_bcd == 0:
                 current_loss = compute_fugw_loss(pi, gamma)
                 if F_val is not None:
@@ -515,14 +521,16 @@ class FUGWSolver(BaseSolver):
                         f"Validation loss:\t{current_loss_validation['total']}"
                     )
 
+                # Update plan difference for potential early stopping
+                if self.tol_bcd is not None:
+                    pi_diff = (pi - pi_prev).abs().sum().item()
+
+                # Update loss difference for potential early stopping
                 if (
-                    len(loss["total"]) >= 2
-                    and abs(loss["total"][-2] - loss["total"][-1])
-                    < self.early_stopping_threshold
+                    self.tol_loss is not None
+                    and len(loss["total"]) >= 2
                 ):
-                    if callback_bcd is not None:
-                        callback_bcd(locals())
-                    break
+                    loss_diff = abs(loss["total"][-2] - loss["total"][-1])
 
             if callback_bcd is not None:
                 callback_bcd(locals())
