@@ -252,7 +252,7 @@ def solver_sinkhorn(
 
         pi_diff = None
         idx = 0
-        while (pi_diff is None or pi_diff < tol) and (
+        while (pi_diff is None or pi_diff >= tol) and (
             niters is None or idx < niters
         ):
             u_prev, v_prev = u.detach().clone(), v.detach().clone()
@@ -274,12 +274,13 @@ def solver_sinkhorn(
                 progress.update(task, advance=1)
 
             if tol is not None and idx % eval_freq == 0:
-                pi_diff = max((u - u_prev).abs().max(), (v - v_prev).abs().max())
+                pi_diff = max(
+                    (u - u_prev).abs().max(), (v - v_prev).abs().max()
+                )
                 if pi_diff < tol:
                     if verbose:
                         progress.console.log(
-                            "Reached tol_uot threshold: "
-                            f"{pi_diff}"
+                            f"Reached tol_uot threshold: {pi_diff}"
                         )
 
             idx += 1
@@ -334,7 +335,7 @@ def solver_sinkhorn_sparse(
 
         pi_diff = None
         idx = 0
-        while (pi_diff is None or pi_diff < tol) and (
+        while (pi_diff is None or pi_diff >= tol) and (
             niters is None or idx < niters
         ):
             u_prev, v_prev = u.detach().clone(), v.detach().clone()
@@ -374,12 +375,13 @@ def solver_sinkhorn_sparse(
                 progress.update(task, advance=1)
 
             if tol is not None and idx % eval_freq == 0:
-                pi_diff = max((u - u_prev).abs().max(), (v - v_prev).abs().max())
+                pi_diff = max(
+                    (u - u_prev).abs().max(), (v - v_prev).abs().max()
+                )
                 if pi_diff < tol:
                     if verbose:
                         progress.console.log(
-                            "Reached tol_uot threshold: "
-                            f"{pi_diff}"
+                            f"Reached tol_uot threshold: {pi_diff}"
                         )
 
             idx += 1
@@ -443,7 +445,7 @@ def solver_mm(
 
         pi_diff = None
         idx = 0
-        while (pi_diff is None or pi_diff < tol) and (
+        while (pi_diff is None or pi_diff >= tol) and (
             niters is None or idx < niters
         ):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
@@ -502,7 +504,7 @@ def solver_mm_l2(
 
         pi_diff = None
         idx = 0
-        while (pi_diff is None or pi_diff < tol) and (
+        while (pi_diff is None or pi_diff >= tol) and (
             niters is None or idx < niters
         ):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
@@ -607,7 +609,7 @@ def solver_mm_sparse(
 
         pi_diff = None
         idx = 0
-        while (pi_diff is None or pi_diff < tol) and (
+        while (pi_diff is None or pi_diff >= tol) and (
             niters is None or idx < niters
         ):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
@@ -684,7 +686,7 @@ def solver_ibpp(
 
         pi_diff = None
         idx = 0
-        while (pi_diff is None or pi_diff < tol) and (
+        while (pi_diff is None or pi_diff >= tol) and (
             niters is None or idx < niters
         ):
             m1_prev = m1.detach().clone()
@@ -785,7 +787,7 @@ def solver_ibpp_sparse(
 
         pi_diff = None
         idx = 0
-        while (pi_diff is None or pi_diff < tol) and (
+        while (pi_diff is None or pi_diff >= tol) and (
             niters is None or idx < niters
         ):
             m1_prev = m1.detach().clone()

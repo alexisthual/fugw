@@ -436,10 +436,8 @@ class FUGWSolver(BaseSolver):
 
         t0 = time.time()
         while (
-            (pi_diff is None or pi_diff > self.tol_bcd)
-            and (
-                loss_diff is None or loss_diff > self.tol_loss
-            )
+            (pi_diff is None or pi_diff >= self.tol_bcd)
+            and (loss_diff is None or loss_diff >= self.tol_loss)
             and (self.nits_bcd is None or idx < self.nits_bcd)
         ):
             pi_prev = pi.detach().clone()
@@ -526,10 +524,7 @@ class FUGWSolver(BaseSolver):
                     pi_diff = (pi - pi_prev).abs().sum().item()
 
                 # Update loss difference for potential early stopping
-                if (
-                    self.tol_loss is not None
-                    and len(loss["total"]) >= 2
-                ):
+                if self.tol_loss is not None and len(loss["total"]) >= 2:
                     loss_diff = abs(loss["total"][-2] - loss["total"][-1])
 
             if callback_bcd is not None:
