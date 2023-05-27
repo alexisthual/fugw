@@ -11,6 +11,7 @@ from fugw.mappings import FUGW
 from fugw.utils import (
     _init_mock_distribution,
     _make_tensor,
+    init_plan_dense,
     load_mapping,
     save_mapping,
 )
@@ -156,3 +157,21 @@ def test_saving_and_loading(device, return_numpy, solver):
 
             weights = pickle.load(f)
             assert weights.shape == (n_voxels_source, n_voxels_target)
+
+
+@pytest.mark.parametrize(
+    "method", ["identity", "entropic", "permutation", "unknown"]
+)
+def test__init_plan(method):
+    n_source = 100
+    n_target = 100
+
+    if method == "unknown":
+        with pytest.raises(Exception, match="Unknown initialisation method.*"):
+            init_plan_dense(n_source, n_target, method=method)
+    else:
+        plan = init_plan_dense(n_source, n_target, method=method)
+        assert plan.shape == (n_source, n_target)
+        # Check that plan satisfies marginal constraints
+        assert torch.allclose(plan.sum(dim=0), torch.ones(n_target))
+        assert torch.allclose(plan.sum(dim=1), torch.ones(n_source))
