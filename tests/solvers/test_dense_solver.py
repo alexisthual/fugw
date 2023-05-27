@@ -346,10 +346,21 @@ def test_convergence_criteria_existence():
     try:
         FUGWSolver(
             nits_bcd=1,
-            tol_bcd=1,
-            tol_loss=1,
-            nits_uot=None,
+            tol_bcd=None,
+            tol_loss=None,
+            nits_uot=1,
             tol_uot=None,
+        )
+    except Exception as e:
+        assert False, f"Solver should not raise exception {e}"
+
+    try:
+        FUGWSolver(
+            nits_bcd=None,
+            tol_bcd=1,
+            tol_loss=None,
+            nits_uot=None,
+            tol_uot=1,
         )
     except Exception as e:
         assert False, f"Solver should not raise exception {e}"
