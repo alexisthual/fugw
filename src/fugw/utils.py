@@ -3,6 +3,7 @@ import pickle
 import numpy as np
 import torch
 
+from ot import emd_1d
 from rich.console import Console
 from rich.progress import (
     BarColumn,
@@ -187,6 +188,65 @@ def _add_dict(d, new_d):
     for key, value in new_d.items():
         d.setdefault(key, []).append(value)
     return d
+
+
+def init_plan_dense(
+    n_source,
+    n_target,
+    weights_source=None,
+    weights_target=None,
+    method="entropic",
+):
+    """Initialize transport plan with dense tensor.
+
+    Generate a matrix satisfying the constraints of a transport plan.
+    In particular, marginal constraints on lines and columns are satisfied.
+
+    Parameters
+    ----------
+    n_source: int
+        Number of source points
+    n_target: int
+        Number of target points
+    weights_source: torch.Tensor of size(n_source), optional, defaults to None
+        Source weights used in entropic init
+    weights_target: torch.Tensor of size(n_target), optional, defaults to None
+        Target weights used in entropic init
+    method: str, optional, defaults to "entropic"
+        Method to use for initialization.
+        Can be "entropic", "permutation" or "identity".
+        If "entropic", weights_source and weights_target must be provided ;
+        the initial plan is then given by the product of the two arrays.
+        If "permutation", the initial plan is the solution to a 1D
+        optimal transport problem between two random arrays, which can be
+        understood as a soft permutation between source and target points.
+        If "identity", the number of source and target points must be equal ;
+        the initial plan is then the identity matrix.
+
+    Returns
+    -------
+    init_plan: torch.Tensor of size(n_source, n_target)
+    """
+
+    if method == "identity":
+        assert n_source == n_target
+        plan = torch.eye((n_source, n_target), dtype=torch.float32)
+        plan = plan / plan.sum()
+    elif method == "entropic":
+        if weights_source is None:
+            ws = torch.ones(n_source, dtype=torch.float32)
+        if weights_target is None:
+            wt = torch.ones(n_target, dtype=torch.float32)
+        plan = ws[:, None] * wt[None, :]
+        plan = plan / plan.sum()
+    elif method == "permutation":
+        xa = torch.rand(n_source)
+        xb = torch.rand(n_target)
+        plan = emd_1d(xa, xb).to(dtype=torch.float32)
+    else:
+        raise Exception(f"Unknown initialisation method {method}")
+
+    return plan
 
 
 def save_mapping(mapping, fname):
