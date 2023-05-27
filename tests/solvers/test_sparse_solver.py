@@ -58,7 +58,7 @@ def test_sparse_solvers(solver, device, callback):
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
-        early_stopping_threshold=1e-5,
+        tol_loss=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
         # Set a high value of ibpp, otherwise nans appear in coupling.
@@ -226,7 +226,7 @@ def test_sparse_validation_solver(validation, device):
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
-        early_stopping_threshold=1e-5,
+        tol_loss=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
         # Set a high value of ibpp, otherwise nans appear in coupling.
@@ -267,3 +267,38 @@ def test_sparse_validation_solver(validation, device):
         "total",
     ]:
         assert len(loss_val[key]) == len(loss_steps)
+
+
+def test_convergence_criteria_existence():
+    with pytest.raises(
+        ValueError, match="At least one of .* must be provided"
+    ):
+        FUGWSparseSolver(
+            nits_bcd=None,
+            tol_bcd=None,
+            tol_loss=None,
+            nits_uot=1,
+            tol_uot=1,
+        )
+
+    with pytest.raises(
+        ValueError, match="At least one of .* must be provided"
+    ):
+        FUGWSparseSolver(
+            nits_bcd=1,
+            tol_bcd=1,
+            tol_loss=1,
+            nits_uot=None,
+            tol_uot=None,
+        )
+
+    try:
+        FUGWSparseSolver(
+            nits_bcd=1,
+            tol_bcd=1,
+            tol_loss=1,
+            nits_uot=None,
+            tol_uot=None,
+        )
+    except Exception as e:
+        assert False, f"Solver should not raise exception {e}"
