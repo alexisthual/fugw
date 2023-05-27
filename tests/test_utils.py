@@ -163,8 +163,8 @@ def test_saving_and_loading(device, return_numpy, solver):
     "method", ["identity", "entropic", "permutation", "unknown"]
 )
 def test_init_plan(method):
-    n_source = 100
-    n_target = 100
+    n_source = 101
+    n_target = 99
 
     if method == "unknown":
         with pytest.raises(Exception, match="Unknown initialisation method.*"):
@@ -173,5 +173,5 @@ def test_init_plan(method):
         plan = init_plan_dense(n_source, n_target, method=method)
         assert plan.shape == (n_source, n_target)
         # Check that plan satisfies marginal constraints
-        assert torch.allclose(plan.sum(dim=0), torch.ones(n_target))
-        assert torch.allclose(plan.sum(dim=1), torch.ones(n_source))
+        assert torch.allclose(plan.sum(dim=0), torch.ones(n_target) / n_target)
+        assert torch.allclose(plan.sum(dim=1), torch.ones(n_source) / n_source)
