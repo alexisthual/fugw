@@ -162,7 +162,7 @@ def test_saving_and_loading(device, return_numpy, solver):
 @pytest.mark.parametrize(
     "method", ["identity", "entropic", "permutation", "unknown"]
 )
-def test__init_plan(method):
+def test_init_plan(method):
     n_source = 100
     n_target = 100
 

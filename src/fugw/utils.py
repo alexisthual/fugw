@@ -230,7 +230,7 @@ def init_plan_dense(
 
     if method == "identity":
         assert n_source == n_target
-        plan = torch.eye((n_source, n_target), dtype=torch.float32)
+        plan = torch.eye(n_source, dtype=torch.float32)
         plan = plan / plan.sum()
     elif method == "entropic":
         if weights_source is None:
