@@ -498,10 +498,8 @@ class FUGWSparseSolver(BaseSolver):
         # Run block coordinate descent (BCD) iterations
         t0 = time.time()
         while (
-            (pi_diff is None or pi_diff > self.tol_bcd)
-            and (
-                loss_diff is None or loss_diff > self.tol_loss
-            )
+            (pi_diff is None or pi_diff >= self.tol_bcd)
+            and (loss_diff is None or loss_diff >= self.tol_loss)
             and (self.nits_bcd is None or idx < self.nits_bcd)
         ):
             pi_prev = pi.detach().clone()
@@ -586,13 +584,12 @@ class FUGWSparseSolver(BaseSolver):
 
                 # Update plan difference for potential early stopping
                 if self.tol_bcd is not None:
-                    pi_diff = (pi.values() - pi_prev.values()).abs().sum().item()
+                    pi_diff = (
+                        (pi.values() - pi_prev.values()).abs().sum().item()
+                    )
 
                 # Update loss difference for potential early stopping
-                if (
-                    self.tol_loss is not None
-                    and len(loss["total"]) >= 2
-                ):
+                if self.tol_loss is not None and len(loss["total"]) >= 2:
                     loss_diff = abs(loss["total"][-2] - loss["total"][-1])
 
             if callback_bcd is not None:
