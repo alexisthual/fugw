@@ -140,6 +140,13 @@ class FUGW(BaseMapping):
         else:
             wt = _make_tensor(target_weights, device=device)
 
+        # If initial plan is provided, move it to device
+        pi_init = (
+            _make_tensor(init_plan, device=device)
+            if init_plan is not None
+            else None
+        )
+
         # Compute distance matrix between features
         Fs = _make_tensor(source_features.T, device=device)
         Ft = _make_tensor(target_features.T, device=device)
@@ -222,7 +229,7 @@ class FUGW(BaseMapping):
             Dt_val=Dt_val,
             ws=ws,
             wt=wt,
-            init_plan=init_plan,
+            init_plan=pi_init,
             init_duals=init_duals,
             solver=solver,
             callback_bcd=callback_bcd,
