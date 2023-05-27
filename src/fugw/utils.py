@@ -237,10 +237,10 @@ def init_plan_dense(
         plan = plan / plan.sum()
     elif method == "entropic":
         if weights_source is None:
-            ws = torch.ones(n_source, dtype=torch.float32)
+            weights_source = torch.ones(n_source, dtype=torch.float32)
         if weights_target is None:
-            wt = torch.ones(n_target, dtype=torch.float32)
-        plan = ws[:, None] * wt[None, :]
+            weights_target = torch.ones(n_target, dtype=torch.float32)
+        plan = weights_source[:, None] * weights_target[None, :]
         plan = plan / plan.sum()
     elif method == "permutation":
         xa = torch.rand(n_source)
