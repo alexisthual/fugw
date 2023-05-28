@@ -147,6 +147,14 @@ class FUGWSparse(BaseMapping):
         else:
             wt = _make_tensor(target_weights, device=device)
 
+        # If initial plan is provided, move it to device.
+        # Convert it to sparse CSR if it's not already.
+        pi_init = (
+            _make_tensor(init_plan.to_sparse_csr(), device=device)
+            if init_plan is not None
+            else None
+        )
+
         # Compute distance matrix between features
         Fs = _make_tensor(source_features.T, device=device)
         Ft = _make_tensor(target_features.T, device=device)
@@ -270,7 +278,7 @@ class FUGWSparse(BaseMapping):
             Dt_val=(Dt1_val, Dt2_val),
             ws=ws,
             wt=wt,
-            init_plan=init_plan,
+            init_plan=pi_init,
             init_duals=init_duals,
             solver=solver,
             callback_bcd=callback_bcd,
