@@ -6,10 +6,10 @@
 
 Computation times
 =================
-**02:44.207** total execution time for **auto_examples_02_miscellaneous** files:
+**02:49.487** total execution time for **auto_examples_02_miscellaneous** files:
 
 +----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_1_simple_crossval.py` (``plot_1_simple_crossval.py``)             | 02:42.289 | 7.9 MB |
+| :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_1_simple_crossval.py` (``plot_1_simple_crossval.py``)             | 02:47.844 | 8.0 MB |
 +----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_2_memory_usage_callback.py` (``plot_2_memory_usage_callback.py``) | 00:01.918 | 7.9 MB |
+| :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_2_memory_usage_callback.py` (``plot_2_memory_usage_callback.py``) | 00:01.643 | 8.0 MB |
 +----------------------------------------------------------------------------------------------------------------------+-----------+--------+
