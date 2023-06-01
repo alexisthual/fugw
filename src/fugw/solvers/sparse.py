@@ -456,12 +456,14 @@ class FUGWSparseSolver(BaseSolver):
             solver_sinkhorn_sparse,
             tuple_weights=(ws, wt, ws_dot_wt),
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+            verbose=verbose,
         )
 
         self_solver_mm = partial(
             solver_mm_sparse,
             tuple_weights=(ws, wt),
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+            verbose=verbose,
         )
 
         self_solver_ibpp = partial(
