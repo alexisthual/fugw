@@ -18,7 +18,7 @@ callbacks = [None, lambda x: x["gamma"]]
 # TODO: need to test sinkhorn
 @pytest.mark.parametrize(
     "solver,device,callback",
-    product(["mm", "ibpp"], devices, callbacks),
+    product(["sinkhorn", "mm", "ibpp"], devices, callbacks),
 )
 def test_sparse_solvers(solver, device, callback):
     torch.manual_seed(1)
