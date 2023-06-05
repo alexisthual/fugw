@@ -3,7 +3,7 @@ import torch
 
 from fugw.solvers.dense import FUGWSolver
 from fugw.mappings.utils import BaseMapping, console
-from fugw.utils import _make_tensor
+from fugw.utils import _make_tensor, init_plan_dense
 
 
 class FUGW(BaseMapping):
@@ -85,6 +85,7 @@ class FUGW(BaseMapping):
             will be set to 1 / m.
         init_plan: ndarray(n, m) or None
             Transport plan to use at initialisation.
+            If None, an entropic initialization will be used.
         init_duals: tuple of [ndarray(n), ndarray(m)] or None
             Dual potentials to use at initialisation.
         solver: "sinkhorn" or "mm" or "ibpp"
@@ -140,11 +141,21 @@ class FUGW(BaseMapping):
         else:
             wt = _make_tensor(target_weights, device=device)
 
-        # If initial plan is provided, move it to device
+        # If initial plan is provided, move it to device.
+        # Otherwise, initialize it with entropic initialization
         pi_init = (
             _make_tensor(init_plan, device=device)
             if init_plan is not None
-            else None
+            else _make_tensor(
+                init_plan_dense(
+                    source_features.shape[1],
+                    target_features.shape[1],
+                    weights_source=ws,
+                    weights_target=wt,
+                    method="entropic",
+                ),
+                device=device,
+            )
         )
 
         # Compute distance matrix between features

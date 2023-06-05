@@ -19,14 +19,15 @@ classifiers = [
 dynamic = ["version"]
 requires-python = ">=3.7"
 dependencies = [
+  "dijkstra3d>=1.12.1",
   "joblib>=1.2.0",
   "numpy>=1.20",
-  "torch>=1.13",
   "rich>=13.3.1",
+  "POT>=0.9.0",
   "scikit-learn",
   "scipy",
+  "torch>=1.13",
   "tvb-gdist>=2.1.1",
-  "dijkstra3d>=1.12.1",
 ]
 
 [project.optional-dependencies]
