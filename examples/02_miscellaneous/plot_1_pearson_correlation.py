@@ -270,10 +270,11 @@ _ = mapping.fit(
 total_time = time.time() - start_time
 
 # %%
-# The Pearson correlation relative to each contrast and training loss evolution
-# are then plotted for each BCD iteration. Notice how the correlation only
-# improves upon a certain number of iterations, even though the fugw loss
-# keeps decreasing.
+# The Pearson correlation relative to each validation contrast and training
+# loss evolution are then plotted for each BCD iteration. Notice how the
+# correlation only improves upon a certain number of iterations, even though
+# the fugw loss keeps decreasing. This is a sign of overfitting, and we
+# might want to stop after fewer iterations.
 
 corr_bcd_steps = np.array(corr_bcd_steps)
 
