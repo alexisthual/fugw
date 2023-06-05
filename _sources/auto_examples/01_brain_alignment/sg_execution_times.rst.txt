@@ -6,14 +6,14 @@
 
 Computation times
 =================
-**15:15.590** total execution time for **auto_examples_01_brain_alignment** files:
+**11:27.730** total execution time for **auto_examples_01_brain_alignment** files:
 
 +--------------------------------------------------------------------------------------------------------------------------------+-----------+----------+
-| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_2_aligning_brain_sparse.py` (``plot_2_aligning_brain_sparse.py``)         | 05:36.384 | 609.4 MB |
+| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_2_aligning_brain_sparse.py` (``plot_2_aligning_brain_sparse.py``)         | 03:58.489 | 671.9 MB |
 +--------------------------------------------------------------------------------------------------------------------------------+-----------+----------+
-| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py` (``plot_1_aligning_brain_dense.py``)           | 04:14.931 | 220.5 MB |
+| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py` (``plot_1_aligning_brain_dense.py``)           | 03:22.338 | 223.8 MB |
 +--------------------------------------------------------------------------------------------------------------------------------+-----------+----------+
-| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py` (``plot_4_aligning_high_res_volumes.py``) | 04:10.756 | 78.5 MB  |
+| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py` (``plot_4_aligning_high_res_volumes.py``) | 03:00.629 | 8.5 MB   |
 +--------------------------------------------------------------------------------------------------------------------------------+-----------+----------+
-| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_3_aligning_low_res_volumes.py` (``plot_3_aligning_low_res_volumes.py``)   | 01:13.520 | 7.9 MB   |
+| :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_3_aligning_low_res_volumes.py` (``plot_3_aligning_low_res_volumes.py``)   | 01:06.274 | 8.1 MB   |
 +--------------------------------------------------------------------------------------------------------------------------------+-----------+----------+

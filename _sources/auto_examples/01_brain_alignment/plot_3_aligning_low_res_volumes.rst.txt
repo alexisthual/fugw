@@ -335,26 +335,26 @@ We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 
  .. code-block:: none
 
-    [11:54:50] Validation data for feature maps is not provided. Using  dense.py:193
+    [13:41:24] Validation data for feature maps is not provided. Using  dense.py:193
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:220
                Using training data instead.                                         
 
 
-    [11:55:04] BCD step 1/4    FUGW loss:      0.02850176766514778      dense.py:516
-               Validation loss:        0.02850176766514778                          
+    [13:41:37] BCD step 1/4    FUGW loss:      0.028501801192760468     dense.py:516
+               Validation loss:        0.028501801192760468                         
 
 
-    [11:55:22] BCD step 2/4    FUGW loss:      0.01484744343906641      dense.py:516
-               Validation loss:        0.01484744343906641                          
+    [13:41:54] BCD step 2/4    FUGW loss:      0.014847295358777046     dense.py:516
+               Validation loss:        0.014847295358777046                         
 
 
-    [11:55:40] BCD step 3/4    FUGW loss:      0.013132380321621895     dense.py:516
-               Validation loss:        0.013132380321621895                         
+    [13:42:10] BCD step 3/4    FUGW loss:      0.013132067397236824     dense.py:516
+               Validation loss:        0.013132067397236824                         
 
 
-    [11:55:58] BCD step 4/4    FUGW loss:      0.01276831142604351      dense.py:516
-               Validation loss:        0.01276831142604351                          
+    [13:42:26] BCD step 4/4    FUGW loss:      0.01276814378798008      dense.py:516
+               Validation loss:        0.01276814378798008                          
 
 
 
@@ -470,7 +470,7 @@ Let's compare the Pearson correlation between source and target features.
 
     Pearson Correlation pre-mapping: 0.28
     Pearson Correlation post-mapping: 0.19
-    Relative improvement: -32.09 %
+    Relative improvement: -32.08 %
 
 
 
@@ -555,7 +555,7 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  13.520 seconds)
+   **Total running time of the script:** ( 1 minutes  6.274 seconds)
 
 **Estimated memory usage:**  8 MB
 
