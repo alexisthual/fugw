@@ -254,9 +254,6 @@ _ = mapping.fit(
     solver="sinkhorn",
     solver_params={
         "nits_bcd": 5,
-        "tol_bcd": 1e-16,
-        "tol_uot": 1e-16,
-        "early_stopping_threshold": 1e-16,
     },
     callback_bcd=partial(
         correlation_callback,
