@@ -69,7 +69,7 @@ def test_sparse_solvers(solver, device, callback):
     alpha = 0.8
     rho_s = 2
     rho_t = 3
-    eps = 0.02
+    eps = 0.1
 
     res = fugw.solve(
         alpha=alpha,
