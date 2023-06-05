@@ -8,8 +8,6 @@ between transformed and target features at each iteration of
 the block-coordinate descent (BCD) algorithm.
 This can be useful to detect numerical errors, or to check that the
 mapping is not over-fitting training data.
-Note that in this example, we don't use a proper validation dataset.
-Instead, we simply compute more metrics on our training dataset.
 """
 # sphinx_gallery_thumbnail_number = 1
 
@@ -205,15 +203,15 @@ init_plan = torch.ones(
         source_features_normalized.shape[1],
     )
 )
-# init_plan = torch.eye(source_features_normalized.shape[1])
+
 init_plan_normalized = init_plan / init_plan.sum()
 
 # Initialize the list of Pearson correlations by fitting
 # source features with the initial plan
 corr_bcd_steps = [
     pearson_corr(
-        source_features_normalized,
-        target_features_normalized,
+        source_features_normalized[n_training_contrasts:],
+        target_features_normalized[n_training_contrasts:],
         init_plan_normalized,
     )
 ]
@@ -240,7 +238,7 @@ def correlation_callback(
 
 
 # %%
-# We now fit the mapping using the sinkhorn solver and 10 BCD iterations.
+# We now fit the mapping using the sinkhorn solver and 5 BCD iterations.
 device = "cpu"
 
 start_time = time.time()
@@ -272,9 +270,10 @@ _ = mapping.fit(
 total_time = time.time() - start_time
 
 # %%
-# The Pearson correlation and training loss evolution are then plotted for
-# each BCD iteration. Notice how the correlation only improves upon a
-# certain number of iterations, even though the fugw loss keeps decreasing.
+# The Pearson correlation relative to each contrast and training loss evolution
+# are then plotted for each BCD iteration. Notice how the correlation only
+# improves upon a certain number of iterations, even though the fugw loss
+# keeps decreasing.
 
 corr_bcd_steps = np.array(corr_bcd_steps)
 
@@ -325,3 +324,5 @@ plt.title(
 fig.tight_layout()
 plt.legend()
 plt.show()
+
+# %%
