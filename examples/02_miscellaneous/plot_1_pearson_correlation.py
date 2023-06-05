@@ -28,16 +28,19 @@ from fugw.mappings import FUGW
 from fugw.utils import _make_tensor
 
 # %%
-# We first fetch 5 contrasts for each subject from the localizer dataset.
+# We first fetch 6 contrasts for each subject from the localizer dataset.
+# We use 3 contrasts for training and 3 contrasts for validation.
 n_subjects = 2
 
 contrasts = [
     "sentence reading vs checkerboard",
     "sentence listening",
+    "sentence reading",
     "calculation vs sentences",
     "left vs right button press",
-    "checkerboard",
+    "left button press",
 ]
+n_training_contrasts = 3
 
 brain_data = datasets.fetch_localizer_contrasts(
     contrasts,
