@@ -8,9 +8,9 @@ class BaseSolver:
         self,
         nits_bcd=10,
         nits_uot=1000,
-        tol_bcd=1e-7,
-        tol_uot=1e-7,
-        early_stopping_threshold=1e-6,
+        tol_bcd=None,
+        tol_uot=None,
+        tol_loss=None,
         eval_bcd=1,
         eval_uot=10,
         # ibpp-specific parameters
@@ -21,44 +21,67 @@ class BaseSolver:
 
         Parameters
         ----------
-        nits_bcd: int,
-            Number of block-coordinate-descent iterations to run
-        nits_uot: int,
+        nits_bcd: int or None,
+            Number of block-coordinate-descent iterations to run.
+            If None, run until tol_bcd or tol_loss is reached.
+            Default: 10
+        nits_uot: int or None,
             Number of solver iteration to run at each BCD iteration
-        tol_bcd: float,
+            If None, run until tol_uot is reached.
+            Default: 1000
+        tol_bcd: float or None,
             Stop the BCD procedure early if the absolute difference
             between two consecutive transport plans
-            under this threshold
-        tol_uot: float,
+            under this threshold. If None, do not stop early.
+            Default: None
+        tol_uot: float or None,
             Stop the BCD procedure early if the absolute difference
             between two consecutive transport plans
-            under this threshold
-        early_stopping_threshold: float,
+            under this threshold. If None, do not stop early.
+            Default: None
+        tol_loss: float or None,
             Stop the BCD procedure early if the FUGW loss falls
-            under this threshold
+            under this threshold. If None, do not stop early.
+            Default: None
         eval_bcd: int,
             During .fit(), at every eval_bcd step:
             1. compute the FUGW loss and store it in an array
-            2. consider stopping early
+            2. consider stopping early if tol_loss is not None
+            3. consider stopping early if tol_bcd is not None
+            Default: 1
         eval_uot: int,
             During .fit(), at every eval_uot step:
-            1. consider stopping early
+            1. consider stopping early if tol_uot is not None
+            Default: 10
         ibpp_eps_base: int,
-            Regularization parameter specific to the ibpp solver
+            Regularization parameter specific to the ibpp solver.
+            Default: 1
         ibpp_nits_sinkhorn: int,
             Number of sinkhorn iterations to run
             within each uot iteration of the ibpp solver.
+            Default: 1
 
         Attributes
         ----------
         Same as parameters.
         """
 
+        if tol_bcd is None and tol_loss is None and nits_bcd is None:
+            raise ValueError(
+                "At least one of nits_bcd, tol_bcd or tol_loss must be "
+                "provided."
+            )
+
+        if tol_uot is None and nits_uot is None:
+            raise ValueError(
+                "At least one of nits_uot or tol_uot must be provided."
+            )
+
         self.nits_bcd = nits_bcd
         self.nits_uot = nits_uot
         self.tol_bcd = tol_bcd
         self.tol_uot = tol_uot
-        self.early_stopping_threshold = early_stopping_threshold
+        self.tol_loss = tol_loss
         self.eval_bcd = eval_bcd
         self.eval_uot = eval_uot
         self.ibpp_eps_base = ibpp_eps_base
@@ -227,7 +250,11 @@ def solver_sinkhorn(
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
-        for idx in range(niters):
+        pi_diff = None
+        idx = 0
+        while (pi_diff is None or pi_diff >= tol) and (
+            niters is None or idx < niters
+        ):
             u_prev, v_prev = u.detach().clone(), v.detach().clone()
             if rho_t == 0:
                 v = torch.zeros_like(v)
@@ -246,12 +273,17 @@ def solver_sinkhorn(
             if verbose:
                 progress.update(task, advance=1)
 
-            if (
-                idx % eval_freq == 0
-                and max((u - u_prev).abs().max(), (v - v_prev).abs().max())
-                < tol
-            ):
-                break
+            if tol is not None and idx % eval_freq == 0:
+                pi_diff = max(
+                    (u - u_prev).abs().max(), (v - v_prev).abs().max()
+                )
+                if pi_diff < tol:
+                    if verbose:
+                        progress.console.log(
+                            f"Reached tol_uot threshold: {pi_diff}"
+                        )
+
+            idx += 1
 
     pi = ws_dot_wt * (u[:, None] + v[None, :] - cost / eps).exp()
 
@@ -301,7 +333,11 @@ def solver_sinkhorn_sparse(
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
-        for idx in range(niters):
+        pi_diff = None
+        idx = 0
+        while (pi_diff is None or pi_diff >= tol) and (
+            niters is None or idx < niters
+        ):
             u_prev, v_prev = u.detach().clone(), v.detach().clone()
             if rho_t == 0:
                 v = torch.zeros_like(v)
@@ -338,12 +374,17 @@ def solver_sinkhorn_sparse(
             if verbose:
                 progress.update(task, advance=1)
 
-            if (
-                idx % eval_freq == 0
-                and max((u - u_prev).abs().max(), (v - v_prev).abs().max())
-                < tol
-            ):
-                break
+            if tol is not None and idx % eval_freq == 0:
+                pi_diff = max(
+                    (u - u_prev).abs().max(), (v - v_prev).abs().max()
+                )
+                if pi_diff < tol:
+                    if verbose:
+                        progress.console.log(
+                            f"Reached tol_uot threshold: {pi_diff}"
+                        )
+
+            idx += 1
 
     # pi = ws_dot_wt * (u[:, None] + v[None, :] - cost / eps).exp()
     new_values_pi = (
@@ -402,7 +443,11 @@ def solver_mm(
         if verbose:
             task = progress.add_task("MM-KL iterations", total=niters)
 
-        for idx in range(niters):
+        pi_diff = None
+        idx = 0
+        while (pi_diff is None or pi_diff >= tol) and (
+            niters is None or idx < niters
+        ):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
             pi = (
                 pi ** (tau_s + tau_t)
@@ -414,16 +459,18 @@ def solver_mm(
             if verbose:
                 progress.update(task, advance=1)
 
-            if idx % eval_freq == 0:
+            if tol is not None and idx % eval_freq == 0:
                 pi1_error = (pi1 - pi1_prev).abs().max()
                 pi2_error = (pi2 - pi2_prev).abs().max()
-                if max(pi1_error, pi2_error) < tol:
+                pi_diff = max(pi1_error, pi2_error)
+                if pi_diff < tol:
                     if verbose:
                         progress.console.log(
                             "Reached tol_uot threshold: "
                             f"{pi1_error}, {pi2_error}"
                         )
-                    break
+
+            idx += 1
 
     return pi
 
@@ -455,7 +502,11 @@ def solver_mm_l2(
         if verbose:
             task = progress.add_task("MM-L2 iterations", total=niters)
 
-        for idx in range(niters):
+        pi_diff = None
+        idx = 0
+        while (pi_diff is None or pi_diff >= tol) and (
+            niters is None or idx < niters
+        ):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
             denom = rho_s * pi1[:, None] + rho_t * pi2[None, :] + eps * pi
             pi = thres * pi / denom
@@ -464,16 +515,18 @@ def solver_mm_l2(
             if verbose:
                 progress.update(task, advance=1)
 
-            if idx % eval_freq == 0:
+            if tol is not None and idx % eval_freq == 0:
                 pi1_error = (pi1 - pi1_prev).abs().max()
                 pi2_error = (pi2 - pi2_prev).abs().max()
-                if max(pi1_error, pi2_error) < tol:
+                pi_diff = max(pi1_error, pi2_error)
+                if pi_diff < tol:
                     if verbose:
                         progress.console.log(
                             "Reached tol_uot threshold: "
                             f"{pi1_error}, {pi2_error}"
                         )
-                    break
+
+            idx += 1
 
     return pi
 
@@ -554,7 +607,11 @@ def solver_mm_sparse(
         if verbose:
             task = progress.add_task("MM iterations", total=niters)
 
-        for idx in range(niters):
+        pi_diff = None
+        idx = 0
+        while (pi_diff is None or pi_diff >= tol) and (
+            niters is None or idx < niters
+        ):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
 
             pi_values = (
@@ -580,16 +637,18 @@ def solver_mm_sparse(
             if verbose:
                 progress.update(task, advance=1)
 
-            if idx % eval_freq == 0:
+            if tol is not None and idx % eval_freq == 0:
                 pi1_error = (pi1 - pi1_prev).abs().max()
                 pi2_error = (pi2 - pi2_prev).abs().max()
-                if max(pi1_error, pi2_error) < tol:
+                pi_diff = max(pi1_error, pi2_error)
+                if pi_diff < tol:
                     if verbose:
                         progress.console.log(
                             "Reached tol_uot threshold: "
                             f"{pi1_error}, {pi2_error}"
                         )
-                    break
+
+            idx += 1
 
     return torch.sparse_csr_tensor(
         crow_indices,
@@ -625,7 +684,11 @@ def solver_ibpp(
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
-        for idx in range(niters):
+        pi_diff = None
+        idx = 0
+        while (pi_diff is None or pi_diff >= tol) and (
+            niters is None or idx < niters
+        ):
             m1_prev = m1.detach().clone()
 
             # IPOT
@@ -651,7 +714,7 @@ def solver_ibpp(
                 progress.update(task, advance=1)
 
             # Check stopping criterion
-            if idx % eval_freq == 0:
+            if tol is not None and idx % eval_freq == 0:
                 m1 = pi.sum(1)
                 if m1.isnan().any() or m1.isinf().any():
                     raise ValueError(
@@ -660,13 +723,13 @@ def solver_ibpp(
                         f"(current value: {eps_base})."
                     )
 
-                error = (m1 - m1_prev).abs().max().item()
-                if error < tol:
+                pi_diff = (m1 - m1_prev).abs().max().item()
+                if pi_diff < tol:
                     if verbose:
                         progress.console.log(
-                            f"Reached tol_uot threshold: {error}"
+                            f"Reached tol_uot threshold: {pi_diff}"
                         )
-                    break
+            idx += 1
 
     # renormalize couplings
     pi = pi * ws_dot_wt
@@ -722,7 +785,11 @@ def solver_ibpp_sparse(
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
-        for idx in range(niters):
+        pi_diff = None
+        idx = 0
+        while (pi_diff is None or pi_diff >= tol) and (
+            niters is None or idx < niters
+        ):
             m1_prev = m1.detach().clone()
 
             new_G_values = K_values * pi.values() ** (eps_base / sum_eps)
@@ -770,7 +837,7 @@ def solver_ibpp_sparse(
                 progress.update(task, advance=1)
 
             # Check stopping criterion
-            if idx % eval_freq == 0:
+            if tol is not None and idx % eval_freq == 0:
                 m1 = csr_sum(pi, dim=1)
                 if m1.isnan().any() or m1.isinf().any():
                     raise ValueError(
@@ -779,13 +846,14 @@ def solver_ibpp_sparse(
                         f"(current value: {eps_base})."
                     )
 
-                error = (m1 - m1_prev).abs().max().item()
-                if error < tol:
+                pi_diff = (m1 - m1_prev).abs().max().item()
+                if pi_diff < tol:
                     if verbose:
                         progress.console.log(
-                            f"Reached tol_uot threshold: {error}"
+                            f"Reached tol_uot threshold: {pi_diff}"
                         )
-                    break
+
+            idx += 1
 
     # renormalize couplings
     pi = torch.sparse_csr_tensor(

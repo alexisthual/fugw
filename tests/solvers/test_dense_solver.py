@@ -46,7 +46,7 @@ def test_dense_solvers(solver, callback):
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
-        early_stopping_threshold=1e-5,
+        tol_loss=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
         ibpp_eps_base=1e2,
@@ -161,7 +161,7 @@ def test_dense_solvers_l2(reg_mode):
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
-        early_stopping_threshold=1e-5,
+        tol_loss=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
     )
@@ -279,7 +279,7 @@ def test_validation_solver(validation):
         nits_uot=1000,
         tol_bcd=1e-7,
         tol_uot=1e-7,
-        early_stopping_threshold=1e-5,
+        tol_loss=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
         ibpp_eps_base=1e2,
@@ -318,3 +318,49 @@ def test_validation_solver(validation):
         "total",
     ]:
         assert len(loss_val[key]) == len(loss_steps)
+
+
+def test_convergence_criteria_existence():
+    with pytest.raises(
+        ValueError, match="At least one of .* must be provided"
+    ):
+        FUGWSolver(
+            nits_bcd=None,
+            tol_bcd=None,
+            tol_loss=None,
+            nits_uot=1,
+            tol_uot=1,
+        )
+
+    with pytest.raises(
+        ValueError, match="At least one of .* must be provided"
+    ):
+        FUGWSolver(
+            nits_bcd=1,
+            tol_bcd=1,
+            tol_loss=1,
+            nits_uot=None,
+            tol_uot=None,
+        )
+
+    try:
+        FUGWSolver(
+            nits_bcd=1,
+            tol_bcd=None,
+            tol_loss=None,
+            nits_uot=1,
+            tol_uot=None,
+        )
+    except Exception as e:
+        assert False, f"Solver should not raise exception {e}"
+
+    try:
+        FUGWSolver(
+            nits_bcd=None,
+            tol_bcd=1,
+            tol_loss=None,
+            nits_uot=None,
+            tol_uot=1,
+        )
+    except Exception as e:
+        assert False, f"Solver should not raise exception {e}"
