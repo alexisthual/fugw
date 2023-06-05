@@ -153,7 +153,8 @@ class FUGW(BaseMapping):
                     weights_source=ws,
                     weights_target=wt,
                     method="entropic",
-                ), device=device
+                ),
+                device=device,
             )
         )
 
