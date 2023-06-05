@@ -240,7 +240,7 @@
 <h1>fugw.solvers.FUGWSolver<a class="headerlink" href="#fugw-solvers-fugwsolver" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="fugw.solvers.FUGWSolver">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fugw.solvers.</span></span><span class="sig-name descname"><span class="pre">FUGWSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nits_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nits_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_eps_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_nits_sinkhorn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fugw.solvers.</span></span><span class="sig-name descname"><span class="pre">FUGWSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nits_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nits_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_eps_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_nits_sinkhorn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver" title="Permalink to this definition">#</a></dt>
 <dd><p>Solver computing dense solutions</p>
 <p class="rubric">Methods</p>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -263,37 +263,49 @@
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="fugw.solvers.FUGWSolver.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nits_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nits_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_eps_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_nits_sinkhorn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nits_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nits_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_eps_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_nits_sinkhorn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Init FUGW solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>nits_bcd: int,</strong></dt><dd><p>Number of block-coordinate-descent iterations to run</p>
+<dt><strong>nits_bcd: int or None,</strong></dt><dd><p>Number of block-coordinate-descent iterations to run.
+If None, run until tol_bcd or tol_loss is reached.
+Default: 10</p>
 </dd>
-<dt><strong>nits_uot: int,</strong></dt><dd><p>Number of solver iteration to run at each BCD iteration</p>
+<dt><strong>nits_uot: int or None,</strong></dt><dd><p>Number of solver iteration to run at each BCD iteration
+If None, run until tol_uot is reached.
+Default: 1000</p>
 </dd>
-<dt><strong>tol_bcd: float,</strong></dt><dd><p>Stop the BCD procedure early if the absolute difference
+<dt><strong>tol_bcd: float or None,</strong></dt><dd><p>Stop the BCD procedure early if the absolute difference
 between two consecutive transport plans
-under this threshold</p>
+under this threshold. If None, do not stop early.
+Default: None</p>
 </dd>
-<dt><strong>tol_uot: float,</strong></dt><dd><p>Stop the BCD procedure early if the absolute difference
+<dt><strong>tol_uot: float or None,</strong></dt><dd><p>Stop the BCD procedure early if the absolute difference
 between two consecutive transport plans
-under this threshold</p>
+under this threshold. If None, do not stop early.
+Default: None</p>
 </dd>
-<dt><strong>early_stopping_threshold: float,</strong></dt><dd><p>Stop the BCD procedure early if the FUGW loss falls
-under this threshold</p>
+<dt><strong>tol_loss: float or None,</strong></dt><dd><p>Stop the BCD procedure early if the FUGW loss falls
+under this threshold. If None, do not stop early.
+Default: None</p>
 </dd>
 <dt><strong>eval_bcd: int,</strong></dt><dd><p>During .fit(), at every eval_bcd step:
 1. compute the FUGW loss and store it in an array
-2. consider stopping early</p>
+2. consider stopping early if tol_loss is not None
+3. consider stopping early if tol_bcd is not None
+Default: 1</p>
 </dd>
 <dt><strong>eval_uot: int,</strong></dt><dd><p>During .fit(), at every eval_uot step:
-1. consider stopping early</p>
+1. consider stopping early if tol_uot is not None
+Default: 10</p>
 </dd>
-<dt><strong>ibpp_eps_base: int,</strong></dt><dd><p>Regularization parameter specific to the ibpp solver</p>
+<dt><strong>ibpp_eps_base: int,</strong></dt><dd><p>Regularization parameter specific to the ibpp solver.
+Default: 1</p>
 </dd>
 <dt><strong>ibpp_nits_sinkhorn: int,</strong></dt><dd><p>Number of sinkhorn iterations to run
-within each uot iteration of the ibpp solver.</p>
+within each uot iteration of the ibpp solver.
+Default: 1</p>
 </dd>
 </dl>
 </dd>
