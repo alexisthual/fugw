@@ -246,22 +246,24 @@ device = "cpu"
 start_time = time.time()
 mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
 _ = mapping.fit(
-    source_features=source_features_normalized,
-    target_features=target_features_normalized,
+    source_features=source_features_normalized[:n_training_contrasts],
+    target_features=target_features_normalized[:n_training_contrasts],
     source_geometry=source_geometry_normalized,
     target_geometry=target_geometry_normalized,
+    source_features_val=source_features_normalized[n_training_contrasts:],
+    target_features_val=target_features_normalized[n_training_contrasts:],
     init_plan=init_plan_normalized,
     solver="sinkhorn",
     solver_params={
-        "nits_bcd": 10,
+        "nits_bcd": 5,
         "tol_bcd": 1e-16,
         "tol_uot": 1e-16,
         "early_stopping_threshold": 1e-16,
     },
     callback_bcd=partial(
         correlation_callback,
-        source_features=source_features_normalized,
-        target_features=target_features_normalized,
+        source_features=source_features_normalized[n_training_contrasts:],
+        target_features=target_features_normalized[n_training_contrasts:],
         device=device,
     ),
     verbose=True,
