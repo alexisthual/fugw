@@ -291,7 +291,7 @@ ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
 color = "tab:blue"
 ax2.set_ylabel("Pearson correlation", color=color)
-for i in range(len(contrasts)):
+for i in range(len(source_features_normalized[n_training_contrasts:])):
     ax2.plot(
         mapping.loss_steps[: len(corr_bcd_steps)],
         corr_bcd_steps[:, i],
@@ -299,22 +299,21 @@ for i in range(len(contrasts)):
         alpha=0.5,
         linestyle="dashed",
     )
-    ax2.text(
-        len(corr_bcd_steps) - 0.95,
-        corr_bcd_steps[-1, i],
-        f"Contrast {i+1}",
-        color=color,
-        fontsize=10,
-        va="center",
-    )
+ax2.set_label("Pearson correlation")
 
-ax2.plot(mapping.loss_steps[: len(corr_bcd_steps)], mean_corr, color="blue")
+ax2.plot(
+    mapping.loss_steps[: len(corr_bcd_steps)],
+    mean_corr,
+    color="blue",
+    label="Average correlation",
+)
 ax2.fill_between(
     mapping.loss_steps[: len(corr_bcd_steps)],
     mean_corr - std_corr,
     mean_corr + std_corr,
     color=color,
     alpha=0.2,
+    label="1st standard deviation",
 )
 ax2.set_ylim(0, 1)
 ax2.tick_params(axis="y", labelcolor=color)
@@ -322,4 +321,5 @@ plt.title(
     f"Sinkhorn mapping training loss\n Total training time = {total_time:.2f}s"
 )
 fig.tight_layout()
+plt.legend()
 plt.show()
