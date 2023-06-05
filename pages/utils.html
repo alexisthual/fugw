@@ -240,6 +240,43 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">fugw.utils</span></code><a class="headerlink" href="#fugw-utils" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">fugw.utils.</span></span><span class="sig-name descname"><span class="pre">init_plan_dense</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'entropic'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Initialize transport plan with dense tensor.</p>
+<p>Generate a matrix satisfying the constraints of a transport plan.
+In particular, marginal constraints on lines and columns are satisfied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_source: int</strong></dt><dd><p>Number of source points</p>
+</dd>
+<dt><strong>n_target: int</strong></dt><dd><p>Number of target points</p>
+</dd>
+<dt><strong>weights_source: torch.Tensor of size(n_source), optional, defaults to None</strong></dt><dd><p>Source weights used in entropic init</p>
+</dd>
+<dt><strong>weights_target: torch.Tensor of size(n_target), optional, defaults to None</strong></dt><dd><p>Target weights used in entropic init</p>
+</dd>
+<dt><strong>method: str, optional, defaults to “entropic”</strong></dt><dd><p>Method to use for initialization.
+Can be “entropic”, “permutation” or “identity”.
+If “entropic”, weights_source and weights_target must be provided ;
+the initial plan is then given by the product of the two arrays.
+If “permutation”, the initial plan is the solution to a 1D
+optimal transport problem between two random arrays, which can be
+understood as a soft permutation between source and target points.
+If “identity”, the number of source and target points must be equal ;
+the initial plan is then the identity matrix.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>init_plan: torch.Tensor of size(n_source, n_target)</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">fugw.utils.</span></span><span class="sig-name descname"><span class="pre">load_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Load mapping from pickle file, optionally loading weights.</p>
 <dl class="field-list simple">
