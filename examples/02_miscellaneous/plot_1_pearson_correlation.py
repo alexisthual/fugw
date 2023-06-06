@@ -31,11 +31,11 @@ from fugw.utils import _make_tensor
 n_subjects = 2
 
 contrasts = [
-    "sentence reading vs checkerboard",
-    "sentence listening",
     "sentence reading",
     "calculation vs sentences",
     "left vs right button press",
+    "sentence reading vs checkerboard",
+    "sentence listening",
     "left button press",
 ]
 n_training_contrasts = 3
@@ -269,9 +269,8 @@ total_time = time.time() - start_time
 # %%
 # The Pearson correlation relative to each validation contrast and training
 # loss evolution are then plotted for each BCD iteration. Notice how the
-# correlation only improves upon a certain number of iterations, even though
-# the fugw loss keeps decreasing. This is a sign of overfitting, and we
-# might want to stop after fewer iterations.
+# average across-voxel correlation spikes right after the first BCD
+# iteration.
 
 corr_bcd_steps = np.array(corr_bcd_steps)
 
@@ -297,6 +296,7 @@ for i in range(len(source_features_normalized[n_training_contrasts:])):
         color=color,
         alpha=0.5,
         linestyle="dashed",
+        label="Individual contrasts" if i == 0 else None,
     )
 ax2.set_label("Pearson correlation")
 
@@ -304,7 +304,7 @@ ax2.plot(
     mapping.loss_steps[: len(corr_bcd_steps)],
     mean_corr,
     color="blue",
-    label="Average correlation",
+    label="Average across-voxels correlation",
 )
 ax2.fill_between(
     mapping.loss_steps[: len(corr_bcd_steps)],
@@ -312,7 +312,7 @@ ax2.fill_between(
     mean_corr + std_corr,
     color=color,
     alpha=0.2,
-    label="1st standard deviation",
+    label="Standard deviation",
 )
 ax2.set_ylim(0, 1)
 ax2.tick_params(axis="y", labelcolor=color)
