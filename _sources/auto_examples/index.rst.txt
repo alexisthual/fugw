@@ -187,14 +187,31 @@ but that can be useful in some cases.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor the Pearson correlation between transfor...">
+
+.. only:: html
+
+  .. image:: /auto_examples/02_miscellaneous/images/thumb/sphx_glr_plot_1_pearson_correlation_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_1_pearson_correlation.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Monitor the Pearson correlation during training with callbacks</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use 3 fMRI feature maps for training and 2 independant fMRI feature maps fo...">
 
 .. only:: html
 
-  .. image:: /auto_examples/02_miscellaneous/images/thumb/sphx_glr_plot_1_simple_crossval_thumb.png
+  .. image:: /auto_examples/02_miscellaneous/images/thumb/sphx_glr_plot_2_simple_crossval_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_1_simple_crossval.py`
+  :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_2_simple_crossval.py`
 
 .. raw:: html
 
@@ -208,10 +225,10 @@ but that can be useful in some cases.
 
 .. only:: html
 
-  .. image:: /auto_examples/02_miscellaneous/images/thumb/sphx_glr_plot_2_memory_usage_callback_thumb.png
+  .. image:: /auto_examples/02_miscellaneous/images/thumb/sphx_glr_plot_3_memory_usage_callback_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_2_memory_usage_callback.py`
+  :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_3_memory_usage_callback.py`
 
 .. raw:: html
 
