@@ -201,6 +201,7 @@ class FUGWSolver(BaseSolver):
         rho_t=1,
         eps=1e-2,
         reg_mode="joint",
+        divergence="kl",
         F=None,
         Ds=None,
         Dt=None,
@@ -213,18 +214,18 @@ class FUGWSolver(BaseSolver):
         init_duals=None,
         solver="sinkhorn",
         callback_bcd=None,
-        divergence="kl",
         verbose=False,
     ):
         """Run BCD iterations.
 
         Parameters
         ----------
-        alpha: float
-        rho_s: float
-        rho_t: float
-        eps: float
-        reg_mode: str
+        alpha: float, optional
+        rho_s: float, optional
+        rho_t: float, optional
+        eps: float, optional
+        reg_mode: string, optional
+        divergence: string, optional
         F: matrix of size n x m.
             Kernel matrix between the source and target training features.
         Ds: matrix of size n x n

@@ -10,6 +10,7 @@ class BaseMapping:
         rho=1,
         eps=1e-2,
         reg_mode="joint",
+        divergence="kl",
     ):
         """Init FUGW problem.
 
@@ -30,6 +31,10 @@ class BaseMapping:
         reg_mode: "joint" or "independent", optional, defaults to "joint"
             "joint": use unbalanced-GW-like regularisation term
             "independent": use unbalanced-W-like regularisation term
+        divergence: string, optional
+            What divergence to use for the marginal contraints
+            and regularization. Can be "kl" or "l2".
+            Defaults to "kl".
 
         Attributes
         ----------
@@ -63,6 +68,7 @@ class BaseMapping:
         self.rho = rho
         self.eps = eps
         self.reg_mode = reg_mode
+        self.divergence = divergence
 
         self.pi = None
 
