@@ -343,7 +343,7 @@ class FUGWSolver(BaseSolver):
         gamma = pi
 
         # initialization of dual vectors
-        if divergence == "l2" or solver == "mm":
+        if solver == "mm":
             duals_pi, duals_gamma = None, None
         else:
             if init_duals is None:
@@ -447,12 +447,13 @@ class FUGWSolver(BaseSolver):
             pi_prev = pi.detach().clone()
 
             # Update gamma
-            l1_pi = pi.sum()
+            mass_pi = pi.sum()
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
 
             if divergence == "kl":
-                new_rho_s, new_rho_t = rho_s * l1_pi, rho_t * l1_pi
-                new_eps = l1_pi * eps if reg_mode == "joint" else eps
+                new_rho_s = rho_s * mass_pi
+                new_rho_t = rho_t * mass_pi
+                new_eps = mass_pi * eps if reg_mode == "joint" else eps
                 uot_params = (new_rho_s, new_rho_t, new_eps)
 
                 if solver == "sinkhorn":
@@ -472,16 +473,16 @@ class FUGWSolver(BaseSolver):
                     cost_gamma, gamma, uot_params, tuple_weights
                 )
 
-            # Rescale mass
-            gamma = (l1_pi / gamma.sum()).sqrt() * gamma
+            # Rescale gamma
+            gamma = (mass_pi / gamma.sum()).sqrt() * gamma
 
             # Update pi
-            l1_gamma = gamma.sum()
+            mass_gamma = gamma.sum()
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
 
             if divergence == "kl":
-                new_rho_s, new_rho_t = rho_s * l1_gamma, rho_t * l1_gamma
-                new_eps = l1_gamma * eps if reg_mode == "joint" else eps
+                new_rho_s, new_rho_t = rho_s * mass_gamma, rho_t * mass_gamma
+                new_eps = mass_gamma * eps if reg_mode == "joint" else eps
                 uot_params = (new_rho_s, new_rho_t, new_eps)
 
                 if solver == "sinkhorn":
@@ -500,7 +501,7 @@ class FUGWSolver(BaseSolver):
                 pi = self_solver_mm_l2(cost_pi, pi, uot_params, tuple_weights)
 
             # Rescale mass
-            pi = (l1_gamma / pi.sum()).sqrt() * pi
+            pi = (mass_gamma / pi.sum()).sqrt() * pi
 
             if idx % self.eval_bcd == 0:
                 current_loss = compute_fugw_loss(pi, gamma)
