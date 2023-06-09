@@ -74,7 +74,7 @@ class FUGWSparseSolver(BaseSolver):
         if alpha != 1 and K1 is not None and K2 is not None:
             wasserstein_cost_values = batch_elementwise_prod_and_sum(
                 K1, K2, row_indices, col_indices, 1
-            )
+            ) / 2
             cost_values += (1 - alpha) * wasserstein_cost_values
 
         # or UOT when alpha = 1
@@ -171,7 +171,7 @@ class FUGWSparseSolver(BaseSolver):
             # with more non-null elements than an int can store.
             loss_wasserstein = csr_sum(
                 elementwise_prod_fact_sparse(K1, K2, pi + gamma)
-            )
+            ) / 2
             loss += (1 - alpha) * loss_wasserstein
 
         if alpha != 0:

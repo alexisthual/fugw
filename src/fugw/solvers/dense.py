@@ -50,7 +50,7 @@ class FUGWSolver(BaseSolver):
 
         # Avoid unnecessary calculation of UGW when alpha = 0
         if alpha != 1 and D is not None:
-            wasserstein_cost = D
+            wasserstein_cost = D / 2
             cost += (1 - alpha) * wasserstein_cost
 
         # or UOT when alpha = 1
@@ -64,7 +64,6 @@ class FUGWSolver(BaseSolver):
             cost += alpha * gromov_wasserstein_cost
 
         if divergence == "kl":
-            # or when cost is balanced
             if rho_s != float("inf") and rho_s != 0:
                 marginal_cost_dim1 = compute_approx_kl(pi1, ws)
                 cost += rho_s * marginal_cost_dim1
@@ -75,6 +74,10 @@ class FUGWSolver(BaseSolver):
             if reg_mode == "joint":
                 regularized_cost = compute_approx_kl(pi, ws_dot_wt)
                 cost += eps * regularized_cost
+        elif divergence == "l2":
+            # Marginal constraints do not appear in the cost matrix
+            # in the L2 case. See calculations.
+            pass
 
         return cost
 
@@ -126,7 +129,7 @@ class FUGWSolver(BaseSolver):
         loss = 0
 
         if alpha != 1 and D is not None:
-            loss_wasserstein = (D * pi).sum() + (D * gamma).sum()
+            loss_wasserstein = ((D * pi).sum() + (D * gamma).sum()) / 2
             loss += (1 - alpha) * loss_wasserstein
 
         if alpha != 0:
