@@ -1,6 +1,6 @@
 import torch
 
-from fugw.utils import _get_progress
+from fugw.utils import _get_progress, console
 
 
 class BaseSolver:
@@ -537,8 +537,13 @@ def solver_mm_l2(
     ws, wt, ws_dot_wt = tuple_weights
     rho_s, rho_t, eps = uot_params
 
-    thres = rho_s * ws[:, None] + rho_t * wt[None, :] + eps * ws_dot_wt - cost
-    thres = torch.clamp(thres, min=0)
+    a = rho_s * ws[:, None] + rho_t * wt[None, :] + eps * ws_dot_wt
+    thres = torch.clamp(a - cost, min=0)
+
+    if torch.count_nonzero(thres) == 0:
+        console.log(
+            "Values for rho and/or eps are too low, plan will be empty."
+        )
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
@@ -552,6 +557,8 @@ def solver_mm_l2(
             niters is None or idx < niters
         ):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
+
+            # Update plan and marginals
             denom = rho_s * pi1[:, None] + rho_t * pi2[None, :] + eps * pi
             pi = thres * pi / denom
             pi1, pi2 = pi.sum(1), pi.sum(0)
