@@ -189,3 +189,27 @@ def test_validation_mapping(validation):
             device="cpu",
         )
         assert len(fugw.loss_val) == len(fugw.loss)
+
+
+@pytest.mark.parametrize("solver", ["sinkhorn", "ibpp"])
+def test_available_l2_solver(solver):
+    _, source_features_train, source_geometry, _ = _init_mock_distribution(
+        n_features_train, n_voxels_source, return_numpy=False
+    )
+
+    _, target_features_train, target_geometry, _ = _init_mock_distribution(
+        n_features_train, n_voxels_target, return_numpy=False
+    )
+
+    mapping = FUGW(divergence="l2")
+
+    with pytest.raises(
+        ValueError, match="Solver must be 'mm' if divergence is 'l2'."
+    ):
+        mapping.fit(
+            source_features=source_features_train,
+            target_features=target_features_train,
+            source_geometry=source_geometry,
+            target_geometry=target_geometry,
+            solver=solver,
+        )
