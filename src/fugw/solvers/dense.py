@@ -6,7 +6,7 @@ import torch
 
 from fugw.solvers.utils import (
     BaseSolver,
-    compute_approx_kl,
+    compute_unnormalized_kl,
     compute_quad_divergence,
     compute_divergence,
     solver_ibpp,
@@ -65,14 +65,14 @@ class FUGWSolver(BaseSolver):
 
         if divergence == "kl":
             if rho_s != float("inf") and rho_s != 0:
-                marginal_cost_dim1 = compute_approx_kl(pi1, ws)
+                marginal_cost_dim1 = compute_unnormalized_kl(pi1, ws)
                 cost += rho_s * marginal_cost_dim1
             if rho_t != float("inf") and rho_t != 0:
-                marginal_cost_dim2 = compute_approx_kl(pi2, wt)
+                marginal_cost_dim2 = compute_unnormalized_kl(pi2, wt)
                 cost += rho_t * marginal_cost_dim2
 
             if reg_mode == "joint":
-                regularized_cost = compute_approx_kl(pi, ws_dot_wt)
+                regularized_cost = compute_unnormalized_kl(pi, ws_dot_wt)
                 cost += eps * regularized_cost
         elif divergence == "l2":
             # Marginal constraints do not appear in the cost matrix

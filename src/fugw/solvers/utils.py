@@ -1078,7 +1078,7 @@ def elementwise_prod_fact_sparse(a, b, p):
     )
 
 
-def compute_approx_kl(p, q):
+def compute_unnormalized_kl(p, q):
     """Compute unnormalized Kullback-Leibler divergence between two vectors.
 
     Parameters
@@ -1097,9 +1097,9 @@ def compute_approx_kl(p, q):
     return entropy
 
 
-def compute_approx_kl_sparse(p, q):
+def compute_unnormalized_kl_sparse(p, q):
     """Compute unnormalized KL divergence between two sparse vectors."""
-    return compute_approx_kl(p.values(), q.values())
+    return compute_unnormalized_kl(p.values(), q.values())
 
 
 def compute_kl(p, q):
@@ -1115,7 +1115,7 @@ def compute_kl(p, q):
     -------
     kl: float
     """
-    return compute_approx_kl(p, q) - p.sum() + q.sum()
+    return compute_unnormalized_kl(p, q) - p.sum() + q.sum()
 
 
 def compute_kl_sparse(p, q):
@@ -1131,7 +1131,7 @@ def compute_kl_sparse(p, q):
     -------
     kl: float
     """
-    return compute_approx_kl_sparse(p, q) - csr_sum(p) + csr_sum(q)
+    return compute_unnormalized_kl_sparse(p, q) - csr_sum(p) + csr_sum(q)
 
 
 def compute_l2(p, q):

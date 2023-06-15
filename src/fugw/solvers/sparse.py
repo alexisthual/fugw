@@ -9,8 +9,8 @@ import torch
 from fugw.solvers.utils import (
     BaseSolver,
     batch_elementwise_prod_and_sum,
-    compute_approx_kl,
-    compute_approx_kl_sparse,
+    compute_unnormalized_kl,
+    compute_unnormalized_kl_sparse,
     compute_divergence_sparse,
     compute_quad_divergence,
     compute_quad_divergence_sparse,
@@ -73,9 +73,12 @@ class FUGWSparseSolver(BaseSolver):
         cost_values = torch.zeros_like(pi.values()).to(device)
 
         if alpha != 1 and K1 is not None and K2 is not None:
-            wasserstein_cost_values = batch_elementwise_prod_and_sum(
-                K1, K2, row_indices, col_indices, 1
-            ) / 2
+            wasserstein_cost_values = (
+                batch_elementwise_prod_and_sum(
+                    K1, K2, row_indices, col_indices, 1
+                )
+                / 2
+            )
             cost_values += (1 - alpha) * wasserstein_cost_values
 
         # or UOT when alpha = 1
@@ -98,14 +101,16 @@ class FUGWSparseSolver(BaseSolver):
         if divergence == "kl":
             # or when cost is balanced
             if rho_s != float("inf") and rho_s != 0:
-                marginal_cost_dim1 = compute_approx_kl(pi1, ws)
+                marginal_cost_dim1 = compute_unnormalized_kl(pi1, ws)
                 cost_values += rho_s * marginal_cost_dim1
             if rho_t != float("inf") and rho_t != 0:
-                marginal_cost_dim2 = compute_approx_kl(pi2, wt)
+                marginal_cost_dim2 = compute_unnormalized_kl(pi2, wt)
                 cost_values += rho_t * marginal_cost_dim2
 
             if reg_mode == "joint":
-                cost_values += eps * compute_approx_kl_sparse(pi, ws_dot_wt)
+                cost_values += eps * compute_unnormalized_kl_sparse(
+                    pi, ws_dot_wt
+                )
         elif divergence == "l2":
             # Marginal constraints do not appear in the cost matrix
             # in the L2 case. See calculations.
@@ -175,9 +180,9 @@ class FUGWSparseSolver(BaseSolver):
             # when adding 2 CSR matrices together.
             # This could become problematic for sparse matrices
             # with more non-null elements than an int can store.
-            loss_wasserstein = csr_sum(
-                elementwise_prod_fact_sparse(K1, K2, pi + gamma)
-            ) / 2
+            loss_wasserstein = (
+                csr_sum(elementwise_prod_fact_sparse(K1, K2, pi + gamma)) / 2
+            )
             loss += (1 - alpha) * loss_wasserstein
 
         if alpha != 0:
