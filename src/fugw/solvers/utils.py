@@ -713,6 +713,7 @@ def solver_mm_sparse(
 def solver_mm_l2_sparse(
     cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
 ):
+    """Solve L2-penalized FUGW problem using majorizatio-minimization algo."""
     niters, tol, eval_freq = train_params
     ws, wt, ws_dot_wt = tuple_weights
     rho_s, rho_t, eps = uot_params
@@ -1078,6 +1079,17 @@ def elementwise_prod_fact_sparse(a, b, p):
 
 
 def compute_approx_kl(p, q):
+    """Compute unnormalized Kullback-Leibler divergence between two vectors.
+
+    Parameters
+    ----------
+    p: torch tensor
+    q: torch tensor
+        Should have the same size as p
+
+    Returns
+    -------
+    unnormalized_kl: float"""
     # By convention: 0 log 0 = 0
     entropy = torch.nan_to_num(
         p * (p / q).log(), nan=0.0, posinf=0.0, neginf=0.0
@@ -1086,6 +1098,7 @@ def compute_approx_kl(p, q):
 
 
 def compute_approx_kl_sparse(p, q):
+    """Compute unnormalized KL divergence between two sparse vectors."""
     return compute_approx_kl(p.values(), q.values())
 
 
@@ -1154,6 +1167,23 @@ def compute_l2_sparse(p, q):
 
 
 def compute_divergence(p, q, divergence="kl"):
+    """Compute div(p, q).
+
+    Parameters
+    ----------
+    p: torch tensor
+    q: torch tensor
+        Should have the same size as p
+    divergence: str
+        Either "kl" or "l2".
+        If "kl", compute KL(p, q).
+        If "l2", compute || p - q ||^2.
+        Default: "kl"
+
+    Returns
+    -------
+    div: float
+    """
     if divergence == "kl":
         return compute_kl(p, q)
     elif divergence == "l2":
@@ -1161,6 +1191,23 @@ def compute_divergence(p, q, divergence="kl"):
 
 
 def compute_divergence_sparse(p, q, divergence="kl"):
+    """Compute div(p, q) for sparse tensors.
+
+    Parameters
+    ----------
+    p: torch sparse CSR tensor
+    q: torch sparse CSR tensor
+        Should have the same size and sparsity mask as p
+    divergence: str
+        Either "kl" or "l2".
+        If "kl", compute KL(p, q).
+        If "l2", compute || p - q ||^2.
+        Default: "kl"
+
+    Returns
+    -------
+    div: float
+    """
     if divergence == "kl":
         return compute_kl_sparse(p, q)
     elif divergence == "l2":
@@ -1228,7 +1275,24 @@ def compute_quad_l2(a, b, mu, nu):
 
 
 def compute_quad_l2_sparse(a, b, mu, nu):
-    """Compute || a otimes b - mu otimes nu ||^2."""
+    """Compute || a otimes b - mu otimes nu ||^2.
+
+    Because a otimes b is constly to store in memory,
+    we expand the norm so that we only have to deal with scalars.
+
+    Parameters
+    ----------
+    a: torch sparse CSR tensor
+    b: torch sparse CSR tensor
+    mu: torch sparse CSR tensor
+        Should have the same size and sparsity mask as a
+    nu: torch sparse CSR tensor
+        Should have the same size and sparsity mask as b
+
+    Returns
+    -------
+    norm: float
+    """
 
     norm = (
         (a.values() ** 2).sum() * (b.values() ** 2).sum()
@@ -1242,6 +1306,26 @@ def compute_quad_l2_sparse(a, b, mu, nu):
 
 
 def compute_quad_divergence(mu, nu, alpha, beta, divergence="kl"):
+    """Compute div(mu otimes nu, alpha otimes beta).
+
+    Parameters
+    ----------
+    mu: torch tensor
+    nu: torch tensor
+    alpha: torch tensor
+        Should have the same size as mu
+    beta: torch tensor
+        Should have the same size as nu
+    divergence: str
+        Either "kl" or "l2".
+        If "kl", compute KL(mu otimes nu, alpha otimes beta).
+        If "l2", compute || mu otimes nu - alpha otimes beta ||^2.
+        Default: "kl"
+
+    Returns
+    -------
+    div: float
+    """
     if divergence == "kl":
         return compute_quad_kl(mu, nu, alpha, beta)
     elif divergence == "l2":
@@ -1249,6 +1333,26 @@ def compute_quad_divergence(mu, nu, alpha, beta, divergence="kl"):
 
 
 def compute_quad_divergence_sparse(mu, nu, alpha, beta, divergence="kl"):
+    """Compute div(mu otimes nu, alpha otimes beta) for sparse tensors.
+
+    Parameters
+    ----------
+    mu: torch sparse CSR tensor
+    nu: torch sparse CSR tensor
+    alpha: torch sparse CSR tensor
+        Should have the same size and sparsity mask as mu
+    beta: torch sparse CSR tensor
+        Should have the same size and sparsity mask as nu
+    divergence: str
+        Either "kl" or "l2".
+        If "kl", compute KL(mu otimes nu, alpha otimes beta).
+        If "l2", compute || mu otimes nu - alpha otimes beta ||^2.
+        Default: "kl"
+
+    Returns
+    -------
+    div: float
+    """
     if divergence == "kl":
         return compute_quad_kl_sparse(mu, nu, alpha, beta)
     elif divergence == "l2":
