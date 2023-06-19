@@ -299,13 +299,13 @@ We use 3 contrasts for training and 3 contrasts for validation.</p>
 Downloading data from https://osf.io/download/5d27c81645253a001c3e1f85/ ...
  ...done. (2 seconds, 0 min)
 Downloading data from https://osf.io/download/5d27d931114a4200190452fe/ ...
- ...done. (2 seconds, 0 min)
+ ...done. (3 seconds, 0 min)
 Downloading data from https://osf.io/download/5d27d62e114a420017049501/ ...
  ...done. (2 seconds, 0 min)
 Downloading data from https://osf.io/download/5d27cdcaa26b340018084b30/ ...
- ...done. (1 seconds, 0 min)
+ ...done. (3 seconds, 0 min)
 Downloading data from https://osf.io/download/5d27d80c114a420016058f7d/ ...
- ...done. (1 seconds, 0 min)
+ ...done. (3 seconds, 0 min)
 /usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:893: UserWarning:
 
 `legacy_format` will default to `False` in release 0.11. Dataset fetchers will then return pandas dataframes by default instead of recarrays.
@@ -401,8 +401,8 @@ all feature and geometry arrays.</p>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span></a><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features</span></a><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
 <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry</span></a> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry</span></a><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry</span></a> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry</span></a><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.max.html#numpy.max" title="numpy.max" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry</span></a><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.max.html#numpy.max" title="numpy.max" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p>We first define a function to compute the Pearson correlation
@@ -569,38 +569,38 @@ target features at each BCD iteration.</p>
 <span class="n">total_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[09:29:59] Validation data for anatomical kernels is not provided.  dense.py:220
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:04:47] Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
-[09:30:11] BCD step 1/5    FUGW loss:      0.02701672725379467      dense.py:516
-           Validation loss:        0.031921692192554474
-[09:30:11] Pearson correlation:  [0.37215528   plot_1_pearson_correlation.py:237
-           0.2676539  0.26645738]
+[21:04:57] BCD step 1/5    FUGW loss:      0.024716345593333244     dense.py:521
+           Validation loss:        0.027000926434993744
+[21:04:57] Pearson correlation:  [0.38212193   plot_1_pearson_correlation.py:237
+           0.29643237 0.26873265]
 
 
-[09:30:28] BCD step 2/5    FUGW loss:      0.011133084073662758     dense.py:516
-           Validation loss:        0.01497834175825119
-[09:30:28] Pearson correlation:  [0.29726561   plot_1_pearson_correlation.py:237
-           0.18080227 0.14409441]
+[21:05:16] BCD step 2/5    FUGW loss:      0.006556201260536909     dense.py:521
+           Validation loss:        0.007570177782326937
+[21:05:16] Pearson correlation:  [0.31391929   plot_1_pearson_correlation.py:237
+           0.3429227  0.32424155]
 
 
-[09:30:45] BCD step 3/5    FUGW loss:      0.010589344426989555     dense.py:516
-           Validation loss:        0.014285219833254814
-[09:30:45] Pearson correlation:  [0.28388686   plot_1_pearson_correlation.py:237
-           0.14694602 0.13754233]
+[21:05:33] BCD step 3/5    FUGW loss:      0.006002937443554401     dense.py:521
+           Validation loss:        0.0066454000771045685
+[21:05:33] Pearson correlation:  [0.33015477   plot_1_pearson_correlation.py:237
+           0.33416949 0.31083955]
 
 
-[09:31:02] BCD step 4/5    FUGW loss:      0.010544436983764172     dense.py:516
-           Validation loss:        0.014314219355583191
-[09:31:02] Pearson correlation:  [0.274317     plot_1_pearson_correlation.py:237
-           0.13863971 0.13435658]
+[21:05:51] BCD step 4/5    FUGW loss:      0.005948435515165329     dense.py:521
+           Validation loss:        0.006552212871611118
+[21:05:51] Pearson correlation:  [0.32666265   plot_1_pearson_correlation.py:237
+           0.32981187 0.29680214]
 
 
-[09:31:18] BCD step 5/5    FUGW loss:      0.010508625768125057     dense.py:516
-           Validation loss:        0.014310953207314014
-[09:31:18] Pearson correlation:  [0.26590698   plot_1_pearson_correlation.py:237
-           0.14459206 0.13488713]
+[21:06:10] BCD step 5/5    FUGW loss:      0.0059365942142903805    dense.py:521
+           Validation loss:        0.00654740771278739
+[21:06:10] Pearson correlation:  [0.32641954   plot_1_pearson_correlation.py:237
+           0.33017029 0.29350085]
 </pre></div>
 </div>
 <p>The Pearson correlation relative to each validation contrast and training
@@ -659,7 +659,7 @@ iteration.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_1_pearson_correlation_001.png" srcset="../../_images/sphx_glr_plot_1_pearson_correlation_001.png" alt="Sinkhorn mapping training loss  Total training time = 79.05s" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  33.404 seconds)</p>
+<img src="../../_images/sphx_glr_plot_1_pearson_correlation_001.png" srcset="../../_images/sphx_glr_plot_1_pearson_correlation_001.png" alt="Sinkhorn mapping training loss  Total training time = 83.42s" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  43.183 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  8 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-02-miscellaneous-plot-1-pearson-correlation-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">

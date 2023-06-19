@@ -237,50 +237,50 @@ using a sinkhorn solver
 
  .. code-block:: none
 
-    [09:16:18] Validation data for feature maps is not provided. Using  dense.py:193
+    [20:49:29] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
-               Validation data for anatomical kernels is not provided.  dense.py:220
+               Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-               BCD step 1/10   FUGW loss:      0.738227903842926        dense.py:516
-               Validation loss:        0.738227903842926                            
+               BCD step 1/10   FUGW loss:      0.029017694294452667     dense.py:521
+               Validation loss:        0.029017694294452667                         
 
 
-    [09:16:19] BCD step 2/10   FUGW loss:      0.030361253768205643     dense.py:516
-               Validation loss:        0.030361253768205643                         
+    [20:49:30] BCD step 2/10   FUGW loss:      0.04671149328351021      dense.py:521
+               Validation loss:        0.04671149328351021                          
 
 
-               BCD step 3/10   FUGW loss:      0.04648213088512421      dense.py:516
-               Validation loss:        0.04648213088512421                          
+    [20:49:31] BCD step 3/10   FUGW loss:      0.022675596177577972     dense.py:521
+               Validation loss:        0.022675596177577972                         
 
 
-    [09:16:20] BCD step 4/10   FUGW loss:      0.04231761768460274      dense.py:516
-               Validation loss:        0.04231761768460274                          
+               BCD step 4/10   FUGW loss:      0.022144610062241554     dense.py:521
+               Validation loss:        0.022144610062241554                         
 
 
-               BCD step 5/10   FUGW loss:      0.09883110225200653      dense.py:516
-               Validation loss:        0.09883110225200653                          
+    [20:49:32] BCD step 5/10   FUGW loss:      0.04954808950424194      dense.py:521
+               Validation loss:        0.04954808950424194                          
 
 
-    [09:16:21] BCD step 6/10   FUGW loss:      0.10006309300661087      dense.py:516
-               Validation loss:        0.10006309300661087                          
+               BCD step 6/10   FUGW loss:      0.0239147637039423       dense.py:521
+               Validation loss:        0.0239147637039423                           
 
 
-    [09:16:22] BCD step 7/10   FUGW loss:      0.028383420780301094     dense.py:516
-               Validation loss:        0.028383420780301094                         
+    [20:49:33] BCD step 7/10   FUGW loss:      0.01939348317682743      dense.py:521
+               Validation loss:        0.01939348317682743                          
 
 
-               BCD step 8/10   FUGW loss:      0.025984298437833786     dense.py:516
-               Validation loss:        0.025984298437833786                         
+    [20:49:34] BCD step 8/10   FUGW loss:      0.018673155456781387     dense.py:521
+               Validation loss:        0.018673155456781387                         
 
 
-    [09:16:23] BCD step 9/10   FUGW loss:      0.02610396035015583      dense.py:516
-               Validation loss:        0.02610396035015583                          
+               BCD step 9/10   FUGW loss:      0.018613629043102264     dense.py:521
+               Validation loss:        0.018613629043102264                         
 
 
-               BCD step 10/10  FUGW loss:      0.026043901219964027     dense.py:516
-               Validation loss:        0.026043901219964027                         
+    [20:49:35] BCD step 10/10  FUGW loss:      0.018613623455166817     dense.py:521
+               Validation loss:        0.018613623455166817                         
 
 
 
@@ -485,9 +485,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.375 seconds)
+   **Total running time of the script:** ( 0 minutes  9.150 seconds)
 
-**Estimated memory usage:**  46 MB
+**Estimated memory usage:**  44 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_1_dense.py:

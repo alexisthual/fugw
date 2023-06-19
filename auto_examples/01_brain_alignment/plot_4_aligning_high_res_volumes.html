@@ -432,43 +432,43 @@ and selection radia have the same units).</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[09:26:51] Validation data for feature maps is not provided. Using  dense.py:193
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:00:57] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
-           Validation data for anatomical kernels is not provided.  dense.py:220
+           Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
-[09:27:01] BCD step 1/5    FUGW loss:      0.025019824504852295     dense.py:516
-           Validation loss:        0.025019824504852295
+[21:01:09] BCD step 1/5    FUGW loss:      0.023748306557536125     dense.py:521
+           Validation loss:        0.023748306557536125
 
 
-[09:27:11] BCD step 2/5    FUGW loss:      0.020169835537672043     dense.py:516
-           Validation loss:        0.020169835537672043
+[21:01:21] BCD step 2/5    FUGW loss:      0.019917232915759087     dense.py:521
+           Validation loss:        0.019917232915759087
 
 
-[09:27:20] BCD step 3/5    FUGW loss:      0.011266661807894707     dense.py:516
-           Validation loss:        0.011266661807894707
+[21:01:33] BCD step 3/5    FUGW loss:      0.011778095737099648     dense.py:521
+           Validation loss:        0.011778095737099648
 
 
-[09:27:30] BCD step 4/5    FUGW loss:      0.006853213533759117     dense.py:516
-           Validation loss:        0.006853213533759117
+[21:01:45] BCD step 4/5    FUGW loss:      0.006057289429008961     dense.py:521
+           Validation loss:        0.006057289429008961
 
 
-[09:27:43] BCD step 5/5    FUGW loss:      0.005719529464840889     dense.py:516
-           Validation loss:        0.005719529464840889
-[09:27:44] Validation data for feature maps is not provided. Using sparse.py:203
+[21:02:00] BCD step 5/5    FUGW loss:      0.00468091806396842      dense.py:521
+           Validation loss:        0.00468091806396842
+           Validation data for feature maps is not provided. Using sparse.py:209
            training data instead.
-           Validation data for anatomical kernels is not provided. sparse.py:247
+           Validation data for anatomical kernels is not provided. sparse.py:253
            Using training data instead.
 
 
-[09:28:23] BCD step 1/3    FUGW loss:      0.009396675042808056    sparse.py:582
+[21:02:48] BCD step 1/3    FUGW loss:      0.0079415924847126      sparse.py:660
 
 
-[09:29:03] BCD step 2/3    FUGW loss:      0.006626536138355732    sparse.py:582
+[21:03:36] BCD step 2/3    FUGW loss:      0.0054353829473257065   sparse.py:660
 
 
-[09:29:43] BCD step 3/3    FUGW loss:      0.005600947421044111    sparse.py:582
+[21:04:25] BCD step 3/3    FUGW loss:      0.004494554363191128    sparse.py:660
 </pre></div>
 </div>
 <p>Let’s plot the probability map of target voxels being matched with
@@ -542,8 +542,8 @@ the 300th source voxel.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Pearson Correlation pre-mapping: 0.38
-Pearson Correlation post-mapping: 0.49
-Relative improvement: 29.34 %
+Pearson Correlation post-mapping: 0.47
+Relative improvement: 24.82 %
 </pre></div>
 </div>
 <p>Let’s plot the transporting feature maps of the test set.</p>
@@ -602,8 +602,8 @@ Relative improvement: 29.34 %
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" srcset="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  57.605 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  8 MB</p>
+<img src="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" srcset="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  34.946 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  80 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-01-brain-alignment-plot-4-aligning-high-res-volumes-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/49540a6a808a06eabc34916bb7b9d3bc/plot_4_aligning_high_res_volumes.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_4_aligning_high_res_volumes.py</span></code></a></p>

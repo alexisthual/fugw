@@ -403,8 +403,8 @@ both the features and the geometry.</p>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span></a><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features</span></a><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
 <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry</span></a> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry</span></a><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry</span></a> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry</span></a><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.max.html#numpy.max" title="numpy.max" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_geometry</span></a><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.max.html#numpy.max" title="numpy.max" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_geometry</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p>We now fit the mapping using the sinkhorn solver and 3 BCD iterations.</p>
@@ -422,26 +422,26 @@ both the features and the geometry.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[09:25:41] Validation data for feature maps is not provided. Using  dense.py:193
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[20:59:43] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
-           Validation data for anatomical kernels is not provided.  dense.py:220
+           Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
-[09:25:55] BCD step 1/4    FUGW loss:      0.028501801192760468     dense.py:516
-           Validation loss:        0.028501801192760468
+[20:59:55] BCD step 1/4    FUGW loss:      0.025816770270466805     dense.py:521
+           Validation loss:        0.025816770270466805
 
 
-[09:26:12] BCD step 2/4    FUGW loss:      0.014847295358777046     dense.py:516
-           Validation loss:        0.014847295358777046
+[21:00:14] BCD step 2/4    FUGW loss:      0.009245545603334904     dense.py:521
+           Validation loss:        0.009245545603334904
 
 
-[09:26:29] BCD step 3/4    FUGW loss:      0.013132067397236824     dense.py:516
-           Validation loss:        0.013132067397236824
+[21:00:32] BCD step 3/4    FUGW loss:      0.007908135652542114     dense.py:521
+           Validation loss:        0.007908135652542114
 
 
-[09:26:45] BCD step 4/4    FUGW loss:      0.01276814378798008      dense.py:516
-           Validation loss:        0.01276814378798008
+[21:00:50] BCD step 4/4    FUGW loss:      0.007553239353001118     dense.py:521
+           Validation loss:        0.007553239353001118
 </pre></div>
 </div>
 <p>Let’s plot the probability map of target voxels being matched with
@@ -505,8 +505,8 @@ the 4th source voxel.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Pearson Correlation pre-mapping: 0.28
-Pearson Correlation post-mapping: 0.19
-Relative improvement: -32.08 %
+Pearson Correlation post-mapping: 0.37
+Relative improvement: 30.16 %
 </pre></div>
 </div>
 <p>Let’s plot the transporting feature maps of the test set.</p>
@@ -569,7 +569,7 @@ Relative improvement: -32.08 %
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" srcset="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  7.954 seconds)</p>
+<img src="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" srcset="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  11.419 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  8 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-01-brain-alignment-plot-3-aligning-low-res-volumes-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">

@@ -404,14 +404,14 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[09:34:04] Validation data for feature maps is not provided. Using  dense.py:193
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:09:10] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
-           Validation data for anatomical kernels is not provided.  dense.py:220
+           Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
-[09:34:05] BCD step 1/5    FUGW loss:      37.338768005371094       dense.py:516
-           Validation loss:        37.338768005371094
+           BCD step 1/5    FUGW loss:      15.441089630126953       dense.py:521
+           Validation loss:        15.441089630126953
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
 ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -428,8 +428,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 │ F          │ 50, 40 │ 2,000 │         7.812 KB │
 │ gamma      │ 50, 40 │ 2,000 │         7.812 KB │
 │ init_plan  │ 50, 40 │ 2,000 │         7.812 KB │
-│ l1_gamma   │        │     1 │         0.004 KB │
-│ l1_pi      │        │     1 │         0.004 KB │
+│ mass_gamma │        │     1 │         0.004 KB │
+│ mass_pi    │        │     1 │         0.004 KB │
 │ new_eps    │        │     1 │         0.004 KB │
 │ new_rho_s  │        │     1 │         0.004 KB │
 │ new_rho_t  │        │     1 │         0.004 KB │
@@ -443,8 +443,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 └────────────┴────────┴───────┴──────────────────┘
 
 
-           BCD step 2/5    FUGW loss:      31.526891708374023       dense.py:516
-           Validation loss:        31.526891708374023
+           BCD step 2/5    FUGW loss:      9.552192687988281        dense.py:521
+           Validation loss:        9.552192687988281
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
 ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -461,8 +461,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 │ F          │ 50, 40 │ 2,000 │         7.812 KB │
 │ gamma      │ 50, 40 │ 2,000 │         7.812 KB │
 │ init_plan  │ 50, 40 │ 2,000 │         7.812 KB │
-│ l1_gamma   │        │     1 │         0.004 KB │
-│ l1_pi      │        │     1 │         0.004 KB │
+│ mass_gamma │        │     1 │         0.004 KB │
+│ mass_pi    │        │     1 │         0.004 KB │
 │ new_eps    │        │     1 │         0.004 KB │
 │ new_rho_s  │        │     1 │         0.004 KB │
 │ new_rho_t  │        │     1 │         0.004 KB │
@@ -476,8 +476,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 └────────────┴────────┴───────┴──────────────────┘
 
 
-           BCD step 3/5    FUGW loss:      19.415464401245117       dense.py:516
-           Validation loss:        19.415464401245117
+           BCD step 3/5    FUGW loss:      5.377944469451904        dense.py:521
+           Validation loss:        5.377944469451904
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
 ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -494,8 +494,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 │ F          │ 50, 40 │ 2,000 │         7.812 KB │
 │ gamma      │ 50, 40 │ 2,000 │         7.812 KB │
 │ init_plan  │ 50, 40 │ 2,000 │         7.812 KB │
-│ l1_gamma   │        │     1 │         0.004 KB │
-│ l1_pi      │        │     1 │         0.004 KB │
+│ mass_gamma │        │     1 │         0.004 KB │
+│ mass_pi    │        │     1 │         0.004 KB │
 │ new_eps    │        │     1 │         0.004 KB │
 │ new_rho_s  │        │     1 │         0.004 KB │
 │ new_rho_t  │        │     1 │         0.004 KB │
@@ -509,8 +509,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 └────────────┴────────┴───────┴──────────────────┘
 
 
-           BCD step 4/5    FUGW loss:      5.9791483879089355       dense.py:516
-           Validation loss:        5.9791483879089355
+           BCD step 4/5    FUGW loss:      6.105615139007568        dense.py:521
+           Validation loss:        6.105615139007568
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
 ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -527,8 +527,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 │ F          │ 50, 40 │ 2,000 │         7.812 KB │
 │ gamma      │ 50, 40 │ 2,000 │         7.812 KB │
 │ init_plan  │ 50, 40 │ 2,000 │         7.812 KB │
-│ l1_gamma   │        │     1 │         0.004 KB │
-│ l1_pi      │        │     1 │         0.004 KB │
+│ mass_gamma │        │     1 │         0.004 KB │
+│ mass_pi    │        │     1 │         0.004 KB │
 │ new_eps    │        │     1 │         0.004 KB │
 │ new_rho_s  │        │     1 │         0.004 KB │
 │ new_rho_t  │        │     1 │         0.004 KB │
@@ -542,8 +542,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 └────────────┴────────┴───────┴──────────────────┘
 
 
-           BCD step 5/5    FUGW loss:      3.8778457641601562       dense.py:516
-           Validation loss:        3.8778457641601562
+[21:09:11] BCD step 5/5    FUGW loss:      7.274874210357666        dense.py:521
+           Validation loss:        7.274874210357666
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
 ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -560,8 +560,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 │ F          │ 50, 40 │ 2,000 │         7.812 KB │
 │ gamma      │ 50, 40 │ 2,000 │         7.812 KB │
 │ init_plan  │ 50, 40 │ 2,000 │         7.812 KB │
-│ l1_gamma   │        │     1 │         0.004 KB │
-│ l1_pi      │        │     1 │         0.004 KB │
+│ mass_gamma │        │     1 │         0.004 KB │
+│ mass_pi    │        │     1 │         0.004 KB │
 │ new_eps    │        │     1 │         0.004 KB │
 │ new_rho_s  │        │     1 │         0.004 KB │
 │ new_rho_t  │        │     1 │         0.004 KB │
@@ -588,7 +588,7 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" srcset="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" alt="Memory usage at each BCD iteration" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.560 seconds)</p>
+<img src="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" srcset="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" alt="Memory usage at each BCD iteration" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.979 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  8 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-02-miscellaneous-plot-3-memory-usage-callback-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
