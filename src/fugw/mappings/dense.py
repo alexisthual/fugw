@@ -107,6 +107,12 @@ class FUGW(BaseMapping):
         -------
         self: FUGW class object
         """
+        if self.divergence == "l2" and solver != "mm":
+            raise ValueError(
+                "Solver must be 'mm' if divergence is 'l2'."
+                " Got solver = '{}'".format(solver)
+            )
+
         if device == "auto":
             if torch.cuda.is_available():
                 device = torch.device("cuda", 0)
@@ -232,6 +238,7 @@ class FUGW(BaseMapping):
             rho_t=rho_t,
             eps=self.eps,
             reg_mode=self.reg_mode,
+            divergence=self.divergence,
             F=F,
             Ds=Ds,
             Dt=Dt,

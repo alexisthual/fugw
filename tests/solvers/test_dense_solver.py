@@ -171,11 +171,12 @@ def test_dense_solvers_l2(reg_mode):
         rho_s=1e4,
         rho_t=1e4,
         eps=0.02,
+        divergence="l2",
         reg_mode=reg_mode,
         F=F_normalized,
         Ds=Ds_normalized,
         Dt=Dt_normalized,
-        divergence="l2",
+        solver="mm",
         verbose=True,
     )
 

@@ -1,6 +1,6 @@
 import torch
 
-from fugw.utils import _get_progress
+from fugw.utils import _get_progress, console
 
 
 class BaseSolver:
@@ -537,8 +537,13 @@ def solver_mm_l2(
     ws, wt, ws_dot_wt = tuple_weights
     rho_s, rho_t, eps = uot_params
 
-    thres = rho_s * ws[:, None] + rho_t * wt[None, :] + eps * ws_dot_wt - cost
-    thres = torch.clamp(thres, min=0)
+    a = rho_s * ws[:, None] + rho_t * wt[None, :] + eps * ws_dot_wt
+    thres = torch.clamp(a - cost, min=0)
+
+    if torch.count_nonzero(thres) == 0:
+        console.log(
+            "Values for rho and/or eps are too low, plan will be empty."
+        )
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
@@ -552,6 +557,8 @@ def solver_mm_l2(
             niters is None or idx < niters
         ):
             pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
+
+            # Update plan and marginals
             denom = rho_s * pi1[:, None] + rho_t * pi2[None, :] + eps * pi
             pi = thres * pi / denom
             pi1, pi2 = pi.sum(1), pi.sum(0)
@@ -699,6 +706,147 @@ def solver_mm_sparse(
         col_indices,
         pi_values,
         size=pi.size(),
+        device=device,
+    )
+
+
+def solver_mm_l2_sparse(
+    cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
+):
+    """Solve L2-penalized FUGW problem using majorizatio-minimization algo."""
+    niters, tol, eval_freq = train_params
+    ws, wt, ws_dot_wt = tuple_weights
+    rho_s, rho_t, eps = uot_params
+
+    crow_indices, col_indices = init_pi.crow_indices(), init_pi.col_indices()
+    row_indices = crow_indices_to_row_indices(crow_indices)
+
+    # Define sparse matrices row_one_hot_indices and col_one_hot_indices
+    # which are useful for computing row / column sums efficiently.
+    # values, group_indices, n_groups
+    device = cost.values().device
+    n_rows = cost.shape[0]
+    n_cols = cost.shape[1]
+    n_values = cost.values().size(0)
+
+    # Sparse matrix to sum on rows
+    row_one_hot_indices = torch.stack(
+        (
+            row_indices,
+            torch.arange(n_values).to(device),
+        )
+    )
+    row_one_hot = torch.sparse_coo_tensor(
+        row_one_hot_indices,
+        torch.ones_like(row_indices).type(torch.float32).to(device),
+        size=(n_rows, n_values),
+    ).to_sparse_csr()
+    row_one_hot_t = row_one_hot.transpose(0, 1).to_sparse_csr()
+    # Sparse matrix to sum on columns
+    col_one_hot_indices = torch.stack(
+        (
+            col_indices,
+            torch.arange(n_values).to(device),
+        )
+    )
+    col_one_hot = torch.sparse_coo_tensor(
+        col_one_hot_indices,
+        torch.ones_like(col_indices).type(torch.float32).to(device),
+        size=(n_cols, n_values),
+    ).to_sparse_csr()
+    col_one_hot_t = col_one_hot.transpose(0, 1).to_sparse_csr()
+
+    # a = rho_s * ws[:, None] + rho_t * wt[None, :] + eps * ws_dot_wt
+    ws_along_rows = (
+        torch.sparse.mm(row_one_hot_t, ws.reshape(-1, 1)).to_dense().flatten()
+    )
+    wt_along_cols = (
+        torch.sparse.mm(col_one_hot_t, wt.reshape(-1, 1)).to_dense().flatten()
+    )
+
+    a_values = (
+        rho_s * ws_along_rows
+        + rho_t * wt_along_cols
+        + eps * ws_dot_wt.values()
+    )
+
+    thres_values = torch.clamp(a_values - cost.values(), min=0)
+
+    if torch.count_nonzero(thres_values) == 0:
+        console.log(
+            "Values for rho and/or eps are too low, plan will be empty."
+        )
+
+    pi1, pi2 = csr_sum(init_pi, dim=1), csr_sum(init_pi, dim=0)
+    pi_values = init_pi.values()
+
+    with _get_progress(transient=True) as progress:
+        if verbose:
+            task = progress.add_task("MM-L2 iterations", total=niters)
+
+        pi_diff = None
+        idx = 0
+        while (pi_diff is None or pi_diff >= tol) and (
+            niters is None or idx < niters
+        ):
+            pi1_prev, pi2_prev = pi1.detach().clone(), pi2.detach().clone()
+            pi_values_prev = pi_values.detach().clone()
+
+            # Update plan and marginals
+            pi1_along_rows = (
+                torch.sparse.mm(row_one_hot_t, pi1_prev.reshape(-1, 1))
+                .to_dense()
+                .flatten()
+            )
+            pi2_along_cols = (
+                torch.sparse.mm(col_one_hot_t, pi2_prev.reshape(-1, 1))
+                .to_dense()
+                .flatten()
+            )
+            denom_values = (
+                rho_s * pi1_along_rows
+                + rho_t * pi2_along_cols
+                + eps * pi_values_prev
+                + 1e-16
+            )
+            print(torch.count_nonzero(denom_values == 0))
+            pi_values = thres_values * pi_values_prev / denom_values
+
+            # Efficiently compute sum on rows
+            pi1 = (
+                torch.sparse.mm(row_one_hot, pi_values.reshape(-1, 1))
+                .to_dense()
+                .flatten()
+            )
+
+            # Efficiently compute sum on columns
+            pi2 = (
+                torch.sparse.mm(col_one_hot, pi_values.reshape(-1, 1))
+                .to_dense()
+                .flatten()
+            )
+
+            if verbose:
+                progress.update(task, advance=1)
+
+            if tol is not None and idx % eval_freq == 0:
+                pi1_error = (pi1 - pi1_prev).abs().max()
+                pi2_error = (pi2 - pi2_prev).abs().max()
+                pi_diff = max(pi1_error, pi2_error)
+                if pi_diff < tol:
+                    if verbose:
+                        progress.console.log(
+                            "Reached tol_uot threshold: "
+                            f"{pi1_error}, {pi2_error}"
+                        )
+
+            idx += 1
+
+    return torch.sparse_csr_tensor(
+        crow_indices,
+        col_indices,
+        pi_values,
+        size=init_pi.size(),
         device=device,
     )
 
@@ -910,14 +1058,6 @@ def solver_ibpp_sparse(
     return (u, v), pi
 
 
-def compute_approx_kl(p, q):
-    # By convention: 0 log 0 = 0
-    entropy = torch.nan_to_num(
-        p * (p / q).log(), nan=0.0, posinf=0.0, neginf=0.0
-    ).sum()
-    return entropy
-
-
 def elementwise_prod_sparse(p, q):
     """Element-wise product between 2 sparse CSR matrices
     which have the same sparcity indices."""
@@ -938,16 +1078,140 @@ def elementwise_prod_fact_sparse(a, b, p):
     )
 
 
-def compute_approx_kl_sparse(p, q):
-    return compute_approx_kl(p.values(), q.values())
+def compute_unnormalized_kl(p, q):
+    """Compute unnormalized Kullback-Leibler divergence between two vectors.
+
+    Parameters
+    ----------
+    p: torch tensor
+    q: torch tensor
+        Should have the same size as p
+
+    Returns
+    -------
+    unnormalized_kl: float"""
+    # By convention: 0 log 0 = 0
+    entropy = torch.nan_to_num(
+        p * (p / q).log(), nan=0.0, posinf=0.0, neginf=0.0
+    ).sum()
+    return entropy
+
+
+def compute_unnormalized_kl_sparse(p, q):
+    """Compute unnormalized KL divergence between two sparse vectors."""
+    return compute_unnormalized_kl(p.values(), q.values())
 
 
 def compute_kl(p, q):
-    return compute_approx_kl(p, q) - p.sum() + q.sum()
+    """Compute Kullback-Leibler divergence between two distributions.
+
+    Parameters
+    ----------
+    p: torch tensor
+    q: torch tensor
+        Should have the same size as p
+
+    Returns
+    -------
+    kl: float
+    """
+    return compute_unnormalized_kl(p, q) - p.sum() + q.sum()
 
 
 def compute_kl_sparse(p, q):
-    return compute_approx_kl_sparse(p, q) - csr_sum(p) + csr_sum(q)
+    """Compute Kullback-Leibler divergence between two distributions.
+
+    Parameters
+    ----------
+    p: torch sparse CSR tensor
+    q: torch sparse CSR tensor
+        Should have the same size and sparsity mask as p
+
+    Returns
+    -------
+    kl: float
+    """
+    return compute_unnormalized_kl_sparse(p, q) - csr_sum(p) + csr_sum(q)
+
+
+def compute_l2(p, q):
+    """Compute L2 distance between two distributions.
+
+    Parameters
+    ----------
+    p: torch tensor
+    q: torch tensor
+        Should have the same size as p
+
+    Returns
+    -------
+    l2: float
+    """
+    return torch.sum((p - q) ** 2)
+
+
+def compute_l2_sparse(p, q):
+    """Compute L2 distance between two distributions.
+
+    Parameters
+    ----------
+    p: torch sparse CSR tensor
+    q: torch sparse CSR tensor
+        Should have the same size and sparsity mask as p
+
+    Returns
+    -------
+    l2: float
+    """
+    return torch.sum((p.values() - q.values()) ** 2)
+
+
+def compute_divergence(p, q, divergence="kl"):
+    """Compute div(p, q).
+
+    Parameters
+    ----------
+    p: torch tensor
+    q: torch tensor
+        Should have the same size as p
+    divergence: str
+        Either "kl" or "l2".
+        If "kl", compute KL(p, q).
+        If "l2", compute || p - q ||^2.
+        Default: "kl"
+
+    Returns
+    -------
+    div: float
+    """
+    if divergence == "kl":
+        return compute_kl(p, q)
+    elif divergence == "l2":
+        return compute_l2(p, q)
+
+
+def compute_divergence_sparse(p, q, divergence="kl"):
+    """Compute div(p, q) for sparse tensors.
+
+    Parameters
+    ----------
+    p: torch sparse CSR tensor
+    q: torch sparse CSR tensor
+        Should have the same size and sparsity mask as p
+    divergence: str
+        Either "kl" or "l2".
+        If "kl", compute KL(p, q).
+        If "l2", compute || p - q ||^2.
+        Default: "kl"
+
+    Returns
+    -------
+    div: float
+    """
+    if divergence == "kl":
+        return compute_kl_sparse(p, q)
+    elif divergence == "l2":
+        return compute_l2_sparse(p, q)
 
 
 def compute_quad_kl(mu, nu, alpha, beta):
@@ -960,14 +1224,17 @@ def compute_quad_kl(mu, nu, alpha, beta):
 
     Parameters
     ----------
-    mu: vector or matrix
-    nu: vector or matrix
-    alpha: vector or matrix with the same size as mu
-    beta: vector or matrix with the same size as nu
+    mu: torch tensor
+    nu: torch tensor
+    alpha: torch tensor
+        Should have the same size as mu
+    beta: torch tensor
+        Should have the same size as nu
 
     Returns
     ----------
-    KL divergence between two product measures
+    kl: float
+        KL divergence between two product measures
     """
 
     m_mu = mu.sum()
@@ -996,32 +1263,97 @@ def compute_quad_kl_sparse(mu, nu, alpha, beta):
 
 
 def compute_quad_l2(a, b, mu, nu):
-    """
-    Compute || a otimes b - mu otimes nu ||^2
-    """
+    """Compute || a otimes b - mu otimes nu ||^2."""
 
-    norm_a2 = (a**2).sum()
-    ratio = (a * mu).sum() / norm_a2
-    norm = norm_a2 * torch.sum((b - ratio * nu) ** 2) + (nu**2).sum() * (
-        torch.sum((mu**2)) - ratio
+    norm = (
+        (a**2).sum() * (b**2).sum()
+        - 2 * (a * mu).sum() * (b * nu).sum()
+        + (mu**2).sum() * (nu**2).sum()
     )
 
     return norm
 
 
-def compute_l2(p, q):
-    return torch.sum((p - q) ** 2)
+def compute_quad_l2_sparse(a, b, mu, nu):
+    """Compute || a otimes b - mu otimes nu ||^2.
+
+    Because a otimes b is constly to store in memory,
+    we expand the norm so that we only have to deal with scalars.
+
+    Parameters
+    ----------
+    a: torch sparse CSR tensor
+    b: torch sparse CSR tensor
+    mu: torch sparse CSR tensor
+        Should have the same size and sparsity mask as a
+    nu: torch sparse CSR tensor
+        Should have the same size and sparsity mask as b
+
+    Returns
+    -------
+    norm: float
+    """
+
+    norm = (
+        (a.values() ** 2).sum() * (b.values() ** 2).sum()
+        - 2
+        * (a.values() * mu.values()).sum()
+        * (b.values() * nu.values()).sum()
+        + (mu.values() ** 2).sum() * (nu.values() ** 2).sum()
+    )
+
+    return norm
 
 
 def compute_quad_divergence(mu, nu, alpha, beta, divergence="kl"):
+    """Compute div(mu otimes nu, alpha otimes beta).
+
+    Parameters
+    ----------
+    mu: torch tensor
+    nu: torch tensor
+    alpha: torch tensor
+        Should have the same size as mu
+    beta: torch tensor
+        Should have the same size as nu
+    divergence: str
+        Either "kl" or "l2".
+        If "kl", compute KL(mu otimes nu, alpha otimes beta).
+        If "l2", compute || mu otimes nu - alpha otimes beta ||^2.
+        Default: "kl"
+
+    Returns
+    -------
+    div: float
+    """
     if divergence == "kl":
         return compute_quad_kl(mu, nu, alpha, beta)
     elif divergence == "l2":
         return compute_quad_l2(mu, nu, alpha, beta)
 
 
-def compute_divergence(p, q, divergence="kl"):
+def compute_quad_divergence_sparse(mu, nu, alpha, beta, divergence="kl"):
+    """Compute div(mu otimes nu, alpha otimes beta) for sparse tensors.
+
+    Parameters
+    ----------
+    mu: torch sparse CSR tensor
+    nu: torch sparse CSR tensor
+    alpha: torch sparse CSR tensor
+        Should have the same size and sparsity mask as mu
+    beta: torch sparse CSR tensor
+        Should have the same size and sparsity mask as nu
+    divergence: str
+        Either "kl" or "l2".
+        If "kl", compute KL(mu otimes nu, alpha otimes beta).
+        If "l2", compute || mu otimes nu - alpha otimes beta ||^2.
+        Default: "kl"
+
+    Returns
+    -------
+    div: float
+    """
     if divergence == "kl":
-        return compute_kl(p, q)
+        return compute_quad_kl_sparse(mu, nu, alpha, beta)
     elif divergence == "l2":
-        return compute_l2(p, q)
+        return compute_quad_l2_sparse(mu, nu, alpha, beta)

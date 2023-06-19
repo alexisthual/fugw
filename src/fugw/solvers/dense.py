@@ -6,7 +6,7 @@ import torch
 
 from fugw.solvers.utils import (
     BaseSolver,
-    compute_approx_kl,
+    compute_unnormalized_kl,
     compute_quad_divergence,
     compute_divergence,
     solver_ibpp,
@@ -50,7 +50,7 @@ class FUGWSolver(BaseSolver):
 
         # Avoid unnecessary calculation of UGW when alpha = 0
         if alpha != 1 and D is not None:
-            wasserstein_cost = D
+            wasserstein_cost = D / 2
             cost += (1 - alpha) * wasserstein_cost
 
         # or UOT when alpha = 1
@@ -64,17 +64,20 @@ class FUGWSolver(BaseSolver):
             cost += alpha * gromov_wasserstein_cost
 
         if divergence == "kl":
-            # or when cost is balanced
             if rho_s != float("inf") and rho_s != 0:
-                marginal_cost_dim1 = compute_approx_kl(pi1, ws)
+                marginal_cost_dim1 = compute_unnormalized_kl(pi1, ws)
                 cost += rho_s * marginal_cost_dim1
             if rho_t != float("inf") and rho_t != 0:
-                marginal_cost_dim2 = compute_approx_kl(pi2, wt)
+                marginal_cost_dim2 = compute_unnormalized_kl(pi2, wt)
                 cost += rho_t * marginal_cost_dim2
 
             if reg_mode == "joint":
-                regularized_cost = compute_approx_kl(pi, ws_dot_wt)
+                regularized_cost = compute_unnormalized_kl(pi, ws_dot_wt)
                 cost += eps * regularized_cost
+        elif divergence == "l2":
+            # Marginal constraints do not appear in the cost matrix
+            # in the L2 case. See calculations.
+            pass
 
         return cost
 
@@ -126,7 +129,7 @@ class FUGWSolver(BaseSolver):
         loss = 0
 
         if alpha != 1 and D is not None:
-            loss_wasserstein = (D * pi).sum() + (D * gamma).sum()
+            loss_wasserstein = ((D * pi).sum() + (D * gamma).sum()) / 2
             loss += (1 - alpha) * loss_wasserstein
 
         if alpha != 0:
@@ -201,6 +204,7 @@ class FUGWSolver(BaseSolver):
         rho_t=1,
         eps=1e-2,
         reg_mode="joint",
+        divergence="kl",
         F=None,
         Ds=None,
         Dt=None,
@@ -213,18 +217,18 @@ class FUGWSolver(BaseSolver):
         init_duals=None,
         solver="sinkhorn",
         callback_bcd=None,
-        divergence="kl",
         verbose=False,
     ):
         """Run BCD iterations.
 
         Parameters
         ----------
-        alpha: float
-        rho_s: float
-        rho_t: float
-        eps: float
-        reg_mode: str
+        alpha: float, optional
+        rho_s: float, optional
+        rho_t: float, optional
+        eps: float, optional
+        reg_mode: string, optional
+        divergence: string, optional
         F: matrix of size n x m.
             Kernel matrix between the source and target training features.
         Ds: matrix of size n x n
@@ -339,7 +343,7 @@ class FUGWSolver(BaseSolver):
         gamma = pi
 
         # initialization of dual vectors
-        if divergence == "l2" or solver == "mm":
+        if solver == "mm":
             duals_pi, duals_gamma = None, None
         else:
             if init_duals is None:
@@ -443,12 +447,13 @@ class FUGWSolver(BaseSolver):
             pi_prev = pi.detach().clone()
 
             # Update gamma
-            l1_pi = pi.sum()
+            mass_pi = pi.sum()
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
 
             if divergence == "kl":
-                new_rho_s, new_rho_t = rho_s * l1_pi, rho_t * l1_pi
-                new_eps = l1_pi * eps if reg_mode == "joint" else eps
+                new_rho_s = rho_s * mass_pi
+                new_rho_t = rho_t * mass_pi
+                new_eps = mass_pi * eps if reg_mode == "joint" else eps
                 uot_params = (new_rho_s, new_rho_t, new_eps)
 
                 if solver == "sinkhorn":
@@ -468,16 +473,16 @@ class FUGWSolver(BaseSolver):
                     cost_gamma, gamma, uot_params, tuple_weights
                 )
 
-            # Rescale mass
-            gamma = (l1_pi / gamma.sum()).sqrt() * gamma
+            # Rescale gamma
+            gamma = (mass_pi / gamma.sum()).sqrt() * gamma
 
             # Update pi
-            l1_gamma = gamma.sum()
+            mass_gamma = gamma.sum()
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
 
             if divergence == "kl":
-                new_rho_s, new_rho_t = rho_s * l1_gamma, rho_t * l1_gamma
-                new_eps = l1_gamma * eps if reg_mode == "joint" else eps
+                new_rho_s, new_rho_t = rho_s * mass_gamma, rho_t * mass_gamma
+                new_eps = mass_gamma * eps if reg_mode == "joint" else eps
                 uot_params = (new_rho_s, new_rho_t, new_eps)
 
                 if solver == "sinkhorn":
@@ -496,7 +501,7 @@ class FUGWSolver(BaseSolver):
                 pi = self_solver_mm_l2(cost_pi, pi, uot_params, tuple_weights)
 
             # Rescale mass
-            pi = (l1_gamma / pi.sum()).sqrt() * pi
+            pi = (mass_gamma / pi.sum()).sqrt() * pi
 
             if idx % self.eval_bcd == 0:
                 current_loss = compute_fugw_loss(pi, gamma)

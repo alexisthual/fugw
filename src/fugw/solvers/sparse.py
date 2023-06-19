@@ -9,17 +9,18 @@ import torch
 from fugw.solvers.utils import (
     BaseSolver,
     batch_elementwise_prod_and_sum,
-    compute_approx_kl,
-    compute_approx_kl_sparse,
-    compute_kl_sparse,
-    compute_quad_kl,
-    compute_quad_kl_sparse,
+    compute_unnormalized_kl,
+    compute_unnormalized_kl_sparse,
+    compute_divergence_sparse,
+    compute_quad_divergence,
+    compute_quad_divergence_sparse,
     crow_indices_to_row_indices,
     csr_sum,
     elementwise_prod_fact_sparse,
     solver_sinkhorn_sparse,
     solver_ibpp_sparse,
     solver_mm_sparse,
+    solver_mm_l2_sparse,
 )
 from fugw.utils import _add_dict, console, _make_csr_matrix
 
@@ -40,7 +41,7 @@ class FUGWSparseSolver(BaseSolver):
         which makes use of this cost to update the transport plans.
         """
 
-        rho_s, rho_t, eps, alpha, reg_mode = hyperparams
+        rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         device = ws.device
 
@@ -72,8 +73,11 @@ class FUGWSparseSolver(BaseSolver):
         cost_values = torch.zeros_like(pi.values()).to(device)
 
         if alpha != 1 and K1 is not None and K2 is not None:
-            wasserstein_cost_values = batch_elementwise_prod_and_sum(
-                K1, K2, row_indices, col_indices, 1
+            wasserstein_cost_values = (
+                batch_elementwise_prod_and_sum(
+                    K1, K2, row_indices, col_indices, 1
+                )
+                / 2
             )
             cost_values += (1 - alpha) * wasserstein_cost_values
 
@@ -94,16 +98,23 @@ class FUGWSparseSolver(BaseSolver):
 
             cost_values += alpha * gromov_wasserstein_cost_values
 
-        # or when cost is balanced
-        if rho_s != float("inf") and rho_s != 0:
-            marginal_cost_dim1 = compute_approx_kl(pi1, ws)
-            cost_values += rho_s * marginal_cost_dim1
-        if rho_t != float("inf") and rho_t != 0:
-            marginal_cost_dim2 = compute_approx_kl(pi2, wt)
-            cost_values += rho_t * marginal_cost_dim2
+        if divergence == "kl":
+            # or when cost is balanced
+            if rho_s != float("inf") and rho_s != 0:
+                marginal_cost_dim1 = compute_unnormalized_kl(pi1, ws)
+                cost_values += rho_s * marginal_cost_dim1
+            if rho_t != float("inf") and rho_t != 0:
+                marginal_cost_dim2 = compute_unnormalized_kl(pi2, wt)
+                cost_values += rho_t * marginal_cost_dim2
 
-        if reg_mode == "joint":
-            cost_values += eps * compute_approx_kl_sparse(pi, ws_dot_wt)
+            if reg_mode == "joint":
+                cost_values += eps * compute_unnormalized_kl_sparse(
+                    pi, ws_dot_wt
+                )
+        elif divergence == "l2":
+            # Marginal constraints do not appear in the cost matrix
+            # in the L2 case. See calculations.
+            pass
 
         cost = torch.sparse_csr_tensor(
             crow_indices, col_indices, cost_values, size=pi.size()
@@ -137,7 +148,7 @@ class FUGWSparseSolver(BaseSolver):
             "regularization", "total".
             Values are float or None.
         """
-        rho_s, rho_t, eps, alpha, reg_mode = hyperparams
+        rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         (
             (Ds_sqr_1, Ds_sqr_2),
@@ -169,8 +180,8 @@ class FUGWSparseSolver(BaseSolver):
             # when adding 2 CSR matrices together.
             # This could become problematic for sparse matrices
             # with more non-null elements than an int can store.
-            loss_wasserstein = csr_sum(
-                elementwise_prod_fact_sparse(K1, K2, pi + gamma)
+            loss_wasserstein = (
+                csr_sum(elementwise_prod_fact_sparse(K1, K2, pi + gamma)) / 2
             )
             loss += (1 - alpha) * loss_wasserstein
 
@@ -184,25 +195,25 @@ class FUGWSparseSolver(BaseSolver):
             loss += alpha * loss_gromov_wasserstein
 
         if rho_s != float("inf") and rho_s != 0:
-            loss_marginal_constraint_dim1 = compute_quad_kl(
-                pi1, gamma1, ws, ws
+            loss_marginal_constraint_dim1 = compute_quad_divergence(
+                pi1, gamma1, ws, ws, divergence
             )
             loss += rho_s * loss_marginal_constraint_dim1
         if rho_t != float("inf") and rho_t != 0:
-            loss_marginal_constraint_dim2 = compute_quad_kl(
-                pi2, gamma2, wt, wt
+            loss_marginal_constraint_dim2 = compute_quad_divergence(
+                pi2, gamma2, wt, wt, divergence
             )
             loss += rho_t * loss_marginal_constraint_dim2
 
         if eps != 0:
             if reg_mode == "joint":
-                loss_regularization = compute_quad_kl_sparse(
-                    pi, gamma, ws_dot_wt, ws_dot_wt
+                loss_regularization = compute_quad_divergence_sparse(
+                    pi, gamma, ws_dot_wt, ws_dot_wt, divergence
                 )
             elif reg_mode == "independent":
-                loss_regularization = compute_kl_sparse(
-                    pi, ws_dot_wt
-                ) + compute_kl_sparse(gamma, ws_dot_wt)
+                loss_regularization = compute_divergence_sparse(
+                    pi, ws_dot_wt, divergence
+                ) + compute_divergence_sparse(gamma, ws_dot_wt, divergence)
 
             loss = loss + eps * loss_regularization
 
@@ -215,6 +226,44 @@ class FUGWSparseSolver(BaseSolver):
             "total": loss.item(),
         }
 
+    def get_parameters_uot_l2(self, pi, tuple_weights, hyperparams):
+        """Compute parameters of the L2 loss."""
+        rho_s, rho_t, eps, reg_mode = hyperparams
+        ws, wt, ws_dot_wt = tuple_weights
+
+        pi1, pi2 = csr_sum(pi, dim=1), csr_sum(pi, dim=0)
+        l2_pi1, l2_pi2 = (pi1**2).sum(), (pi2**2).sum()
+        l2_pi = (pi.values() ** 2).sum()
+
+        # Distribution weights of the updated problem
+        weight_ws = pi1.dot(ws) / l2_pi1
+        weight_wt = pi2.dot(wt) / l2_pi2
+        weight_wst_values = (
+            (pi.values() * ws_dot_wt.values()).sum() / l2_pi
+            if reg_mode == "joint"
+            else 1
+        )
+
+        weighted_tuple_weights = (
+            weight_ws * ws,
+            weight_wt * wt,
+            _make_csr_matrix(
+                pi.crow_indices(),
+                pi.col_indices(),
+                weight_wst_values * ws_dot_wt.values(),
+                pi.size(),
+                pi.device,
+            ),
+        )
+
+        # Loss parameters of the updated problem
+        new_rho_s = rho_s * l2_pi1
+        new_rho_t = rho_t * l2_pi2
+        new_eps = eps * l2_pi if reg_mode == "joint" else eps
+        uot_params = (new_rho_s, new_rho_t, new_eps)
+
+        return weighted_tuple_weights, uot_params
+
     def solve(
         self,
         alpha=0.5,
@@ -222,6 +271,7 @@ class FUGWSparseSolver(BaseSolver):
         rho_t=1,
         eps=1e-2,
         reg_mode="joint",
+        divergence="kl",
         F=(None, None),
         Ds=(None, None),
         Dt=(None, None),
@@ -240,11 +290,12 @@ class FUGWSparseSolver(BaseSolver):
 
         Parameters
         ----------
-        alpha: float
-        rho_s: float
-        rho_t: float
-        eps: float
-        reg_mode: str
+        alpha: float, optional
+        rho_s: float, optional
+        rho_t: float, optional
+        eps: float, optional
+        reg_mode: string, optional
+        divergence: string, optional
         F: (ndarray(n, d+2), ndarray(m, d+2)) or (None, None)
         Ds: (ndarray(n, k+2), ndarray(n, k+2)), or (None, None)
         Dt: (ndarray(m, k+2), ndarray(m, k+2)), or (None, None)
@@ -435,23 +486,36 @@ class FUGWSparseSolver(BaseSolver):
             self.local_biconvex_cost,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
         compute_fugw_loss = partial(
             self.fugw_loss,
             data_const=(Ds_sqr, Dt_sqr, Ds, Dt, F),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
         compute_fugw_loss_validation = partial(
             self.fugw_loss,
             data_const=(Ds_sqr_val, Dt_sqr_val, Ds_val, Dt_val, F_val),
             tuple_weights=(ws, wt, ws_dot_wt),
-            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode),
+            hyperparams=(rho_s, rho_t, eps, alpha, reg_mode, divergence),
         )
 
+        # If divergence is L2
+        self_solver_mm_l2 = partial(
+            solver_mm_l2_sparse,
+            train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+        )
+
+        self_get_params_uot_l2 = partial(
+            self.get_parameters_uot_l2,
+            tuple_weights=(ws, wt, ws_dot_wt),
+            hyperparams=(rho_s, rho_t, eps, reg_mode),
+        )
+
+        # If divergence is KL
         self_solver_sinkhorn = partial(
             solver_sinkhorn_sparse,
             tuple_weights=(ws, wt, ws_dot_wt),
@@ -507,25 +571,33 @@ class FUGWSparseSolver(BaseSolver):
             pi_prev = pi.detach().clone()
 
             # Update gamma
-            mp = csr_sum(pi)
-            new_rho_s = rho_s * mp
-            new_rho_t = rho_t * mp
-            new_eps = mp * eps if reg_mode == "joint" else eps
-            uot_params = (new_rho_s, new_rho_t, new_eps)
-
+            mass_pi = csr_sum(pi)
             cost_gamma = compute_local_biconvex_cost(pi, transpose=True)
-            if solver == "sinkhorn":
-                duals_gamma, gamma = self_solver_sinkhorn(
-                    cost_gamma, duals_gamma, uot_params
-                )
-            elif solver == "mm":
-                gamma = self_solver_mm(cost_gamma, gamma, uot_params)
-            if solver == "ibpp":
-                duals_gamma, gamma = self_solver_ibpp(
-                    cost_gamma, gamma, duals_gamma, uot_params
+
+            if divergence == "kl":
+                new_rho_s = rho_s * mass_pi
+                new_rho_t = rho_t * mass_pi
+                new_eps = mass_pi * eps if reg_mode == "joint" else eps
+                uot_params = (new_rho_s, new_rho_t, new_eps)
+
+                if solver == "sinkhorn":
+                    duals_gamma, gamma = self_solver_sinkhorn(
+                        cost_gamma, duals_gamma, uot_params
+                    )
+                elif solver == "mm":
+                    gamma = self_solver_mm(cost_gamma, gamma, uot_params)
+                if solver == "ibpp":
+                    duals_gamma, gamma = self_solver_ibpp(
+                        cost_gamma, gamma, duals_gamma, uot_params
+                    )
+            elif divergence == "l2":
+                tuple_weights, uot_params = self_get_params_uot_l2(pi)
+                gamma = self_solver_mm_l2(
+                    cost_gamma, gamma, uot_params, tuple_weights
                 )
 
-            gamma_scaling_factor = (mp / csr_sum(gamma)).sqrt()
+            # Rescale gamma
+            gamma_scaling_factor = (mass_pi / csr_sum(gamma)).sqrt()
             new_gamma_values = gamma.values() * gamma_scaling_factor
             gamma = torch.sparse_csr_tensor(
                 crow_indices,
@@ -536,25 +608,31 @@ class FUGWSparseSolver(BaseSolver):
             )
 
             # Update pi
-            mg = csr_sum(gamma)
-            new_rho_s = rho_s * mg
-            new_rho_t = rho_t * mg
-            new_eps = mp * eps if reg_mode == "joint" else eps
-            uot_params = (new_rho_s, new_rho_t, new_eps)
-
+            mass_gamma = csr_sum(gamma)
             cost_pi = compute_local_biconvex_cost(gamma, transpose=False)
-            if solver == "sinkhorn":
-                duals_pi, pi = self_solver_sinkhorn(
-                    cost_pi, duals_pi, uot_params
-                )
-            elif solver == "mm":
-                pi = self_solver_mm(cost_pi, pi, uot_params)
-            elif solver == "ibpp":
-                duals_pi, pi = self_solver_ibpp(
-                    cost_pi, pi, duals_pi, uot_params
-                )
 
-            pi_scaling_factor = (mg / csr_sum(pi)).sqrt()
+            if divergence == "kl":
+                new_rho_s = rho_s * mass_gamma
+                new_rho_t = rho_t * mass_gamma
+                new_eps = mass_gamma * eps if reg_mode == "joint" else eps
+                uot_params = (new_rho_s, new_rho_t, new_eps)
+
+                if solver == "sinkhorn":
+                    duals_pi, pi = self_solver_sinkhorn(
+                        cost_pi, duals_pi, uot_params
+                    )
+                elif solver == "mm":
+                    pi = self_solver_mm(cost_pi, pi, uot_params)
+                elif solver == "ibpp":
+                    duals_pi, pi = self_solver_ibpp(
+                        cost_pi, pi, duals_pi, uot_params
+                    )
+            elif divergence == "l2":
+                tuple_weights, uot_params = self_get_params_uot_l2(gamma)
+                pi = self_solver_mm_l2(cost_pi, pi, uot_params, tuple_weights)
+
+            # Rescale pi
+            pi_scaling_factor = (mass_gamma / csr_sum(pi)).sqrt()
             new_pi_values = pi.values() * pi_scaling_factor
             pi = torch.sparse_csr_tensor(
                 crow_indices,

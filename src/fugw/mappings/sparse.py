@@ -113,6 +113,12 @@ class FUGWSparse(BaseMapping):
         -------
         self: FUGWSparse class object
         """
+        if self.divergence == "l2" and solver != "mm":
+            raise ValueError(
+                "Solver must be 'mm' if divergence is 'l2'."
+                " Got solver = '{}'".format(solver)
+            )
+
         if device == "auto":
             if torch.cuda.is_available():
                 device = torch.device("cuda", 0)
@@ -270,6 +276,7 @@ class FUGWSparse(BaseMapping):
             rho_t=rho_t,
             eps=self.eps,
             reg_mode=self.reg_mode,
+            divergence=self.divergence,
             F=(F1, F2),
             Ds=(Ds1, Ds2),
             Dt=(Dt1, Dt2),
