@@ -1,7 +1,7 @@
 # Fused Unbalanced Gromov-Wasserstein for Python
 
 ![build](https://img.shields.io/github/actions/workflow/status/alexisthual/fugw/unit_tests.yml?event=push&style=for-the-badge)
-![python version](https://img.shields.io/badge/python-3.7_|_3.8_|_3.9_|_3.10_|_3.11-blue?style=for-the-badge)
+![python version](https://img.shields.io/badge/python-3.8_|_3.9_|_3.10_|_3.11-blue?style=for-the-badge)
 ![license](https://img.shields.io/github/license/alexisthual/fugw?style=for-the-badge)
 ![code style](https://img.shields.io/badge/code_style-black-black?style=for-the-badge)
 
