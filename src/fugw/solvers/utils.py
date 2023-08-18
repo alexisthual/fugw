@@ -809,7 +809,7 @@ def solver_mm_l2_sparse(
                 + eps * pi_values_prev
                 + 1e-16
             )
-            print(torch.count_nonzero(denom_values == 0))
+
             pi_values = thres_values * pi_values_prev / denom_values
 
             # Efficiently compute sum on rows
