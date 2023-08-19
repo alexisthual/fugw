@@ -156,7 +156,7 @@ Now, let's compute the embedding! This computation is easy to parallelize.
       100% Geodesic distances (landmarks) ━━━━━━━━━━━━━━━━ 100/100 0:00:03 < 0:00:00
     /github/workspace/src/fugw/scripts/lmds.py:175: UserWarning:
 
-    A might not be centered (1.8671875 > 0.001)
+    A might not be centered (1.8740234375 > 0.001)
 
 
 
@@ -255,9 +255,9 @@ is well approximated by the kernel matrix derived from the embeddings:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  15.952 seconds)
+   **Total running time of the script:** (0 minutes 13.668 seconds)
 
-**Estimated memory usage:**  141 MB
+**Estimated memory usage:**  130 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_1_lmds.py:

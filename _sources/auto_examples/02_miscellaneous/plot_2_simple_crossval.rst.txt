@@ -278,48 +278,48 @@ as it will usually be the case in practice when aligning real fMRI data.
 
  .. code-block:: none
 
-    [20:55:44] Validation data for anatomical kernels is not provided.  dense.py:226
+    [20:33:39] Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [20:55:54] BCD step 1/10   FUGW loss:      0.02483261190354824      dense.py:521
-               Validation loss:        0.02661210484802723                          
+    [20:33:50] BCD step 1/10   FUGW loss:      0.024832483381032944     dense.py:521
+               Validation loss:        0.026611944660544395                         
 
 
-    [20:56:12] BCD step 2/10   FUGW loss:      0.007542587351053953     dense.py:521
-               Validation loss:        0.007889988832175732                         
+    [20:34:09] BCD step 2/10   FUGW loss:      0.00754228001460433      dense.py:521
+               Validation loss:        0.00788966752588749                          
 
 
-    [20:56:30] BCD step 3/10   FUGW loss:      0.006806590594351292     dense.py:521
-               Validation loss:        0.006886965595185757                         
+    [20:34:27] BCD step 3/10   FUGW loss:      0.006806173361837864     dense.py:521
+               Validation loss:        0.006886300630867481                         
 
 
-    [20:56:49] BCD step 4/10   FUGW loss:      0.006415019743144512     dense.py:521
-               Validation loss:        0.006309802178293467                         
+    [20:34:46] BCD step 4/10   FUGW loss:      0.00641474686563015      dense.py:521
+               Validation loss:        0.006309011019766331                         
 
 
-    [20:57:07] BCD step 5/10   FUGW loss:      0.0062031010165810585    dense.py:521
-               Validation loss:        0.005970505066215992                         
+    [20:35:04] BCD step 5/10   FUGW loss:      0.006202487275004387     dense.py:521
+               Validation loss:        0.005969356279820204                         
 
 
-    [20:57:25] BCD step 6/10   FUGW loss:      0.0059886109083890915    dense.py:521
-               Validation loss:        0.005597996059805155                         
+    [20:35:23] BCD step 6/10   FUGW loss:      0.005987714510411024     dense.py:521
+               Validation loss:        0.005596367176622152                         
 
 
-    [20:57:44] BCD step 7/10   FUGW loss:      0.005855436436831951     dense.py:521
-               Validation loss:        0.0053308987990021706                        
+    [20:35:41] BCD step 7/10   FUGW loss:      0.00585530698299408      dense.py:521
+               Validation loss:        0.005330576561391354                         
 
 
-    [20:58:02] BCD step 8/10   FUGW loss:      0.005845545791089535     dense.py:521
-               Validation loss:        0.005313204135745764                         
+    [20:36:00] BCD step 8/10   FUGW loss:      0.005845530424267054     dense.py:521
+               Validation loss:        0.005313202738761902                         
 
 
-    [20:58:21] BCD step 9/10   FUGW loss:      0.005844415631145239     dense.py:521
-               Validation loss:        0.005311452783644199                         
+    [20:36:18] BCD step 9/10   FUGW loss:      0.005844546481966972     dense.py:521
+               Validation loss:        0.005311585031449795                         
 
 
-    [20:58:39] BCD step 10/10  FUGW loss:      0.005844208877533674     dense.py:521
-               Validation loss:        0.005310453474521637                         
+    [20:36:36] BCD step 10/10  FUGW loss:      0.005844196770340204     dense.py:521
+               Validation loss:        0.00531043903902173                          
 
 
 
@@ -693,9 +693,9 @@ and project it on the fsaverage5 surface.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  58.448 seconds)
+   **Total running time of the script:** (3 minutes 0.594 seconds)
 
-**Estimated memory usage:**  11 MB
+**Estimated memory usage:**  9 MB
 
 
 .. _sphx_glr_download_auto_examples_02_miscellaneous_plot_2_simple_crossval.py:

@@ -104,9 +104,9 @@ We use 3 contrasts for training and 3 contrasts for validation.
     Downloading data from https://osf.io/download/5d27d931114a4200190452fe/ ...
      ...done. (3 seconds, 0 min)
     Downloading data from https://osf.io/download/5d27d62e114a420017049501/ ...
-     ...done. (2 seconds, 0 min)
+     ...done. (3 seconds, 0 min)
     Downloading data from https://osf.io/download/5d27cdcaa26b340018084b30/ ...
-     ...done. (2 seconds, 0 min)
+     ...done. (1 seconds, 0 min)
     Downloading data from https://osf.io/download/5d27d80c114a420016058f7d/ ...
      ...done. (1 seconds, 0 min)
     /usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:893: UserWarning:
@@ -464,38 +464,38 @@ We now fit the mapping using the sinkhorn solver and 5 BCD iterations.
 
  .. code-block:: none
 
-    [20:54:17] Validation data for anatomical kernels is not provided.  dense.py:226
+    [20:32:10] Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [20:54:27] BCD step 1/5    FUGW loss:      0.02471662499010563      dense.py:521
-               Validation loss:        0.02700120583176613                          
-    [20:54:27] Pearson correlation:  [0.38212545   plot_1_pearson_correlation.py:237
-               0.29642644 0.26873962]                                               
+    [20:32:21] BCD step 1/5    FUGW loss:      0.024716345593333244     dense.py:521
+               Validation loss:        0.027000926434993744                         
+    [20:32:21] Pearson correlation:  [0.38212193   plot_1_pearson_correlation.py:237
+               0.29643237 0.26873265]                                               
 
 
-    [20:54:45] BCD step 2/5    FUGW loss:      0.006556129548698664     dense.py:521
-               Validation loss:        0.007570093497633934                         
-    [20:54:45] Pearson correlation:  [0.31391621   plot_1_pearson_correlation.py:237
-               0.3429269  0.32424471]                                               
+    [20:32:40] BCD step 2/5    FUGW loss:      0.006556201260536909     dense.py:521
+               Validation loss:        0.007570177782326937                         
+    [20:32:40] Pearson correlation:  [0.31391929   plot_1_pearson_correlation.py:237
+               0.3429227  0.32424155]                                               
 
 
-    [20:55:03] BCD step 3/5    FUGW loss:      0.006002883892506361     dense.py:521
-               Validation loss:        0.006645367480814457                         
-    [20:55:04] Pearson correlation:  [0.33015285   plot_1_pearson_correlation.py:237
-               0.33416814 0.31084432]                                               
+    [20:32:59] BCD step 3/5    FUGW loss:      0.006002937443554401     dense.py:521
+               Validation loss:        0.0066454000771045685                        
+    [20:32:59] Pearson correlation:  [0.33015477   plot_1_pearson_correlation.py:237
+               0.33416949 0.31083955]                                               
 
 
-    [20:55:23] BCD step 4/5    FUGW loss:      0.005948266945779324     dense.py:521
-               Validation loss:        0.006552059203386307                         
-    [20:55:23] Pearson correlation:  [0.32666047   plot_1_pearson_correlation.py:237
-               0.32980611 0.29680038]                                               
+    [20:33:17] BCD step 4/5    FUGW loss:      0.005948435515165329     dense.py:521
+               Validation loss:        0.006552212871611118                         
+    [20:33:17] Pearson correlation:  [0.32666265   plot_1_pearson_correlation.py:237
+               0.32981187 0.29680214]                                               
 
 
-    [20:55:41] BCD step 5/5    FUGW loss:      0.005936829838901758     dense.py:521
-               Validation loss:        0.006547647528350353                         
-    [20:55:41] Pearson correlation:  [0.32642035   plot_1_pearson_correlation.py:237
-               0.33017314 0.29350298]                                               
+    [20:33:36] BCD step 5/5    FUGW loss:      0.0059365942142903805    dense.py:521
+               Validation loss:        0.00654740771278739                          
+    [20:33:36] Pearson correlation:  [0.32641954   plot_1_pearson_correlation.py:237
+               0.33017029 0.29350085]                                               
 
 
 
@@ -567,7 +567,7 @@ iteration.
 
 
 .. image-sg:: /auto_examples/02_miscellaneous/images/sphx_glr_plot_1_pearson_correlation_001.png
-   :alt: Sinkhorn mapping training loss  Total training time = 83.59s
+   :alt: Sinkhorn mapping training loss  Total training time = 85.72s
    :srcset: /auto_examples/02_miscellaneous/images/sphx_glr_plot_1_pearson_correlation_001.png
    :class: sphx-glr-single-img
 
@@ -578,9 +578,9 @@ iteration.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  39.772 seconds)
+   **Total running time of the script:** (1 minutes 42.392 seconds)
 
-**Estimated memory usage:**  10 MB
+**Estimated memory usage:**  8 MB
 
 
 .. _sphx_glr_download_auto_examples_02_miscellaneous_plot_1_pearson_correlation.py:

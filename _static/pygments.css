@@ -18,6 +18,7 @@
 .highlight .cs { color: #008800; font-style: italic } /* Comment.Special */
 .highlight .gd { color: #2c2cff } /* Generic.Deleted */
 .highlight .ge { color: #008800 } /* Generic.Emph */
+.highlight .ges { color: #2c2cff } /* Generic.EmphStrong */
 .highlight .gr { color: #d30202 } /* Generic.Error */
 .highlight .gh { color: #2c2cff } /* Generic.Heading */
 .highlight .gi { color: #2c2cff } /* Generic.Inserted */
@@ -89,6 +90,7 @@ body[data-theme="dark"] .highlight .c1 { color: #777777; font-style: italic } /*
 body[data-theme="dark"] .highlight .cs { color: #777777; font-style: italic } /* Comment.Special */
 body[data-theme="dark"] .highlight .gd { color: #cccccc } /* Generic.Deleted */
 body[data-theme="dark"] .highlight .ge { color: #cccccc } /* Generic.Emph */
+body[data-theme="dark"] .highlight .ges { color: #cccccc } /* Generic.EmphStrong */
 body[data-theme="dark"] .highlight .gr { color: #cccccc } /* Generic.Error */
 body[data-theme="dark"] .highlight .gh { color: #cccccc } /* Generic.Heading */
 body[data-theme="dark"] .highlight .gi { color: #cccccc } /* Generic.Inserted */
@@ -174,6 +176,7 @@ body:not([data-theme="light"]) .highlight .c1 { color: #777777; font-style: ital
 body:not([data-theme="light"]) .highlight .cs { color: #777777; font-style: italic } /* Comment.Special */
 body:not([data-theme="light"]) .highlight .gd { color: #cccccc } /* Generic.Deleted */
 body:not([data-theme="light"]) .highlight .ge { color: #cccccc } /* Generic.Emph */
+body:not([data-theme="light"]) .highlight .ges { color: #cccccc } /* Generic.EmphStrong */
 body:not([data-theme="light"]) .highlight .gr { color: #cccccc } /* Generic.Error */
 body:not([data-theme="light"]) .highlight .gh { color: #cccccc } /* Generic.Heading */
 body:not([data-theme="light"]) .highlight .gi { color: #cccccc } /* Generic.Inserted */
