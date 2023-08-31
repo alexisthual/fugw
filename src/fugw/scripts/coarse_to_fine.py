@@ -7,7 +7,7 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.feature_extraction.image import grid_to_graph
 
 
-def random_normalizing(X, sample_size=100, repeats=10):
+def random_normalizing(X, sample_size=100, repeats=10, anisotropy=1.0):
     """
     Normalize X by dividing it by the maximum distance
     between pairs of rows of X.
@@ -22,6 +22,8 @@ def random_normalizing(X, sample_size=100, repeats=10):
         Number of vectors to sample from X at each iteration.
     repeats: int, optional, defaults to 10
         Number of iterations to run.
+    anisotropy: float, optional, defaults to 1.0
+        Anisotropic coefficient of the space.
 
     Returns
     -------
@@ -39,6 +41,7 @@ def random_normalizing(X, sample_size=100, repeats=10):
         d = distances.max()
         d_max = max(d, d_max)
 
+    d_max *= anisotropy
     X_normalized = X_tensor / d_max
 
     return X_normalized, d_max.item()
