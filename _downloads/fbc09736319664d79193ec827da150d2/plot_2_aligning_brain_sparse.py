@@ -267,7 +267,7 @@ coarse_mapping_solver_params = {
 }
 
 alpha_fine = 0.5
-rho_fine = 1
+rho_fine = 1e-2
 eps_fine = 1e-4
 fine_mapping = FUGWSparse(alpha=alpha_fine, rho=rho_fine, eps=eps_fine)
 fine_mapping_solver = "mm"

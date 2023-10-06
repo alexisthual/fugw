@@ -85,7 +85,7 @@ We first fetch 5 contrasts for each subject from the localizer dataset.
 
  .. code-block:: none
 
-    /usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:893: UserWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:904: UserWarning:
 
     `legacy_format` will default to `False` in release 0.11. Dataset fetchers will then return pandas dataframes by default instead of recarrays.
 
@@ -287,11 +287,11 @@ Let's subsample the vertices.
 
  .. code-block:: none
 
-    /usr/local/lib/python3.8/site-packages/sklearn/cluster/_agglomerative.py:303: UserWarning:
+    /usr/local/lib/python3.8/site-packages/sklearn/cluster/_agglomerative.py:304: UserWarning:
 
     the number of connected components of the connectivity matrix is 3 > 1. Completing it to avoid stopping the tree early.
 
-    /usr/local/lib/python3.8/site-packages/sklearn/cluster/_agglomerative.py:303: UserWarning:
+    /usr/local/lib/python3.8/site-packages/sklearn/cluster/_agglomerative.py:304: UserWarning:
 
     the number of connected components of the connectivity matrix is 3 > 1. Completing it to avoid stopping the tree early.
 
@@ -345,43 +345,43 @@ and selection radia have the same units).
 
  .. code-block:: none
 
-    [20:28:19] Validation data for feature maps is not provided. Using  dense.py:199
+    [11:49:19] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [20:28:31] BCD step 1/5    FUGW loss:      0.023748306557536125     dense.py:521
+    [11:49:26] BCD step 1/5    FUGW loss:      0.023748306557536125     dense.py:521
                Validation loss:        0.023748306557536125                         
 
 
-    [20:28:43] BCD step 2/5    FUGW loss:      0.019917232915759087     dense.py:521
+    [11:49:33] BCD step 2/5    FUGW loss:      0.019917232915759087     dense.py:521
                Validation loss:        0.019917232915759087                         
 
 
-    [20:28:55] BCD step 3/5    FUGW loss:      0.011778095737099648     dense.py:521
+    [11:49:40] BCD step 3/5    FUGW loss:      0.011778095737099648     dense.py:521
                Validation loss:        0.011778095737099648                         
 
 
-    [20:29:07] BCD step 4/5    FUGW loss:      0.006057289429008961     dense.py:521
+    [11:49:47] BCD step 4/5    FUGW loss:      0.006057289429008961     dense.py:521
                Validation loss:        0.006057289429008961                         
 
 
-    [20:29:23] BCD step 5/5    FUGW loss:      0.00468091806396842      dense.py:521
+    [11:49:56] BCD step 5/5    FUGW loss:      0.00468091806396842      dense.py:521
                Validation loss:        0.00468091806396842                          
-    [20:29:24] Validation data for feature maps is not provided. Using sparse.py:209
+               Validation data for feature maps is not provided. Using sparse.py:209
                training data instead.                                               
                Validation data for anatomical kernels is not provided. sparse.py:253
                Using training data instead.                                         
 
 
-    [20:30:14] BCD step 1/3    FUGW loss:      0.0079415924847126      sparse.py:660
+    [11:50:26] BCD step 1/3    FUGW loss:      0.0079415924847126      sparse.py:660
 
 
-    [20:31:03] BCD step 2/3    FUGW loss:      0.0054353829473257065   sparse.py:660
+    [11:50:55] BCD step 2/3    FUGW loss:      0.0054353829473257065   sparse.py:660
 
 
-    [20:31:51] BCD step 3/3    FUGW loss:      0.004494554363191128    sparse.py:660
+    [11:51:24] BCD step 3/3    FUGW loss:      0.004494554363191128    sparse.py:660
 
 
 
@@ -588,9 +588,9 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (3 minutes 39.456 seconds)
+   **Total running time of the script:** (2 minutes 10.453 seconds)
 
-**Estimated memory usage:**  93 MB
+**Estimated memory usage:**  8 MB
 
 
 .. _sphx_glr_download_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py:

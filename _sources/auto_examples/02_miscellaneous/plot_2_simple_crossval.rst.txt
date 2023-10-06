@@ -87,7 +87,7 @@ We first fetch 5 contrasts for each subject from the localizer dataset.
 
  .. code-block:: none
 
-    /usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:893: UserWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:904: UserWarning:
 
     `legacy_format` will default to `False` in release 0.11. Dataset fetchers will then return pandas dataframes by default instead of recarrays.
 
@@ -153,47 +153,47 @@ We then downsample the images by 5 to reduce the computational cost.
 
  .. code-block:: none
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:673: RuntimeWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:663: RuntimeWarning:
 
     NaNs or infinite values are present in the data passed to resample. This is a bad thing as they make resampling ill-defined and much slower.
 
-    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:294: UserWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/image/resampling.py:291: UserWarning:
 
     Resampling binary images with continuous or linear interpolation. This might lead to unexpected results. You might consider using nearest interpolation instead.
 
@@ -278,47 +278,47 @@ as it will usually be the case in practice when aligning real fMRI data.
 
  .. code-block:: none
 
-    [20:33:39] Validation data for anatomical kernels is not provided.  dense.py:226
+    [11:52:58] Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [20:33:50] BCD step 1/10   FUGW loss:      0.024832483381032944     dense.py:521
+    [11:53:08] BCD step 1/10   FUGW loss:      0.024832483381032944     dense.py:521
                Validation loss:        0.026611944660544395                         
 
 
-    [20:34:09] BCD step 2/10   FUGW loss:      0.00754228001460433      dense.py:521
+    [11:53:24] BCD step 2/10   FUGW loss:      0.00754228001460433      dense.py:521
                Validation loss:        0.00788966752588749                          
 
 
-    [20:34:27] BCD step 3/10   FUGW loss:      0.006806173361837864     dense.py:521
+    [11:53:40] BCD step 3/10   FUGW loss:      0.006806173361837864     dense.py:521
                Validation loss:        0.006886300630867481                         
 
 
-    [20:34:46] BCD step 4/10   FUGW loss:      0.00641474686563015      dense.py:521
+    [11:53:56] BCD step 4/10   FUGW loss:      0.00641474686563015      dense.py:521
                Validation loss:        0.006309011019766331                         
 
 
-    [20:35:04] BCD step 5/10   FUGW loss:      0.006202487275004387     dense.py:521
+    [11:54:12] BCD step 5/10   FUGW loss:      0.006202487275004387     dense.py:521
                Validation loss:        0.005969356279820204                         
 
 
-    [20:35:23] BCD step 6/10   FUGW loss:      0.005987714510411024     dense.py:521
+    [11:54:29] BCD step 6/10   FUGW loss:      0.005987714510411024     dense.py:521
                Validation loss:        0.005596367176622152                         
 
 
-    [20:35:41] BCD step 7/10   FUGW loss:      0.00585530698299408      dense.py:521
+    [11:54:45] BCD step 7/10   FUGW loss:      0.00585530698299408      dense.py:521
                Validation loss:        0.005330576561391354                         
 
 
-    [20:36:00] BCD step 8/10   FUGW loss:      0.005845530424267054     dense.py:521
+    [11:55:01] BCD step 8/10   FUGW loss:      0.005845530424267054     dense.py:521
                Validation loss:        0.005313202738761902                         
 
 
-    [20:36:18] BCD step 9/10   FUGW loss:      0.005844546481966972     dense.py:521
+    [11:55:17] BCD step 9/10   FUGW loss:      0.005844546481966972     dense.py:521
                Validation loss:        0.005311585031449795                         
 
 
-    [20:36:36] BCD step 10/10  FUGW loss:      0.005844196770340204     dense.py:521
+    [11:55:32] BCD step 10/10  FUGW loss:      0.005844196770340204     dense.py:521
                Validation loss:        0.00531043903902173                          
 
 
@@ -693,9 +693,9 @@ and project it on the fsaverage5 surface.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (3 minutes 0.594 seconds)
+   **Total running time of the script:** (2 minutes 37.113 seconds)
 
-**Estimated memory usage:**  9 MB
+**Estimated memory usage:**  8 MB
 
 
 .. _sphx_glr_download_auto_examples_02_miscellaneous_plot_2_simple_crossval.py:

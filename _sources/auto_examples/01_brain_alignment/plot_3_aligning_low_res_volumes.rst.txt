@@ -86,7 +86,7 @@ We first fetch 5 contrasts for each subject from the localizer dataset.
 
  .. code-block:: none
 
-    /usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:893: UserWarning:
+    /usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:904: UserWarning:
 
     `legacy_format` will default to `False` in release 0.11. Dataset fetchers will then return pandas dataframes by default instead of recarrays.
 
@@ -335,25 +335,25 @@ We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 
  .. code-block:: none
 
-    [20:27:04] Validation data for feature maps is not provided. Using  dense.py:199
+    [11:48:15] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [20:27:16] BCD step 1/4    FUGW loss:      0.025816770270466805     dense.py:521
+    [11:48:25] BCD step 1/4    FUGW loss:      0.025816770270466805     dense.py:521
                Validation loss:        0.025816770270466805                         
 
 
-    [20:27:35] BCD step 2/4    FUGW loss:      0.009245545603334904     dense.py:521
+    [11:48:42] BCD step 2/4    FUGW loss:      0.009245545603334904     dense.py:521
                Validation loss:        0.009245545603334904                         
 
 
-    [20:27:54] BCD step 3/4    FUGW loss:      0.007908135652542114     dense.py:521
+    [11:48:58] BCD step 3/4    FUGW loss:      0.007908135652542114     dense.py:521
                Validation loss:        0.007908135652542114                         
 
 
-    [20:28:12] BCD step 4/4    FUGW loss:      0.007553239353001118     dense.py:521
+    [11:49:14] BCD step 4/4    FUGW loss:      0.007553239353001118     dense.py:521
                Validation loss:        0.007553239353001118                         
 
 
@@ -555,7 +555,7 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 13.027 seconds)
+   **Total running time of the script:** (1 minutes 3.833 seconds)
 
 **Estimated memory usage:**  8 MB
 
