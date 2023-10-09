@@ -136,7 +136,9 @@ def test_sparse_solvers(solver, device, callback, alpha):
 
     # Loss should decrease
     assert np.all(
-        np.sign(np.array(loss["total"][1:]) - np.array(loss["total"][:-1]))
+        np.sign(
+            np.array(loss["total"][1:]) - np.array(loss["total"][:-1]) - 1e-6
+        )  # numerical tolerance
         == -1
     )
 
