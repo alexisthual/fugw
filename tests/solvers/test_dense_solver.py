@@ -9,11 +9,14 @@ from fugw.solvers import FUGWSolver
 
 callbacks = [None, lambda x: x["gamma"]]
 
+alphas = [0.0, 0.5, 1.0]
+
 
 @pytest.mark.parametrize(
-    "solver,callback", product(["sinkhorn", "mm", "ibpp"], callbacks)
+    "solver,callback,alpha",
+    product(["sinkhorn", "mm", "ibpp"], callbacks, alphas),
 )
-def test_dense_solvers(solver, callback):
+def test_dense_solvers(solver, callback, alpha):
     torch.manual_seed(0)
 
     use_cuda = torch.cuda.is_available()
@@ -52,7 +55,6 @@ def test_dense_solvers(solver, callback):
         ibpp_eps_base=1e2,
     )
 
-    alpha = 0.8
     rho_s = 2
     rho_t = 3
     eps = 0.02
