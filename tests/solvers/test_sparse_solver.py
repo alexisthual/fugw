@@ -14,13 +14,15 @@ if torch.cuda.is_available():
 
 callbacks = [None, lambda x: x["gamma"]]
 
+alphas = [0.0, 0.5, 1.0]
+
 
 # TODO: need to test sinkhorn
 @pytest.mark.parametrize(
-    "solver,device,callback",
-    product(["sinkhorn", "mm", "ibpp"], devices, callbacks),
+    "solver,device,callback,alpha",
+    product(["sinkhorn", "mm", "ibpp"], devices, callbacks, alphas),
 )
-def test_sparse_solvers(solver, device, callback):
+def test_sparse_solvers(solver, device, callback, alpha):
     torch.manual_seed(1)
     torch.backends.cudnn.benchmark = True
 
@@ -66,7 +68,6 @@ def test_sparse_solvers(solver, device, callback):
         ibpp_eps_base=1e2,
     )
 
-    alpha = 0.8
     rho_s = 2
     rho_t = 3
     eps = 0.5
