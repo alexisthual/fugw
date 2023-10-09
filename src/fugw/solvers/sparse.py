@@ -167,11 +167,11 @@ class FUGWSparseSolver(BaseSolver):
             csr_sum(gamma, dim=0),
         )
 
-        loss_wasserstein = None
-        loss_gromov_wasserstein = None
-        loss_marginal_constraint_dim1 = None
-        loss_marginal_constraint_dim2 = None
-        loss_regularization = None
+        loss_wasserstein = torch.zeros(1)
+        loss_gromov_wasserstein = torch.zeros(1)
+        loss_marginal_constraint_dim1 = torch.zeros(1)
+        loss_marginal_constraint_dim2 = torch.zeros(1)
+        loss_regularization = torch.zeros(1)
         loss = 0
 
         if alpha != 1 and K1 is not None and K2 is not None:
