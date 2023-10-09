@@ -46,7 +46,7 @@ class FUGWSolver(BaseSolver):
 
         pi1, pi2 = pi.sum(1), pi.sum(0)
 
-        cost = torch.zeros_like(D)
+        cost = torch.zeros_like(pi)
 
         # Avoid unnecessary calculation of UGW when alpha = 0
         if alpha != 1 and D is not None:
@@ -121,11 +121,11 @@ class FUGWSolver(BaseSolver):
         pi1, pi2 = pi.sum(1), pi.sum(0)
         gamma1, gamma2 = gamma.sum(1), gamma.sum(0)
 
-        loss_wasserstein = None
-        loss_gromov_wasserstein = None
-        loss_marginal_constraint_dim1 = None
-        loss_marginal_constraint_dim2 = None
-        loss_regularization = None
+        loss_wasserstein = torch.zeros(1)
+        loss_gromov_wasserstein = torch.zeros(1)
+        loss_marginal_constraint_dim1 = torch.zeros(1)
+        loss_marginal_constraint_dim2 = torch.zeros(1)
+        loss_regularization = torch.zeros(1)
         loss = 0
 
         if alpha != 1 and D is not None:
