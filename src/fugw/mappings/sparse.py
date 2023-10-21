@@ -305,9 +305,7 @@ class FUGWSparse(BaseMapping):
 
         return self
 
-    def transform(
-        self, source_features, id_interpolation=False, device="auto"
-    ):
+    def transform(self, source_features, id_reg=0, device="auto"):
         """
         Transport source feature maps using fitted OT plan.
         Use GPUs if available.
@@ -316,9 +314,10 @@ class FUGWSparse(BaseMapping):
         ----------
         source_features: ndarray(n_samples, n) or ndarray(n)
             Contrast map for source subject
-        id_interpolation: bool, optional, defaults to False
-            If True and source/target share the same geometry,
-            interpolate the transport plan with the identity.
+        id_reg: float, optional, defaults to 0
+            If source/target share the same geometry,
+            interpolate the transport plan with the identity
+            using the provided coefficient.
         device: "auto" or torch.device
             If "auto": use first available GPU if it's available,
             CPU otherwise.
@@ -351,29 +350,31 @@ class FUGWSparse(BaseMapping):
             )
 
         # Transform data
-        if id_interpolation:
+        if id_reg != 0:
             if self.pi.shape[0] != self.pi.shape[1]:
                 raise ValueError(
                     "Cannot interpolate with identity if source and target"
                     " have different geometries."
                 )
+            if id_reg < 0 or id_reg > 1:
+                raise ValueError(
+                    f"id_reg should be between 0 and 1, got {id_reg}"
+                )
             transformed_data = (
                 (
-                    (
-                        torch.sparse.mm(
-                            self.pi.to(device).transpose(0, 1),
-                            source_features_tensor.T,
-                        ).to_dense()
-                        / (
-                            torch.sparse.sum(self.pi.to(device), dim=0)
-                            .to_dense()
-                            .reshape(-1, 1)
-                            # Add very small value to handle null rows
-                            + 1e-16
-                        )
-                        + source_features_tensor.T
+                    (1 - id_reg)
+                    * torch.sparse.mm(
+                        self.pi.to(device).transpose(0, 1),
+                        source_features_tensor.T,
+                    ).to_dense()
+                    / (
+                        torch.sparse.sum(self.pi.to(device), dim=0)
+                        .to_dense()
+                        .reshape(-1, 1)
+                        # Add very small value to handle null rows
+                        + 1e-16
                     )
-                    / 2
+                    + id_reg * source_features_tensor.T
                 )
                 .T.detach()
                 .cpu()
