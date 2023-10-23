@@ -279,7 +279,7 @@ class FUGW(BaseMapping):
         ----------
         source_features: ndarray(n_samples, n) or ndarray(n)
             Contrast map for source subject
-        id_reg: float, optional, defaults to 0
+        id_reg: float, in the [0, 1] interval, defaults to 0
             If source/target share the same geometry,
             interpolate the transport plan with the identity
             using the provided coefficient.
