@@ -328,16 +328,13 @@ class FUGW(BaseMapping):
                 )
             transformed_data = (
                 (
-                    (
-                        (1 - id_reg)
-                        * (
-                            pi.T
-                            @ source_features_tensor.T
-                            / pi.sum(dim=0).reshape(-1, 1)
-                        )
-                        + id_reg * source_features_tensor.T
+                    (1 - id_reg)
+                    * (
+                        pi.T
+                        @ source_features_tensor.T
+                        / pi.sum(dim=0).reshape(-1, 1)
                     )
-                    / 2
+                    + id_reg * source_features_tensor.T
                 )
                 .T.detach()
                 .cpu()
