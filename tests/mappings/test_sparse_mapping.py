@@ -251,3 +251,27 @@ def test_sparse_validation_mapping(validation):
             device=device,
         )
         assert len(fugw.loss_val) == len(fugw.loss)
+
+
+@pytest.mark.parametrize("id_reg", [0.0, 0.5, 1.0])
+def test_sparse_identity_regularization(id_reg):
+    _, source_features_train, _, _ = _init_mock_distribution(
+        n_features_train, n_voxels_source, return_numpy=False
+    )
+
+    mapping = FUGWSparse()
+    mapping.pi = torch.eye(n_voxels_source).to_sparse_coo()
+
+    if id_reg < 0 or id_reg > 1:
+        with pytest.raises(
+            ValueError, match=f"id_reg should be between 0 and 1, got {id_reg}"
+        ):
+            mapping.transform(source_features_train, id_reg=id_reg)
+    else:
+        transformed_data = mapping.transform(
+            source_features_train, id_reg=id_reg
+        )
+        assert transformed_data.shape == source_features_train.shape
+        assert torch.allclose(
+            transformed_data, source_features_train, atol=1e-5
+        )
