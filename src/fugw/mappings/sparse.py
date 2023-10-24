@@ -318,6 +318,8 @@ class FUGWSparse(BaseMapping):
             If source/target share the same geometry,
             interpolate the transport plan with the identity
             using the provided coefficient.
+            A value of 1 (resp. 0) will rely solely on the identity
+            (resp. the transport plan).
         device: "auto" or torch.device
             If "auto": use first available GPU if it's available,
             CPU otherwise.
