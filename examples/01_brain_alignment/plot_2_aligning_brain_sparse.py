@@ -689,7 +689,7 @@ plt.show()
 # %%
 # We can also partially transport feature maps, by specifying
 # a parameter ``id_reg`` which balances the amount of regularization
-# applied between the tarnsport plan and the identity mapping. The
+# applied between the transport plan and the identity mapping. The
 # regularized transport plan is then ``id_reg`` times the identity
 # plus ``(1 - id_reg)`` times the transport plan computed by FUGW.
 
