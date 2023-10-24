@@ -694,7 +694,7 @@ plt.show()
 # plus ``(1 - id_reg)`` times the transport plan computed by FUGW.
 
 # Set of weights for the regularization parameter
-id_reg = 1 - np.linspace(0, 1, 3)
+id_reg = [.0, .5, 1.]
 
 fig = plt.figure(figsize=(3 * 5, 4))
 fig.suptitle(
