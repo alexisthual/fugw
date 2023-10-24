@@ -685,3 +685,53 @@ plot_surface_map(
 )
 
 plt.show()
+
+# %%
+# We can also partially transport feature maps, by specifying
+# a parameter ``id_reg`` which balances the amount of regularization
+# applied between the transport plan and the identity mapping. The
+# regularized transport plan is then ``id_reg`` times the identity
+# plus ``(1 - id_reg)`` times the transport plan computed by FUGW.
+
+# Set of weights for the regularization parameter
+id_reg = [.0, .5, 1.]
+
+fig = plt.figure(figsize=(3 * 5, 4))
+fig.suptitle(
+    "Partial transportation of the feature maps by\nregularizing the transport"
+    " plan with the identity"
+)
+grid_spec = gridspec.GridSpec(1, 5, figure=fig)
+
+ax = fig.add_subplot(grid_spec[0, 0], projection="3d")
+ax.set_title("Actual source features")
+plot_surface_map(
+    source_features[contrast_index, :],
+    axes=ax,
+    vmax=10,
+    vmin=-10,
+    colorbar=False,
+)
+
+for i in range(len(id_reg)):
+    predicted_target_features = fine_mapping.transform(
+        source_features[contrast_index, :],
+        id_reg=id_reg[i],
+    )
+    ax = fig.add_subplot(grid_spec[0, i + 1], projection="3d")
+    ax.set_title(f"id_reg={id_reg[i]}")
+    plot_surface_map(
+        predicted_target_features, axes=ax, vmax=10, vmin=-10, colorbar=False
+    )
+
+ax = fig.add_subplot(grid_spec[0, -1], projection="3d")
+ax.set_title("Actual target features")
+plot_surface_map(
+    target_features[contrast_index, :],
+    axes=ax,
+    vmax=10,
+    vmin=-10,
+    colorbar=False,
+)
+
+plt.show()

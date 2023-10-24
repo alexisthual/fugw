@@ -253,7 +253,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fugw.mappings.FUGWSparse.inverse_transform" title="fugw.mappings.FUGWSparse.inverse_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inverse_transform</span></code></a>(target_features[, device])</p></td>
 <td><p>Transport target feature maps using fitted OT plan.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fugw.mappings.FUGWSparse.transform" title="fugw.mappings.FUGWSparse.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(source_features[, device])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fugw.mappings.FUGWSparse.transform" title="fugw.mappings.FUGWSparse.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(source_features[, id_reg, device])</p></td>
 <td><p>Transport source feature maps using fitted OT plan.</p></td>
 </tr>
 </tbody>
@@ -432,13 +432,19 @@ CPU otherwise.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fugw.mappings.FUGWSparse.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.mappings.FUGWSparse.transform" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_reg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.mappings.FUGWSparse.transform" title="Permalink to this definition">#</a></dt>
 <dd><p>Transport source feature maps using fitted OT plan.
 Use GPUs if available.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>source_features: ndarray(n_samples, n) or ndarray(n)</strong></dt><dd><p>Contrast map for source subject</p>
+</dd>
+<dt><strong>id_reg: float, in the [0, 1] interval, defaults to 0</strong></dt><dd><p>If source/target share the same geometry,
+interpolate the transport plan with the identity
+using the provided coefficient.
+A value of 1 (resp. 0) will rely solely on the identity
+(resp. the transport plan).</p>
 </dd>
 <dt><strong>device: “auto” or torch.device</strong></dt><dd><p>If “auto”: use first available GPU if it’s available,
 CPU otherwise.</p>
