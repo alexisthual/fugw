@@ -28,7 +28,7 @@ a validation loss on 2 low-resolution brain volumes.
 
 .. GENERATED FROM PYTHON SOURCE LINES 11-19
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import numpy as np
@@ -51,7 +51,7 @@ We first fetch 5 contrasts for each subject from the localizer dataset.
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-48
 
-.. code-block:: default
+.. code-block:: Python
 
     n_subjects = 2
 
@@ -101,7 +101,7 @@ We then downsample the images by 5 to reduce the computational cost.
 
 .. GENERATED FROM PYTHON SOURCE LINES 50-87
 
-.. code-block:: default
+.. code-block:: Python
 
     SCALE_FACTOR = 5
 
@@ -207,7 +207,7 @@ We then compute the distance matrix between voxel coordinates.
 
 .. GENERATED FROM PYTHON SOURCE LINES 89-92
 
-.. code-block:: default
+.. code-block:: Python
 
     source_geometry = distance_matrix(coordinates, coordinates)
     target_geometry = source_geometry.copy()
@@ -226,7 +226,7 @@ both the features and the geometry.
 
 .. GENERATED FROM PYTHON SOURCE LINES 95-104
 
-.. code-block:: default
+.. code-block:: Python
 
     source_features_normalized = source_features / np.linalg.norm(
         source_features, axis=1
@@ -253,7 +253,7 @@ as it will usually be the case in practice when aligning real fMRI data.
 
 .. GENERATED FROM PYTHON SOURCE LINES 109-124
 
-.. code-block:: default
+.. code-block:: Python
 
     mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
     _ = mapping.fit(
@@ -278,48 +278,48 @@ as it will usually be the case in practice when aligning real fMRI data.
 
  .. code-block:: none
 
-    [22:24:26] Validation data for anatomical kernels is not provided.  dense.py:226
+    [16:08:12] Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [22:24:36] BCD step 1/10   FUGW loss:      0.02483261190354824      dense.py:521
-               Validation loss:        0.02661210484802723                          
+    [16:08:17] BCD step 1/10   FUGW loss:      0.024832360446453094     dense.py:521
+               Validation loss:        0.02661185897886753                          
 
 
-    [22:24:55] BCD step 2/10   FUGW loss:      0.007542587351053953     dense.py:521
-               Validation loss:        0.007889988832175732                         
+    [16:08:26] BCD step 2/10   FUGW loss:      0.0075426651164889336    dense.py:521
+               Validation loss:        0.007890073582530022                         
 
 
-    [22:25:14] BCD step 3/10   FUGW loss:      0.006806590594351292     dense.py:521
-               Validation loss:        0.006886965595185757                         
+    [16:08:35] BCD step 3/10   FUGW loss:      0.006806435063481331     dense.py:521
+               Validation loss:        0.006886775605380535                         
 
 
-    [22:25:33] BCD step 4/10   FUGW loss:      0.006415019743144512     dense.py:521
-               Validation loss:        0.006309802178293467                         
+    [16:08:43] BCD step 4/10   FUGW loss:      0.006414878182113171     dense.py:521
+               Validation loss:        0.00630957493558526                          
 
 
-    [22:25:52] BCD step 5/10   FUGW loss:      0.0062031010165810585    dense.py:521
-               Validation loss:        0.005970505066215992                         
+    [16:08:52] BCD step 5/10   FUGW loss:      0.006202980875968933     dense.py:521
+               Validation loss:        0.005970312282443047                         
 
 
-    [22:26:11] BCD step 6/10   FUGW loss:      0.0059886109083890915    dense.py:521
-               Validation loss:        0.005597996059805155                         
+    [16:09:01] BCD step 6/10   FUGW loss:      0.005988470744341612     dense.py:521
+               Validation loss:        0.005597750190645456                         
 
 
-    [22:26:30] BCD step 7/10   FUGW loss:      0.005855436436831951     dense.py:521
-               Validation loss:        0.0053308987990021706                        
+    [16:09:10] BCD step 7/10   FUGW loss:      0.005855489056557417     dense.py:521
+               Validation loss:        0.005330917425453663                         
 
 
-    [22:26:49] BCD step 8/10   FUGW loss:      0.005845545791089535     dense.py:521
-               Validation loss:        0.005313204135745764                         
+    [16:09:19] BCD step 8/10   FUGW loss:      0.005845479667186737     dense.py:521
+               Validation loss:        0.005313139874488115                         
 
 
-    [22:27:08] BCD step 9/10   FUGW loss:      0.005844415631145239     dense.py:521
-               Validation loss:        0.005311452783644199                         
+    [16:09:27] BCD step 9/10   FUGW loss:      0.005844404920935631     dense.py:521
+               Validation loss:        0.0053114378824830055                        
 
 
-    [22:27:27] BCD step 10/10  FUGW loss:      0.005844208877533674     dense.py:521
-               Validation loss:        0.005310453474521637                         
+    [16:09:36] BCD step 10/10  FUGW loss:      0.005843969993293285     dense.py:521
+               Validation loss:        0.005310213193297386                         
 
 
 
@@ -330,7 +330,7 @@ Plot the evolution of losses on train and test datasets.
 
 .. GENERATED FROM PYTHON SOURCE LINES 126-139
 
-.. code-block:: default
+.. code-block:: Python
 
     fig, ax1 = plt.subplots()
     ax1.set_xlabel("BCD Step")
@@ -364,7 +364,7 @@ and project it on the fsaverage5 surface.
 
 .. GENERATED FROM PYTHON SOURCE LINES 142-146
 
-.. code-block:: default
+.. code-block:: Python
 
     example_array = np.nan_to_num(source_im_resized.slicer[..., -1].get_fdata())
     example_array /= np.max(np.abs(example_array))
@@ -693,9 +693,9 @@ and project it on the fsaverage5 surface.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (3 minutes 4.191 seconds)
+   **Total running time of the script:** (1 minutes 27.522 seconds)
 
-**Estimated memory usage:**  8 MB
+**Estimated memory usage:**  10 MB
 
 
 .. _sphx_glr_download_auto_examples_02_miscellaneous_plot_2_simple_crossval.py:
@@ -704,16 +704,13 @@ and project it on the fsaverage5 surface.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_2_simple_crossval.ipynb <plot_2_simple_crossval.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_2_simple_crossval.py <plot_2_simple_crossval.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_2_simple_crossval.ipynb <plot_2_simple_crossval.ipynb>`
 
 
 .. only:: html

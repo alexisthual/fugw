@@ -28,7 +28,7 @@ have less than 10k points.
 
 .. GENERATED FROM PYTHON SOURCE LINES 11-20
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import matplotlib.pyplot as plt
@@ -48,7 +48,7 @@ have less than 10k points.
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-29
 
-.. code-block:: default
+.. code-block:: Python
 
     torch.manual_seed(0)
 
@@ -70,7 +70,7 @@ Let us generate random training data for the source and target distributions
 
 .. GENERATED FROM PYTHON SOURCE LINES 31-39
 
-.. code-block:: default
+.. code-block:: Python
 
     _, source_features_train, source_geometry, source_embeddings = (
         _init_mock_distribution(n_features_train, n_points_source)
@@ -103,7 +103,7 @@ We can visualize the generated features:
 
 .. GENERATED FROM PYTHON SOURCE LINES 41-50
 
-.. code-block:: default
+.. code-block:: Python
 
     fig = plt.figure(figsize=(4, 4))
     ax = fig.add_subplot()
@@ -132,7 +132,7 @@ And embeddings:
 
 .. GENERATED FROM PYTHON SOURCE LINES 52-72
 
-.. code-block:: default
+.. code-block:: Python
 
     fig = plt.figure()
     ax = fig.add_subplot(projection="3d")
@@ -172,7 +172,7 @@ Features and geometries should be normalized before calling the solver
 
 .. GENERATED FROM PYTHON SOURCE LINES 74-84
 
-.. code-block:: default
+.. code-block:: Python
 
     source_features_train_normalized = source_features_train / torch.linalg.norm(
         source_features_train, dim=1
@@ -197,7 +197,7 @@ Let us define the optimization problem to solve
 
 .. GENERATED FROM PYTHON SOURCE LINES 86-91
 
-.. code-block:: default
+.. code-block:: Python
 
     alpha = 0.5
     rho = 1000
@@ -218,7 +218,7 @@ using a sinkhorn solver
 
 .. GENERATED FROM PYTHON SOURCE LINES 94-103
 
-.. code-block:: default
+.. code-block:: Python
 
     _ = mapping.fit(
         source_features_train_normalized,
@@ -237,50 +237,50 @@ using a sinkhorn solver
 
  .. code-block:: none
 
-    [22:06:16] Validation data for feature maps is not provided. Using  dense.py:199
+    [15:59:32] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [22:06:17] BCD step 1/10   FUGW loss:      0.029077230021357536     dense.py:521
-               Validation loss:        0.029077230021357536                         
+    [15:59:33] BCD step 1/10   FUGW loss:      0.029136842116713524     dense.py:521
+               Validation loss:        0.029136842116713524                         
 
 
-    [22:06:18] BCD step 2/10   FUGW loss:      0.046711478382349014     dense.py:521
-               Validation loss:        0.046711478382349014                         
+               BCD step 2/10   FUGW loss:      0.046771109104156494     dense.py:521
+               Validation loss:        0.046771109104156494                         
 
 
-               BCD step 3/10   FUGW loss:      0.02267550304532051      dense.py:521
-               Validation loss:        0.02267550304532051                          
+    [15:59:34] BCD step 3/10   FUGW loss:      0.022854337468743324     dense.py:521
+               Validation loss:        0.022854337468743324                         
 
 
-    [22:06:19] BCD step 4/10   FUGW loss:      0.02190692536532879      dense.py:521
-               Validation loss:        0.02190692536532879                          
+               BCD step 4/10   FUGW loss:      0.02232404239475727      dense.py:521
+               Validation loss:        0.02232404239475727                          
 
 
-    [22:06:20] BCD step 5/10   FUGW loss:      0.04769175872206688      dense.py:521
-               Validation loss:        0.04769175872206688                          
+               BCD step 5/10   FUGW loss:      0.04798972234129906      dense.py:521
+               Validation loss:        0.04798972234129906                          
 
 
-    [22:06:21] BCD step 6/10   FUGW loss:      0.023379186168313026     dense.py:521
-               Validation loss:        0.023379186168313026                         
+    [15:59:35] BCD step 6/10   FUGW loss:      0.02343880571424961      dense.py:521
+               Validation loss:        0.02343880571424961                          
 
 
-    [22:06:22] BCD step 7/10   FUGW loss:      0.01915481500327587      dense.py:521
-               Validation loss:        0.01915481500327587                          
+               BCD step 7/10   FUGW loss:      0.019214436411857605     dense.py:521
+               Validation loss:        0.019214436411857605                         
 
 
-    [22:06:23] BCD step 8/10   FUGW loss:      0.018553871661424637     dense.py:521
-               Validation loss:        0.018553871661424637                         
+               BCD step 8/10   FUGW loss:      0.01873275265097618      dense.py:521
+               Validation loss:        0.01873275265097618                          
 
 
-    [22:06:24] BCD step 9/10   FUGW loss:      0.018553996458649635     dense.py:521
-               Validation loss:        0.018553996458649635                         
+    [15:59:36] BCD step 9/10   FUGW loss:      0.01861358806490898      dense.py:521
+               Validation loss:        0.01861358806490898                          
 
 
-    [22:06:25] BCD step 10/10  FUGW loss:      0.018732825294137        dense.py:521
-               Validation loss:        0.018732825294137                            
+               BCD step 10/10  FUGW loss:      0.018613653257489204     dense.py:521
+               Validation loss:        0.018613653257489204                         
 
 
 
@@ -291,7 +291,7 @@ The transport plan can be accessed after the model has been fitted
 
 .. GENERATED FROM PYTHON SOURCE LINES 105-108
 
-.. code-block:: default
+.. code-block:: Python
 
     pi = mapping.pi
     print(f"Transport plan's total mass: {pi.sum():.5f}")
@@ -316,7 +316,7 @@ as well as the contribution of each loss term:
 
 .. GENERATED FROM PYTHON SOURCE LINES 111-137
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig, ax = plt.subplots(figsize=(10, 4))
@@ -366,7 +366,7 @@ it altogether.
 
 .. GENERATED FROM PYTHON SOURCE LINES 143-152
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig, ax = plt.subplots(figsize=(4, 4))
@@ -399,7 +399,7 @@ were matched together in the feature space.
 
 .. GENERATED FROM PYTHON SOURCE LINES 158-187
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig = plt.figure(figsize=(4, 4))
@@ -449,7 +449,7 @@ between source and target
 
 .. GENERATED FROM PYTHON SOURCE LINES 190-195
 
-.. code-block:: default
+.. code-block:: Python
 
     source_features_test = torch.rand(n_features_test, n_points_source)
     target_features_test = torch.rand(n_features_test, n_points_target)
@@ -471,7 +471,7 @@ between source and target
 
 .. GENERATED FROM PYTHON SOURCE LINES 196-198
 
-.. code-block:: default
+.. code-block:: Python
 
     assert transformed_data.shape == target_features_test.shape
 
@@ -485,9 +485,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 11.859 seconds)
+   **Total running time of the script:** (0 minutes 6.365 seconds)
 
-**Estimated memory usage:**  45 MB
+**Estimated memory usage:**  46 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_1_dense.py:
@@ -496,16 +496,13 @@ between source and target
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_1_dense.ipynb <plot_1_dense.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_1_dense.py <plot_1_dense.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_1_dense.ipynb <plot_1_dense.ipynb>`
 
 
 .. only:: html

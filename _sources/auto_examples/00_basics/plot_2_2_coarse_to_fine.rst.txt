@@ -28,7 +28,7 @@ have more than 10k points.
 
 .. GENERATED FROM PYTHON SOURCE LINES 11-22
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import matplotlib.pyplot as plt
@@ -50,7 +50,7 @@ have more than 10k points.
 
 .. GENERATED FROM PYTHON SOURCE LINES 24-33
 
-.. code-block:: default
+.. code-block:: Python
 
     torch.manual_seed(13)
 
@@ -74,7 +74,7 @@ Let us generate random training data for the source and target distributions
 
 .. GENERATED FROM PYTHON SOURCE LINES 35-42
 
-.. code-block:: default
+.. code-block:: Python
 
     _, source_features_train, _, source_embeddings = _init_mock_distribution(
         n_features_train, n_points_source
@@ -105,7 +105,7 @@ We can visualize the generated features:
 
 .. GENERATED FROM PYTHON SOURCE LINES 44-53
 
-.. code-block:: default
+.. code-block:: Python
 
     fig = plt.figure(figsize=(4, 4))
     ax = fig.add_subplot()
@@ -135,7 +135,7 @@ before fitting the models.
 
 .. GENERATED FROM PYTHON SOURCE LINES 56-71
 
-.. code-block:: default
+.. code-block:: Python
 
 
     source_features_train_normalized = source_features_train / torch.linalg.norm(
@@ -166,7 +166,7 @@ We also specify which solver to use at each of the 2 steps:
 
 .. GENERATED FROM PYTHON SOURCE LINES 74-92
 
-.. code-block:: default
+.. code-block:: Python
 
     alpha_coarse = 0.5
     rho_coarse = 1
@@ -206,7 +206,7 @@ distributions you are trying to align.
 
 .. GENERATED FROM PYTHON SOURCE LINES 101-131
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Sub-sample source and target distributions
@@ -246,50 +246,50 @@ distributions you are trying to align.
 
  .. code-block:: none
 
-    [22:06:42] Validation data for feature maps is not provided. Using  dense.py:199
+    [15:59:49] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [22:06:43] BCD step 1/10   FUGW loss:      0.03209483623504639      dense.py:521
-               Validation loss:        0.03209483623504639                          
+               BCD step 1/10   FUGW loss:      0.03209492564201355      dense.py:521
+               Validation loss:        0.03209492564201355                          
 
 
-               BCD step 2/10   FUGW loss:      0.027612196281552315     dense.py:521
-               Validation loss:        0.027612196281552315                         
+               BCD step 2/10   FUGW loss:      0.027612239122390747     dense.py:521
+               Validation loss:        0.027612239122390747                         
 
 
-    [22:06:44] BCD step 3/10   FUGW loss:      0.018442433327436447     dense.py:521
-               Validation loss:        0.018442433327436447                         
+    [15:59:50] BCD step 3/10   FUGW loss:      0.018442563712596893     dense.py:521
+               Validation loss:        0.018442563712596893                         
 
 
-               BCD step 4/10   FUGW loss:      0.01579635962843895      dense.py:521
-               Validation loss:        0.01579635962843895                          
+               BCD step 4/10   FUGW loss:      0.01579628325998783      dense.py:521
+               Validation loss:        0.01579628325998783                          
 
 
-    [22:06:45] BCD step 5/10   FUGW loss:      0.015153632499277592     dense.py:521
-               Validation loss:        0.015153632499277592                         
+               BCD step 5/10   FUGW loss:      0.015153789892792702     dense.py:521
+               Validation loss:        0.015153789892792702                         
 
 
-    [22:06:46] BCD step 6/10   FUGW loss:      0.01487602386623621      dense.py:521
-               Validation loss:        0.01487602386623621                          
+               BCD step 6/10   FUGW loss:      0.014875941909849644     dense.py:521
+               Validation loss:        0.014875941909849644                         
 
 
-    [22:06:47] BCD step 7/10   FUGW loss:      0.014715117402374744     dense.py:521
-               Validation loss:        0.014715117402374744                         
+    [15:59:51] BCD step 7/10   FUGW loss:      0.014715257100760937     dense.py:521
+               Validation loss:        0.014715257100760937                         
 
 
-    [22:06:48] BCD step 8/10   FUGW loss:      0.014592298306524754     dense.py:521
-               Validation loss:        0.014592298306524754                         
+               BCD step 8/10   FUGW loss:      0.014592343010008335     dense.py:521
+               Validation loss:        0.014592343010008335                         
 
 
-    [22:06:50] BCD step 9/10   FUGW loss:      0.014477195218205452     dense.py:521
-               Validation loss:        0.014477195218205452                         
+               BCD step 9/10   FUGW loss:      0.014477252028882504     dense.py:521
+               Validation loss:        0.014477252028882504                         
 
 
-    [22:06:51] BCD step 10/10  FUGW loss:      0.01438040193170309      dense.py:521
-               Validation loss:        0.01438040193170309                          
+    [15:59:52] BCD step 10/10  FUGW loss:      0.01438036747276783      dense.py:521
+               Validation loss:        0.01438036747276783                          
     /github/workspace/src/fugw/scripts/coarse_to_fine.py:463: UserWarning:
 
     Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:53.)
@@ -300,34 +300,34 @@ distributions you are trying to align.
                Using training data instead.                                         
 
 
-    [22:06:56] BCD step 1/10   FUGW loss:      0.02047714963555336     sparse.py:660
+    [15:59:54] BCD step 1/10   FUGW loss:      0.02047727443277836     sparse.py:660
 
 
-    [22:07:01] BCD step 2/10   FUGW loss:      0.014399952255189419    sparse.py:660
+    [15:59:56] BCD step 2/10   FUGW loss:      0.014399909414350986    sparse.py:660
 
 
-    [22:07:06] BCD step 3/10   FUGW loss:      0.01264447346329689     sparse.py:660
+    [15:59:58] BCD step 3/10   FUGW loss:      0.012644448317587376    sparse.py:660
 
 
-    [22:07:11] BCD step 4/10   FUGW loss:      0.01199110597372055     sparse.py:660
+    [16:00:01] BCD step 4/10   FUGW loss:      0.011991660110652447    sparse.py:660
 
 
-    [22:07:16] BCD step 5/10   FUGW loss:      0.011676724068820477    sparse.py:660
+    [16:00:03] BCD step 5/10   FUGW loss:      0.011676586233079433    sparse.py:660
 
 
-    [22:07:21] BCD step 6/10   FUGW loss:      0.011500321328639984    sparse.py:660
+    [16:00:05] BCD step 6/10   FUGW loss:      0.011500303633511066    sparse.py:660
 
 
-    [22:07:27] BCD step 7/10   FUGW loss:      0.011388549581170082    sparse.py:660
+    [16:00:08] BCD step 7/10   FUGW loss:      0.011388624086976051    sparse.py:660
 
 
-    [22:07:34] BCD step 8/10   FUGW loss:      0.011310475878417492    sparse.py:660
+    [16:00:10] BCD step 8/10   FUGW loss:      0.011310438625514507    sparse.py:660
 
 
-    [22:07:42] BCD step 9/10   FUGW loss:      0.011251787655055523    sparse.py:660
+    [16:00:13] BCD step 9/10   FUGW loss:      0.011251626536250114    sparse.py:660
 
 
-    [22:07:51] BCD step 10/10  FUGW loss:      0.011205347254872322    sparse.py:660
+    [16:00:15] BCD step 10/10  FUGW loss:      0.011205767281353474    sparse.py:660
 
 
 
@@ -339,7 +339,7 @@ after the models have been fitted
 
 .. GENERATED FROM PYTHON SOURCE LINES 134-140
 
-.. code-block:: default
+.. code-block:: Python
 
     print(f"Coarse transport plan's total mass: {coarse_mapping.pi.sum():.5f}")
     print(
@@ -368,7 +368,7 @@ of the coarse mapping, as well as the contribution of each loss term:
 
 .. GENERATED FROM PYTHON SOURCE LINES 143-169
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig, ax = plt.subplots(figsize=(10, 4))
@@ -414,7 +414,7 @@ And here is a similar plot for the fine-grained mapping:
 
 .. GENERATED FROM PYTHON SOURCE LINES 171-197
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig, ax = plt.subplots(figsize=(10, 4))
@@ -464,7 +464,7 @@ we usually want to keep this number much smaller.
 
 .. GENERATED FROM PYTHON SOURCE LINES 203-209
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sparsity_ratio = (
@@ -493,7 +493,7 @@ we don't expect it to show a particularly meaningful structure.
 
 .. GENERATED FROM PYTHON SOURCE LINES 213-229
 
-.. code-block:: default
+.. code-block:: Python
 
     indices = fine_mapping.pi.indices()
     fine_mapping_as_scipy_coo = coo_matrix(
@@ -530,7 +530,7 @@ and target points in the feature space.
 
 .. GENERATED FROM PYTHON SOURCE LINES 232-265
 
-.. code-block:: default
+.. code-block:: Python
 
     pi = fine_mapping.pi.to_dense()
     fig = plt.figure(figsize=(10, 10))
@@ -584,7 +584,7 @@ between source and target
 
 .. GENERATED FROM PYTHON SOURCE LINES 268-273
 
-.. code-block:: default
+.. code-block:: Python
 
     source_features_test = torch.rand(n_features_test, n_points_source)
     target_features_test = torch.rand(n_features_test, n_points_target)
@@ -606,7 +606,7 @@ between source and target
 
 .. GENERATED FROM PYTHON SOURCE LINES 274-275
 
-.. code-block:: default
+.. code-block:: Python
 
     assert transformed_data.shape == target_features_test.shape
 
@@ -619,9 +619,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 20.651 seconds)
+   **Total running time of the script:** (0 minutes 34.264 seconds)
 
-**Estimated memory usage:**  153 MB
+**Estimated memory usage:**  150 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_2_coarse_to_fine.py:
@@ -630,16 +630,13 @@ between source and target
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_2_2_coarse_to_fine.ipynb <plot_2_2_coarse_to_fine.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_2_2_coarse_to_fine.py <plot_2_2_coarse_to_fine.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_2_2_coarse_to_fine.ipynb <plot_2_2_coarse_to_fine.ipynb>`
 
 
 .. only:: html

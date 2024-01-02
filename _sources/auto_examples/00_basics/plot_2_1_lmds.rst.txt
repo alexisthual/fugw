@@ -31,7 +31,7 @@ computed in the right dimension can probably estimate it.
 
 .. GENERATED FROM PYTHON SOURCE LINES 14-23
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import gdist
@@ -57,7 +57,7 @@ The derived embedding will be in dimension ``k``.
 
 .. GENERATED FROM PYTHON SOURCE LINES 28-33
 
-.. code-block:: default
+.. code-block:: Python
 
     torch.manual_seed(0)
 
@@ -77,7 +77,7 @@ Let us load a pre-computed mesh and have a look at it first
 
 .. GENERATED FROM PYTHON SOURCE LINES 35-39
 
-.. code-block:: default
+.. code-block:: Python
 
     fsaverage3 = datasets.fetch_surf_fsaverage(mesh="fsaverage3")
     coordinates, triangles = surface.load_surf_mesh(fsaverage3.sphere_left)
@@ -104,7 +104,7 @@ Let us load a pre-computed mesh and have a look at it first
 
 .. GENERATED FROM PYTHON SOURCE LINES 40-50
 
-.. code-block:: default
+.. code-block:: Python
 
     fig = plt.figure(figsize=(5, 5))
     ax = fig.add_subplot(projection="3d")
@@ -134,7 +134,7 @@ Now, let's compute the embedding! This computation is easy to parallelize.
 
 .. GENERATED FROM PYTHON SOURCE LINES 52-61
 
-.. code-block:: default
+.. code-block:: Python
 
     X = lmds.compute_lmds_mesh(
         coordinates,
@@ -153,7 +153,7 @@ Now, let's compute the embedding! This computation is easy to parallelize.
 
  .. code-block:: none
 
-      100% Geodesic distances (landmarks) ━━━━━━━━━━━━━━━━ 100/100 0:00:03 < 0:00:00
+      100% Geodesic distances (landmarks) ━━━━━━━━━━━━━━━━ 100/100 0:00:02 < 0:00:00
     /github/workspace/src/fugw/scripts/lmds.py:175: UserWarning:
 
     A might not be centered (1.8671875 > 0.001)
@@ -168,7 +168,7 @@ It should have the correct size
 
 .. GENERATED FROM PYTHON SOURCE LINES 63-65
 
-.. code-block:: default
+.. code-block:: Python
 
     assert X.shape == (coordinates.shape[0], k)
 
@@ -185,7 +185,7 @@ We can actually have a peek at the computed embedding:
 
 .. GENERATED FROM PYTHON SOURCE LINES 67-79
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig = plt.figure(figsize=(5, 5))
@@ -219,7 +219,7 @@ is well approximated by the kernel matrix derived from the embeddings:
 
 .. GENERATED FROM PYTHON SOURCE LINES 83-102
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig = plt.figure(figsize=(5, 10))
@@ -255,9 +255,9 @@ is well approximated by the kernel matrix derived from the embeddings:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 13.873 seconds)
+   **Total running time of the script:** (0 minutes 9.856 seconds)
 
-**Estimated memory usage:**  134 MB
+**Estimated memory usage:**  82 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_1_lmds.py:
@@ -266,16 +266,13 @@ is well approximated by the kernel matrix derived from the embeddings:
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_2_1_lmds.ipynb <plot_2_1_lmds.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_2_1_lmds.py <plot_2_1_lmds.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_2_1_lmds.ipynb <plot_2_1_lmds.ipynb>`
 
 
 .. only:: html

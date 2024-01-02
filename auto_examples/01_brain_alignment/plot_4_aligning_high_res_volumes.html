@@ -246,7 +246,7 @@ to download the full example code</p>
 <span id="sphx-glr-auto-examples-01-brain-alignment-plot-4-aligning-high-res-volumes-py"></span><h1>High-resolution volume alignment of 2 individuals with fMRI data<a class="headerlink" href="#high-resolution-volume-alignment-of-2-individuals-with-fmri-data" title="Permalink to this heading">#</a></h1>
 <p>In this example, we align 2 low-resolution brain volumes
 using 4 fMRI feature maps (z-score contrast maps).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">colors</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
@@ -257,7 +257,7 @@ using 4 fMRI feature maps (z-score contrast maps).</p>
 </pre></div>
 </div>
 <p>We first fetch 5 contrasts for each subject from the localizer dataset.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n_subjects</span> <span class="o">=</span> <span class="mi">2</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">n_subjects</span> <span class="o">=</span> <span class="mi">2</span>
 
 <span class="n">contrasts</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;sentence reading vs checkerboard&quot;</span><span class="p">,</span>
@@ -288,7 +288,7 @@ using 4 fMRI feature maps (z-score contrast maps).</p>
 </div>
 <p>Let’s use a resolution of 2000 voxels so that computations
 can easily run on a single CPU.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SCALE_FACTOR</span> <span class="o">=</span> <span class="mi">3</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">SCALE_FACTOR</span> <span class="o">=</span> <span class="mi">3</span>
 
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_maps</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.nan_to_num.html#numpy.nan_to_num" title="numpy.nan_to_num" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span></a><span class="p">(</span>
     <span class="n">source_im</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()[::</span><span class="n">SCALE_FACTOR</span><span class="p">,</span> <span class="p">::</span><span class="n">SCALE_FACTOR</span><span class="p">,</span> <span class="p">::</span><span class="n">SCALE_FACTOR</span><span class="p">]</span>
@@ -315,7 +315,7 @@ can easily run on a single CPU.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(5, 2258)
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.add_subplot" title="matplotlib.figure.Figure.add_subplot" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span></a><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html#matplotlib.axes.Axes.set_title" title="matplotlib.axes.Axes.set_title" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span></a><span class="p">(</span><span class="s2">&quot;Voxel coordinates&quot;</span><span class="p">)</span>
@@ -328,7 +328,7 @@ can easily run on a single CPU.</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_001.png" srcset="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_001.png" alt="Voxel coordinates" class = "sphx-glr-single-img"/><p>We then compute the distance matrix between voxel coordinates.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source_geometry_embeddings</span> <span class="o">=</span> <span class="n">lmds</span><span class="o">.</span><span class="n">compute_lmds_volume</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">source_geometry_embeddings</span> <span class="o">=</span> <span class="n">lmds</span><span class="o">.</span><span class="n">compute_lmds_volume</span><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segmentation_coarse</span></a>
 <span class="p">)</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">()</span>
 <span class="n">target_geometry_embeddings</span> <span class="o">=</span> <span class="n">source_geometry_embeddings</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
@@ -342,7 +342,7 @@ can easily run on a single CPU.</p>
 </div>
 <p>In order to avoid numerical errors when fitting the mapping, we normalize
 both the features and the geometry.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span></a><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span></a><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
 <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features_normalized</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span></a><span class="p">(</span>
@@ -358,7 +358,7 @@ both the features and the geometry.</p>
 </pre></div>
 </div>
 <p>We now fit the mapping using the sinkhorn solver and 3 BCD iterations.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alpha_coarse</span> <span class="o">=</span> <span class="mf">0.5</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">alpha_coarse</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">rho_coarse</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">eps_coarse</span> <span class="o">=</span> <span class="mf">1e-4</span>
 <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">coarse_mapping</span></a> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha_coarse</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">rho_coarse</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps_coarse</span><span class="p">)</span>
@@ -380,7 +380,7 @@ both the features and the geometry.</p>
 </pre></div>
 </div>
 <p>Let’s subsample the vertices.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_sample</span></a> <span class="o">=</span> <span class="n">coarse_to_fine</span><span class="o">.</span><span class="n">sample_volume_uniformly</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_sample</span></a> <span class="o">=</span> <span class="n">coarse_to_fine</span><span class="o">.</span><span class="n">sample_volume_uniformly</span><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segmentation_coarse</span></a><span class="p">,</span>
     <span class="n">embeddings</span><span class="o">=</span><span class="n">source_geometry_embeddings</span><span class="p">,</span>
     <span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
@@ -406,7 +406,7 @@ We set the selection radius to 3mm for both source and target
 (don’t forget to divide by the distance returned by
 <cite>coarse_to_fine.random_normalizing()</cite> so that geometries
 and selection radia have the same units).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">coarse_to_fine</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">coarse_to_fine</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
     <span class="c1"># Source and target&#39;s features and embeddings</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features_normalized</span></a><span class="p">[:</span><span class="n">n_training_contrasts</span><span class="p">,</span> <span class="p">:],</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features_normalized</span></a><span class="p">[:</span><span class="n">n_training_contrasts</span><span class="p">,</span> <span class="p">:],</span>
@@ -432,48 +432,48 @@ and selection radia have the same units).</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[22:18:35] Validation data for feature maps is not provided. Using  dense.py:199
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[16:05:21] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
            Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
-[22:18:49] BCD step 1/5    FUGW loss:      0.023748338222503662     dense.py:521
-           Validation loss:        0.023748338222503662
+[16:05:28] BCD step 1/5    FUGW loss:      0.023749656975269318     dense.py:521
+           Validation loss:        0.023749656975269318
 
 
-[22:19:04] BCD step 2/5    FUGW loss:      0.019916994497179985     dense.py:521
-           Validation loss:        0.019916994497179985
+[16:05:35] BCD step 2/5    FUGW loss:      0.019920265302062035     dense.py:521
+           Validation loss:        0.019920265302062035
 
 
-[22:19:18] BCD step 3/5    FUGW loss:      0.011777888052165508     dense.py:521
-           Validation loss:        0.011777888052165508
+[16:05:42] BCD step 3/5    FUGW loss:      0.011780289933085442     dense.py:521
+           Validation loss:        0.011780289933085442
 
 
-[22:19:33] BCD step 4/5    FUGW loss:      0.0060572451911866665    dense.py:521
-           Validation loss:        0.0060572451911866665
+[16:05:48] BCD step 4/5    FUGW loss:      0.00605743145570159      dense.py:521
+           Validation loss:        0.00605743145570159
 
 
-[22:19:51] BCD step 5/5    FUGW loss:      0.004680843558162451     dense.py:521
-           Validation loss:        0.004680843558162451
-[22:19:52] Validation data for feature maps is not provided. Using sparse.py:209
+[16:05:55] BCD step 5/5    FUGW loss:      0.004680723417550325     dense.py:521
+           Validation loss:        0.004680723417550325
+[16:05:56] Validation data for feature maps is not provided. Using sparse.py:209
            training data instead.
            Validation data for anatomical kernels is not provided. sparse.py:253
            Using training data instead.
 
 
-[22:20:48] BCD step 1/3    FUGW loss:      0.00794147327542305     sparse.py:660
+[16:06:22] BCD step 1/3    FUGW loss:      0.007941684685647488    sparse.py:660
 
 
-[22:21:43] BCD step 2/3    FUGW loss:      0.005435337778180838    sparse.py:660
+[16:06:48] BCD step 2/3    FUGW loss:      0.005435771308839321    sparse.py:660
 
 
-[22:22:38] BCD step 3/3    FUGW loss:      0.0044945101253688335   sparse.py:660
+[16:07:13] BCD step 3/3    FUGW loss:      0.004494884517043829    sparse.py:660
 </pre></div>
 </div>
 <p>Let’s plot the probability map of target voxels being matched with
 the 300th source voxel.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pi</span> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">pi</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">pi</span> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fine_mapping</span></a><span class="o">.</span><span class="n">pi</span>
 <span class="n">vertex_index</span> <span class="o">=</span> <span class="mi">300</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">one_hot</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">one_hot</span></a><span class="p">[</span><span class="n">vertex_index</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -516,7 +516,7 @@ the 300th source voxel.</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_002.png" srcset="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_002.png" alt="Probability map of target voxels being matched with source voxel 300" class = "sphx-glr-single-img"/><p>We can now align test contrasts using the fitted fine mapping.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contrast_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">contrast_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">predicted_target_features</span></a> <span class="o">=</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse.transform" title="fugw.mappings.FUGWSparse.transform" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-method"><span class="n">fine_mapping</span><span class="o">.</span><span class="n">transform</span></a><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a><span class="p">[</span><span class="n">contrast_index</span><span class="p">,</span> <span class="p">:]</span>
 <span class="p">)</span>
@@ -527,7 +527,7 @@ the 300th source voxel.</p>
 </pre></div>
 </div>
 <p>Let’s compare the Pearson correlation between source and target features.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.corrcoef.html#numpy.corrcoef" title="numpy.corrcoef" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span></a><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.corrcoef.html#numpy.corrcoef" title="numpy.corrcoef" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span></a><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a><span class="p">[</span><span class="n">contrast_index</span><span class="p">,</span> <span class="p">:],</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features</span></a><span class="p">[</span><span class="n">contrast_index</span><span class="p">,</span> <span class="p">:]</span>
 <span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_post_mapping</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.corrcoef.html#numpy.corrcoef" title="numpy.corrcoef" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span></a><span class="p">(</span>
@@ -543,11 +543,11 @@ the 300th source voxel.</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Pearson Correlation pre-mapping: 0.38
 Pearson Correlation post-mapping: 0.47
-Relative improvement: 24.82 %
+Relative improvement: 24.77 %
 </pre></div>
 </div>
 <p>Let’s plot the transporting feature maps of the test set.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.suptitle" title="matplotlib.figure.Figure.suptitle" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span></a><span class="p">(</span><span class="s2">&quot;Transporting feature maps of the test set&quot;</span><span class="p">)</span>
 
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.add_subplot" title="matplotlib.figure.Figure.add_subplot" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
@@ -602,14 +602,14 @@ Relative improvement: 24.82 %
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" srcset="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (4 minutes 11.674 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  51 MB</p>
+<img src="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" srcset="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 57.101 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  8 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-01-brain-alignment-plot-4-aligning-high-res-volumes-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/49540a6a808a06eabc34916bb7b9d3bc/plot_4_aligning_high_res_volumes.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_4_aligning_high_res_volumes.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ee514658243cad2e75228000beb0a278/plot_4_aligning_high_res_volumes.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_4_aligning_high_res_volumes.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/49540a6a808a06eabc34916bb7b9d3bc/plot_4_aligning_high_res_volumes.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_4_aligning_high_res_volumes.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -644,7 +644,7 @@ Relative improvement: 24.82 %
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2022-2023, the fugw team
+                Copyright &#169; 2022-2024, the fugw team
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

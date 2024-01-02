@@ -28,7 +28,7 @@ memory usage is not too high for a given device.
 
 .. GENERATED FROM PYTHON SOURCE LINES 11-24
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import re
@@ -52,7 +52,7 @@ memory usage is not too high for a given device.
 
 .. GENERATED FROM PYTHON SOURCE LINES 25-32
 
-.. code-block:: default
+.. code-block:: Python
 
     torch.manual_seed(0)
 
@@ -74,7 +74,7 @@ Let us generate random training data for the source and target distributions
 
 .. GENERATED FROM PYTHON SOURCE LINES 34-41
 
-.. code-block:: default
+.. code-block:: Python
 
     _, source_features_train, source_geometry, _ = _init_mock_distribution(
         n_features_train, n_points_source
@@ -105,7 +105,7 @@ Features and geometries should be normalized before calling the solver
 
 .. GENERATED FROM PYTHON SOURCE LINES 43-54
 
-.. code-block:: default
+.. code-block:: Python
 
     source_features_train_normalized = source_features_train / torch.linalg.norm(
         source_features_train, dim=1
@@ -137,7 +137,7 @@ and we compute their respective memory usage.
 
 .. GENERATED FROM PYTHON SOURCE LINES 62-135
 
-.. code-block:: default
+.. code-block:: Python
 
     def is_sparse(t):
         return str(t.layout).find("sparse") >= 0
@@ -225,7 +225,7 @@ Let us define the optimization problem to solve
 
 .. GENERATED FROM PYTHON SOURCE LINES 137-142
 
-.. code-block:: default
+.. code-block:: Python
 
     alpha = 0.5
     rho = 1000
@@ -247,7 +247,7 @@ Our callback function will be called at each iteration of the BCD algorithm.
 
 .. GENERATED FROM PYTHON SOURCE LINES 146-164
 
-.. code-block:: default
+.. code-block:: Python
 
     device = torch.device("cpu")
     memory_at_bcd_step = []
@@ -275,14 +275,14 @@ Our callback function will be called at each iteration of the BCD algorithm.
 
  .. code-block:: none
 
-    [22:27:30] Validation data for feature maps is not provided. Using  dense.py:199
+    [16:09:39] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-               BCD step 1/5    FUGW loss:      15.445060729980469       dense.py:521
-               Validation loss:        15.445060729980469                           
+               BCD step 1/5    FUGW loss:      15.431012153625488       dense.py:521
+               Validation loss:        15.431012153625488                           
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
     ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -314,8 +314,8 @@ Our callback function will be called at each iteration of the BCD algorithm.
     └────────────┴────────┴───────┴──────────────────┘
 
 
-    [22:27:31] BCD step 2/5    FUGW loss:      9.542288780212402        dense.py:521
-               Validation loss:        9.542288780212402                            
+               BCD step 2/5    FUGW loss:      9.585478782653809        dense.py:521
+               Validation loss:        9.585478782653809                            
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
     ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -347,8 +347,8 @@ Our callback function will be called at each iteration of the BCD algorithm.
     └────────────┴────────┴───────┴──────────────────┘
 
 
-               BCD step 3/5    FUGW loss:      5.359362602233887        dense.py:521
-               Validation loss:        5.359362602233887                            
+               BCD step 3/5    FUGW loss:      5.271676540374756        dense.py:521
+               Validation loss:        5.271676540374756                            
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
     ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -380,8 +380,8 @@ Our callback function will be called at each iteration of the BCD algorithm.
     └────────────┴────────┴───────┴──────────────────┘
 
 
-               BCD step 4/5    FUGW loss:      6.325170516967773        dense.py:521
-               Validation loss:        6.325170516967773                            
+               BCD step 4/5    FUGW loss:      6.342617511749268        dense.py:521
+               Validation loss:        6.342617511749268                            
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
     ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -413,8 +413,8 @@ Our callback function will be called at each iteration of the BCD algorithm.
     └────────────┴────────┴───────┴──────────────────┘
 
 
-               BCD step 5/5    FUGW loss:      8.313586235046387        dense.py:521
-               Validation loss:        8.313586235046387                            
+               BCD step 5/5    FUGW loss:      7.891664028167725        dense.py:521
+               Validation loss:        7.891664028167725                            
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
     ┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -454,7 +454,7 @@ In this example, we see that fugw's memory usage is constant.
 
 .. GENERATED FROM PYTHON SOURCE LINES 166-176
 
-.. code-block:: default
+.. code-block:: Python
 
     fig = plt.figure(figsize=(5, 5))
     fig.suptitle("Memory usage at each BCD iteration")
@@ -481,7 +481,7 @@ In this example, we see that fugw's memory usage is constant.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.768 seconds)
+   **Total running time of the script:** (0 minutes 2.133 seconds)
 
 **Estimated memory usage:**  8 MB
 
@@ -492,16 +492,13 @@ In this example, we see that fugw's memory usage is constant.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_3_memory_usage_callback.ipynb <plot_3_memory_usage_callback.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_3_memory_usage_callback.py <plot_3_memory_usage_callback.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_3_memory_usage_callback.ipynb <plot_3_memory_usage_callback.ipynb>`
 
 
 .. only:: html

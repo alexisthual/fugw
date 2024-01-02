@@ -27,7 +27,7 @@ using 4 fMRI feature maps (z-score contrast maps).
 
 .. GENERATED FROM PYTHON SOURCE LINES 10-21
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import numpy as np
@@ -53,7 +53,7 @@ We first fetch 5 contrasts for each subject from the localizer dataset.
 
 .. GENERATED FROM PYTHON SOURCE LINES 24-47
 
-.. code-block:: default
+.. code-block:: Python
 
     n_subjects = 2
 
@@ -101,7 +101,7 @@ so that this example will run on a CPU.
 
 .. GENERATED FROM PYTHON SOURCE LINES 50-65
 
-.. code-block:: default
+.. code-block:: Python
 
     SCALE_FACTOR = 5
 
@@ -127,7 +127,7 @@ so that this example will run on a CPU.
 
 .. GENERATED FROM PYTHON SOURCE LINES 66-76
 
-.. code-block:: default
+.. code-block:: Python
 
     fig = plt.figure(figsize=(5, 5))
 
@@ -158,7 +158,7 @@ and end up with roughly 500 voxels.
 
 .. GENERATED FROM PYTHON SOURCE LINES 79-89
 
-.. code-block:: default
+.. code-block:: Python
 
 
     source_features = source_maps[
@@ -189,7 +189,7 @@ We then compute the distance matrix between voxel coordinates.
 
 .. GENERATED FROM PYTHON SOURCE LINES 91-107
 
-.. code-block:: default
+.. code-block:: Python
 
     source_geometry = distance_matrix(coordinates, coordinates)
     target_geometry = source_geometry.copy()
@@ -221,7 +221,7 @@ We then compute the distance matrix between voxel coordinates.
 
 .. GENERATED FROM PYTHON SOURCE LINES 108-154
 
-.. code-block:: default
+.. code-block:: Python
 
     vertex_index = 4
     fig = plt.figure(figsize=(7, 5))
@@ -288,7 +288,7 @@ both the features and the geometry.
 
 .. GENERATED FROM PYTHON SOURCE LINES 157-166
 
-.. code-block:: default
+.. code-block:: Python
 
     source_features_normalized = source_features / np.linalg.norm(
         source_features, axis=1
@@ -312,7 +312,7 @@ We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 
 .. GENERATED FROM PYTHON SOURCE LINES 168-181
 
-.. code-block:: default
+.. code-block:: Python
 
     mapping = FUGW(alpha=0.5, rho=1, eps=1e-4)
     _ = mapping.fit(
@@ -335,26 +335,26 @@ We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 
  .. code-block:: none
 
-    [22:17:18] Validation data for feature maps is not provided. Using  dense.py:199
+    [16:04:44] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [22:17:29] BCD step 1/4    FUGW loss:      0.02581644244492054      dense.py:521
-               Validation loss:        0.02581644244492054                          
+    [16:04:50] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:521
+               Validation loss:        0.025816654786467552                         
 
 
-    [22:17:48] BCD step 2/4    FUGW loss:      0.009248867630958557     dense.py:521
-               Validation loss:        0.009248867630958557                         
+    [16:04:59] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:521
+               Validation loss:        0.009248202666640282                         
 
 
-    [22:18:07] BCD step 3/4    FUGW loss:      0.007908444851636887     dense.py:521
-               Validation loss:        0.007908444851636887                         
+    [16:05:07] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:521
+               Validation loss:        0.007908511906862259                         
 
 
-    [22:18:26] BCD step 4/4    FUGW loss:      0.007553297095000744     dense.py:521
-               Validation loss:        0.007553297095000744                         
+    [16:05:16] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:521
+               Validation loss:        0.007553447037935257                         
 
 
 
@@ -366,7 +366,7 @@ the 4th source voxel.
 
 .. GENERATED FROM PYTHON SOURCE LINES 184-215
 
-.. code-block:: default
+.. code-block:: Python
 
     pi = mapping.pi
     probability_map = pi[vertex_index, :] / np.sqrt(
@@ -417,7 +417,7 @@ We can now align test contrasts using the fitted mapping.
 
 .. GENERATED FROM PYTHON SOURCE LINES 217-223
 
-.. code-block:: default
+.. code-block:: Python
 
     contrast_index = -1
     predicted_target_features = mapping.transform(
@@ -444,7 +444,7 @@ Let's compare the Pearson correlation between source and target features.
 
 .. GENERATED FROM PYTHON SOURCE LINES 225-239
 
-.. code-block:: default
+.. code-block:: Python
 
     corr_pre_mapping = np.corrcoef(
         source_features[contrast_index, :], target_features[contrast_index, :]
@@ -481,7 +481,7 @@ Let's plot the transporting feature maps of the test set.
 
 .. GENERATED FROM PYTHON SOURCE LINES 241-298
 
-.. code-block:: default
+.. code-block:: Python
 
     fig = plt.figure(figsize=(12, 4))
 
@@ -555,7 +555,7 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 14.357 seconds)
+   **Total running time of the script:** (0 minutes 37.485 seconds)
 
 **Estimated memory usage:**  8 MB
 
@@ -566,16 +566,13 @@ Let's plot the transporting feature maps of the test set.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_3_aligning_low_res_volumes.ipynb <plot_3_aligning_low_res_volumes.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_3_aligning_low_res_volumes.py <plot_3_aligning_low_res_volumes.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_3_aligning_low_res_volumes.ipynb <plot_3_aligning_low_res_volumes.ipynb>`
 
 
 .. only:: html
