@@ -694,7 +694,7 @@ plt.show()
 # plus ``(1 - id_reg)`` times the transport plan computed by FUGW.
 
 # Set of weights for the regularization parameter
-id_reg = [.0, .5, 1.]
+id_reg = [0.0, 0.5, 1.0]
 
 fig = plt.figure(figsize=(3 * 5, 4))
 fig.suptitle(
@@ -713,13 +713,13 @@ plot_surface_map(
     colorbar=False,
 )
 
-for i in range(len(id_reg)):
+for i, weight in enumerate(sorted(id_reg, reverse=True)):
     predicted_target_features = fine_mapping.transform(
         source_features[contrast_index, :],
-        id_reg=id_reg[i],
+        id_reg=weight,
     )
     ax = fig.add_subplot(grid_spec[0, i + 1], projection="3d")
-    ax.set_title(f"id_reg={id_reg[i]}")
+    ax.set_title(f"id_reg={weight}")
     plot_surface_map(
         predicted_target_features, axes=ax, vmax=10, vmin=-10, colorbar=False
     )
