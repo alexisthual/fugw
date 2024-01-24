@@ -26,7 +26,7 @@ dependencies = [
   "POT>=0.9.0",
   "scikit-learn",
   "scipy",
-  "torch>=1.13",
+  "torch>=1.12",
   "tvb-gdist>=2.1.1",
 ]
 
