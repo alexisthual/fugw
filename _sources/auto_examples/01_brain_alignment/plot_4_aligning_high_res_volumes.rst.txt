@@ -345,43 +345,43 @@ and selection radia have the same units).
 
  .. code-block:: none
 
-    [14:33:55] Validation data for feature maps is not provided. Using  dense.py:199
+    [16:54:19] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [14:34:01] BCD step 1/5    FUGW loss:      0.023749656975269318     dense.py:521
+    [16:54:25] BCD step 1/5    FUGW loss:      0.023749656975269318     dense.py:521
                Validation loss:        0.023749656975269318                         
 
 
-    [14:34:08] BCD step 2/5    FUGW loss:      0.019920265302062035     dense.py:521
+    [16:54:32] BCD step 2/5    FUGW loss:      0.019920265302062035     dense.py:521
                Validation loss:        0.019920265302062035                         
 
 
-    [14:34:14] BCD step 3/5    FUGW loss:      0.011780289933085442     dense.py:521
+    [16:54:38] BCD step 3/5    FUGW loss:      0.011780289933085442     dense.py:521
                Validation loss:        0.011780289933085442                         
 
 
-    [14:34:20] BCD step 4/5    FUGW loss:      0.00605743145570159      dense.py:521
+    [16:54:44] BCD step 4/5    FUGW loss:      0.00605743145570159      dense.py:521
                Validation loss:        0.00605743145570159                          
 
 
-    [14:34:27] BCD step 5/5    FUGW loss:      0.004680723417550325     dense.py:521
+    [16:54:51] BCD step 5/5    FUGW loss:      0.004680723417550325     dense.py:521
                Validation loss:        0.004680723417550325                         
-               Validation data for feature maps is not provided. Using sparse.py:209
+    [16:54:52] Validation data for feature maps is not provided. Using sparse.py:209
                training data instead.                                               
                Validation data for anatomical kernels is not provided. sparse.py:253
                Using training data instead.                                         
 
 
-    [14:34:52] BCD step 1/3    FUGW loss:      0.007941684685647488    sparse.py:660
+    [16:55:17] BCD step 1/3    FUGW loss:      0.007941684685647488    sparse.py:660
 
 
-    [14:35:18] BCD step 2/3    FUGW loss:      0.005435771308839321    sparse.py:660
+    [16:55:42] BCD step 2/3    FUGW loss:      0.005435771308839321    sparse.py:660
 
 
-    [14:35:43] BCD step 3/3    FUGW loss:      0.004494884517043829    sparse.py:660
+    [16:56:07] BCD step 3/3    FUGW loss:      0.004494884517043829    sparse.py:660
 
 
 
@@ -588,9 +588,9 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 52.305 seconds)
+   **Total running time of the script:** (1 minutes 52.749 seconds)
 
-**Estimated memory usage:**  61 MB
+**Estimated memory usage:**  187 MB
 
 
 .. _sphx_glr_download_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py:

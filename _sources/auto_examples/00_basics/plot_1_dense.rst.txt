@@ -237,13 +237,13 @@ using a sinkhorn solver
 
  .. code-block:: none
 
-    [14:28:04] Validation data for feature maps is not provided. Using  dense.py:199
+    [16:48:37] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [14:28:05] BCD step 1/10   FUGW loss:      0.029136842116713524     dense.py:521
+    [16:48:38] BCD step 1/10   FUGW loss:      0.029136842116713524     dense.py:521
                Validation loss:        0.029136842116713524                         
 
 
@@ -255,7 +255,7 @@ using a sinkhorn solver
                Validation loss:        0.022854337468743324                         
 
 
-    [14:28:06] BCD step 4/10   FUGW loss:      0.02232404239475727      dense.py:521
+    [16:48:39] BCD step 4/10   FUGW loss:      0.02232404239475727      dense.py:521
                Validation loss:        0.02232404239475727                          
 
 
@@ -267,7 +267,7 @@ using a sinkhorn solver
                Validation loss:        0.02343880571424961                          
 
 
-    [14:28:07] BCD step 7/10   FUGW loss:      0.019214436411857605     dense.py:521
+    [16:48:40] BCD step 7/10   FUGW loss:      0.019214436411857605     dense.py:521
                Validation loss:        0.019214436411857605                         
 
 
@@ -279,7 +279,7 @@ using a sinkhorn solver
                Validation loss:        0.01861358806490898                          
 
 
-    [14:28:08] BCD step 10/10  FUGW loss:      0.018613653257489204     dense.py:521
+    [16:48:41] BCD step 10/10  FUGW loss:      0.018613653257489204     dense.py:521
                Validation loss:        0.018613653257489204                         
 
 
@@ -485,9 +485,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.219 seconds)
+   **Total running time of the script:** (0 minutes 6.085 seconds)
 
-**Estimated memory usage:**  51 MB
+**Estimated memory usage:**  53 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_1_dense.py:
