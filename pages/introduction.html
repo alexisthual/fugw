@@ -279,15 +279,15 @@ In their paper, authors relax this constraint and only impose that
 the mass of each plan is equal (ie <span class="math notranslate nohighlight">\(\text{m}(P) = \text{m}(Q)\)</span>) and the problem is now
 convex in <span class="math notranslate nohighlight">\(P\)</span> and in <span class="math notranslate nohighlight">\(Q\)</span>. Finally, they derive a block-coordinate-descent
 (BCD) algorithm in which they alternatively freeze the value of <span class="math notranslate nohighlight">\(P\)</span> (resp. <span class="math notranslate nohighlight">\(Q\)</span>)
-while running a convex-problem solver (in their case it’s a sinkhorn algorithm)
-to optimize <span class="math notranslate nohighlight">\(Q\)</span> (resp. <span class="math notranslate nohighlight">\(P\)</span>).</p>
+while running a solver for the regularized unbalanced optimal transport problem
+(in their case it’s a Sinkhorn algorithm) to optimize <span class="math notranslate nohighlight">\(Q\)</span> (resp. <span class="math notranslate nohighlight">\(P\)</span>).</p>
 <p>In this work, we adapt the previous approach to approximate solutions
 to FUGW losses. Moreover, we provide multiple solvers to run inside the BCD algorithm.
 Namely, we provide:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">sinkhorn</span></code>: the classical Sinkhorn procedure described in <a class="reference external" href="#7">(Chizat et al. 2017) [7]</a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">mm</span></code>: a majorize-minimization algorithm described in <a class="reference external" href="#4">(Chapel et al. 2021) [4]</a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ibpp</span></code>: an inexact-bregman-proximal-point algorithm described in <a class="reference external" href="#5">(Xie et al. 2020) [5]</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mm</span></code>: a majorization-minimization algorithm described in <a class="reference external" href="#4">(Chapel et al. 2021) [4]</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ibpp</span></code>: an extension to the unbalanced setting of the inexact-bregman-proximal-point algorithm described in <a class="reference external" href="#5">(Xie et al. 2020) [5]</a></p></li>
 </ul>
 </section>
 <section id="references">
