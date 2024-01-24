@@ -45,16 +45,16 @@ In their paper, authors relax this constraint and only impose that
 the mass of each plan is equal (ie `$\text{m}(P) = \text{m}(Q)$`) and the problem is now
 convex in `$P$` and in `$Q$`. Finally, they derive a block-coordinate-descent
 (BCD) algorithm in which they alternatively freeze the value of `$P$` (resp. `$Q$`)
-while running a convex-problem solver (in their case it's a sinkhorn algorithm)
-to optimize `$Q$` (resp. `$P$`).
+while running a solver for the regularized unbalanced optimal transport problem
+(in their case it's a Sinkhorn algorithm) to optimize `$Q$` (resp. `$P$`).
 
 In this work, we adapt the previous approach to approximate solutions
 to FUGW losses. Moreover, we provide multiple solvers to run inside the BCD algorithm.
 Namely, we provide:
 
 - `sinkhorn`: the classical Sinkhorn procedure described in [(Chizat et al. 2017) [7]](#7)
-- `mm`: a majorize-minimization algorithm described in [(Chapel et al. 2021) [4]](#4)
-- `ibpp`: an inexact-bregman-proximal-point algorithm described in [(Xie et al. 2020) [5]](#5)
+- `mm`: a majorization-minimization algorithm described in [(Chapel et al. 2021) [4]](#4)
+- `ibpp`: an extension to the unbalanced setting of the inexact-bregman-proximal-point algorithm described in [(Xie et al. 2020) [5]](#5)
 
 ## References
 

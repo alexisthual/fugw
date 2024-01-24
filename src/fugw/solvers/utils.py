@@ -1147,7 +1147,7 @@ def compute_l2(p, q):
     -------
     l2: float
     """
-    return torch.sum((p - q) ** 2)
+    return torch.sum((p - q) ** 2) / 2
 
 
 def compute_l2_sparse(p, q):
@@ -1163,7 +1163,7 @@ def compute_l2_sparse(p, q):
     -------
     l2: float
     """
-    return torch.sum((p.values() - q.values()) ** 2)
+    return torch.sum((p.values() - q.values()) ** 2) / 2
 
 
 def compute_divergence(p, q, divergence="kl"):
@@ -1177,7 +1177,7 @@ def compute_divergence(p, q, divergence="kl"):
     divergence: str
         Either "kl" or "l2".
         If "kl", compute KL(p, q).
-        If "l2", compute || p - q ||^2.
+        If "l2", compute || p - q ||^2 / 2.
         Default: "kl"
 
     Returns
@@ -1201,7 +1201,7 @@ def compute_divergence_sparse(p, q, divergence="kl"):
     divergence: str
         Either "kl" or "l2".
         If "kl", compute KL(p, q).
-        If "l2", compute || p - q ||^2.
+        If "l2", compute || p - q ||^2 / 2.
         Default: "kl"
 
     Returns
@@ -1263,7 +1263,7 @@ def compute_quad_kl_sparse(mu, nu, alpha, beta):
 
 
 def compute_quad_l2(a, b, mu, nu):
-    """Compute || a otimes b - mu otimes nu ||^2."""
+    """Compute || a otimes b - mu otimes nu ||^2 / 2."""
 
     norm = (
         (a**2).sum() * (b**2).sum()
@@ -1271,11 +1271,11 @@ def compute_quad_l2(a, b, mu, nu):
         + (mu**2).sum() * (nu**2).sum()
     )
 
-    return norm
+    return norm / 2
 
 
 def compute_quad_l2_sparse(a, b, mu, nu):
-    """Compute || a otimes b - mu otimes nu ||^2.
+    """Compute || a otimes b - mu otimes nu ||^2 / 2.
 
     Because a otimes b is constly to store in memory,
     we expand the norm so that we only have to deal with scalars.
@@ -1302,7 +1302,7 @@ def compute_quad_l2_sparse(a, b, mu, nu):
         + (mu.values() ** 2).sum() * (nu.values() ** 2).sum()
     )
 
-    return norm
+    return norm / 2
 
 
 def compute_quad_divergence(mu, nu, alpha, beta, divergence="kl"):
@@ -1319,7 +1319,7 @@ def compute_quad_divergence(mu, nu, alpha, beta, divergence="kl"):
     divergence: str
         Either "kl" or "l2".
         If "kl", compute KL(mu otimes nu, alpha otimes beta).
-        If "l2", compute || mu otimes nu - alpha otimes beta ||^2.
+        If "l2", compute || mu otimes nu - alpha otimes beta ||^2 / 2.
         Default: "kl"
 
     Returns
@@ -1346,7 +1346,7 @@ def compute_quad_divergence_sparse(mu, nu, alpha, beta, divergence="kl"):
     divergence: str
         Either "kl" or "l2".
         If "kl", compute KL(mu otimes nu, alpha otimes beta).
-        If "l2", compute || mu otimes nu - alpha otimes beta ||^2.
+        If "l2", compute || mu otimes nu - alpha otimes beta ||^2 / 2.
         Default: "kl"
 
     Returns
