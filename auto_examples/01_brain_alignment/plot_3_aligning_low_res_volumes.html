@@ -282,11 +282,6 @@ using 4 fMRI feature maps (z-score contrast maps).</p>
 <span class="n">target_im</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">load_img</span><span class="p">(</span><span class="n">target_imgs_paths</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/nilearn/datasets/func.py:904: UserWarning:
-
-`legacy_format` will default to `False` in release 0.11. Dataset fetchers will then return pandas dataframes by default instead of recarrays.
-</pre></div>
-</div>
 <p>We greatly downsample all image to reduce the computational cost
 so that this example will run on a CPU.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">SCALE_FACTOR</span> <span class="o">=</span> <span class="mi">5</span>
@@ -422,25 +417,25 @@ both the features and the geometry.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[16:56:15] Validation data for feature maps is not provided. Using  dense.py:199
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[16:00:10] Validation data for feature maps is not provided. Using  dense.py:202
            training data instead.
-           Validation data for anatomical kernels is not provided.  dense.py:226
+           Validation data for anatomical kernels is not provided.  dense.py:229
            Using training data instead.
 
 
-[16:56:21] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:521
+[16:00:16] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:521
            Validation loss:        0.025816654786467552
 
 
-[16:56:32] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:521
+[16:00:25] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:521
            Validation loss:        0.009248202666640282
 
 
-[16:56:44] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:521
+[16:00:34] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:521
            Validation loss:        0.007908511906862259
 
 
-[16:56:55] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:521
+[16:00:43] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:521
            Validation loss:        0.007553447037935257
 </pre></div>
 </div>
@@ -569,7 +564,7 @@ Relative improvement: 30.13 %
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" srcset="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 45.200 seconds)</p>
+<img src="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" srcset="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 38.332 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  8 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-01-brain-alignment-plot-3-aligning-low-res-volumes-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
