@@ -81,7 +81,6 @@ class FUGWSparseBarycenter:
         coarse_mapping_solver_params,
         fine_mapping_solver_params,
         selection_radius,
-        callback_bcd,
         device,
         verbose,
     ):
@@ -157,7 +156,6 @@ class FUGWSparseBarycenter:
         coarse_mapping_solver_params={},
         fine_mapping_solver_params={},
         mesh_sample=None,
-        callback_bcd=None,
         nits_barycenter=5,
         device="auto",
         verbose=False,
@@ -189,9 +187,6 @@ class FUGWSparseBarycenter:
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
-        callback_bcd: callable, optional.
-            Callback function to call at each barycenter computation step.
-            Defaults to None.
 
         Returns
         -------
@@ -265,7 +260,6 @@ class FUGWSparseBarycenter:
                 coarse_mapping_solver_params,
                 fine_mapping_solver_params,
                 self.selection_radius,
-                callback_bcd,
                 device,
                 verbose,
             )
