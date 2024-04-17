@@ -284,6 +284,7 @@ def fit(
     target_geometry_embeddings=None,
     source_weights=None,
     target_weights=None,
+    init_plan=None,
     device="auto",
     verbose=False,
 ):
@@ -348,6 +349,9 @@ def fit(
         Distribution weights of target nodes.
         Should sum to 1. If None, each node's weight
         will be set to 1 / m.
+    init_plan: torch.sparse_coo_tensor or None
+        Initial transport plan to use when fitting the fine mapping.
+        If None, a random plan will be used.
     device: "auto" or torch.device
         if "auto": use first available gpu if it's available,
         cpu otherwise.
@@ -463,14 +467,15 @@ def fit(
     mask = (N_source @ C_source) @ (N_target @ C_target).T
 
     # Define init plan from spasity mask
-    init_plan = torch.sparse_coo_tensor(
-        mask.indices(),
-        torch.ones_like(mask.values()) / mask.values().shape[0],
-        (
-            source_geometry_embeddings.shape[0],
-            target_geometry_embeddings.shape[0],
-        ),
-    ).coalesce()
+    if init_plan is None:
+        init_plan = torch.sparse_coo_tensor(
+            mask.indices(),
+            torch.ones_like(mask.values()) / mask.values().shape[0],
+            (
+                source_geometry_embeddings.shape[0],
+                target_geometry_embeddings.shape[0],
+            ),
+        ).coalesce()
 
     # 3. Fit fine-grained mapping
     fine_mapping.fit(
