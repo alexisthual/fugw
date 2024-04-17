@@ -44,7 +44,8 @@ class FUGWSparseBarycenter:
             f = _make_tensor(features, device=device)
 
             if features is not None:
-                acc = w * pi.T @ f.T / pi.sum(0).reshape(-1, 1)
+                pi_sum = torch.sparse.sum(pi, dim=0).to_dense()
+                acc = w * pi.T @ f.T / pi_sum.unsqueeze(1)
 
                 if i == 0:
                     barycenter_features = acc
