@@ -17,7 +17,7 @@ class FUGWSparseBarycenter:
         rho_fine=1e-2,
         eps_coarse=1e-4,
         eps_fine=1e-4,
-        selection_radius=10,
+        selection_radius=0.1,
         reg_mode="joint",
         force_psd=False,
         learn_geometry=False,
@@ -82,6 +82,7 @@ class FUGWSparseBarycenter:
         coarse_mapping_solver_params,
         fine_mapping_solver_params,
         selection_radius,
+        mask,
         device,
         verbose,
     ):
@@ -110,7 +111,7 @@ class FUGWSparseBarycenter:
                 reg_mode=self.reg_mode,
             )
 
-            coarse_to_fine.fit(
+            _, _, mask = coarse_to_fine.fit(
                 source_features=features,
                 target_features=barycenter_features,
                 source_geometry_embeddings=G,
@@ -129,6 +130,7 @@ class FUGWSparseBarycenter:
                 fine_mapping_solver=solver,
                 fine_mapping_solver_params=fine_mapping_solver_params,
                 init_plan=plans[i] if plans is not None else None,
+                mask=mask,
                 device=device,
                 verbose=verbose,
             )
@@ -244,6 +246,7 @@ class FUGWSparseBarycenter:
 
         plans = None
         duals = None
+        mask = None
         losses_each_bar_step = []
 
         for _ in range(nits_barycenter):
@@ -261,6 +264,7 @@ class FUGWSparseBarycenter:
                 coarse_mapping_solver_params,
                 fine_mapping_solver_params,
                 self.selection_radius,
+                mask,
                 device,
                 verbose,
             )
