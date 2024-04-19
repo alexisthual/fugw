@@ -469,24 +469,7 @@ def fit(
         C_source = get_cluster_matrix(rows, source_sample.shape[0])
         C_target = get_cluster_matrix(cols, target_sample.shape[0])
 
-        mask1 = N_source @ C_source
-        print("Computed mask1")
-        mask2 = N_target @ C_target
-        print("Computed mask2")
-        mask2_t = mask2.T
-        # Print sparsity ratios
-        print(
-            "Sparsity ratio mask1:"
-            f" {mask1.values().shape[0] / mask1.shape[0] / mask1.shape[1]}"
-        )
-        print(
-            "Sparsity ratio mask2:"
-            f" {mask2.values().shape[0] / mask2.shape[0] / mask2.shape[1]}"
-        )
-        print("Computed mask2_t")
-        mask = mask1 @ mask2_t
-
-        # mask = (N_source @ C_source) @ (N_target @ C_target).T
+        mask = (N_source @ C_source) @ (N_target @ C_target).T
 
     # Define init plan from spasity mask
     if init_plan is None:
