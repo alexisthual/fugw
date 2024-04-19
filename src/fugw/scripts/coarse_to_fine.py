@@ -285,6 +285,7 @@ def fit(
     source_weights=None,
     target_weights=None,
     init_plan=None,
+    mask=None,
     device="auto",
     verbose=False,
 ):
@@ -352,6 +353,9 @@ def fit(
     init_plan: torch.sparse_coo_tensor or None
         Initial transport plan to use when fitting the fine mapping.
         If None, a random plan will be used.
+    mask: torch.Tensor or None
+        Sparsity mask to use when fitting the fine mapping.
+        If None, a mask will be computed from the coarse mapping.
     device: "auto" or torch.device
         if "auto": use first available gpu if it's available,
         cpu otherwise.
@@ -450,21 +454,39 @@ def fit(
             ]
         )
 
-    # Compute mask as a matrix product between:
-    # a. neighbourhood matrices that encode
-    # which vertex is close to which sampled point
-    N_source = get_neighbourhood_matrix(
-        source_geometry_embeddings, source_sample, source_selection_radius
-    )
-    N_target = get_neighbourhood_matrix(
-        target_geometry_embeddings, target_sample, target_selection_radius
-    )
-    # b. cluster matrices that encode
-    # which sampled point belongs to which cluster
-    C_source = get_cluster_matrix(rows, source_sample.shape[0])
-    C_target = get_cluster_matrix(cols, target_sample.shape[0])
+    if mask is None:
+        # Compute mask as a matrix product between:
+        # a. neighbourhood matrices that encode
+        # which vertex is close to which sampled point
+        N_source = get_neighbourhood_matrix(
+            source_geometry_embeddings, source_sample, source_selection_radius
+        )
+        N_target = get_neighbourhood_matrix(
+            target_geometry_embeddings, target_sample, target_selection_radius
+        )
+        # b. cluster matrices that encode
+        # which sampled point belongs to which cluster
+        C_source = get_cluster_matrix(rows, source_sample.shape[0])
+        C_target = get_cluster_matrix(cols, target_sample.shape[0])
 
-    mask = (N_source @ C_source) @ (N_target @ C_target).T
+        mask1 = N_source @ C_source
+        print("Computed mask1")
+        mask2 = N_target @ C_target
+        print("Computed mask2")
+        mask2_t = mask2.T
+        # Print sparsity ratios
+        print(
+            "Sparsity ratio mask1:"
+            f" {mask1.values().shape[0] / mask1.shape[0] / mask1.shape[1]}"
+        )
+        print(
+            "Sparsity ratio mask2:"
+            f" {mask2.values().shape[0] / mask2.shape[0] / mask2.shape[1]}"
+        )
+        print("Computed mask2_t")
+        mask = mask1 @ mask2_t
+
+        # mask = (N_source @ C_source) @ (N_target @ C_target).T
 
     # Define init plan from spasity mask
     if init_plan is None:
@@ -491,6 +513,7 @@ def fit(
         solver=fine_mapping_solver,
         solver_params=fine_mapping_solver_params,
         callback_bcd=fine_callback_bcd,
+        storing_device=device,
     )
 
-    return source_sample, target_sample
+    return source_sample, target_sample, mask
