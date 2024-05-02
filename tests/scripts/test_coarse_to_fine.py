@@ -26,6 +26,7 @@ if torch.cuda.is_available():
 return_numpys = [False, True]
 
 
+@pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize("return_numpy", product(return_numpys))
 def test_random_normalizing(return_numpy):
     _, _, _, embeddings = _init_mock_distribution(
@@ -53,6 +54,7 @@ def test_uniform_mesh_sampling():
     assert np.unique(sample).shape == (n_samples,)
 
 
+@pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize(
     "device,return_numpy", product(devices, return_numpys)
 )
