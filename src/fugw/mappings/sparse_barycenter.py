@@ -7,17 +7,17 @@ from fugw.utils import _make_tensor
 
 
 class FUGWSparseBarycenter:
-    """FUGW sparse barycenters"""
+    """FUGW Sparse Barycenters"""
 
     def __init__(
         self,
         alpha_coarse=0.5,
         alpha_fine=0.5,
-        rho_coarse=1,
-        rho_fine=1e-2,
-        eps_coarse=1e-4,
-        eps_fine=1e-4,
-        selection_radius=0.1,
+        rho_coarse=1.0,
+        rho_fine=1.0,
+        eps_coarse=1.0,
+        eps_fine=1.0,
+        selection_radius=10.0,
         reg_mode="joint",
         force_psd=False,
         learn_geometry=False,
@@ -134,7 +134,9 @@ class FUGWSparseBarycenter:
                 device=device,
                 verbose=verbose,
             )
-
+            # Assert that the init_plan does not contain NaN values
+            if torch.isnan(fine_mapping.pi.values()).any():
+                raise ValueError("fine plan contains NaN values")
             new_plans.append(fine_mapping.pi)
             new_losses.append(
                 (
