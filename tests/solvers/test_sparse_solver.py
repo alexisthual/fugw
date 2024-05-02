@@ -18,8 +18,6 @@ alphas = [0.0, 0.5, 1.0]
 
 
 # TODO: need to test sinkhorn
-
-
 @pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize(
     "solver,device,callback,alpha",
