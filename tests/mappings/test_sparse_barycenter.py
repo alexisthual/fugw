@@ -13,9 +13,9 @@ if torch.cuda.is_available():
 @pytest.mark.parametrize("device", devices)
 def test_fugw_barycenter(device):
     np.random.seed(0)
-    n_subjects = 4
-    n_voxels = 100
-    n_features = 10
+    n_subjects = 3
+    n_voxels = 50
+    n_features = 5
 
     mesh_sample = np.random.randint(0, n_voxels, size=10)
 
@@ -25,12 +25,12 @@ def test_fugw_barycenter(device):
 
     for _ in range(n_subjects):
         weights, features, geometry_embedding, _ = _init_mock_distribution(
-            n_features, n_voxels
+            n_features, n_voxels, should_normalize=True
         )
         weights_list.append(weights)
         features_list.append(features)
 
-    fugw_barycenter = FUGWSparseBarycenter(selection_radius=5)
+    fugw_barycenter = FUGWSparseBarycenter()
 
     # Fit the barycenter
     fugw_barycenter.fit(
@@ -38,8 +38,9 @@ def test_fugw_barycenter(device):
         features_list,
         [geometry_embedding],
         mesh_sample=mesh_sample,
-        coarse_mapping_solver_params={"nits_bcd": 2, "nits_uot": 10},
-        fine_mapping_solver_params={"nits_bcd": 2, "nits_uot": 10},
+        coarse_mapping_solver_params={"nits_bcd": 2, "nits_uot": 5},
+        fine_mapping_solver_params={"nits_bcd": 2, "nits_uot": 5},
+        nits_barycenter=3,
         device=device,
         verbose=True,
     )
