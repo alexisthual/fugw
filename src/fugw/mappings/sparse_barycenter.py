@@ -17,7 +17,7 @@ class FUGWSparseBarycenter:
         rho_fine=1.0,
         eps_coarse=1.0,
         eps_fine=1.0,
-        selection_radius=10.0,
+        selection_radius=1.0,
         reg_mode="joint",
         force_psd=False,
         learn_geometry=False,
