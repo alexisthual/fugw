@@ -27,6 +27,7 @@ solvers = ["sinkhorn", "mm", "ibpp"]
 callbacks = [None, lambda x: x["gamma"]]
 
 
+@pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize(
     "device,return_numpy,solver,callback",
     product(devices, return_numpys, solvers, callbacks),
@@ -95,6 +96,7 @@ def test_sparse_mapping(device, return_numpy, solver, callback):
     assert isinstance(target_features_on_source, torch.Tensor)
 
 
+@pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize(
     "device,sparse_layout,return_numpy",
     product(devices, sparse_layouts, return_numpys),
@@ -163,6 +165,7 @@ def test_fugw_sparse_with_init(device, sparse_layout, return_numpy):
     assert isinstance(target_features_on_source, torch.Tensor)
 
 
+@pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize(
     "validation", ["None", "features", "geometries", "Both"]
 )
