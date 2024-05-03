@@ -10,6 +10,9 @@ Examples
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
@@ -31,6 +34,7 @@ can be used in combination with sparse solvers for the FUGW loss.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -83,6 +87,8 @@ can be used in combination with sparse solvers for the FUGW loss.
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -98,6 +104,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -167,6 +174,8 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -184,6 +193,7 @@ but that can be useful in some cases.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -235,6 +245,8 @@ but that can be useful in some cases.
       <div class="sphx-glr-thumbnail-title">Monitor memory usage at each BCD iteration with callbacks</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

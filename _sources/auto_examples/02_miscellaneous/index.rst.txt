@@ -15,6 +15,7 @@ but that can be useful in some cases.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -66,6 +67,8 @@ but that can be useful in some cases.
       <div class="sphx-glr-thumbnail-title">Monitor memory usage at each BCD iteration with callbacks</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

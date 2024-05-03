@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_01_brain_alignment_plot_3_aligning_low_res_volumes.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -326,25 +326,25 @@ We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 
  .. code-block:: none
 
-    [06:41:45] Validation data for feature maps is not provided. Using  dense.py:202
+    [07:27:41] Validation data for feature maps is not provided. Using  dense.py:202
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:229
                Using training data instead.                                         
 
 
-    [06:41:51] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:521
+    [07:27:47] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:521
                Validation loss:        0.025816654786467552                         
 
 
-    [06:42:00] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:521
+    [07:27:56] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:521
                Validation loss:        0.009248202666640282                         
 
 
-    [06:42:08] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:521
+    [07:28:05] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:521
                Validation loss:        0.007908511906862259                         
 
 
-    [06:42:17] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:521
+    [07:28:14] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:521
                Validation loss:        0.007553447037935257                         
 
 
@@ -546,7 +546,7 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.690 seconds)
+   **Total running time of the script:** (0 minutes 36.635 seconds)
 
 **Estimated memory usage:**  8 MB
 

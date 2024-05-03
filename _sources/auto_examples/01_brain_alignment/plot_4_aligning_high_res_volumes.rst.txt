@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -336,43 +336,43 @@ and selection radia have the same units).
 
  .. code-block:: none
 
-    [06:42:22] Validation data for feature maps is not provided. Using  dense.py:202
+    [07:28:18] Validation data for feature maps is not provided. Using  dense.py:202
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:229
                Using training data instead.                                         
 
 
-    [06:42:28] BCD step 1/5    FUGW loss:      0.023749656975269318     dense.py:521
+    [07:28:24] BCD step 1/5    FUGW loss:      0.023749656975269318     dense.py:521
                Validation loss:        0.023749656975269318                         
 
 
-    [06:42:34] BCD step 2/5    FUGW loss:      0.019920265302062035     dense.py:521
+    [07:28:31] BCD step 2/5    FUGW loss:      0.019920265302062035     dense.py:521
                Validation loss:        0.019920265302062035                         
 
 
-    [06:42:41] BCD step 3/5    FUGW loss:      0.011780289933085442     dense.py:521
+    [07:28:37] BCD step 3/5    FUGW loss:      0.011780289933085442     dense.py:521
                Validation loss:        0.011780289933085442                         
 
 
-    [06:42:47] BCD step 4/5    FUGW loss:      0.00605743145570159      dense.py:521
+    [07:28:43] BCD step 4/5    FUGW loss:      0.00605743145570159      dense.py:521
                Validation loss:        0.00605743145570159                          
 
 
-    [06:42:54] BCD step 5/5    FUGW loss:      0.004680723417550325     dense.py:521
+    [07:28:49] BCD step 5/5    FUGW loss:      0.004680723417550325     dense.py:521
                Validation loss:        0.004680723417550325                         
-    [06:42:55] Validation data for feature maps is not provided. Using sparse.py:212
+    [07:28:50] Validation data for feature maps is not provided. Using sparse.py:212
                training data instead.                                               
                Validation data for anatomical kernels is not provided. sparse.py:256
                Using training data instead.                                         
 
 
-    [06:43:21] BCD step 1/3    FUGW loss:      0.007941684685647488    sparse.py:660
+    [07:29:14] BCD step 1/3    FUGW loss:      0.007941684685647488    sparse.py:660
 
 
-    [06:43:47] BCD step 2/3    FUGW loss:      0.005435771308839321    sparse.py:660
+    [07:29:38] BCD step 2/3    FUGW loss:      0.005435771308839321    sparse.py:660
 
 
-    [06:44:13] BCD step 3/3    FUGW loss:      0.004494884517043829    sparse.py:660
+    [07:30:02] BCD step 3/3    FUGW loss:      0.004494884517043829    sparse.py:660
 
 
 
@@ -579,9 +579,9 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 55.526 seconds)
+   **Total running time of the script:** (1 minutes 48.510 seconds)
 
-**Estimated memory usage:**  8 MB
+**Estimated memory usage:**  50 MB
 
 
 .. _sphx_glr_download_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py:

@@ -13,6 +13,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -81,6 +82,8 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
       <div class="sphx-glr-thumbnail-title">High-resolution volume alignment of 2 individuals with fMRI data</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

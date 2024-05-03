@@ -18,6 +18,7 @@ can be used in combination with sparse solvers for the FUGW loss.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -69,6 +70,8 @@ can be used in combination with sparse solvers for the FUGW loss.
       <div class="sphx-glr-thumbnail-title">Transport distributions using sparse solvers</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
