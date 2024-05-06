@@ -370,6 +370,8 @@ def fit(
     target_sample: torch.Tensor of size(target_sample_size)
         Tensor containing the indices which were sampled on the
         target so as to compute the coarse mapping.
+    mask: torch.Tensor of size(n, m)
+        Sparsity mask used to fit the fine mapping.
     """
     # 0. Parse input tensors
     source_sample = _make_tensor(source_sample, dtype=torch.int64)
