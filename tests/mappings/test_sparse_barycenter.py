@@ -10,6 +10,7 @@ if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
 
+@pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize("device", devices)
 def test_fugw_barycenter(device):
     np.random.seed(0)
