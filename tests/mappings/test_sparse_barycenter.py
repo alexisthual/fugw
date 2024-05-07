@@ -17,6 +17,7 @@ def test_fugw_barycenter(device):
     n_subjects = 4
     n_voxels = 100
     n_features = 10
+    nits_barycenter = 3
 
     mesh_sample = np.random.randint(0, n_voxels, size=10)
 
@@ -34,14 +35,23 @@ def test_fugw_barycenter(device):
     fugw_barycenter = FUGWSparseBarycenter()
 
     # Fit the barycenter
-    fugw_barycenter.fit(
+    (
+        barycenter_weights,
+        barycenter_features,
+        plans,
+        losses_each_bar_step,
+    ) = fugw_barycenter.fit(
         weights_list,
         features_list,
         [geometry_embedding],
         mesh_sample=mesh_sample,
         coarse_mapping_solver_params={"nits_bcd": 2, "nits_uot": 5},
         fine_mapping_solver_params={"nits_bcd": 2, "nits_uot": 5},
-        nits_barycenter=3,
+        nits_barycenter=nits_barycenter,
         device=device,
-        verbose=True,
     )
+
+    assert barycenter_weights.shape == (n_voxels,)
+    assert barycenter_features.shape == (n_features, n_voxels)
+    assert len(plans) == n_subjects
+    assert len(losses_each_bar_step) == nits_barycenter
