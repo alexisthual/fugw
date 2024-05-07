@@ -498,6 +498,7 @@ def fit(
         solver=fine_mapping_solver,
         solver_params=fine_mapping_solver_params,
         callback_bcd=fine_callback_bcd,
+        storing_device=device,
     )
 
     return source_sample, target_sample, mask
