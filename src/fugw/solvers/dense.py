@@ -40,26 +40,36 @@ class FUGWSolver(BaseSolver):
 
         rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
-        X_sqr, Y_sqr, X, Y, D = data_const
+
+        (
+            (Ds_sqr_1, Ds_sqr_2),
+            (Dt_sqr_1, Dt_sqr_2),
+            (Ds1, Ds2),
+            (Dt1, Dt2),
+            (K1, K2),
+        ) = data_const
         if transpose:
-            X_sqr, Y_sqr, X, Y = X_sqr.T, Y_sqr.T, X.T, Y.T
+            Ds_sqr_1, Ds_sqr_2 = Ds_sqr_2, Ds_sqr_1
+            Dt_sqr_1, Dt_sqr_2 = Dt_sqr_2, Dt_sqr_1
+            Ds1, Ds2 = Ds2, Ds1
+            Dt1, Dt2 = Dt2, Dt1
 
         pi1, pi2 = pi.sum(1), pi.sum(0)
 
         cost = torch.zeros_like(pi)
 
         # Avoid unnecessary calculation of UGW when alpha = 0
-        if alpha != 1 and D is not None:
-            wasserstein_cost = D / 2
+        if alpha != 1 and K1 is not None and K2 is not None:
+            wasserstein_cost = (K1 @ K2.T) * pi / 2
+            print(wasserstein_cost.shape)
             cost += (1 - alpha) * wasserstein_cost
 
         # or UOT when alpha = 1
         if alpha != 0:
-            A = X_sqr @ pi1
-            B = Y_sqr @ pi2
-            gromov_wasserstein_cost = (
-                A[:, None] + B[None, :] - 2 * X @ pi @ Y.T
-            )
+            A = Ds_sqr_1 @ (Ds_sqr_2.T @ pi1)
+            B = Dt_sqr_1 @ (Dt_sqr_2.T @ pi2)
+            C1, C2 = Ds1, ((Ds2.T @ torch.sparse.mm(pi, Dt2)) @ Dt1.T).T
+            gromov_wasserstein_cost = A[:, None] + B[None, :] - 2 * C1 @ C2.T
 
             cost += alpha * gromov_wasserstein_cost
 
@@ -116,7 +126,13 @@ class FUGWSolver(BaseSolver):
         """
         rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
-        X_sqr, Y_sqr, X, Y, D = data_const
+        (
+            (Ds_sqr_1, Ds_sqr_2),
+            (Dt_sqr_1, Dt_sqr_2),
+            (Ds1, Ds2),
+            (Dt1, Dt2),
+            (K1, K2),
+        ) = data_const
 
         pi1, pi2 = pi.sum(1), pi.sum(0)
         gamma1, gamma2 = gamma.sum(1), gamma.sum(0)
@@ -128,14 +144,14 @@ class FUGWSolver(BaseSolver):
         loss_regularization = torch.zeros(1)
         loss = 0
 
-        if alpha != 1 and D is not None:
-            loss_wasserstein = ((D * pi).sum() + (D * gamma).sum()) / 2
+        if alpha != 1 and K1 is not None and K2 is not None:
+            loss_wasserstein = ((K1 @ K2.T) * (pi + gamma)).sum() / 2
             loss += (1 - alpha) * loss_wasserstein
 
         if alpha != 0:
-            A = (X_sqr @ gamma1).dot(pi1)
-            B = (Y_sqr @ gamma2).dot(pi2)
-            C = (X @ gamma @ Y.T) * pi
+            A = (Ds_sqr_1 @ (Ds_sqr_2.T @ gamma1)).dot(pi1)
+            B = (Dt_sqr_1 @ (Dt_sqr_2.T @ gamma2)).dot(pi2)
+            C = (Ds1 @ ((Ds2.T @ gamma @ Dt2) @ Dt1.T)) * pi
             loss_gromov_wasserstein = A + B - 2 * C.sum()
             loss += alpha * loss_gromov_wasserstein
 
@@ -206,11 +222,11 @@ class FUGWSolver(BaseSolver):
         reg_mode="joint",
         divergence="kl",
         F=None,
-        Ds=None,
-        Dt=None,
+        Ds=(None, None),
+        Dt=(None, None),
         F_val=None,
-        Ds_val=None,
-        Dt_val=None,
+        Ds_val=(None, None),
+        Dt_val=(None, None),
         ws=None,
         wt=None,
         init_plan=None,
@@ -229,14 +245,13 @@ class FUGWSolver(BaseSolver):
         eps: float, optional
         reg_mode: string, optional
         divergence: string, optional
-        F: matrix of size n x m.
-            Kernel matrix between the source and target training features.
-        Ds: matrix of size n x n
-        Dt: matrix of size m x m
+        F: (ndarray(n, d+2), ndarray(m, d+2)) or (None, None)
+        Ds: (ndarray(n, k+2), ndarray(n, k+2)), or (None, None)
+        Dt: (ndarray(m, k+2), ndarray(m, k+2)), or (None, None)
         F_val: matrix of size n x m, None
             Kernel matrix between the source and target validation features.
-        Ds_val: matrix of size n x n, None
-        Dt_val: matrix of size m x m, None
+        Ds_val: (ndarray(n, k+2), ndarray(n, k+2)), or (None, None)
+        Dt_val: (ndarray(m, k+2), ndarray(m, k+2)), or (None, None)
         ws: ndarray(n), None
             Measures assigned to source points.
         wt: ndarray(m), None
@@ -310,31 +325,66 @@ class FUGWSolver(BaseSolver):
         if solver == "sinkhorn" and eps == 0:
             solver = "ibpp"
 
-        device, dtype = Ds.device, Ds.dtype
+        n, m = Ds[0].shape[0], Dt[0].shape[0]
+        device, dtype = Ds[0].device, Ds[0].dtype
 
         # constant data variables
-        Ds_sqr = Ds**2
-        Dt_sqr = Dt**2
+        Ds1, Ds2 = Ds
+        Ds_sqr = (
+            torch.einsum("ij,il->ijl", Ds1, Ds1).reshape(
+                Ds1.shape[0], Ds1.shape[1] ** 2
+            ),
+            torch.einsum("ij,il->ijl", Ds2, Ds2).reshape(
+                Ds2.shape[0], Ds2.shape[1] ** 2
+            ),
+        )
+
+        Dt1, Dt2 = Dt
+        Dt_sqr = (
+            torch.einsum("ij,il->ijl", Dt1, Dt1).reshape(
+                Dt1.shape[0], Dt1.shape[1] ** 2
+            ),
+            torch.einsum("ij,il->ijl", Dt2, Dt2).reshape(
+                Dt2.shape[0], Dt2.shape[1] ** 2
+            ),
+        )
 
         # Same for validation data if provided
-        if Ds_val is not None and Dt_val is not None:
-            Ds_sqr_val = Ds_val**2
-            Dt_sqr_val = Dt_val**2
+        if Ds_val != (None, None) and Dt_val != (None, None):
+            Ds1_val, Ds2_val = Ds_val
+            Ds_sqr_val = (
+                torch.einsum("ij,il->ijl", Ds1_val, Ds1_val).reshape(
+                    Ds1_val.shape[0], Ds1_val.shape[1] ** 2
+                ),
+                torch.einsum("ij,il->ijl", Ds2, Ds2).reshape(
+                    Ds2_val.shape[0], Ds2_val.shape[1] ** 2
+                ),
+            )
+
+            Dt1_val, Dt2_val = Dt_val
+            Dt_sqr_val = (
+                torch.einsum("ij,il->ijl", Dt1_val, Dt1_val).reshape(
+                    Dt1_val.shape[0], Dt1_val.shape[1] ** 2
+                ),
+                torch.einsum("ij,il->ijl", Dt2_val, Dt2_val).reshape(
+                    Dt2_val.shape[0], Dt2_val.shape[1] ** 2
+                ),
+            )
 
         else:
             Ds_val, Dt_val = Ds, Dt
             Ds_sqr_val, Dt_sqr_val = Ds_sqr, Dt_sqr
 
-        if alpha == 1 or F is None:
+        if alpha == 1 or F[0] is None or F[1] is None:
             alpha = 1
-            F = None
+            F = (None, None)
 
         # measures on rows and columns
         if ws is None:
-            n = Ds.shape[0]
+            n = Ds1.shape[0]
             ws = torch.ones(n).to(device).to(dtype) / n
         if wt is None:
-            m = Dt.shape[0]
+            m = Dt1.shape[0]
             wt = torch.ones(m).to(device).to(dtype) / m
         ws_dot_wt = ws[:, None] * wt[None, :]
 
@@ -400,12 +450,14 @@ class FUGWSolver(BaseSolver):
             solver_sinkhorn,
             tuple_weights=(ws, wt, ws_dot_wt),
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+            verbose=verbose,
         )
 
         self_solver_mm_kl = partial(
             solver_mm,
             tuple_weights=(ws, wt),
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+            verbose=verbose,
         )
 
         self_solver_ibpp = partial(
