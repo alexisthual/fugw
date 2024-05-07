@@ -14,9 +14,9 @@ if torch.cuda.is_available():
 @pytest.mark.parametrize("device", devices)
 def test_fugw_barycenter(device):
     np.random.seed(0)
-    n_subjects = 3
-    n_voxels = 50
-    n_features = 5
+    n_subjects = 4
+    n_voxels = 100
+    n_features = 10
 
     mesh_sample = np.random.randint(0, n_voxels, size=10)
 
