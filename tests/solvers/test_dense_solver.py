@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from fugw.solvers import FUGWSolver
-
+from fugw.utils import _low_rank_squared_l2
 
 callbacks = [None, lambda x: x["gamma"]]
 
@@ -23,9 +23,9 @@ def test_dense_solvers(solver, callback, alpha):
     device = torch.device("cuda:0" if use_cuda else "cpu")
     torch.backends.cudnn.benchmark = True
 
-    ns = 104
+    ns = 150
     ds = 3
-    nt = 151
+    nt = 200
     dt = 7
     nf = 10
 
@@ -34,13 +34,17 @@ def test_dense_solvers(solver, callback, alpha):
     source_embeddings = torch.rand(ns, ds).to(device)
     target_embeddings = torch.rand(nt, dt).to(device)
 
-    F = torch.cdist(source_features, target_features)
-    Ds = torch.cdist(source_embeddings, source_embeddings)
-    Dt = torch.cdist(target_embeddings, target_embeddings)
+    F = _low_rank_squared_l2(source_features, target_features)
+    Ds = _low_rank_squared_l2(source_embeddings, source_embeddings)
+    Dt = _low_rank_squared_l2(target_embeddings, target_embeddings)
 
-    Ds_normalized = Ds / Ds.max()
-    Dt_normalized = Dt / Dt.max()
-    F_normalized = F / F.max()
+    F_norm = (F[0] @ F[1].T).max()
+    Ds_norm = (Ds[0] @ Ds[1].T).max()
+    Dt_norm = (Dt[0] @ Dt[1].T).max()
+
+    F_normalized = (F[0] / F_norm, F[1] / F_norm)
+    Ds_normalized = (Ds[0] / Ds_norm, Ds[1] / Ds_norm)
+    Dt_normalized = (Dt[0] / Dt_norm, Dt[1] / Dt_norm)
 
     nits_bcd = 100
     eval_bcd = 2
