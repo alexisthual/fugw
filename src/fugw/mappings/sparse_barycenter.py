@@ -247,7 +247,6 @@ class FUGWSparseBarycenter:
             )
 
         plans = None
-        duals = None
         mask = None
         losses_each_bar_step = []
 
@@ -282,6 +281,5 @@ class FUGWSparseBarycenter:
             barycenter_weights,
             barycenter_features,
             plans,
-            duals,
             losses_each_bar_step,
         )
