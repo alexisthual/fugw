@@ -93,10 +93,10 @@ solvers = ["sinkhorn", "mm", "ibpp"]
     "device,return_numpy,solver", product(devices, return_numpys, solvers)
 )
 def test_saving_and_loading(device, return_numpy, solver):
-    _, source_features_train, source_geometry, _ = _init_mock_distribution(
+    _, source_features_train, _, source_embeddings = _init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
     )
-    _, target_features_train, target_geometry, _ = _init_mock_distribution(
+    _, target_features_train, _, target_embeddings = _init_mock_distribution(
         n_features_train, n_voxels_target, return_numpy=return_numpy
     )
 
@@ -104,8 +104,8 @@ def test_saving_and_loading(device, return_numpy, solver):
     fugw.fit(
         source_features=source_features_train,
         target_features=target_features_train,
-        source_geometry=source_geometry,
-        target_geometry=target_geometry,
+        source_geometry_embedding=source_embeddings,
+        target_geometry_embedding=target_embeddings,
         solver=solver,
         solver_params={
             "nits_bcd": 3,
