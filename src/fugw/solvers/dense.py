@@ -1,4 +1,5 @@
 from functools import partial
+from copy import deepcopy
 
 import time
 
@@ -61,7 +62,6 @@ class FUGWSolver(BaseSolver):
         # Avoid unnecessary calculation of UGW when alpha = 0
         if alpha != 1 and K1 is not None and K2 is not None:
             wasserstein_cost = (K1 @ K2.T) * pi / 2
-            print(wasserstein_cost.shape)
             cost += (1 - alpha) * wasserstein_cost
 
         # or UOT when alpha = 1
@@ -224,7 +224,7 @@ class FUGWSolver(BaseSolver):
         F=None,
         Ds=(None, None),
         Dt=(None, None),
-        F_val=None,
+        F_val=(None, None),
         Ds_val=(None, None),
         Dt_val=(None, None),
         ws=None,
@@ -477,7 +477,7 @@ class FUGWSolver(BaseSolver):
         # Initialize loss
         current_loss = compute_fugw_loss(pi, gamma)
 
-        if F_val is not None:
+        if F_val != (None, None):
             current_loss_validation = compute_fugw_loss_validation(pi, gamma)
         else:
             current_loss_validation = current_loss
@@ -558,12 +558,12 @@ class FUGWSolver(BaseSolver):
 
             if idx % self.eval_bcd == 0:
                 current_loss = compute_fugw_loss(pi, gamma)
-                if F_val is not None:
+                if F_val != (None, None):
                     current_loss_validation = compute_fugw_loss_validation(
                         pi, gamma
                     )
                 else:
-                    current_loss_validation = current_loss
+                    current_loss_validation = deepcopy(current_loss)
 
                 loss_steps.append(idx + 1)
                 loss = _add_dict(loss, current_loss)
