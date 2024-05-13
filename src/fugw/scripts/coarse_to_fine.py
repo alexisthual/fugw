@@ -373,19 +373,17 @@ def fit(
     source_geometry_embeddings = _make_tensor(source_geometry_embeddings)
     target_geometry_embeddings = _make_tensor(target_geometry_embeddings)
 
-    # Compute anatomical kernels
-    source_geometry_kernel = torch.cdist(
-        source_geometry_embeddings[source_sample],
-        source_geometry_embeddings[source_sample],
-        p=2,
+    # Compute coarse geometry embeddings
+    source_coarse_embedding = source_geometry_embeddings[source_sample]
+    target_coarse_embedding = target_geometry_embeddings[target_sample]
+
+    # Normalize embeddings
+    source_coarse_embedding = (
+        source_coarse_embedding / source_coarse_embedding.max()
     )
-    source_geometry_kernel /= source_geometry_kernel.max()
-    target_geometry_kernel = torch.cdist(
-        target_geometry_embeddings[target_sample],
-        target_geometry_embeddings[target_sample],
-        p=2,
+    target_coarse_embedding = (
+        target_coarse_embedding / target_coarse_embedding.max()
     )
-    target_geometry_kernel /= target_geometry_kernel.max()
 
     # Sampled weights
     if source_weights is None:
@@ -408,8 +406,8 @@ def fit(
     coarse_mapping.fit(
         source_features[:, source_sample],
         target_features[:, target_sample],
-        source_geometry=source_geometry_kernel,
-        target_geometry=target_geometry_kernel,
+        source_geometry_embedding=source_coarse_embedding,
+        target_geometry_embedding=target_coarse_embedding,
         source_weights=source_weights_sampled,
         target_weights=target_weights_sampled,
         solver=coarse_mapping_solver,
