@@ -437,6 +437,7 @@ class FUGWSolver(BaseSolver):
         self_solver_mm_l2 = partial(
             solver_mm_l2,
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
+            verbose=verbose,
         )
 
         self_get_params_uot_l2 = partial(
