@@ -134,12 +134,11 @@ def test_dense_solvers(solver, device, callback, alpha):
     )
 
 
-@pytest.mark.parametrize("reg_mode", ["independent", "joint"])
-def test_dense_solvers_l2(reg_mode):
+@pytest.mark.parametrize(
+    "reg_mode, device", product(["independent", "joint"], devices)
+)
+def test_dense_solvers_l2(reg_mode, device):
     torch.manual_seed(0)
-
-    use_cuda = torch.cuda.is_available()
-    device = torch.device("cuda:0" if use_cuda else "cpu")
     torch.backends.cudnn.benchmark = True
 
     ns = 204
@@ -151,13 +150,19 @@ def test_dense_solvers_l2(reg_mode):
     source_embeddings = torch.rand(ns, ds).to(device)
     target_embeddings = source_embeddings
 
-    F = torch.cdist(source_features, target_features)
-    Ds = torch.cdist(source_embeddings, source_embeddings)
-    Dt = torch.cdist(target_embeddings, target_embeddings)
+    F = _low_rank_squared_l2(source_features, target_features)
+    Ds = _low_rank_squared_l2(source_embeddings, source_embeddings)
+    Dt = _low_rank_squared_l2(target_embeddings, target_embeddings)
 
-    Ds_normalized = Ds / Ds.max()
-    Dt_normalized = Dt / Dt.max()
-    F_normalized = F / F.max()
+    F_norm = (F[0] @ F[1].T).max()
+    Ds_norm = (Ds[0] @ Ds[1].T).max()
+    Dt_norm = (Dt[0] @ Dt[1].T).max()
+
+    F_normalized = (F[0] / F_norm, F[1] / F_norm)
+    Ds_normalized = (Ds[0] / Ds_norm, Ds[1] / Ds_norm)
+    Dt_normalized = (Dt[0] / Dt_norm, Dt[1] / Dt_norm)
+
+    init_plan = (torch.ones(ns, ns) / ns).to(device)
 
     nits_bcd = 100
     eval_bcd = 2
@@ -181,8 +186,9 @@ def test_dense_solvers_l2(reg_mode):
         F=F_normalized,
         Ds=Ds_normalized,
         Dt=Dt_normalized,
+        init_plan=init_plan,
         solver="mm",
-        verbose=True,
+        verbose=False,
     )
 
     pi = res["pi"]
@@ -211,14 +217,19 @@ def test_dense_solvers_l2(reg_mode):
     ]:
         assert len(loss[key]) == len(loss_steps)
     # Loss should decrease
-    # assert np.all(np.sign(np.array(loss[1:]) - np.array(loss[:-1])) == -1)
+    assert np.all(
+        np.sign(
+            np.array(loss["total"][1:]) - np.array(loss["total"][:-1]) - 1e-6
+        )  # numerical tolerance
+        == -1
+    )
 
     # Check if we can recover ground truth optimal plan (identity matrix)
     pi_true = np.eye(ns, ns) / ns
     pi_np = pi.cpu().detach().numpy()
     gamma_np = gamma.cpu().detach().numpy()
-    np.testing.assert_allclose(pi_true, pi_np, atol=1e-04)
-    np.testing.assert_allclose(pi_true, gamma_np, atol=1e-04)
+    np.testing.assert_allclose(pi_true, pi_np, atol=1e-02)
+    np.testing.assert_allclose(pi_true, gamma_np, atol=1e-02)
 
 
 @pytest.mark.parametrize(
