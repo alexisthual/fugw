@@ -7,6 +7,10 @@ import torch
 from fugw.solvers import FUGWSolver
 from fugw.utils import _low_rank_squared_l2
 
+devices = [torch.device("cpu")]
+if torch.cuda.is_available():
+    devices.append(torch.device("cuda:0"))
+
 callbacks = [None, lambda x: x["gamma"]]
 
 alphas = [0.0, 0.5, 1.0]
