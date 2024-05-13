@@ -233,13 +233,11 @@ def test_dense_solvers_l2(reg_mode, device):
 
 
 @pytest.mark.parametrize(
-    "validation", ["None", "features", "geometries", "Both"]
+    "validation,device",
+    product(["None", "features", "geometries", "Both"], devices),
 )
-def test_validation_solver(validation):
+def test_validation_solver(validation, device):
     torch.manual_seed(0)
-
-    use_cuda = torch.cuda.is_available()
-    device = torch.device("cuda:0" if use_cuda else "cpu")
     torch.backends.cudnn.benchmark = True
 
     ns = 104
@@ -252,42 +250,62 @@ def test_validation_solver(validation):
     target_features = torch.rand(nt, nf).to(device)
     source_embeddings = torch.rand(ns, ds).to(device)
     target_embeddings = torch.rand(nt, dt).to(device)
+    source_features_val = torch.rand(ns, nf).to(device)
+    target_features_val = torch.rand(nt, nf).to(device)
+    source_embeddings_val = torch.rand(ns, ds).to(device)
+    target_embeddings_val = torch.rand(nt, dt).to(device)
 
-    F = torch.cdist(source_features, target_features)
-    Ds = torch.cdist(source_embeddings, source_embeddings)
-    Dt = torch.cdist(target_embeddings, target_embeddings)
+    F = _low_rank_squared_l2(source_features, target_features)
+    Ds = _low_rank_squared_l2(source_embeddings, source_embeddings)
+    Dt = _low_rank_squared_l2(target_embeddings, target_embeddings)
 
-    Ds_normalized = Ds / Ds.max()
-    Dt_normalized = Dt / Dt.max()
-    F_normalized = F / F.max()
+    F_norm = (F[0] @ F[1].T).max()
+    Ds_norm = (Ds[0] @ Ds[1].T).max()
+    Dt_norm = (Dt[0] @ Dt[1].T).max()
+
+    F_normalized = (F[0] / F_norm, F[1] / F_norm)
+    Ds_normalized = (Ds[0] / Ds_norm, Ds[1] / Ds_norm)
+    Dt_normalized = (Dt[0] / Dt_norm, Dt[1] / Dt_norm)
 
     if validation == "None":
-        F_val = None
-        Ds_val = None
-        Dt_val = None
+        F_val_normalized = None, None
+        Ds_val_normalized = None, None
+        Dt_val_normalized = None, None
 
     elif validation == "features":
-        source_features_val = torch.rand(ns, nf).to(device)
-        target_features_val = torch.rand(nt, nf).to(device)
-        F_val = torch.cdist(source_features_val, target_features_val)
-        Ds_val = None
-        Dt_val = None
+        F_val = _low_rank_squared_l2(source_features_val, target_features_val)
+        F_norm_val = (F_val[0] @ F_val[1].T).max()
+        F_val_normalized = (F_val[0] / F_norm, F_val[1] / F_norm_val)
+        Ds_val_normalized = None, None
+        Dt_val_normalized = None, None
 
     elif validation == "geometries":
-        source_embeddings_val = torch.rand(ns, ds).to(device)
-        target_embeddings_val = torch.rand(nt, dt).to(device)
-        F_val = None
-        Ds_val = torch.cdist(source_embeddings_val, source_embeddings_val)
-        Dt_val = torch.cdist(target_embeddings_val, target_embeddings_val)
+        F_val_normalized = None, None
+        Ds_val = _low_rank_squared_l2(
+            source_embeddings_val, source_embeddings_val
+        )
+        Dt_val = _low_rank_squared_l2(
+            target_embeddings_val, target_embeddings_val
+        )
+        Ds_norm_val = (Ds_val[0] @ Ds_val[1].T).max()
+        Dt_norm_val = (Dt_val[0] @ Dt_val[1].T).max()
+        Ds_val_normalized = (Ds_val[0] / Ds_norm_val, Ds_val[1] / Ds_norm_val)
+        Dt_val_normalized = (Dt_val[0] / Dt_norm_val, Dt_val[1] / Dt_norm_val)
 
     elif validation == "Both":
-        source_features_val = torch.rand(ns, nf).to(device)
-        target_features_val = torch.rand(nt, nf).to(device)
-        F_val = torch.cdist(source_features_val, target_features_val)
-        source_embeddings_val = torch.rand(ns, ds).to(device)
-        target_embeddings_val = torch.rand(nt, dt).to(device)
-        Ds_val = torch.cdist(source_embeddings_val, source_embeddings_val)
-        Dt_val = torch.cdist(target_embeddings_val, target_embeddings_val)
+        F_val = _low_rank_squared_l2(source_features_val, target_features_val)
+        F_norm_val = (F_val[0] @ F_val[1].T).max()
+        F_val_normalized = (F_val[0] / F_norm, F_val[1] / F_norm_val)
+        Ds_val = _low_rank_squared_l2(
+            source_embeddings_val, source_embeddings_val
+        )
+        Dt_val = _low_rank_squared_l2(
+            target_embeddings_val, target_embeddings_val
+        )
+        Ds_norm_val = (Ds_val[0] @ Ds_val[1].T).max()
+        Dt_norm_val = (Dt_val[0] @ Dt_val[1].T).max()
+        Ds_val_normalized = (Ds_val[0] / Ds_norm_val, Ds_val[1] / Ds_norm_val)
+        Dt_val_normalized = (Dt_val[0] / Dt_norm_val, Dt_val[1] / Dt_norm_val)
 
     nits_bcd = 100
     eval_bcd = 2
@@ -299,11 +317,13 @@ def test_validation_solver(validation):
         tol_loss=1e-5,
         eval_bcd=eval_bcd,
         eval_uot=10,
+        # Set a high value of ibpp, otherwise nans appear in coupling.
+        # This will generally increase the computed fugw loss.
         ibpp_eps_base=1e2,
     )
 
     res = fugw.solve(
-        alpha=0.8,
+        alpha=0.2,
         rho_s=2,
         rho_t=3,
         eps=0.02,
@@ -311,11 +331,10 @@ def test_validation_solver(validation):
         F=F_normalized,
         Ds=Ds_normalized,
         Dt=Dt_normalized,
-        F_val=F_val,
-        Ds_val=Ds_val,
-        Dt_val=Dt_val,
-        init_plan=None,
-        solver="sinkhorn",
+        F_val=F_val_normalized,
+        Ds_val=Ds_val_normalized,
+        Dt_val=Dt_val_normalized,
+        solver="mm",
         verbose=True,
     )
 
