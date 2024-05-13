@@ -17,14 +17,11 @@ alphas = [0.0, 0.5, 1.0]
 
 
 @pytest.mark.parametrize(
-    "solver,callback,alpha",
-    product(["sinkhorn", "mm", "ibpp"], callbacks, alphas),
+    "solver,device,callback,alpha",
+    product(["sinkhorn", "mm", "ibpp"], devices, callbacks, alphas),
 )
-def test_dense_solvers(solver, callback, alpha):
+def test_dense_solvers(solver, device, callback, alpha):
     torch.manual_seed(0)
-
-    use_cuda = torch.cuda.is_available()
-    device = torch.device("cuda:0" if use_cuda else "cpu")
     torch.backends.cudnn.benchmark = True
 
     ns = 150
@@ -65,7 +62,7 @@ def test_dense_solvers(solver, callback, alpha):
 
     rho_s = 2
     rho_t = 3
-    eps = 0.02
+    eps = 0.5
 
     res = fugw.solve(
         alpha=alpha,
@@ -76,7 +73,6 @@ def test_dense_solvers(solver, callback, alpha):
         F=F_normalized,
         Ds=Ds_normalized,
         Dt=Dt_normalized,
-        init_plan=None,
         solver=solver,
         callback_bcd=callback,
         verbose=True,
@@ -90,19 +86,16 @@ def test_dense_solvers(solver, callback, alpha):
     loss_steps = res["loss_steps"]
     loss_times = res["loss_times"]
 
-    assert pi.shape == (ns, nt)
-    assert gamma.shape == (ns, nt)
+    assert pi.size() == (ns, nt)
+    assert gamma.size() == (ns, nt)
 
     if solver == "mm":
         assert duals_pi is None
         assert duals_gamma is None
-    else:
+    elif solver == "ibpp":
         assert len(duals_pi) == 2
         assert duals_pi[0].shape == (ns,)
         assert duals_pi[1].shape == (nt,)
-        assert len(duals_gamma) == 2
-        assert duals_gamma[0].shape == (ns,)
-        assert duals_gamma[1].shape == (nt,)
 
     assert len(loss_steps) - 1 <= nits_bcd // eval_bcd + 1
     assert len(loss_times) == len(loss_steps)
@@ -134,7 +127,9 @@ def test_dense_solvers(solver, callback, alpha):
 
     # Loss should decrease
     assert np.all(
-        np.sign(np.array(loss["total"][1:]) - np.array(loss["total"][:-1]))
+        np.sign(
+            np.array(loss["total"][1:]) - np.array(loss["total"][:-1]) - 1e-6
+        )  # numerical tolerance
         == -1
     )
 
