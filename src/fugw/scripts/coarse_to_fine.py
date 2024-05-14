@@ -379,10 +379,16 @@ def fit(
 
     # Normalize embeddings
     source_coarse_embedding = (
-        source_coarse_embedding / source_coarse_embedding.max()
+        source_coarse_embedding
+        / (source_coarse_embedding @ source_coarse_embedding.T)
+        .norm(dim=1)
+        .max()
     )
     target_coarse_embedding = (
-        target_coarse_embedding / target_coarse_embedding.max()
+        target_coarse_embedding
+        / (target_coarse_embedding @ target_coarse_embedding.T)
+        .norm(dim=1)
+        .max()
     )
 
     # Sampled weights
