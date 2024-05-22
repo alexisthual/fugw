@@ -86,16 +86,12 @@ class FUGWBarycenter:
             w = _make_tensor(weights, device=device)
             f = _make_tensor(features, device=device)
             if features is not None:
-                acc = w * pi.T @ f.T / pi.sum(0).reshape(-1, 1)
+                acc = w * pi.T @ f.T / (pi.sum(0).reshape(-1, 1) + 1e-16)
 
                 if i == 0:
                     barycenter_features = acc
                 else:
                     barycenter_features += acc
-
-        # Check for NaN values in the barycenter features
-        if torch.isnan(barycenter_features).any():
-            raise ValueError("Barycenter features contain NaN values")
 
         return barycenter_features.T
 
