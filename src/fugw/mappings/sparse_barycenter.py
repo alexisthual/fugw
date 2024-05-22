@@ -36,7 +36,6 @@ class FUGWSparseBarycenter:
 
     @staticmethod
     def update_barycenter_features(plans, weights_list, features_list, device):
-        barycenter_features = 0
         for i, (pi, weights, features) in enumerate(
             zip(plans, weights_list, features_list)
         ):
@@ -44,17 +43,16 @@ class FUGWSparseBarycenter:
             f = _make_tensor(features, device=device)
 
             if features is not None:
-                pi_sum = torch.sparse.sum(pi, dim=0).to_dense()
-                acc = w * pi.T @ f.T / pi_sum.unsqueeze(1)
+                pi_sum = (
+                    torch.sparse.sum(pi, dim=0).to_dense().reshape(-1, 1)
+                    + 1e-16
+                )
+                acc = w * pi.T @ f.T / pi_sum
 
                 if i == 0:
                     barycenter_features = acc
                 else:
                     barycenter_features += acc
-
-        # Check for NaN values in the barycenter features
-        if torch.isnan(barycenter_features).any():
-            raise ValueError("Barycenter features contain NaN values")
 
         return barycenter_features.T
 
