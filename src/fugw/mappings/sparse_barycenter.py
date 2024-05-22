@@ -134,9 +134,9 @@ class FUGWSparseBarycenter:
                 device=device,
                 verbose=verbose,
             )
-            # Assert that the init_plan does not contain NaN values
+            # Check for NaN values in the fine plan
             if torch.isnan(fine_mapping.pi.values()).any():
-                raise ValueError("fine plan contains NaN values")
+                raise ValueError("Fine plan contains NaN values")
             new_plans.append(fine_mapping.pi)
             new_losses.append(
                 (
