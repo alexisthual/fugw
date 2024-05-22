@@ -54,6 +54,7 @@ def test_fugw_barycenter(device):
     assert isinstance(barycenter_weights, torch.Tensor)
     assert barycenter_weights.shape == (n_voxels,)
     assert isinstance(barycenter_features, torch.Tensor)
+    assert not torch.isnan(barycenter_features).any()
     assert barycenter_features.shape == (n_features, n_voxels)
     assert len(plans) == n_subjects
     assert len(losses_each_bar_step) == nits_barycenter
