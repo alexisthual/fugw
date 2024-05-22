@@ -52,6 +52,10 @@ class FUGWSparseBarycenter:
                 else:
                     barycenter_features += acc
 
+        # Check for NaN values in the barycenter features
+        if torch.isnan(barycenter_features).any():
+            raise ValueError("Barycenter features contain NaN values")
+
         return barycenter_features.T
 
     @staticmethod
