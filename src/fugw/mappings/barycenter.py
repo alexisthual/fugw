@@ -80,7 +80,6 @@ class FUGWBarycenter:
 
     @staticmethod
     def update_barycenter_features(plans, weights_list, features_list, device):
-        barycenter_features = 0
         for i, (pi, weights, features) in enumerate(
             zip(plans, weights_list, features_list)
         ):
