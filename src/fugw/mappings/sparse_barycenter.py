@@ -180,7 +180,8 @@ class FUGWSparseBarycenter:
             have the same number of features n_features.
         geometry_list (list of np.array or np.array): List of kernel matrices
             or just one kernel matrix if it's shared across individuals
-            barycenter_size (int, optional): Size of computed
+        barycenter_size (int), optional: 
+            Size of computed barycentric features and geometry. Defaults to None.
             barycentric features and geometry. Defaults to None.
         init_barycenter_weights (np.array, optional): Distribution weights
             of barycentric points. If None, points will have uniform
