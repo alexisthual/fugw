@@ -178,20 +178,28 @@ class FUGWSparseBarycenter:
             can have weights with different sizes.
         features_list (list of np.array): List of features. Individuals should
             have the same number of features n_features.
-        geometry_list (list of np.array or np.array): List of kernel matrices
-            or just one kernel matrix if it's shared across individuals
-        barycenter_size (int), optional: 
-            Size of computed barycentric features and geometry. Defaults to None.
-            barycentric features and geometry. Defaults to None.
+        geometry_list (list of np.array or torch.Tensor): List of geometry
+            embeddings or just one embedding if it's shared across individuals.
+        barycenter_size (int), optional:
+            Size of computed barycentric features and geometry.
+            Defaults to None.
+        mesh_sample (np.array, optional): Sample points on which to compute
+            the barycenter. Defaults to None.
         init_barycenter_weights (np.array, optional): Distribution weights
             of barycentric points. If None, points will have uniform
             weights. Defaults to None.
-        mesh_sample (np.array, optional): Sample points on which to compute
-            the barycenter. Defaults to None.
         init_barycenter_features (np.array, optional): np.array of size
             (barycenter_size, n_features). Defaults to None.
         init_barycenter_geometry (np.array, optional): np.array of size
             (barycenter_size, barycenter_size). Defaults to None.
+        solver (str, optional): Solver to use for the OT computation.
+            Defaults to "sinkhorn".
+        coarse_mapping_solver_params (dict, optional): Parameters for the
+            coarse mapping solver. Defaults to {}.
+        fine_mapping_solver_params (dict, optional): Parameters for the fine
+            mapping solver. Defaults to {}.
+        nits_barycenter (int, optional): Number of iterations to compute
+            the barycenter. Defaults to 5.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
