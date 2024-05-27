@@ -27,6 +27,7 @@ class FUGW(BaseMapping):
         solver_params={},
         callback_bcd=None,
         device="auto",
+        storing_device="cpu",
         verbose=False,
     ):
         """
@@ -100,6 +101,8 @@ class FUGW(BaseMapping):
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
+        storing_device: torch.device, default="cpu"
+            Device on which to store the computed transport plan.
         verbose: bool, optional, defaults to False
             Log solving process.
 
@@ -255,7 +258,7 @@ class FUGW(BaseMapping):
         )
 
         # Store variables of interest in model
-        self.pi = res["pi"].detach().cpu()
+        self.pi = res["pi"].detach().to(device=storing_device)
         self.loss = res["loss"]
         self.loss_steps = res["loss_steps"]
         self.loss_times = res["loss_times"]

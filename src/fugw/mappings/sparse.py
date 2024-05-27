@@ -33,6 +33,7 @@ class FUGWSparse(BaseMapping):
         solver_params={},
         callback_bcd=None,
         device="auto",
+        storing_device="cpu",
         verbose=False,
     ):
         """
@@ -106,6 +107,8 @@ class FUGWSparse(BaseMapping):
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
+        storing_device: torch.device, default="cpu"
+            Device on which to store the computed transport plan.
         verbose: bool, optional, defaults to False
             Log solving process.
 
@@ -292,7 +295,7 @@ class FUGWSparse(BaseMapping):
             verbose=verbose,
         )
 
-        self.pi = res["pi"].to_sparse_coo().detach().cpu()
+        self.pi = res["pi"].to_sparse_coo().detach().to(device=storing_device)
         self.loss = res["loss"]
         self.loss_val = res["loss_val"]
         self.loss_steps = res["loss_steps"]

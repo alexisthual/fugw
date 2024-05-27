@@ -18,6 +18,7 @@ alphas = [0.0, 0.5, 1.0]
 
 
 # TODO: need to test sinkhorn
+@pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize(
     "solver,device,callback,alpha",
     product(["sinkhorn", "mm", "ibpp"], devices, callbacks, alphas),
@@ -143,6 +144,7 @@ def test_sparse_solvers(solver, device, callback, alpha):
     )
 
 
+@pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize(
     "validation,device",
     product(["None", "features", "geometries", "Both"], devices),
