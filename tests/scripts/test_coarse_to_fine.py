@@ -76,7 +76,7 @@ def test_coarse_to_fine(device, return_numpy):
     source_sample = torch.randperm(n_voxels_source)[:n_samples_source]
     target_sample = torch.randperm(n_voxels_target)[:n_samples_target]
 
-    source_sample, target_sample = coarse_to_fine.fit(
+    source_sample, target_sample, mask = coarse_to_fine.fit(
         coarse_mapping=coarse_mapping,
         coarse_mapping_solver=coarse_mapping_solver,
         fine_mapping=fine_mapping,
@@ -92,6 +92,7 @@ def test_coarse_to_fine(device, return_numpy):
 
     assert coarse_mapping.pi.shape == (n_samples_source, n_samples_target)
     assert fine_mapping.pi.shape == (n_voxels_source, n_voxels_target)
+    assert mask.shape == (n_voxels_source, n_voxels_target)
 
     # Use trained model to transport new features
     # 1. with numpy arrays

@@ -1,82 +1,38 @@
 import torch
 
 from fugw.mappings.dense import FUGW
+from fugw.mappings.sparse import FUGWSparse
+from fugw.scripts import coarse_to_fine
 from fugw.utils import _make_tensor
 
 
-class FUGWBarycenter:
-    """FUGW barycenters"""
+class FUGWSparseBarycenter:
+    """FUGW Sparse Barycenters"""
 
     def __init__(
         self,
-        alpha=0.5,
-        rho=1,
-        eps=1e-2,
+        alpha_coarse=0.5,
+        alpha_fine=0.5,
+        rho_coarse=1.0,
+        rho_fine=1.0,
+        eps_coarse=1.0,
+        eps_fine=1.0,
+        selection_radius=1.0,
         reg_mode="joint",
         force_psd=False,
         learn_geometry=False,
     ):
         # Save model arguments
-        self.alpha = alpha
-        self.rho = rho
-        self.eps = eps
+        self.alpha_coarse = alpha_coarse
+        self.alpha_fine = alpha_fine
+        self.rho_coarse = rho_coarse
+        self.rho_fine = rho_fine
+        self.eps_coarse = eps_coarse
+        self.eps_fine = eps_fine
         self.reg_mode = reg_mode
         self.force_psd = force_psd
         self.learn_geometry = learn_geometry
-
-    @staticmethod
-    def update_barycenter_geometry(
-        plans_, weights_, geometry_, force_psd, device
-    ):
-        barycenter_geometry = 0
-        # pi_samp, pi_feat: both of size (ns, n)
-        for i, (plans, weights) in enumerate(zip(plans_, weights_)):
-            if len(geometry_) == 1 and len(weights_) > 1:
-                C = _make_tensor(geometry_[0], device=device)
-            else:
-                C = _make_tensor(geometry_[i], device=device)
-
-            pi_samp, pi_feat = plans
-            pi1_samp, pi1_feat = pi_samp.sum(0), pi_feat.sum(0)
-
-            if force_psd:
-                if isinstance(C, tuple):
-                    C1, C2 = C
-                    term = pi_samp.T @ (C1 @ (C2.T @ pi_samp)) / (
-                        pi1_samp[:, None] * pi1_samp[None, :]
-                    ) + pi_feat.T @ (C1 @ (C2.T @ pi_feat)) / (
-                        pi1_feat[:, None] * pi1_feat[None, :]
-                    )
-                elif torch.is_tensor(C):
-                    term = pi_samp.T @ C @ pi_samp / (
-                        pi1_samp[:, None] * pi1_samp[None, :]
-                    ) + pi_feat.T @ C @ pi_feat / (
-                        pi1_feat[:, None] * pi1_feat[None, :]
-                    )
-                term = term / 2
-
-            else:
-                if isinstance(C, tuple):
-                    C1, C2 = C
-                    term = (
-                        pi_samp.T
-                        @ (C1 @ (C2.T @ pi_feat))
-                        / (pi1_samp[:, None] * pi1_feat[None, :])
-                    )  # shape (n, n)
-                elif torch.is_tensor(C):
-                    term = (
-                        pi_samp.T
-                        @ C
-                        @ pi_feat
-                        / (pi1_samp[:, None] * pi1_feat[None, :])
-                    )  # shape (n, n)
-
-            w = _make_tensor(weights, device=device)
-            barycenter_geometry = (
-                barycenter_geometry + w * term
-            )  # shape (n, n)
-
-        return barycenter_geometry
+        self.selection_radius = selection_radius
 
     @staticmethod
     def update_barycenter_features(plans, weights_list, features_list, device):
@@ -85,8 +41,13 @@ class FUGWBarycenter:
         ):
             w = _make_tensor(weights, device=device)
             f = _make_tensor(features, device=device)
+
             if features is not None:
-                acc = w * pi.T @ f.T / (pi.sum(0).reshape(-1, 1) + 1e-16)
+                pi_sum = (
+                    torch.sparse.sum(pi, dim=0).to_dense().reshape(-1, 1)
+                    + 1e-16
+                )
+                acc = w * pi.T @ f.T / pi_sum
 
                 if i == 0:
                     barycenter_features = acc
@@ -112,15 +73,18 @@ class FUGWBarycenter:
     def compute_all_ot_plans(
         self,
         plans,
-        duals,
         weights_list,
         features_list,
         geometry_list,
         barycenter_weights,
         barycenter_features,
-        barycenter_geometry,
+        barycenter_geometry_embedding,
+        mesh_sample,
         solver,
-        solver_params,
+        coarse_mapping_solver_params,
+        fine_mapping_solver_params,
+        selection_radius,
+        mask,
         device,
         verbose,
     ):
@@ -135,35 +99,52 @@ class FUGWBarycenter:
             else:
                 G = geometry_list[i]
 
-            mapping = FUGW(
-                alpha=self.alpha,
-                rho=self.rho,
-                eps=self.eps,
+            coarse_mapping = FUGW(
+                alpha=self.alpha_coarse,
+                rho=self.rho_coarse,
+                eps=self.eps_coarse,
                 reg_mode=self.reg_mode,
             )
 
-            mapping.fit(
-                source_features=features,
-                target_features=barycenter_features,
-                source_geometry=G,
-                target_geometry=barycenter_geometry,
-                source_weights=weights,
-                target_weights=barycenter_weights,
-                init_plan=plans[i] if plans is not None else None,
-                init_duals=duals[i] if duals is not None else None,
-                solver=solver,
-                solver_params=solver_params,
-                device=device,
-                storing_device=device,
-                verbose=verbose,
+            fine_mapping = FUGWSparse(
+                alpha=self.alpha_fine,
+                rho=self.rho_fine,
+                eps=self.eps_fine,
+                reg_mode=self.reg_mode,
             )
 
-            new_plans.append(mapping.pi)
+            _, _, mask = coarse_to_fine.fit(
+                source_features=features,
+                target_features=barycenter_features,
+                source_geometry_embeddings=G,
+                target_geometry_embeddings=barycenter_geometry_embedding,
+                source_sample=mesh_sample,
+                target_sample=mesh_sample,
+                coarse_mapping=coarse_mapping,
+                source_weights=weights,
+                target_weights=barycenter_weights,
+                coarse_mapping_solver=solver,
+                coarse_mapping_solver_params=coarse_mapping_solver_params,
+                coarse_pairs_selection_method="topk",
+                source_selection_radius=selection_radius,
+                target_selection_radius=selection_radius,
+                fine_mapping=fine_mapping,
+                fine_mapping_solver=solver,
+                fine_mapping_solver_params=fine_mapping_solver_params,
+                init_plan=plans[i] if plans is not None else None,
+                mask=mask,
+                device=device,
+                verbose=verbose,
+            )
+            # Check for NaN values in the fine plan
+            if torch.isnan(fine_mapping.pi.values()).any():
+                raise ValueError("Fine plan contains NaN values")
+            new_plans.append(fine_mapping.pi)
             new_losses.append(
                 (
-                    mapping.loss,
-                    mapping.loss_steps,
-                    mapping.loss_times,
+                    fine_mapping.loss,
+                    fine_mapping.loss_steps,
+                    fine_mapping.loss_times,
                 )
             )
 
@@ -179,7 +160,9 @@ class FUGWBarycenter:
         init_barycenter_features=None,
         init_barycenter_geometry=None,
         solver="sinkhorn",
-        solver_params={},
+        coarse_mapping_solver_params={},
+        fine_mapping_solver_params={},
+        mesh_sample=None,
         nits_barycenter=5,
         device="auto",
         verbose=False,
@@ -195,10 +178,13 @@ class FUGWBarycenter:
             can have weights with different sizes.
         features_list (list of np.array): List of features. Individuals should
             have the same number of features n_features.
-        geometry_list (list of np.array or np.array): List of kernel matrices
-            or just one kernel matrix if it's shared across individuals
-            barycenter_size (int, optional): Size of computed
-            barycentric features and geometry. Defaults to None.
+        geometry_list (list of np.array or torch.Tensor): List of geometry
+            embeddings or just one embedding if it's shared across individuals.
+        barycenter_size (int), optional:
+            Size of computed barycentric features and geometry.
+            Defaults to None.
+        mesh_sample (np.array, optional): Sample points on which to compute
+            the barycenter. Defaults to None.
         init_barycenter_weights (np.array, optional): Distribution weights
             of barycentric points. If None, points will have uniform
             weights. Defaults to None.
@@ -206,6 +192,14 @@ class FUGWBarycenter:
             (barycenter_size, n_features). Defaults to None.
         init_barycenter_geometry (np.array, optional): np.array of size
             (barycenter_size, barycenter_size). Defaults to None.
+        solver (str, optional): Solver to use for the OT computation.
+            Defaults to "sinkhorn".
+        coarse_mapping_solver_params (dict, optional): Parameters for the
+            coarse mapping solver. Defaults to {}.
+        fine_mapping_solver_params (dict, optional): Parameters for the fine
+            mapping solver. Defaults to {}.
+        nits_barycenter (int, optional): Number of iterations to compute
+            the barycenter. Defaults to 5.
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
@@ -257,32 +251,32 @@ class FUGWBarycenter:
             )
 
         if init_barycenter_geometry is None:
-            barycenter_geometry = (
-                torch.ones((barycenter_size, barycenter_size)).to(device)
-                / barycenter_size
-            )
+            barycenter_geometry_embedding = geometry_list[0]
         else:
-            barycenter_geometry = _make_tensor(
+            barycenter_geometry_embedding = _make_tensor(
                 init_barycenter_geometry, device=device
             )
 
         plans = None
-        duals = None
+        mask = None
         losses_each_bar_step = []
 
         for _ in range(nits_barycenter):
             # Transport all elements
             plans, losses = self.compute_all_ot_plans(
                 plans,
-                duals,
                 weights_list,
                 features_list,
                 geometry_list,
                 barycenter_weights,
                 barycenter_features,
-                barycenter_geometry,
+                barycenter_geometry_embedding,
+                mesh_sample,
                 solver,
-                solver_params,
+                coarse_mapping_solver_params,
+                fine_mapping_solver_params,
+                self.selection_radius,
+                mask,
                 device,
                 verbose,
             )
@@ -293,16 +287,10 @@ class FUGWBarycenter:
             barycenter_features = self.update_barycenter_features(
                 plans, weights_list, features_list, device
             )
-            if self.learn_geometry:
-                barycenter_geometry = self.update_barycenter_geometry(
-                    plans, weights_list, geometry_list, self.force_psd, device
-                )
 
         return (
             barycenter_weights,
             barycenter_features,
-            barycenter_geometry,
             plans,
-            duals,
             losses_each_bar_step,
         )

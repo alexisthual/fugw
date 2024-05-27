@@ -284,6 +284,8 @@ def fit(
     target_geometry_embeddings=None,
     source_weights=None,
     target_weights=None,
+    init_plan=None,
+    mask=None,
     device="auto",
     verbose=False,
 ):
@@ -348,6 +350,12 @@ def fit(
         Distribution weights of target nodes.
         Should sum to 1. If None, each node's weight
         will be set to 1 / m.
+    init_plan: torch.sparse_coo_tensor or None
+        Initial transport plan to use when fitting the fine mapping.
+        If None, a random plan will be used.
+    mask: torch.Tensor or None
+        Sparsity mask to use when fitting the fine mapping.
+        If None, a mask will be computed from the coarse mapping.
     device: "auto" or torch.device
         if "auto": use first available gpu if it's available,
         cpu otherwise.
@@ -362,6 +370,8 @@ def fit(
     target_sample: torch.Tensor of size(target_sample_size)
         Tensor containing the indices which were sampled on the
         target so as to compute the coarse mapping.
+    mask: torch.Tensor of size(n, m)
+        Sparsity mask used to fit the fine mapping.
     """
     # 0. Parse input tensors
     source_sample = _make_tensor(source_sample, dtype=torch.int64)
@@ -446,31 +456,33 @@ def fit(
             ]
         )
 
-    # Compute mask as a matrix product between:
-    # a. neighbourhood matrices that encode
-    # which vertex is close to which sampled point
-    N_source = get_neighbourhood_matrix(
-        source_geometry_embeddings, source_sample, source_selection_radius
-    )
-    N_target = get_neighbourhood_matrix(
-        target_geometry_embeddings, target_sample, target_selection_radius
-    )
-    # b. cluster matrices that encode
-    # which sampled point belongs to which cluster
-    C_source = get_cluster_matrix(rows, source_sample.shape[0])
-    C_target = get_cluster_matrix(cols, target_sample.shape[0])
+    if mask is None:
+        # Compute mask as a matrix product between:
+        # a. neighbourhood matrices that encode
+        # which vertex is close to which sampled point
+        N_source = get_neighbourhood_matrix(
+            source_geometry_embeddings, source_sample, source_selection_radius
+        )
+        N_target = get_neighbourhood_matrix(
+            target_geometry_embeddings, target_sample, target_selection_radius
+        )
+        # b. cluster matrices that encode
+        # which sampled point belongs to which cluster
+        C_source = get_cluster_matrix(rows, source_sample.shape[0])
+        C_target = get_cluster_matrix(cols, target_sample.shape[0])
 
-    mask = (N_source @ C_source) @ (N_target @ C_target).T
+        mask = (N_source @ C_source) @ (N_target @ C_target).T
 
     # Define init plan from spasity mask
-    init_plan = torch.sparse_coo_tensor(
-        mask.indices(),
-        torch.ones_like(mask.values()) / mask.values().shape[0],
-        (
-            source_geometry_embeddings.shape[0],
-            target_geometry_embeddings.shape[0],
-        ),
-    ).coalesce()
+    if init_plan is None:
+        init_plan = torch.sparse_coo_tensor(
+            mask.indices(),
+            torch.ones_like(mask.values()) / mask.values().shape[0],
+            (
+                source_geometry_embeddings.shape[0],
+                target_geometry_embeddings.shape[0],
+            ),
+        ).coalesce()
 
     # 3. Fit fine-grained mapping
     fine_mapping.fit(
@@ -486,6 +498,7 @@ def fit(
         solver=fine_mapping_solver,
         solver_params=fine_mapping_solver_params,
         callback_bcd=fine_callback_bcd,
+        storing_device=device,
     )
 
-    return source_sample, target_sample
+    return source_sample, target_sample, mask

@@ -1,5 +1,6 @@
 import torch
 import pytest
+import warnings
 
 
 def pytest_configure(config):
@@ -15,3 +16,11 @@ def check_mkl_availability(request):
         and not torch.backends.mkl.is_available()
     ):
         pytest.skip("Test requires MKL support which is not available.")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def ignore_sparse_csr_warning():
+    """Remove the warning for sparse CSR tensor support."""
+    warnings.filterwarnings(
+        "ignore", ".*Sparse CSR tensor support is in beta state.*"
+    )

@@ -127,6 +127,7 @@ class FUGWSparse(BaseMapping):
                 device = torch.device("cuda", 0)
             else:
                 device = torch.device("cpu")
+            storing_device = device
 
         if isinstance(self.rho, float) or isinstance(self.rho, int):
             rho_s = self.rho
