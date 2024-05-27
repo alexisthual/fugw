@@ -252,7 +252,7 @@ def init_plan_dense(
     return plan
 
 
-def save_mapping(mapping, fname, storing_device="cpu"):
+def save_mapping(mapping, fname):
     """Save mapping in pickle file, separating hyperparams and weights.
 
     Parameters
@@ -261,10 +261,8 @@ def save_mapping(mapping, fname, storing_device="cpu"):
         FUGW mapping to save
     fname: str or pathlib.Path
         Path to pickle file to save
-    storing_device: torch.device, default="cpu"
-        Device on which to store the computed transport plan.
     """
-    mapping.pi = mapping.pi.to(storing_device)
+    mapping.pi = mapping.pi.to("cpu")
     with open(fname, "wb") as f:
         # Dump hyperparams first
         pickle.dump(mapping, f)
@@ -272,7 +270,7 @@ def save_mapping(mapping, fname, storing_device="cpu"):
         pickle.dump(mapping.pi, f)
 
 
-def load_mapping(fname, load_weights=True, storing_device="cpu"):
+def load_mapping(fname, load_weights=True, device="cpu"):
     """Load mapping from pickle file, optionally loading weights.
 
     Parameters
@@ -281,7 +279,7 @@ def load_mapping(fname, load_weights=True, storing_device="cpu"):
         Path to pickle file to load
     load_weights: bool, optional, defaults to True
         If True, load mapping weights from pickle file.
-    storing_device: torch.device, default="cpu"
+    device: torch.device, default="cpu"
         Device on which to store the computed transport plan.
 
     Returns
@@ -292,6 +290,6 @@ def load_mapping(fname, load_weights=True, storing_device="cpu"):
         mapping = pickle.load(f)
         if load_weights:
             mapping.pi = pickle.load(f)
-            mapping.pi = mapping.pi.to(storing_device)
+            mapping.pi = mapping.pi.to(device)
 
     return mapping
