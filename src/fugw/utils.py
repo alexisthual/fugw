@@ -262,6 +262,7 @@ def save_mapping(mapping, fname):
     fname: str or pathlib.Path
         Path to pickle file to save
     """
+    # Move mapping weights to CPU before saving
     mapping.pi = mapping.pi.to("cpu")
     with open(fname, "wb") as f:
         # Dump hyperparams first
