@@ -98,7 +98,7 @@ Let us load a pre-computed mesh and have a look at it first
     Dataset created in /github/home/nilearn_data/fsaverage3
 
     Downloading data from https://osf.io/azhdf/download ...
-     ...done. (4 seconds, 0 min)
+     ...done. (2 seconds, 0 min)
     Extracting data from /github/home/nilearn_data/fsaverage3/472ead7320dbd53fb2ec42e05f1bb6bf/download..... done.
 
     (642, 3)
@@ -258,9 +258,9 @@ is well approximated by the kernel matrix derived from the embeddings:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 11.562 seconds)
+   **Total running time of the script:** (0 minutes 9.215 seconds)
 
-**Estimated memory usage:**  80 MB
+**Estimated memory usage:**  82 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_1_lmds.py:
