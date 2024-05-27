@@ -3,7 +3,7 @@ import torch
 
 from fugw.solvers.dense import FUGWSolver
 from fugw.mappings.utils import BaseMapping, console
-from fugw.utils import _make_tensor, init_plan_dense
+from fugw.utils import _make_tensor, init_plan_dense, _low_rank_squared_l2
 
 
 class FUGW(BaseMapping):
@@ -13,12 +13,12 @@ class FUGW(BaseMapping):
         self,
         source_features=None,
         target_features=None,
-        source_geometry=None,
-        target_geometry=None,
+        source_geometry_embedding=None,
+        target_geometry_embedding=None,
         source_features_val=None,
         target_features_val=None,
-        source_geometry_val=None,
-        target_geometry_val=None,
+        source_geometry_embedding_val=None,
+        target_geometry_embedding_val=None,
         source_weights=None,
         target_weights=None,
         init_plan=None,
@@ -52,14 +52,16 @@ class FUGW(BaseMapping):
             Feature maps for target subject.
             **This array should be normalized**, otherwise you will
             run into computational errors.
-        source_geometry: ndarray(n, n)
-            Kernel matrix of anatomical distances
-            between nodes of source mesh
+        source_geometry_embedding: ndarray(n, k), optional
+            Embedding X such that norm(X_i - X_j) approximates
+            the anatomical distance between vertices i and j
+            of the source mesh
             **This array should be normalized**, otherwise you will
             run into computational errors.
-        target_geometry: ndarray(m, m)
-            Kernel matrix of anatomical distances
-            between nodes of target mesh
+        target_geometry_embedding: ndarray(m, k), optional
+            Embedding X such that norm(X_i - X_j) approximates
+            the anatomical distance between vertices i and j
+            of the target mesh
             **This array should be normalized**, otherwise you will
             run into computational errors.
         source_features_val: ndarray(n_features, n) or None
@@ -68,11 +70,11 @@ class FUGW(BaseMapping):
         target_features_val: ndarray(n_features, m) or None
             Feature maps for target subject used for validation.
             If None, target_features will be used instead.
-        source_geometry_val: ndarray(n, n) or None
+        source_geometry_embedding_val: ndarray(n, n) or None
             Kernel matrix of anatomical distances
             between nodes of source mesh used for validation.
             If None, source_geometry will be used instead.
-        target_geometry_val: ndarray(m, m) or None
+        target_geometry_embedding_val: ndarray(m, m) or None
             Kernel matrix of anatomical distances
             between nodes of target mesh used for validation.
             If None, target_geometry will be used instead.
@@ -170,17 +172,30 @@ class FUGW(BaseMapping):
         # Compute distance matrix between features
         Fs = _make_tensor(source_features.T, device=device)
         Ft = _make_tensor(target_features.T, device=device)
-        F = torch.cdist(Fs, Ft, p=2) ** 2
+        F1, F2 = _low_rank_squared_l2(Fs, Ft)
+        F1 = _make_tensor(F1, device=device)
+        F2 = _make_tensor(F2, device=device)
 
         # Load anatomical kernels to GPU
-        Ds = _make_tensor(source_geometry, device=device)
-        Dt = _make_tensor(target_geometry, device=device)
+        Ds1, Ds2 = _low_rank_squared_l2(
+            source_geometry_embedding, source_geometry_embedding
+        )
+        Ds1 = _make_tensor(Ds1, device=device)
+        Ds2 = _make_tensor(Ds2, device=device)
+        Dt1, Dt2 = _low_rank_squared_l2(
+            target_geometry_embedding, target_geometry_embedding
+        )
+        Dt1 = _make_tensor(Dt1, device=device)
+        Dt2 = _make_tensor(Dt2, device=device)
 
         # Do the same for validation data if it was provided
         if source_features_val is not None and target_features_val is not None:
             Fs_val = _make_tensor(source_features_val.T, device=device)
-            Ft_val = _make_tensor(target_features_val.T, device=device)
-            F_val = torch.cdist(Fs_val, Ft_val, p=2) ** 2
+            Fs_val = _make_tensor(source_features.T, device=device)
+            Ft_val = _make_tensor(target_features.T, device=device)
+            F1_val, F2_val = _low_rank_squared_l2(Fs_val, Ft_val)
+            F1_val = _make_tensor(F1_val, device=device)
+            F2_val = _make_tensor(F2_val, device=device)
 
         elif source_features_val is not None and target_features_val is None:
             raise ValueError(
@@ -195,7 +210,7 @@ class FUGW(BaseMapping):
             )
 
         else:
-            F_val = None
+            F1_val, F2_val = None, None
 
             # Raise warning if validation feature maps are not provided
             if verbose:
@@ -204,27 +219,44 @@ class FUGW(BaseMapping):
                     " Using training data instead."
                 )
 
-        if source_geometry_val is not None and target_geometry_val is not None:
-            Ds_val = _make_tensor(source_geometry_val, device=device)
-            Dt_val = _make_tensor(target_geometry_val, device=device)
+        if (
+            source_geometry_embedding_val is not None
+            and target_geometry_embedding_val is not None
+        ):
+            Ds1_val, Ds2_val = _low_rank_squared_l2(
+                source_geometry_embedding_val, source_geometry_embedding_val
+            )
+            Ds1_val = _make_tensor(Ds1, device=device)
+            Ds2_val = _make_tensor(Ds2, device=device)
+            Dt1_val, Dt2_val = _low_rank_squared_l2(
+                target_geometry_embedding, target_geometry_embedding
+            )
+            Dt1_val = _make_tensor(Dt1_val, device=device)
+            Dt2_val = _make_tensor(Dt2_val, device=device)
 
-        elif source_geometry_val is not None and target_geometry_val is None:
+        elif (
+            source_geometry_embedding_val is not None
+            and target_geometry_embedding_val is None
+        ):
             raise ValueError(
                 "Source geometry validation data provided but not target"
                 " geometry validation data."
             )
 
-        elif source_geometry_val is None and target_geometry_val is not None:
+        elif (
+            source_geometry_embedding_val is None
+            and target_geometry_embedding_val is not None
+        ):
             raise ValueError(
                 "Target geometry validation data provided but not source"
                 " geometry validation data."
             )
 
         else:
-            Ds_val = None
-            Dt_val = None
+            Ds1_val, Ds2_val = Ds1, Ds2
+            Dt1_val, Dt2_val = Dt1, Dt2
 
-            # Raise warning if validation anatomical kernelsare not provided
+            # Raise warning if validation anatomical kernels are not provided
             if verbose:
                 console.log(
                     "Validation data for anatomical kernels is not provided."
@@ -242,12 +274,12 @@ class FUGW(BaseMapping):
             eps=self.eps,
             reg_mode=self.reg_mode,
             divergence=self.divergence,
-            F=F,
-            Ds=Ds,
-            Dt=Dt,
-            F_val=F_val,
-            Ds_val=Ds_val,
-            Dt_val=Dt_val,
+            F=(F1, F2),
+            Ds=(Ds1, Ds2),
+            Dt=(Dt1, Dt2),
+            F_val=(F1_val, F2_val),
+            Ds_val=(Ds1_val, Ds2_val),
+            Dt_val=(Dt1_val, Dt2_val),
             ws=ws,
             wt=wt,
             init_plan=pi_init,
@@ -265,9 +297,9 @@ class FUGW(BaseMapping):
         self.loss_val = res["loss_val"]
 
         # Free allocated GPU memory
-        del Fs, Ft, F, Ds, Dt
+        del F1, F2, Ds1, Ds2, Dt1, Dt2
         if source_features_val is not None:
-            del Fs_val, Ft_val, F_val, Ds_val, Dt_val
+            del Ds1_val, Ds2_val, Dt1_val, Dt2_val
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 

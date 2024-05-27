@@ -23,12 +23,12 @@ def test_fugw_barycenter(device):
     weights_list = []
 
     for _ in range(n_subjects):
-        weights, features, geometry, _ = _init_mock_distribution(
+        weights, features, _, geometry_embedding = _init_mock_distribution(
             n_features, n_voxels
         )
         weights_list.append(weights)
         features_list.append(features)
-        geometry_list.append(geometry)
+        geometry_list.append(geometry_embedding)
 
     fugw_barycenter = FUGWBarycenter()
     fugw_barycenter.fit(
