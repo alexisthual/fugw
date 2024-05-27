@@ -252,7 +252,7 @@ def init_plan_dense(
     return plan
 
 
-def save_mapping(mapping, fname):
+def save_mapping(mapping, fname, storing_device="cpu"):
     """Save mapping in pickle file, separating hyperparams and weights.
 
     Parameters
@@ -261,7 +261,10 @@ def save_mapping(mapping, fname):
         FUGW mapping to save
     fname: str or pathlib.Path
         Path to pickle file to save
+    storing_device: torch.device, default="cpu"
+        Device on which to store the computed transport plan.
     """
+    mapping.pi = mapping.pi.to(storing_device)
     with open(fname, "wb") as f:
         # Dump hyperparams first
         pickle.dump(mapping, f)
