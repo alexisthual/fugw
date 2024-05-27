@@ -18,7 +18,7 @@ from fugw.utils import _add_dict, console
 
 
 class FUGWSolver(BaseSolver):
-    """Solver computing dense solutions"""
+    """Solver computing dense solutions."""
 
     def local_biconvex_cost(
         self,
@@ -28,7 +28,8 @@ class FUGWSolver(BaseSolver):
         tuple_weights,
         hyperparams,
     ):
-        """
+        """Compute a matrix representing the local biconvex cost.
+
         Before each block coordinate descent (BCD) step,
         the local cost matrix is updated.
         This local cost is a matrix of size (n, m)
@@ -36,8 +37,54 @@ class FUGWSolver(BaseSolver):
         of the source and target distributions.
         Then, we run a BCD (sinkhorn, ibpp or mm) step
         which makes use of this cost to update the transport plans.
-        """
 
+        Parameters
+        ----------
+        pi: torch.Tensor
+            Transport plan.
+        transpose: bool
+            Whether to transpose the transport plan.
+        data_const: tuple
+            Tuple containing the following elements:
+                - X_sqr: torch.Tensor of size n x n
+                    Squared distances between source points.
+                - Y_sqr: torch.Tensor of size m x m
+                    Squared distances between target points.
+                - X: torch.Tensor of size n x d1
+                    Source points.
+                - Y: torch.Tensor of size m x d2
+                    Target points.
+                - D: torch.Tensor of size n x m
+                    Kernel matrix between the source and target training
+                    features.
+        tuple_weights: tuple
+            Tuple containing the following elements:
+                - ws: torch.Tensor of size n
+                    Measures assigned to source points.
+                - wt: torch.Tensor of size m
+                    Measures assigned to target points.
+                - ws_dot_wt: torch.Tensor of size n x m
+                    Outer product of ws and wt.
+        hyperparams: tuple
+            Tuple containing the following elements:
+                - rho_s: float
+                    Regularization parameter for source marginal constraints.
+                - rho_t: float
+                    Regularization parameter for target marginal constraints.
+                - eps: float
+                    Regularization parameter for joint regularization.
+                - alpha: float
+                    Weight of the Gromov-Wasserstein loss.
+                - reg_mode: string
+                    Regularization mode.
+                - divergence: string
+                    Divergence to use.
+
+        Returns
+        -------
+        cost: torch.Tensor
+            Local biconvex cost matrix of size (n, m).
+        """
         rho_s, rho_t, eps, alpha, reg_mode, divergence = hyperparams
         ws, wt, ws_dot_wt = tuple_weights
         X_sqr, Y_sqr, X, Y, D = data_const

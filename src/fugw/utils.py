@@ -118,12 +118,12 @@ def _low_rank_squared_l2(X, Y):
     n, m = X.shape[0], Y.shape[0]
 
     norms_X = (X**2).sum(1, keepdim=True)
-    norms_y = (Y**2).sum(1, keepdim=True)
+    norms_Y = (Y**2).sum(1, keepdim=True)
     ones_x = torch.ones(n, 1).to(device).to(dtype)
     ones_y = torch.ones(m, 1).to(device).to(dtype)
 
     A1 = torch.cat([norms_X, ones_x, -(2**0.5) * X], dim=1)
-    A2 = torch.cat([ones_y, norms_y, 2**0.5 * Y], dim=1)
+    A2 = torch.cat([ones_y, norms_Y, 2**0.5 * Y], dim=1)
 
     return (A1, A2)
 

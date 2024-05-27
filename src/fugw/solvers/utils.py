@@ -468,13 +468,14 @@ def solver_mm(
     (because the Kronecker sum of two marginals will eventually contain zeros,
     and divided by zero will result in undesirable coupling).
     """
-
     niters, tol, eval_freq = train_params
     ws, wt = tuple_weights
     rho_s, rho_t, eps = uot_params
 
     sum_param = rho_s + rho_t + eps
-    tau_s, tau_t, r = rho_s / sum_param, rho_t / sum_param, eps / sum_param
+    tau_s = rho_s / sum_param
+    tau_t = rho_t / sum_param
+    r = eps / sum_param
     K = (
         ws[:, None] ** (tau_s + r)
         * wt[None, :] ** (tau_t + r)
