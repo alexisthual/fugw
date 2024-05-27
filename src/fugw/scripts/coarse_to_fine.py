@@ -419,6 +419,9 @@ def fit(
         verbose=verbose,
     )
 
+    # Send coarse mapping to cpu to handle numpy operations
+    coarse_mapping.pi = coarse_mapping.pi.cpu()
+
     # 2. Build sparsity mask
 
     # Select best pairs of source and target vertices from coarse alignment
