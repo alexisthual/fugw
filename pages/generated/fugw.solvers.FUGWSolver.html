@@ -242,7 +242,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fugw.solvers.FUGWSolver">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fugw.solvers.</span></span><span class="sig-name descname"><span class="pre">FUGWSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nits_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nits_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_bcd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_uot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_eps_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ibpp_nits_sinkhorn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver" title="Permalink to this definition">#</a></dt>
-<dd><p>Solver computing dense solutions</p>
+<dd><p>Solver computing dense solutions.</p>
 <p class="rubric">Methods</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -254,7 +254,7 @@
 <td><p>Compute parameters of the L2 loss.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fugw.solvers.FUGWSolver.local_biconvex_cost" title="fugw.solvers.FUGWSolver.local_biconvex_cost"><code class="xref py py-obj docutils literal notranslate"><span class="pre">local_biconvex_cost</span></code></a>(pi, transpose, ...)</p></td>
-<td><p>Before each block coordinate descent (BCD) step, the local cost matrix is updated.</p></td>
+<td><p>Compute a matrix representing the local biconvex cost.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fugw.solvers.FUGWSolver.solve" title="fugw.solvers.FUGWSolver.solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve</span></code></a>([alpha, rho_s, rho_t, eps, reg_mode, ...])</p></td>
 <td><p>Run BCD iterations.</p></td>
@@ -359,13 +359,119 @@ Values are float or None.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fugw.solvers.FUGWSolver.local_biconvex_cost">
 <span class="sig-name descname"><span class="pre">local_biconvex_cost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_const</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuple_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyperparams</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fugw.solvers.FUGWSolver.local_biconvex_cost" title="Permalink to this definition">#</a></dt>
-<dd><p>Before each block coordinate descent (BCD) step,
+<dd><p>Compute a matrix representing the local biconvex cost.</p>
+<p>Before each block coordinate descent (BCD) step,
 the local cost matrix is updated.
 This local cost is a matrix of size (n, m)
 which evaluates the cost between every pair of points
 of the source and target distributions.
 Then, we run a BCD (sinkhorn, ibpp or mm) step
 which makes use of this cost to update the transport plans.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pi: torch.Tensor</strong></dt><dd><p>Transport plan.</p>
+</dd>
+<dt><strong>transpose: bool</strong></dt><dd><p>Whether to transpose the transport plan.</p>
+</dd>
+<dt><strong>data_const: tuple</strong></dt><dd><dl class="simple">
+<dt>Tuple containing the following elements:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>X_sqr: torch.Tensor of size n x n</dt><dd><p>Squared distances between source points.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Y_sqr: torch.Tensor of size m x m</dt><dd><p>Squared distances between target points.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>X: torch.Tensor of size n x d1</dt><dd><p>Source points.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Y: torch.Tensor of size m x d2</dt><dd><p>Target points.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>D: torch.Tensor of size n x m</dt><dd><p>Kernel matrix between the source and target training
+features.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>tuple_weights: tuple</strong></dt><dd><dl class="simple">
+<dt>Tuple containing the following elements:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>ws: torch.Tensor of size n</dt><dd><p>Measures assigned to source points.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>wt: torch.Tensor of size m</dt><dd><p>Measures assigned to target points.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>ws_dot_wt: torch.Tensor of size n x m</dt><dd><p>Outer product of ws and wt.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>hyperparams: tuple</strong></dt><dd><dl class="simple">
+<dt>Tuple containing the following elements:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>rho_s: float</dt><dd><p>Regularization parameter for source marginal constraints.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>rho_t: float</dt><dd><p>Regularization parameter for target marginal constraints.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>eps: float</dt><dd><p>Regularization parameter for joint regularization.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>alpha: float</dt><dd><p>Weight of the Gromov-Wasserstein loss.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>reg_mode: string</dt><dd><p>Regularization mode.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>divergence: string</dt><dd><p>Divergence to use.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>cost: torch.Tensor</dt><dd><p>Local biconvex cost matrix of size (n, m).</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

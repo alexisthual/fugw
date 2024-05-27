@@ -404,13 +404,13 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[07:32:28] Validation data for feature maps is not provided. Using  dense.py:202
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[13:13:47] Validation data for feature maps is not provided. Using  dense.py:202
            training data instead.
            Validation data for anatomical kernels is not provided.  dense.py:229
            Using training data instead.
 
 
-           BCD step 1/5    FUGW loss:      15.431012153625488       dense.py:521
+           BCD step 1/5    FUGW loss:      15.431012153625488       dense.py:568
            Validation loss:        15.431012153625488
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -443,7 +443,7 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 └────────────┴────────┴───────┴──────────────────┘
 
 
-           BCD step 2/5    FUGW loss:      9.585478782653809        dense.py:521
+           BCD step 2/5    FUGW loss:      9.585478782653809        dense.py:568
            Validation loss:        9.585478782653809
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -476,7 +476,7 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 └────────────┴────────┴───────┴──────────────────┘
 
 
-           BCD step 3/5    FUGW loss:      5.271676540374756        dense.py:521
+           BCD step 3/5    FUGW loss:      5.271676540374756        dense.py:568
            Validation loss:        5.271676540374756
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -509,7 +509,7 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 └────────────┴────────┴───────┴──────────────────┘
 
 
-           BCD step 4/5    FUGW loss:      6.342617511749268        dense.py:521
+           BCD step 4/5    FUGW loss:      6.342617511749268        dense.py:568
            Validation loss:        6.342617511749268
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -542,7 +542,7 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 └────────────┴────────┴───────┴──────────────────┘
 
 
-           BCD step 5/5    FUGW loss:      7.891664028167725        dense.py:521
+           BCD step 5/5    FUGW loss:      7.891664028167725        dense.py:568
            Validation loss:        7.891664028167725
 ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -576,10 +576,10 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 </pre></div>
 </div>
 <p>In this example, we see that fugw’s memory usage is constant.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.suptitle" title="matplotlib.figure.Figure.suptitle" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span></a><span class="p">(</span><span class="s2">&quot;Memory usage at each BCD iteration&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.suptitle.html#matplotlib.figure.Figure.suptitle" title="matplotlib.figure.Figure.suptitle" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span></a><span class="p">(</span><span class="s2">&quot;Memory usage at each BCD iteration&quot;</span><span class="p">)</span>
 
-<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.add_subplot" title="matplotlib.figure.Figure.add_subplot" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span></a><span class="p">()</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.add_subplot.html#matplotlib.figure.Figure.add_subplot" title="matplotlib.figure.Figure.add_subplot" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span></a><span class="p">()</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html#matplotlib.axes.Axes.set_xlabel" title="matplotlib.axes.Axes.set_xlabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span></a><span class="p">(</span><span class="s2">&quot;BCD iteration&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xticks.html#matplotlib.axes.Axes.set_xticks" title="matplotlib.axes.Axes.set_xticks" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span></a><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">memory_at_bcd_step</span><span class="p">)))</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html#matplotlib.axes.Axes.set_ylabel" title="matplotlib.axes.Axes.set_ylabel" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span></a><span class="p">(</span><span class="s2">&quot;Memory allocated (KB)&quot;</span><span class="p">)</span>
@@ -588,7 +588,7 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" srcset="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" alt="Memory usage at each BCD iteration" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.821 seconds)</p>
+<img src="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" srcset="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" alt="Memory usage at each BCD iteration" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.889 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  8 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-02-miscellaneous-plot-3-memory-usage-callback-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">

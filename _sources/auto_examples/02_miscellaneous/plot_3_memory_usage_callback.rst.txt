@@ -275,13 +275,13 @@ Our callback function will be called at each iteration of the BCD algorithm.
 
  .. code-block:: none
 
-    [07:32:28] Validation data for feature maps is not provided. Using  dense.py:202
+    [13:13:47] Validation data for feature maps is not provided. Using  dense.py:202
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:229
                Using training data instead.                                         
 
 
-               BCD step 1/5    FUGW loss:      15.431012153625488       dense.py:521
+               BCD step 1/5    FUGW loss:      15.431012153625488       dense.py:568
                Validation loss:        15.431012153625488                           
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -314,7 +314,7 @@ Our callback function will be called at each iteration of the BCD algorithm.
     └────────────┴────────┴───────┴──────────────────┘
 
 
-               BCD step 2/5    FUGW loss:      9.585478782653809        dense.py:521
+               BCD step 2/5    FUGW loss:      9.585478782653809        dense.py:568
                Validation loss:        9.585478782653809                            
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -347,7 +347,7 @@ Our callback function will be called at each iteration of the BCD algorithm.
     └────────────┴────────┴───────┴──────────────────┘
 
 
-               BCD step 3/5    FUGW loss:      5.271676540374756        dense.py:521
+               BCD step 3/5    FUGW loss:      5.271676540374756        dense.py:568
                Validation loss:        5.271676540374756                            
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -380,7 +380,7 @@ Our callback function will be called at each iteration of the BCD algorithm.
     └────────────┴────────┴───────┴──────────────────┘
 
 
-               BCD step 4/5    FUGW loss:      6.342617511749268        dense.py:521
+               BCD step 4/5    FUGW loss:      6.342617511749268        dense.py:568
                Validation loss:        6.342617511749268                            
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -413,7 +413,7 @@ Our callback function will be called at each iteration of the BCD algorithm.
     └────────────┴────────┴───────┴──────────────────┘
 
 
-               BCD step 5/5    FUGW loss:      7.891664028167725        dense.py:521
+               BCD step 5/5    FUGW loss:      7.891664028167725        dense.py:568
                Validation loss:        7.891664028167725                            
     ┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
     ┃ Variable   ┃   Size ┃ Numel ┃ Memory allocated ┃
@@ -481,7 +481,7 @@ In this example, we see that fugw's memory usage is constant.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.821 seconds)
+   **Total running time of the script:** (0 minutes 1.889 seconds)
 
 **Estimated memory usage:**  8 MB
 
