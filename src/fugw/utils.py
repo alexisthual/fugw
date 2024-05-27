@@ -272,7 +272,7 @@ def save_mapping(mapping, fname, storing_device="cpu"):
         pickle.dump(mapping.pi, f)
 
 
-def load_mapping(fname, load_weights=True):
+def load_mapping(fname, load_weights=True, storing_device="cpu"):
     """Load mapping from pickle file, optionally loading weights.
 
     Parameters
@@ -281,6 +281,8 @@ def load_mapping(fname, load_weights=True):
         Path to pickle file to load
     load_weights: bool, optional, defaults to True
         If True, load mapping weights from pickle file.
+    storing_device: torch.device, default="cpu"
+        Device on which to store the computed transport plan.
 
     Returns
     -------
@@ -290,5 +292,6 @@ def load_mapping(fname, load_weights=True):
         mapping = pickle.load(f)
         if load_weights:
             mapping.pi = pickle.load(f)
+            mapping.pi = mapping.pi.to(storing_device)
 
     return mapping
