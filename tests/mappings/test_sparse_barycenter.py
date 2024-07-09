@@ -43,7 +43,7 @@ def test_fugw_barycenter(device):
     ) = fugw_barycenter.fit(
         weights_list,
         features_list,
-        [geometry_embedding],
+        geometry_embedding,
         mesh_sample=mesh_sample,
         coarse_mapping_solver_params={"nits_bcd": 2, "nits_uot": 5},
         fine_mapping_solver_params={"nits_bcd": 2, "nits_uot": 5},
