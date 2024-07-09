@@ -353,7 +353,7 @@ def fit(
     init_plan: torch.sparse_coo_tensor or None
         Initial transport plan to use when fitting the fine mapping.
         If None, a random plan will be used.
-    mask: torch.Tensor or None
+    sparsity_mask: torch.Tensor of size(n, m) or None
         Sparsity mask to use when fitting the fine mapping.
         If None, a mask will be computed from the coarse mapping.
     device: "auto" or torch.device
@@ -370,7 +370,7 @@ def fit(
     target_sample: torch.Tensor of size(target_sample_size)
         Tensor containing the indices which were sampled on the
         target so as to compute the coarse mapping.
-    mask: torch.Tensor of size(n, m)
+    sparsity_mask: torch.Tensor of size(n, m)
         Sparsity mask used to fit the fine mapping.
     """
     # 0. Parse input tensors
