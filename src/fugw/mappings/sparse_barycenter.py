@@ -170,7 +170,7 @@ class FUGWSparseBarycenter:
         features_list (list of np.array): List of features. Individuals should
             have the same number of features n_features.
         geometry_embedding (np.array or torch.Tensor): Common geometry
-        embedding of all individuals and barycenter.
+            embedding of all individuals and barycenter.
         barycenter_size (int), optional:
             Size of computed barycentric features and geometry.
             Defaults to None.
