@@ -20,7 +20,6 @@ class FUGWSparseBarycenter:
         selection_radius=1.0,
         reg_mode="joint",
         force_psd=False,
-        learn_geometry=False,
     ):
         # Save model arguments
         self.alpha_coarse = alpha_coarse
@@ -31,7 +30,6 @@ class FUGWSparseBarycenter:
         self.eps_fine = eps_fine
         self.reg_mode = reg_mode
         self.force_psd = force_psd
-        self.learn_geometry = learn_geometry
         self.selection_radius = selection_radius
 
     @staticmethod
@@ -75,10 +73,9 @@ class FUGWSparseBarycenter:
         plans,
         weights_list,
         features_list,
-        geometry_list,
+        geometry_embedding,
         barycenter_weights,
         barycenter_features,
-        barycenter_geometry_embedding,
         mesh_sample,
         solver,
         coarse_mapping_solver_params,
@@ -94,11 +91,6 @@ class FUGWSparseBarycenter:
         for i, (features, weights) in enumerate(
             zip(features_list, weights_list)
         ):
-            if len(geometry_list) == 1 and len(weights_list) > 1:
-                G = geometry_list[0]
-            else:
-                G = geometry_list[i]
-
             coarse_mapping = FUGW(
                 alpha=self.alpha_coarse,
                 rho=self.rho_coarse,
@@ -116,8 +108,8 @@ class FUGWSparseBarycenter:
             _, _, mask = coarse_to_fine.fit(
                 source_features=features,
                 target_features=barycenter_features,
-                source_geometry_embeddings=G,
-                target_geometry_embeddings=barycenter_geometry_embedding,
+                source_geometry_embeddings=geometry_embedding,
+                target_geometry_embeddings=geometry_embedding,
                 source_sample=mesh_sample,
                 target_sample=mesh_sample,
                 coarse_mapping=coarse_mapping,
@@ -154,11 +146,10 @@ class FUGWSparseBarycenter:
         self,
         weights_list,
         features_list,
-        geometry_list,
+        geometry_embedding,
         barycenter_size=None,
         init_barycenter_weights=None,
         init_barycenter_features=None,
-        init_barycenter_geometry=None,
         solver="sinkhorn",
         coarse_mapping_solver_params={},
         fine_mapping_solver_params={},
@@ -178,8 +169,8 @@ class FUGWSparseBarycenter:
             can have weights with different sizes.
         features_list (list of np.array): List of features. Individuals should
             have the same number of features n_features.
-        geometry_list (list of np.array or torch.Tensor): List of geometry
-            embeddings or just one embedding if it's shared across individuals.
+        geometry_embedding (np.array or torch.Tensor): Common geometry
+        embedding of all individuals and barycenter.
         barycenter_size (int), optional:
             Size of computed barycentric features and geometry.
             Defaults to None.
@@ -190,8 +181,6 @@ class FUGWSparseBarycenter:
             weights. Defaults to None.
         init_barycenter_features (np.array, optional): np.array of size
             (barycenter_size, n_features). Defaults to None.
-        init_barycenter_geometry (np.array, optional): np.array of size
-            (barycenter_size, barycenter_size). Defaults to None.
         solver (str, optional): Solver to use for the OT computation.
             Defaults to "sinkhorn".
         coarse_mapping_solver_params (dict, optional): Parameters for the
@@ -250,11 +239,9 @@ class FUGWSparseBarycenter:
                 init_barycenter_features, device=device
             )
 
-        if init_barycenter_geometry is None:
-            barycenter_geometry_embedding = geometry_list[0]
-        else:
-            barycenter_geometry_embedding = _make_tensor(
-                init_barycenter_geometry, device=device
+        if not isinstance(geometry_embedding, torch.Tensor):
+            geometry_embedding = _make_tensor(
+                geometry_embedding, device=device
             )
 
         plans = None
@@ -267,10 +254,9 @@ class FUGWSparseBarycenter:
                 plans,
                 weights_list,
                 features_list,
-                geometry_list,
+                geometry_embedding,
                 barycenter_weights,
                 barycenter_features,
-                barycenter_geometry_embedding,
                 mesh_sample,
                 solver,
                 coarse_mapping_solver_params,
