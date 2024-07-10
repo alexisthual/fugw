@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:48.538** total execution time for 3 files **from auto_examples/00_basics**:
+**00:48.839** total execution time for 3 files **from auto_examples/00_basics**:
 
 .. container::
 
@@ -33,11 +33,11 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_00_basics_plot_2_2_coarse_to_fine.py` (``plot_2_2_coarse_to_fine.py``)
-     - 00:33.308
-     - 163.6
+     - 00:33.140
+     - 150.5
    * - :ref:`sphx_glr_auto_examples_00_basics_plot_2_1_lmds.py` (``plot_2_1_lmds.py``)
-     - 00:08.876
-     - 82.9
+     - 00:09.488
+     - 83.9
    * - :ref:`sphx_glr_auto_examples_00_basics_plot_1_dense.py` (``plot_1_dense.py``)
-     - 00:06.353
-     - 81.6
+     - 00:06.211
+     - 75.5
