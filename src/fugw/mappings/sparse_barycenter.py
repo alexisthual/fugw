@@ -254,7 +254,7 @@ class FUGWSparseBarycenter:
         mask = None
         losses_each_bar_step = []
 
-        for _ in range(nits_barycenter):
+        for idx in range(nits_barycenter):
             # Transport all elements
             plans, losses = self.compute_all_ot_plans(
                 plans,
