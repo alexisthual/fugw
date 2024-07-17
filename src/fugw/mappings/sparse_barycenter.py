@@ -140,7 +140,7 @@ class FUGWSparseBarycenter:
                 )
             )
 
-        return new_plans, new_losses
+        return new_plans, new_losses, sparsity_mask
 
     def fit(
         self,
@@ -256,7 +256,7 @@ class FUGWSparseBarycenter:
 
         for idx in range(nits_barycenter):
             # Transport all elements
-            plans, losses = self.compute_all_ot_plans(
+            plans, losses, sparsity_mask = self.compute_all_ot_plans(
                 plans,
                 weights_list,
                 features_list,
