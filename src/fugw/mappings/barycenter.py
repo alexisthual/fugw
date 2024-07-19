@@ -155,7 +155,6 @@ class FUGWBarycenter:
                 solver=solver,
                 solver_params=solver_params,
                 device=device,
-                storing_device=device,
                 verbose=verbose,
             )
 

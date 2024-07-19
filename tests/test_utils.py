@@ -119,10 +119,14 @@ def test_saving_and_loading(device, return_numpy, solver):
 
         save_mapping(fugw, fname)
 
-        mapping_without_weights = load_mapping(fname, load_weights=False)
+        mapping_without_weights = load_mapping(
+            fname, load_weights=False, device=device
+        )
         assert mapping_without_weights.pi is None
 
-        mapping_with_weights = load_mapping(fname, load_weights=True)
+        mapping_with_weights = load_mapping(
+            fname, load_weights=True, device=device
+        )
         assert mapping_with_weights.pi.shape == (
             n_voxels_source,
             n_voxels_target,
