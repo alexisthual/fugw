@@ -326,25 +326,25 @@ We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 
  .. code-block:: none
 
-    [19:50:45] Validation data for feature maps is not provided. Using  dense.py:202
+    [05:26:32] Validation data for feature maps is not provided. Using  dense.py:202
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:229
                Using training data instead.                                         
 
 
-    [19:50:50] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
+    [05:26:38] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
                Validation loss:        0.025816654786467552                         
 
 
-    [19:50:59] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
+    [05:26:47] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
                Validation loss:        0.009248202666640282                         
 
 
-    [19:51:08] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
+    [05:26:55] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
                Validation loss:        0.007908511906862259                         
 
 
-    [19:51:17] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
+    [05:27:04] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
                Validation loss:        0.007553447037935257                         
 
 
@@ -546,7 +546,7 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.616 seconds)
+   **Total running time of the script:** (0 minutes 36.629 seconds)
 
 **Estimated memory usage:**  8 MB
 
