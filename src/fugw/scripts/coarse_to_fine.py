@@ -309,9 +309,7 @@ def compute_sparsity_mask(
     """
     if method == "quantile":
         # Method 1: keep first percentile
-        quantile = 99.95
-
-        threshold = np.percentile(coarse_mapping.pi, quantile)
+        threshold = np.percentile(coarse_mapping.pi, 99.95)
         rows, cols = np.nonzero(coarse_mapping.pi > threshold)
 
     elif method == "topk":
