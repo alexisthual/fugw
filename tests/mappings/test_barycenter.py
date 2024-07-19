@@ -1,3 +1,5 @@
+from itertools import product
+
 import numpy as np
 import pytest
 import torch
@@ -9,9 +11,14 @@ devices = [torch.device("cpu")]
 if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
+callbacks = [None, lambda x: x["plans"]]
 
-@pytest.mark.parametrize("device", devices)
-def test_fugw_barycenter(device):
+
+@pytest.mark.parametrize(
+    "device, callback",
+    product(devices, callbacks),
+)
+def test_fugw_barycenter(device, callback):
     np.random.seed(0)
     n_subjects = 4
     n_voxels = 100
@@ -32,5 +39,9 @@ def test_fugw_barycenter(device):
 
     fugw_barycenter = FUGWBarycenter()
     fugw_barycenter.fit(
-        weights_list, features_list, geometry_list, device=device
+        weights_list,
+        features_list,
+        geometry_list,
+        device=device,
+        callback_barycenter=callback,
     )

@@ -156,6 +156,7 @@ class FUGWSparseBarycenter:
         mesh_sample=None,
         nits_barycenter=5,
         device="auto",
+        callback_barycenter=None,
         verbose=False,
     ):
         """Compute barycentric features and geometry
@@ -192,6 +193,11 @@ class FUGWSparseBarycenter:
         device: "auto" or torch.device
             if "auto": use first available gpu if it's available,
             cpu otherwise.
+        callback_barycenter: callable or None
+            Callback function called at the end of each barycenter step.
+            It will be called with the following arguments:
+
+                - locals (dictionary containing all local variables)
 
         Returns
         -------
@@ -248,7 +254,7 @@ class FUGWSparseBarycenter:
         mask = None
         losses_each_bar_step = []
 
-        for _ in range(nits_barycenter):
+        for idx in range(nits_barycenter):
             # Transport all elements
             plans, losses = self.compute_all_ot_plans(
                 plans,
@@ -273,6 +279,9 @@ class FUGWSparseBarycenter:
             barycenter_features = self.update_barycenter_features(
                 plans, weights_list, features_list, device
             )
+
+            if callback_barycenter is not None:
+                callback_barycenter(locals())
 
         return (
             barycenter_weights,
