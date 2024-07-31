@@ -343,7 +343,21 @@ def compute_sparsity_mask(
     C_source = get_cluster_matrix(rows, source_sample.shape[0])
     C_target = get_cluster_matrix(cols, target_sample.shape[0])
 
-    return (N_source @ C_source) @ (N_target @ C_target).T
+    sparsity_mask = (N_source @ C_source) @ (N_target @ C_target).T
+
+    # Check for any empty row/column in the sparsity mask
+    rows, cols = sparsity_mask.indices()
+    if (
+        len(np.unique(rows)) < sparsity_mask.shape[0]
+        or len(np.unique(cols)) < sparsity_mask.shape[1]
+    ):
+        raise ValueError(
+            "Sparsity mask contains empty rows or columns. "
+            "Please consider increasing the selection radius "
+            "or increasing the number of samples."
+        )
+
+    return sparsity_mask
 
 
 def fit(
@@ -524,7 +538,7 @@ def fit(
             method=coarse_pairs_selection_method,
         )
 
-    # Define init plan from spasity mask
+    # Define init plan from sparsity mask
     if init_plan is None:
         init_plan = torch.sparse_coo_tensor(
             sparsity_mask.indices(),
