@@ -1,7 +1,7 @@
 import torch
 
 from fugw.mappings.dense import FUGW
-from fugw.utils import _make_tensor
+from fugw.utils import _make_tensor, console
 
 
 class FUGWBarycenter:
@@ -131,6 +131,9 @@ class FUGWBarycenter:
         for i, (features, weights) in enumerate(
             zip(features_list, weights_list)
         ):
+            if verbose:
+                console.log(f"Updating mapping {i + 1} / {len(weights_list)}")
+
             if len(geometry_list) == 1 and len(weights_list) > 1:
                 G = geometry_list[0]
             else:
@@ -278,6 +281,10 @@ class FUGWBarycenter:
         losses_each_bar_step = []
 
         for idx in range(nits_barycenter):
+            if verbose:
+                console.log(
+                    f"Barycenter iterations {idx + 1} / {nits_barycenter}"
+                )
             # Transport all elements
             plans, losses = self.compute_all_ot_plans(
                 plans,
