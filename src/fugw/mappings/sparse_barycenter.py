@@ -3,7 +3,7 @@ import torch
 from fugw.mappings.dense import FUGW
 from fugw.mappings.sparse import FUGWSparse
 from fugw.scripts import coarse_to_fine
-from fugw.utils import _make_tensor
+from fugw.utils import _make_tensor, console
 
 
 class FUGWSparseBarycenter:
@@ -91,6 +91,9 @@ class FUGWSparseBarycenter:
         for i, (features, weights) in enumerate(
             zip(features_list, weights_list)
         ):
+            if verbose:
+                console.log(f"Updating mapping {i + 1} / {len(weights_list)}")
+
             coarse_mapping = FUGW(
                 alpha=self.alpha_coarse,
                 rho=self.rho_coarse,
@@ -255,6 +258,11 @@ class FUGWSparseBarycenter:
         losses_each_bar_step = []
 
         for idx in range(nits_barycenter):
+            if verbose:
+                console.log(
+                    f"Barycenter iterations {idx + 1} / {nits_barycenter}"
+                )
+
             # Transport all elements
             plans, losses, sparsity_mask = self.compute_all_ot_plans(
                 plans,
