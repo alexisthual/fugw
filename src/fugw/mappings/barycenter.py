@@ -146,8 +146,8 @@ class FUGWBarycenter:
             mapping.fit(
                 source_features=features,
                 target_features=barycenter_features,
-                source_geometry=G,
-                target_geometry=barycenter_geometry,
+                source_geometry_embedding=G,
+                target_geometry_embedding=barycenter_geometry,
                 source_weights=weights,
                 target_weights=barycenter_weights,
                 init_plan=plans[i] if plans is not None else None,
@@ -196,9 +196,9 @@ class FUGWBarycenter:
             can have weights with different sizes.
         features_list (list of np.array): List of features. Individuals should
             have the same number of features n_features.
-        geometry_list (list of np.array or np.array): List of kernel matrices
-            or just one kernel matrix if it's shared across individuals
-            barycenter_size (int, optional): Size of computed
+        geometry_list (list of np.array or np.array): List of geometry
+            embeddings or just one embedding if it's shared across individuals.
+        barycenter_size (int, optional): Size of computed
             barycentric features and geometry. Defaults to None.
         init_barycenter_weights (np.array, optional): Distribution weights
             of barycentric points. If None, points will have uniform
