@@ -16,6 +16,7 @@ memory = Memory(fugw_data, verbose=0)
 
 
 def _check_mesh(mesh: str) -> None:
+    """Check if the mesh is valid."""
     valid_meshes = ["pial_left", "pial_right", "infl_left", "infl_right"]
     if mesh not in valid_meshes:
         raise ValueError(
@@ -24,6 +25,7 @@ def _check_mesh(mesh: str) -> None:
 
 
 def _check_resolution(resolution: str) -> None:
+    """Check if the resolution is valid."""
     valid_resolutions = [
         "fsaverage3",
         "fsaverage4",
@@ -42,7 +44,10 @@ def _check_resolution(resolution: str) -> None:
 @memory.cache
 def _fetch_geometry_full_rank(
     mesh: str, resolution: str, method: str = "geodesic"
-):
+) -> Tuple[np.ndarray, float]:
+    """Returns the normalized full-rank distance matrix for the
+    given mesh and the maximum distance between two points in the mesh.
+    """
     mesh_path = datasets.fetch_surf_fsaverage(mesh=resolution)[mesh]
     (coordinates, triangles) = surface.load_surf_mesh(mesh_path)
     if method == "geodesic":
@@ -72,6 +77,9 @@ def _fetch_geometry_low_rank(
     n_jobs: int = 2,
     verbose: bool = True,
 ) -> Tuple[np.ndarray, float]:
+    """Returns the normalized low-rank distance matrix for the
+    given mesh and the maximum distance between two points in the mesh.
+    """
     if method == "euclidean":
         raise NotImplementedError(
             "Low-rank embedding is not implemented for L2 distance matrices."
@@ -103,7 +111,41 @@ def fetch_surf_geometry(
     n_landmarks: int = 100,
     n_jobs: int = 2,
     verbose: bool = True,
-):
+) -> Tuple[np.ndarray, float]:
+    """Returns either the normalized full-rank or low-rank embedding
+    of the distance matrix for the given mesh and the maximum distance
+    between two points in the mesh.
+
+    Parameters
+    ----------
+    mesh : str
+        Input mesh name. Valid meshes include "pial_left", "pial_right",
+        "infl_left", and "infl_right".
+    resolution : str
+        Input resolution name. Valid resolutions include "fsaverage3",
+        "fsaverage4", "fsaverage5", "fsaverage6", "fsaverage7", and
+        "fsaverage".
+    method : str, optional
+        Method used to compute distances, either "geodesic" or "euclidean",
+        by default "geodesic".
+    rank : int, optional
+        Dimension of embedding, -1 for full-rank embedding
+        and rank < n_vertices for low-rank embedding, by default -1
+    n_landmarks : int, optional
+        Number of vertices to sample on mesh to approximate embedding,
+        by default 100
+    n_jobs : int, optional,
+        Relative tolerance used to check intermediate results, by default 2
+    verbose : bool, optional
+        Enable logging, by default True
+
+    Returns
+    -------
+    Tuple[np.ndarray, float]
+        Full-rank or low-rank embedding of the distance matrix of size
+        (n_vertices, n_vertices) or (n_vertices, rank) and the maximum
+        distance encountered in the mesh.
+    """
     _check_mesh(mesh)
     _check_resolution(resolution)
 
