@@ -27,8 +27,11 @@ def test_fetch_geometry_full_rank():
     mask = "mni152_gm_mask"
     resolution = 10
     n_voxels = 1886  # Number of voxels in the mask
-    geometry = _fetch_geometry_full_rank(mask, resolution, method="euclidean")
+    geometry, d_max = _fetch_geometry_full_rank(
+        mask, resolution, method="euclidean"
+    )
 
+    assert isinstance(d_max, float)
     assert isinstance(geometry, np.ndarray)
     assert geometry.shape == (n_voxels, n_voxels)
 
@@ -57,8 +60,9 @@ def test_fetch_vol_geometry():
     n_voxels = 1886  # Number of voxels in the mask
 
     rank = -1
-    geometry = fetch_vol_geometry(mask, resolution, rank=rank)
+    geometry, d_max = fetch_vol_geometry(mask, resolution, rank=rank)
 
+    assert isinstance(d_max, float)
     assert isinstance(geometry, np.ndarray)
     assert geometry.shape == (n_voxels, n_voxels)
 
