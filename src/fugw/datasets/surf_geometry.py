@@ -56,9 +56,10 @@ def _fetch_geometry_full_rank(
         geometry = distance_matrix(coordinates, coordinates)
 
     # Normalize the distance matrix
-    geometry = geometry / geometry.max()
+    d_max = geometry.max()
+    geometry = geometry / d_max
 
-    return geometry
+    return geometry, d_max
 
 
 @memory.cache
