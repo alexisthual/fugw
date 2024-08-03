@@ -15,6 +15,7 @@ memory = Memory(fugw_data, verbose=0)
 
 
 def _check_masker(mask: str) -> None:
+    """Check if the mask is valid."""
     valid_masks = ["mni152_gm_mask", "mni152_brain_mask"]
     if mask not in valid_masks:
         raise ValueError(
@@ -23,6 +24,7 @@ def _check_masker(mask: str) -> None:
 
 
 def _compute_connected_segmentation(mask_img: Any) -> np.ndarray:
+    """Compute the connected segmentation of the mask from a 3D Nifti image."""
     return (
         masking.compute_background_mask(mask_img, connected=True).get_fdata()
         > 0
@@ -32,7 +34,10 @@ def _compute_connected_segmentation(mask_img: Any) -> np.ndarray:
 @memory.cache
 def _fetch_geometry_full_rank(
     mask: str, resolution: int, method: str = "euclidean"
-):
+) -> Tuple[np.ndarray, float]:
+    """Returns the normalized full-rank distance matrix for the
+    given mesh and the maximum distance between two points in the volume.
+    """
     if mask == "mni152_gm_mask":
         mask_img = datasets.load_mni152_gm_mask(resolution=resolution)
     elif mask == "mni152_brain_mask":
@@ -67,6 +72,9 @@ def _fetch_geometry_low_rank(
     n_jobs: int = 2,
     verbose: bool = True,
 ) -> Tuple[np.ndarray, float]:
+    """Returns the normalized low-rank distance matrix for the
+    given mesh and the maximum distance between two points in the mesh.
+    """
     if mask == "mni152_gm_mask":
         mask_img = datasets.load_mni152_gm_mask(resolution=resolution)
     elif mask == "mni152_brain_mask":
@@ -105,7 +113,39 @@ def fetch_vol_geometry(
     n_landmarks: int = 100,
     n_jobs: int = 2,
     verbose: bool = True,
-):
+) -> Tuple[np.ndarray, float]:
+    """Returns either the normalized full-rank or low-rank embedding
+    of the distance matrix for the given mesh and the maximum distance
+    between two points in the volume.
+
+    Parameters
+    ----------
+    mask : str
+        Input mask name. Valid masks include "mni152_gm_mask" and
+        "mni152_brain_mask".
+    resolution : int
+        Input resolution name.
+    method : str, optional
+        Method used to compute distances, either "geodesic" or "euclidean",
+        by default "geodesic".
+    rank : int, optional
+        Dimension of embedding, -1 for full-rank embedding
+        and rank < n_vertices for low-rank embedding, by default -1
+    n_landmarks : int, optional
+        Number of vertices to sample on mesh to approximate embedding,
+        by default 100
+    n_jobs : int, optional,
+        Relative tolerance used to check intermediate results, by default 2
+    verbose : bool, optional
+        Enable logging, by default True
+
+    Returns
+    -------
+    Tuple[np.ndarray, float]
+        Full-rank or low-rank embedding of the distance matrix of size
+        (n_vertices, n_vertices) or (n_vertices, rank) and the maximum
+        distance encountered in the volume.
+    """
     _check_masker(mask)
 
     if rank == -1:
