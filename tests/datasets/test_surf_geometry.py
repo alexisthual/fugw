@@ -47,8 +47,9 @@ def test_check_resolution():
 def test_fetch_geometry_full_rank(mesh, method):
     resolution = "fsaverage3"
     n_vertices = 642  # fsaverage3 has 642 vertices
-    geometry = _fetch_geometry_full_rank(mesh, resolution, method)
+    geometry, d_max = _fetch_geometry_full_rank(mesh, resolution, method)
 
+    assert isinstance(d_max, float)
     assert isinstance(geometry, np.ndarray)
     assert geometry.shape == (n_vertices, n_vertices)
 
@@ -83,8 +84,9 @@ def test_fetch_surf_geometry(mesh):
     n_vertices = 642
 
     rank = -1
-    geometry = fetch_surf_geometry(mesh, resolution, rank=rank)
+    geometry, d_max = fetch_surf_geometry(mesh, resolution, rank=rank)
 
+    assert isinstance(d_max, float)
     assert isinstance(geometry, np.ndarray)
     assert geometry.shape == (n_vertices, n_vertices)
 
