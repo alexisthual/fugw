@@ -88,7 +88,7 @@ Let us generate random training data for the source and target distributions
 
  .. code-block:: none
 
-    /usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:271: UserWarning:
+    /usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:272: UserWarning:
 
     Singular sample detected.
 
@@ -237,13 +237,13 @@ using a sinkhorn solver
 
  .. code-block:: none
 
-    [05:21:35] Validation data for feature maps is not provided. Using  dense.py:202
+    [21:02:18] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
-               Validation data for anatomical kernels is not provided.  dense.py:229
+               Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [05:21:36] BCD step 1/10   FUGW loss:      0.029136842116713524     dense.py:568
+    [21:02:19] BCD step 1/10   FUGW loss:      0.029136842116713524     dense.py:568
                Validation loss:        0.029136842116713524                         
 
 
@@ -255,7 +255,7 @@ using a sinkhorn solver
                Validation loss:        0.022854337468743324                         
 
 
-    [05:21:37] BCD step 4/10   FUGW loss:      0.02232404239475727      dense.py:568
+    [21:02:20] BCD step 4/10   FUGW loss:      0.02232404239475727      dense.py:568
                Validation loss:        0.02232404239475727                          
 
 
@@ -263,11 +263,11 @@ using a sinkhorn solver
                Validation loss:        0.04798972234129906                          
 
 
-    [05:21:38] BCD step 6/10   FUGW loss:      0.02343880571424961      dense.py:568
+               BCD step 6/10   FUGW loss:      0.02343880571424961      dense.py:568
                Validation loss:        0.02343880571424961                          
 
 
-               BCD step 7/10   FUGW loss:      0.019214436411857605     dense.py:568
+    [21:02:21] BCD step 7/10   FUGW loss:      0.019214436411857605     dense.py:568
                Validation loss:        0.019214436411857605                         
 
 
@@ -275,11 +275,11 @@ using a sinkhorn solver
                Validation loss:        0.01873275265097618                          
 
 
-    [05:21:39] BCD step 9/10   FUGW loss:      0.01861358806490898      dense.py:568
+               BCD step 9/10   FUGW loss:      0.01861358806490898      dense.py:568
                Validation loss:        0.01861358806490898                          
 
 
-               BCD step 10/10  FUGW loss:      0.018613653257489204     dense.py:568
+    [21:02:22] BCD step 10/10  FUGW loss:      0.018613653257489204     dense.py:568
                Validation loss:        0.018613653257489204                         
 
 
@@ -485,9 +485,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.244 seconds)
+   **Total running time of the script:** (0 minutes 6.441 seconds)
 
-**Estimated memory usage:**  79 MB
+**Estimated memory usage:**  131 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_1_dense.py:
@@ -503,6 +503,10 @@ between source and target
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_1_dense.py <plot_1_dense.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_1_dense.zip <plot_1_dense.zip>`
 
 
 .. only:: html

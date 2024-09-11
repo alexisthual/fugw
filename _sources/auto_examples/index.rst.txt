@@ -38,7 +38,7 @@ can be used in combination with sparse solvers for the FUGW loss.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a dense fugw alignment between them....">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a dense fugw alignment between them. Dense alignments are typically used when both aligned distributions have less than 10k points.">
 
 .. only:: html
 
@@ -55,7 +55,7 @@ can be used in combination with sparse solvers for the FUGW loss.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to derive an embedding which approximates the kernel matrix of geo...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to derive an embedding which approximates the kernel matrix of geodesic distances on a given mesh. This technique is useful when trying to align distributions with a large number of points. Indeed, the kernel matrix of pairwise distances won&#x27;t fit in memory, but an embedding computed in the right dimension can probably estimate it.">
 
 .. only:: html
 
@@ -72,7 +72,7 @@ can be used in combination with sparse solvers for the FUGW loss.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a sparse fugw alignment between them...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a sparse fugw alignment between them. Sparse alignments are typically used when both aligned distributions have more than 10k points.">
 
 .. only:: html
 
@@ -108,7 +108,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution left hemispheres using 4 fMRI feature maps (z-score ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution left hemispheres using 4 fMRI feature maps (z-score contrast maps).">
 
 .. only:: html
 
@@ -125,7 +125,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to use this package to align 2 high-resolution left hemispheres us...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to use this package to align 2 high-resolution left hemispheres using fMRI feature maps (z-score contrast maps). Note that, since we want this example to run on CPU, we stick to rather low-resolution meshes (around 10k vertices per hemisphere) but that this package can easily scale to resolutions above 150k vertices per hemisphere. In this case, with appropriate hyper-parameters and solver parameters, it takes less than 10 minutes to compute a mapping between 2 such distributions using a V100 Nvidia GPU.">
 
 .. only:: html
 
@@ -142,7 +142,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score contrast maps).">
 
 .. only:: html
 
@@ -159,7 +159,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score contrast maps).">
 
 .. only:: html
 
@@ -197,7 +197,7 @@ but that can be useful in some cases.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor the Pearson correlation between transfor...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor the Pearson correlation between transformed and target features at each iteration of the block-coordinate descent (BCD) algorithm. This can be useful to detect numerical errors, or to check that the mapping is not over-fitting training data.">
 
 .. only:: html
 
@@ -214,7 +214,7 @@ but that can be useful in some cases.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use 3 fMRI feature maps for training and 2 independant fMRI feature maps fo...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use 3 fMRI feature maps for training and 2 independant fMRI feature maps for testing to examine the evolutions of a training and a validation loss on 2 low-resolution brain volumes.">
 
 .. only:: html
 
@@ -231,7 +231,7 @@ but that can be useful in some cases.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor memory usage at each iteration of the bl...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor memory usage at each iteration of the block-coordinate descent (BCD) algorithm. This can be useful to detect memory leaks, or to check that the memory usage is not too high for a given device.">
 
 .. only:: html
 

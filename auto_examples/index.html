@@ -247,29 +247,29 @@ its dense solvers. Then we show how a large, low-rank geometry
 can be approximated with by computing an embedding, resulting in
 much less memory usage. Finally, we show how these embeddings
 can be used in combination with sparse solvers for the FUGW loss.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a dense fugw alignment between them...."><img alt="" src="../_images/sphx_glr_plot_1_dense_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a dense fugw alignment between them. Dense alignments are typically used when both aligned distributions have less than 10k points."><img alt="" src="../_images/sphx_glr_plot_1_dense_thumb.png" />
 <p><a class="reference internal" href="00_basics/plot_1_dense.html#sphx-glr-auto-examples-00-basics-plot-1-dense-py"><span class="std std-ref">Transport distributions using dense solvers</span></a></p>
   <div class="sphx-glr-thumbnail-title">Transport distributions using dense solvers</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to derive an embedding which approximates the kernel matrix of geo..."><img alt="" src="../_images/sphx_glr_plot_2_1_lmds_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to derive an embedding which approximates the kernel matrix of geodesic distances on a given mesh. This technique is useful when trying to align distributions with a large number of points. Indeed, the kernel matrix of pairwise distances won&#x27;t fit in memory, but an embedding computed in the right dimension can probably estimate it."><img alt="" src="../_images/sphx_glr_plot_2_1_lmds_thumb.png" />
 <p><a class="reference internal" href="00_basics/plot_2_1_lmds.html#sphx-glr-auto-examples-00-basics-plot-2-1-lmds-py"><span class="std std-ref">Generate embeddings from mesh</span></a></p>
   <div class="sphx-glr-thumbnail-title">Generate embeddings from mesh</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a sparse fugw alignment between them..."><img alt="" src="../_images/sphx_glr_plot_2_2_coarse_to_fine_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a sparse fugw alignment between them. Sparse alignments are typically used when both aligned distributions have more than 10k points."><img alt="" src="../_images/sphx_glr_plot_2_2_coarse_to_fine_thumb.png" />
 <p><a class="reference internal" href="00_basics/plot_2_2_coarse_to_fine.html#sphx-glr-auto-examples-00-basics-plot-2-2-coarse-to-fine-py"><span class="std std-ref">Transport distributions using sparse solvers</span></a></p>
   <div class="sphx-glr-thumbnail-title">Transport distributions using sparse solvers</div>
 </div></div></section>
 <section id="brain-alignment">
 <h2>Brain alignment<a class="headerlink" href="#brain-alignment" title="Permalink to this heading">#</a></h2>
 <p>This subsection gives an exhaustive overview of brain alignment pipelines which cover 4 cases: volumetric or surface data, low or high resolution.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution left hemispheres using 4 fMRI feature maps (z-score ..."><img alt="" src="../_images/sphx_glr_plot_1_aligning_brain_dense_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution left hemispheres using 4 fMRI feature maps (z-score contrast maps)."><img alt="" src="../_images/sphx_glr_plot_1_aligning_brain_dense_thumb.png" />
 <p><a class="reference internal" href="01_brain_alignment/plot_1_aligning_brain_dense.html#sphx-glr-auto-examples-01-brain-alignment-plot-1-aligning-brain-dense-py"><span class="std std-ref">Low-resolution surface alignment of 2 individuals with fMRI data</span></a></p>
   <div class="sphx-glr-thumbnail-title">Low-resolution surface alignment of 2 individuals with fMRI data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to use this package to align 2 high-resolution left hemispheres us..."><img alt="" src="../_images/sphx_glr_plot_2_aligning_brain_sparse_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to use this package to align 2 high-resolution left hemispheres using fMRI feature maps (z-score contrast maps). Note that, since we want this example to run on CPU, we stick to rather low-resolution meshes (around 10k vertices per hemisphere) but that this package can easily scale to resolutions above 150k vertices per hemisphere. In this case, with appropriate hyper-parameters and solver parameters, it takes less than 10 minutes to compute a mapping between 2 such distributions using a V100 Nvidia GPU."><img alt="" src="../_images/sphx_glr_plot_2_aligning_brain_sparse_thumb.png" />
 <p><a class="reference internal" href="01_brain_alignment/plot_2_aligning_brain_sparse.html#sphx-glr-auto-examples-01-brain-alignment-plot-2-aligning-brain-sparse-py"><span class="std std-ref">High-resolution surface alignment of 2 individuals with fMRI data</span></a></p>
   <div class="sphx-glr-thumbnail-title">High-resolution surface alignment of 2 individuals with fMRI data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con..."><img alt="" src="../_images/sphx_glr_plot_3_aligning_low_res_volumes_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score contrast maps)."><img alt="" src="../_images/sphx_glr_plot_3_aligning_low_res_volumes_thumb.png" />
 <p><a class="reference internal" href="01_brain_alignment/plot_3_aligning_low_res_volumes.html#sphx-glr-auto-examples-01-brain-alignment-plot-3-aligning-low-res-volumes-py"><span class="std std-ref">Low-resolution volume alignment of 2 individuals with fMRI data</span></a></p>
   <div class="sphx-glr-thumbnail-title">Low-resolution volume alignment of 2 individuals with fMRI data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con..."><img alt="" src="../_images/sphx_glr_plot_4_aligning_high_res_volumes_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score contrast maps)."><img alt="" src="../_images/sphx_glr_plot_4_aligning_high_res_volumes_thumb.png" />
 <p><a class="reference internal" href="01_brain_alignment/plot_4_aligning_high_res_volumes.html#sphx-glr-auto-examples-01-brain-alignment-plot-4-aligning-high-res-volumes-py"><span class="std std-ref">High-resolution volume alignment of 2 individuals with fMRI data</span></a></p>
   <div class="sphx-glr-thumbnail-title">High-resolution volume alignment of 2 individuals with fMRI data</div>
 </div></div></section>
@@ -278,13 +278,13 @@ can be used in combination with sparse solvers for the FUGW loss.</p>
 <p>This section contains a series of miscellaneous tools
 that are not directly related to the main functionality of the package,
 but that can be useful in some cases.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor the Pearson correlation between transfor..."><img alt="" src="../_images/sphx_glr_plot_1_pearson_correlation_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor the Pearson correlation between transformed and target features at each iteration of the block-coordinate descent (BCD) algorithm. This can be useful to detect numerical errors, or to check that the mapping is not over-fitting training data."><img alt="" src="../_images/sphx_glr_plot_1_pearson_correlation_thumb.png" />
 <p><a class="reference internal" href="02_miscellaneous/plot_1_pearson_correlation.html#sphx-glr-auto-examples-02-miscellaneous-plot-1-pearson-correlation-py"><span class="std std-ref">Monitor the Pearson correlation during training with callbacks</span></a></p>
   <div class="sphx-glr-thumbnail-title">Monitor the Pearson correlation during training with callbacks</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we use 3 fMRI feature maps for training and 2 independant fMRI feature maps fo..."><img alt="" src="../_images/sphx_glr_plot_2_simple_crossval_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we use 3 fMRI feature maps for training and 2 independant fMRI feature maps for testing to examine the evolutions of a training and a validation loss on 2 low-resolution brain volumes."><img alt="" src="../_images/sphx_glr_plot_2_simple_crossval_thumb.png" />
 <p><a class="reference internal" href="02_miscellaneous/plot_2_simple_crossval.html#sphx-glr-auto-examples-02-miscellaneous-plot-2-simple-crossval-py"><span class="std std-ref">Using a validation set to monitor the convergence of the fugw loss</span></a></p>
   <div class="sphx-glr-thumbnail-title">Using a validation set to monitor the convergence of the fugw loss</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor memory usage at each iteration of the bl..."><img alt="" src="../_images/sphx_glr_plot_3_memory_usage_callback_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor memory usage at each iteration of the block-coordinate descent (BCD) algorithm. This can be useful to detect memory leaks, or to check that the memory usage is not too high for a given device."><img alt="" src="../_images/sphx_glr_plot_3_memory_usage_callback_thumb.png" />
 <p><a class="reference internal" href="02_miscellaneous/plot_3_memory_usage_callback.html#sphx-glr-auto-examples-02-miscellaneous-plot-3-memory-usage-callback-py"><span class="std std-ref">Monitor memory usage at each BCD iteration with callbacks</span></a></p>
   <div class="sphx-glr-thumbnail-title">Monitor memory usage at each BCD iteration with callbacks</div>
 </div></div><div class="toctree-wrapper compound">

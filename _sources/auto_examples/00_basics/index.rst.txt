@@ -22,7 +22,7 @@ can be used in combination with sparse solvers for the FUGW loss.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a dense fugw alignment between them....">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a dense fugw alignment between them. Dense alignments are typically used when both aligned distributions have less than 10k points.">
 
 .. only:: html
 
@@ -39,7 +39,7 @@ can be used in combination with sparse solvers for the FUGW loss.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to derive an embedding which approximates the kernel matrix of geo...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to derive an embedding which approximates the kernel matrix of geodesic distances on a given mesh. This technique is useful when trying to align distributions with a large number of points. Indeed, the kernel matrix of pairwise distances won&#x27;t fit in memory, but an embedding computed in the right dimension can probably estimate it.">
 
 .. only:: html
 
@@ -56,7 +56,7 @@ can be used in combination with sparse solvers for the FUGW loss.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a sparse fugw alignment between them...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we sample 2 toy distributions and compute a sparse fugw alignment between them. Sparse alignments are typically used when both aligned distributions have more than 10k points.">
 
 .. only:: html
 

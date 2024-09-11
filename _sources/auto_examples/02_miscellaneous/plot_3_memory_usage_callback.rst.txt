@@ -91,7 +91,7 @@ Let us generate random training data for the source and target distributions
 
  .. code-block:: none
 
-    /usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:271: UserWarning:
+    /usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:272: UserWarning:
 
     Singular sample detected.
 
@@ -275,9 +275,9 @@ Our callback function will be called at each iteration of the BCD algorithm.
 
  .. code-block:: none
 
-    [05:31:18] Validation data for feature maps is not provided. Using  dense.py:202
+    [21:12:31] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
-               Validation data for anatomical kernels is not provided.  dense.py:229
+               Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
@@ -481,9 +481,9 @@ In this example, we see that fugw's memory usage is constant.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.837 seconds)
+   **Total running time of the script:** (0 minutes 1.998 seconds)
 
-**Estimated memory usage:**  8 MB
+**Estimated memory usage:**  61 MB
 
 
 .. _sphx_glr_download_auto_examples_02_miscellaneous_plot_3_memory_usage_callback.py:
@@ -499,6 +499,10 @@ In this example, we see that fugw's memory usage is constant.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_3_memory_usage_callback.py <plot_3_memory_usage_callback.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_3_memory_usage_callback.zip <plot_3_memory_usage_callback.zip>`
 
 
 .. only:: html

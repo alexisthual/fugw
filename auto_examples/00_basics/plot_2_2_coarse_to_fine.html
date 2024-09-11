@@ -278,7 +278,7 @@ have more than 10k points.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:271: UserWarning:
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.8/site-packages/torch/distributions/wishart.py:272: UserWarning:
 
 Singular sample detected.
 </pre></div>
@@ -370,9 +370,9 @@ distributions you are trying to align.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[05:21:51] Validation data for feature maps is not provided. Using  dense.py:202
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:02:34] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
-           Validation data for anatomical kernels is not provided.  dense.py:229
+           Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
@@ -388,11 +388,11 @@ distributions you are trying to align.</p>
            Validation loss:        0.018442563712596893
 
 
-           BCD step 4/10   FUGW loss:      0.01579628325998783      dense.py:568
+[21:02:35] BCD step 4/10   FUGW loss:      0.01579628325998783      dense.py:568
            Validation loss:        0.01579628325998783
 
 
-[05:21:52] BCD step 5/10   FUGW loss:      0.015153789892792702     dense.py:568
+           BCD step 5/10   FUGW loss:      0.015153789892792702     dense.py:568
            Validation loss:        0.015153789892792702
 
 
@@ -400,11 +400,11 @@ distributions you are trying to align.</p>
            Validation loss:        0.014875941909849644
 
 
-           BCD step 7/10   FUGW loss:      0.014715257100760937     dense.py:568
+[21:02:36] BCD step 7/10   FUGW loss:      0.014715257100760937     dense.py:568
            Validation loss:        0.014715257100760937
 
 
-[05:21:53] BCD step 8/10   FUGW loss:      0.014592343010008335     dense.py:568
+           BCD step 8/10   FUGW loss:      0.014592343010008335     dense.py:568
            Validation loss:        0.014592343010008335
 
 
@@ -412,46 +412,46 @@ distributions you are trying to align.</p>
            Validation loss:        0.014477252028882504
 
 
-           BCD step 10/10  FUGW loss:      0.01438036747276783      dense.py:568
+[21:02:37] BCD step 10/10  FUGW loss:      0.01438036747276783      dense.py:568
            Validation loss:        0.01438036747276783
-/github/workspace/src/fugw/scripts/coarse_to_fine.py:474: UserWarning:
+/github/workspace/src/fugw/scripts/coarse_to_fine.py:477: UserWarning:
 
 Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:53.)
 
-           Validation data for feature maps is not provided. Using sparse.py:213
+           Validation data for feature maps is not provided. Using sparse.py:209
            training data instead.
-           Validation data for anatomical kernels is not provided. sparse.py:257
+           Validation data for anatomical kernels is not provided. sparse.py:253
            Using training data instead.
 
 
-[05:21:56] BCD step 1/10   FUGW loss:      0.02047727443277836     sparse.py:660
+[21:02:39] BCD step 1/10   FUGW loss:      0.02047727443277836     sparse.py:660
 
 
-[05:21:58] BCD step 2/10   FUGW loss:      0.014399909414350986    sparse.py:660
+[21:02:41] BCD step 2/10   FUGW loss:      0.014399909414350986    sparse.py:660
 
 
-[05:22:00] BCD step 3/10   FUGW loss:      0.012644448317587376    sparse.py:660
+[21:02:44] BCD step 3/10   FUGW loss:      0.012644448317587376    sparse.py:660
 
 
-[05:22:02] BCD step 4/10   FUGW loss:      0.011991660110652447    sparse.py:660
+[21:02:46] BCD step 4/10   FUGW loss:      0.011991660110652447    sparse.py:660
 
 
-[05:22:04] BCD step 5/10   FUGW loss:      0.011676586233079433    sparse.py:660
+[21:02:48] BCD step 5/10   FUGW loss:      0.011676586233079433    sparse.py:660
 
 
-[05:22:07] BCD step 6/10   FUGW loss:      0.011500303633511066    sparse.py:660
+[21:02:51] BCD step 6/10   FUGW loss:      0.011500303633511066    sparse.py:660
 
 
-[05:22:09] BCD step 7/10   FUGW loss:      0.011388624086976051    sparse.py:660
+[21:02:53] BCD step 7/10   FUGW loss:      0.011388624086976051    sparse.py:660
 
 
-[05:22:11] BCD step 8/10   FUGW loss:      0.011310438625514507    sparse.py:660
+[21:02:56] BCD step 8/10   FUGW loss:      0.011310438625514507    sparse.py:660
 
 
-[05:22:14] BCD step 9/10   FUGW loss:      0.011251626536250114    sparse.py:660
+[21:02:58] BCD step 9/10   FUGW loss:      0.011251626536250114    sparse.py:660
 
 
-[05:22:16] BCD step 10/10  FUGW loss:      0.011205767281353474    sparse.py:660
+[21:03:01] BCD step 10/10  FUGW loss:      0.011205767281353474    sparse.py:660
 </pre></div>
 </div>
 <p>Both the coarse and fine-grained transport plans can be accessed
@@ -606,14 +606,17 @@ between source and target</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 33.021 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  146 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 34.834 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  212 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-2-2-coarse-to-fine-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1989790ea42548515b90e754eead3ced/plot_2_2_coarse_to_fine.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_2_2_coarse_to_fine.ipynb</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/400739f84596661dbde0701b2a6ac605/plot_2_2_coarse_to_fine.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_2_2_coarse_to_fine.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/47bd84e94b335cd9a3f29cd13b336111/plot_2_2_coarse_to_fine.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">plot_2_2_coarse_to_fine.zip</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>

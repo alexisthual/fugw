@@ -19,7 +19,7 @@ but that can be useful in some cases.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor the Pearson correlation between transfor...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor the Pearson correlation between transformed and target features at each iteration of the block-coordinate descent (BCD) algorithm. This can be useful to detect numerical errors, or to check that the mapping is not over-fitting training data.">
 
 .. only:: html
 
@@ -36,7 +36,7 @@ but that can be useful in some cases.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use 3 fMRI feature maps for training and 2 independant fMRI feature maps fo...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use 3 fMRI feature maps for training and 2 independant fMRI feature maps for testing to examine the evolutions of a training and a validation loss on 2 low-resolution brain volumes.">
 
 .. only:: html
 
@@ -53,7 +53,7 @@ but that can be useful in some cases.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor memory usage at each iteration of the bl...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we use a callback function to monitor memory usage at each iteration of the block-coordinate descent (BCD) algorithm. This can be useful to detect memory leaks, or to check that the memory usage is not too high for a given device.">
 
 .. only:: html
 

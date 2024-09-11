@@ -326,25 +326,25 @@ We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 
  .. code-block:: none
 
-    [05:26:32] Validation data for feature maps is not provided. Using  dense.py:202
+    [21:07:31] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
-               Validation data for anatomical kernels is not provided.  dense.py:229
+               Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [05:26:38] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
+    [21:07:37] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
                Validation loss:        0.025816654786467552                         
 
 
-    [05:26:47] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
+    [21:07:46] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
                Validation loss:        0.009248202666640282                         
 
 
-    [05:26:55] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
+    [21:07:55] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
                Validation loss:        0.007908511906862259                         
 
 
-    [05:27:04] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
+    [21:08:04] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
                Validation loss:        0.007553447037935257                         
 
 
@@ -546,9 +546,9 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.629 seconds)
+   **Total running time of the script:** (0 minutes 38.172 seconds)
 
-**Estimated memory usage:**  8 MB
+**Estimated memory usage:**  61 MB
 
 
 .. _sphx_glr_download_auto_examples_01_brain_alignment_plot_3_aligning_low_res_volumes.py:
@@ -564,6 +564,10 @@ Let's plot the transporting feature maps of the test set.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_3_aligning_low_res_volumes.py <plot_3_aligning_low_res_volumes.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_3_aligning_low_res_volumes.zip <plot_3_aligning_low_res_volumes.zip>`
 
 
 .. only:: html

@@ -17,7 +17,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution left hemispheres using 4 fMRI feature maps (z-score ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution left hemispheres using 4 fMRI feature maps (z-score contrast maps).">
 
 .. only:: html
 
@@ -34,7 +34,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to use this package to align 2 high-resolution left hemispheres us...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to use this package to align 2 high-resolution left hemispheres using fMRI feature maps (z-score contrast maps). Note that, since we want this example to run on CPU, we stick to rather low-resolution meshes (around 10k vertices per hemisphere) but that this package can easily scale to resolutions above 150k vertices per hemisphere. In this case, with appropriate hyper-parameters and solver parameters, it takes less than 10 minutes to compute a mapping between 2 such distributions using a V100 Nvidia GPU.">
 
 .. only:: html
 
@@ -51,7 +51,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score contrast maps).">
 
 .. only:: html
 
@@ -68,7 +68,7 @@ This subsection gives an exhaustive overview of brain alignment pipelines which 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score con...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we align 2 low-resolution brain volumes using 4 fMRI feature maps (z-score contrast maps).">
 
 .. only:: html
 

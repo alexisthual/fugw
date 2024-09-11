@@ -460,37 +460,37 @@ We now fit the mapping using the sinkhorn solver and 5 BCD iterations.
 
  .. code-block:: none
 
-    [05:29:08] Validation data for anatomical kernels is not provided.  dense.py:229
+    [21:10:16] Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [05:29:13] BCD step 1/5    FUGW loss:      0.02471640333533287      dense.py:568
+    [21:10:22] BCD step 1/5    FUGW loss:      0.02471640333533287      dense.py:568
                Validation loss:        0.02700098603963852                          
-    [05:29:13] Pearson correlation:  [0.38212429   plot_1_pearson_correlation.py:237
+    [21:10:22] Pearson correlation:  [0.38212429   plot_1_pearson_correlation.py:237
                0.2964243  0.26874193]                                               
 
 
-    [05:29:22] BCD step 2/5    FUGW loss:      0.006555820349603891     dense.py:568
+    [21:10:31] BCD step 2/5    FUGW loss:      0.006555820349603891     dense.py:568
                Validation loss:        0.007569685112684965                         
-    [05:29:22] Pearson correlation:  [0.31391999   plot_1_pearson_correlation.py:237
+    [21:10:31] Pearson correlation:  [0.31391999   plot_1_pearson_correlation.py:237
                0.34292094 0.32424131]                                               
 
 
-    [05:29:31] BCD step 3/5    FUGW loss:      0.006002967711538076     dense.py:568
+    [21:10:40] BCD step 3/5    FUGW loss:      0.006002967711538076     dense.py:568
                Validation loss:        0.006645429879426956                         
-    [05:29:31] Pearson correlation:  [0.33015294   plot_1_pearson_correlation.py:237
+    [21:10:40] Pearson correlation:  [0.33015294   plot_1_pearson_correlation.py:237
                0.33416723 0.31084012]                                               
 
 
-    [05:29:40] BCD step 4/5    FUGW loss:      0.005948252975940704     dense.py:568
+    [21:10:49] BCD step 4/5    FUGW loss:      0.005948252975940704     dense.py:568
                Validation loss:        0.006552045699208975                         
-    [05:29:40] Pearson correlation:  [0.32666147   plot_1_pearson_correlation.py:237
+    [21:10:49] Pearson correlation:  [0.32666147   plot_1_pearson_correlation.py:237
                0.32980771 0.29679679]                                               
 
 
-    [05:29:49] BCD step 5/5    FUGW loss:      0.005936595611274242     dense.py:568
+    [21:10:58] BCD step 5/5    FUGW loss:      0.005936595611274242     dense.py:568
                Validation loss:        0.006547404453158379                         
-    [05:29:49] Pearson correlation:  [0.32642125   plot_1_pearson_correlation.py:237
+    [21:10:58] Pearson correlation:  [0.32642125   plot_1_pearson_correlation.py:237
                0.33017425 0.29350384]                                               
 
 
@@ -563,7 +563,7 @@ iteration.
 
 
 .. image-sg:: /auto_examples/02_miscellaneous/images/sphx_glr_plot_1_pearson_correlation_001.png
-   :alt: Sinkhorn mapping training loss  Total training time = 40.58s
+   :alt: Sinkhorn mapping training loss  Total training time = 41.86s
    :srcset: /auto_examples/02_miscellaneous/images/sphx_glr_plot_1_pearson_correlation_001.png
    :class: sphx-glr-single-img
 
@@ -574,9 +574,9 @@ iteration.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 53.194 seconds)
+   **Total running time of the script:** (0 minutes 54.221 seconds)
 
-**Estimated memory usage:**  8 MB
+**Estimated memory usage:**  61 MB
 
 
 .. _sphx_glr_download_auto_examples_02_miscellaneous_plot_1_pearson_correlation.py:
@@ -592,6 +592,10 @@ iteration.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_1_pearson_correlation.py <plot_1_pearson_correlation.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_1_pearson_correlation.zip <plot_1_pearson_correlation.zip>`
 
 
 .. only:: html
