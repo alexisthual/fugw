@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**10:10.811** total execution time for 10 files **from all galleries**:
+**10:01.024** total execution time for 10 files **from all galleries**:
 
 .. container::
 
@@ -33,32 +33,32 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_2_aligning_brain_sparse.py` (``../examples/01_brain_alignment/plot_2_aligning_brain_sparse.py``)
-     - 02:25.953
-     - 687.5
-   * - :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py` (``../examples/01_brain_alignment/plot_4_aligning_high_res_volumes.py``)
-     - 01:57.571
-     - 92.9
+     - 02:18.446
+     - 680.6
    * - :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py` (``../examples/01_brain_alignment/plot_1_aligning_brain_dense.py``)
-     - 01:52.909
-     - 230.7
+     - 01:59.009
+     - 282.8
+   * - :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py` (``../examples/01_brain_alignment/plot_4_aligning_high_res_volumes.py``)
+     - 01:51.471
+     - 76.7
    * - :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_2_simple_crossval.py` (``../examples/02_miscellaneous/plot_2_simple_crossval.py``)
-     - 01:29.686
-     - 61.0
+     - 01:28.305
+     - 60.8
    * - :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_1_pearson_correlation.py` (``../examples/02_miscellaneous/plot_1_pearson_correlation.py``)
-     - 00:54.221
-     - 61.4
+     - 00:55.610
+     - 63.3
    * - :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_3_aligning_low_res_volumes.py` (``../examples/01_brain_alignment/plot_3_aligning_low_res_volumes.py``)
-     - 00:38.172
-     - 61.0
+     - 00:36.970
+     - 60.8
    * - :ref:`sphx_glr_auto_examples_00_basics_plot_2_2_coarse_to_fine.py` (``../examples/00_basics/plot_2_2_coarse_to_fine.py``)
-     - 00:34.834
-     - 212.0
+     - 00:33.909
+     - 208.2
    * - :ref:`sphx_glr_auto_examples_00_basics_plot_2_1_lmds.py` (``../examples/00_basics/plot_2_1_lmds.py``)
-     - 00:09.026
-     - 133.5
+     - 00:09.614
+     - 136.4
    * - :ref:`sphx_glr_auto_examples_00_basics_plot_1_dense.py` (``../examples/00_basics/plot_1_dense.py``)
-     - 00:06.441
-     - 131.5
+     - 00:06.086
+     - 125.1
    * - :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_3_memory_usage_callback.py` (``../examples/02_miscellaneous/plot_3_memory_usage_callback.py``)
-     - 00:01.998
-     - 61.0
+     - 00:01.605
+     - 60.8

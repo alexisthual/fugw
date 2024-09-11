@@ -98,7 +98,7 @@ We use 3 contrasts for training and 3 contrasts for validation.
  .. code-block:: none
 
     Downloading data from https://osf.io/download/5d27c4a51c5b4a001c9e75b1/ ...
-     ...done. (2 seconds, 0 min)
+     ...done. (3 seconds, 0 min)
     Downloading data from https://osf.io/download/5d27c81645253a001c3e1f85/ ...
      ...done. (2 seconds, 0 min)
     Downloading data from https://osf.io/download/5d27d931114a4200190452fe/ ...
@@ -108,7 +108,7 @@ We use 3 contrasts for training and 3 contrasts for validation.
     Downloading data from https://osf.io/download/5d27cdcaa26b340018084b30/ ...
      ...done. (1 seconds, 0 min)
     Downloading data from https://osf.io/download/5d27d80c114a420016058f7d/ ...
-     ...done. (2 seconds, 0 min)
+     ...done. (1 seconds, 0 min)
 
 
 
@@ -460,37 +460,37 @@ We now fit the mapping using the sinkhorn solver and 5 BCD iterations.
 
  .. code-block:: none
 
-    [21:10:16] Validation data for anatomical kernels is not provided.  dense.py:226
+    [21:25:02] Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [21:10:22] BCD step 1/5    FUGW loss:      0.02471640333533287      dense.py:568
+    [21:25:07] BCD step 1/5    FUGW loss:      0.02471640333533287      dense.py:568
                Validation loss:        0.02700098603963852                          
-    [21:10:22] Pearson correlation:  [0.38212429   plot_1_pearson_correlation.py:237
+    [21:25:07] Pearson correlation:  [0.38212429   plot_1_pearson_correlation.py:237
                0.2964243  0.26874193]                                               
 
 
-    [21:10:31] BCD step 2/5    FUGW loss:      0.006555820349603891     dense.py:568
+    [21:25:16] BCD step 2/5    FUGW loss:      0.006555820349603891     dense.py:568
                Validation loss:        0.007569685112684965                         
-    [21:10:31] Pearson correlation:  [0.31391999   plot_1_pearson_correlation.py:237
+    [21:25:16] Pearson correlation:  [0.31391999   plot_1_pearson_correlation.py:237
                0.34292094 0.32424131]                                               
 
 
-    [21:10:40] BCD step 3/5    FUGW loss:      0.006002967711538076     dense.py:568
+    [21:25:25] BCD step 3/5    FUGW loss:      0.006002967711538076     dense.py:568
                Validation loss:        0.006645429879426956                         
-    [21:10:40] Pearson correlation:  [0.33015294   plot_1_pearson_correlation.py:237
+    [21:25:25] Pearson correlation:  [0.33015294   plot_1_pearson_correlation.py:237
                0.33416723 0.31084012]                                               
 
 
-    [21:10:49] BCD step 4/5    FUGW loss:      0.005948252975940704     dense.py:568
+    [21:25:34] BCD step 4/5    FUGW loss:      0.005948252975940704     dense.py:568
                Validation loss:        0.006552045699208975                         
-    [21:10:49] Pearson correlation:  [0.32666147   plot_1_pearson_correlation.py:237
+    [21:25:34] Pearson correlation:  [0.32666147   plot_1_pearson_correlation.py:237
                0.32980771 0.29679679]                                               
 
 
-    [21:10:58] BCD step 5/5    FUGW loss:      0.005936595611274242     dense.py:568
+    [21:25:43] BCD step 5/5    FUGW loss:      0.005936595611274242     dense.py:568
                Validation loss:        0.006547404453158379                         
-    [21:10:58] Pearson correlation:  [0.32642125   plot_1_pearson_correlation.py:237
+    [21:25:43] Pearson correlation:  [0.32642125   plot_1_pearson_correlation.py:237
                0.33017425 0.29350384]                                               
 
 
@@ -563,7 +563,7 @@ iteration.
 
 
 .. image-sg:: /auto_examples/02_miscellaneous/images/sphx_glr_plot_1_pearson_correlation_001.png
-   :alt: Sinkhorn mapping training loss  Total training time = 41.86s
+   :alt: Sinkhorn mapping training loss  Total training time = 41.17s
    :srcset: /auto_examples/02_miscellaneous/images/sphx_glr_plot_1_pearson_correlation_001.png
    :class: sphx-glr-single-img
 
@@ -574,9 +574,9 @@ iteration.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 54.221 seconds)
+   **Total running time of the script:** (0 minutes 55.610 seconds)
 
-**Estimated memory usage:**  61 MB
+**Estimated memory usage:**  63 MB
 
 
 .. _sphx_glr_download_auto_examples_02_miscellaneous_plot_1_pearson_correlation.py:
