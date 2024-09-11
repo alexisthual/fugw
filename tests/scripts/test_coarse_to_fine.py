@@ -25,6 +25,11 @@ if torch.cuda.is_available():
 
 return_numpys = [False, True]
 
+sparsity_masks = [
+    None,
+    torch.eye(n_voxels_source, n_voxels_target).to_sparse_coo(),
+]
+
 
 @pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize("return_numpy", product(return_numpys))
@@ -56,9 +61,10 @@ def test_uniform_mesh_sampling():
 
 @pytest.mark.skip_if_no_mkl
 @pytest.mark.parametrize(
-    "device,return_numpy", product(devices, return_numpys)
+    "device,return_numpy, sparsity_mask",
+    product(devices, return_numpys, sparsity_masks),
 )
-def test_coarse_to_fine(device, return_numpy):
+def test_coarse_to_fine(device, return_numpy, sparsity_mask):
     _, source_features, _, source_embeddings = _init_mock_distribution(
         n_features_train, n_voxels_source, return_numpy=return_numpy
     )
@@ -87,12 +93,15 @@ def test_coarse_to_fine(device, return_numpy):
         target_features=target_features,
         source_geometry_embeddings=source_embeddings,
         target_geometry_embeddings=target_embeddings,
+        sparsity_mask=sparsity_mask,
         device=device,
+        verbose=True,
     )
 
-    assert coarse_mapping.pi.shape == (n_samples_source, n_samples_target)
     assert fine_mapping.pi.shape == (n_voxels_source, n_voxels_target)
     assert mask.shape == (n_voxels_source, n_voxels_target)
+    if sparsity_mask is None:
+        assert coarse_mapping.pi.shape == (n_samples_source, n_samples_target)
 
     # Use trained model to transport new features
     # 1. with numpy arrays

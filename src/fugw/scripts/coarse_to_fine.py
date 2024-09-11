@@ -264,6 +264,90 @@ def get_neighbourhood_matrix(embeddings, sample, radius):
     return neighbourhood_matrix
 
 
+def compute_sparsity_mask(
+    coarse_mapping,
+    source_sample,
+    target_sample,
+    source_geometry_embeddings,
+    target_geometry_embeddings,
+    source_selection_radius=1,
+    target_selection_radius=1,
+    method="topk",
+):
+    """
+    Compute sparsity mask from coarse mapping.
+
+    Parameters
+    ----------
+    coarse_mapping: fugw.FUGW
+        Dense mapping between subsampled meshes
+    source_sample: torch.Tensor of size (n1)
+        Indices of sampled points on source distribution
+    target_sample: torch.Tensor of size (m1)
+        Indices of sampled points on target distribution
+    source_geometry_embeddings: torch.Tensor of size (n, k)
+        Embeddings approximating the geodesic distance between
+        source vertices
+    target_geometry_embeddings: torch.Tensor of size (m, k)
+        Embeddings approximating the geodesic distance between
+        target vertices
+    source_selection_radius: float
+        Radius used to determine the neighbourhood
+        of source vertices when defining sparsity mask
+    target_selection_radius: float
+        Radius used to determine the neighbourhood
+        of target vertices when defining sparsity mask
+    method: "topk" or "quantile"
+        Method used to select pairs of source and target features
+        whose neighbourhoods will be used to define
+        the sparsity mask of the solution
+
+    Returns
+    -------
+    sparsity_mask: torch.sparse_coo_tensor of size (n, m)
+        Sparsity mask used to initialize the fine mapping.
+    """
+    if method == "quantile":
+        # Method 1: keep first percentile
+        threshold = np.percentile(coarse_mapping.pi, 99.95)
+        rows, cols = np.nonzero(coarse_mapping.pi > threshold)
+
+    elif method == "topk":
+        # Method 2: keep topk indices per line and per column
+        # (this should be preferred as it will keep vertices
+        # which are particularly unbalanced)
+        rows = np.concatenate(
+            [
+                np.arange(source_sample.shape[0]),
+                np.argmax(coarse_mapping.pi, axis=0),
+            ]
+        )
+        cols = np.concatenate(
+            [
+                np.argmax(coarse_mapping.pi, axis=1),
+                np.arange(target_sample.shape[0]),
+            ]
+        )
+
+    # Compute mask as a matrix product between:
+    # a. neighbourhood matrices that encode
+    # which vertex is close to which sampled point
+    N_source = get_neighbourhood_matrix(
+        source_geometry_embeddings, source_sample, source_selection_radius
+    )
+    N_target = get_neighbourhood_matrix(
+        target_geometry_embeddings, target_sample, target_selection_radius
+    )
+    # b. cluster matrices that encode
+    # which sampled point belongs to which cluster
+    C_source = get_cluster_matrix(rows, source_sample.shape[0])
+    C_target = get_cluster_matrix(cols, target_sample.shape[0])
+
+    sparsity_mask = (N_source @ C_source) @ (N_target @ C_target).T
+
+    return sparsity_mask
+
+
 def fit(
     coarse_mapping=None,
     coarse_mapping_solver="mm",
@@ -285,7 +369,7 @@ def fit(
     source_weights=None,
     target_weights=None,
     init_plan=None,
-    mask=None,
+    sparsity_mask=None,
     device="auto",
     verbose=False,
 ):
@@ -353,7 +437,7 @@ def fit(
     init_plan: torch.sparse_coo_tensor or None
         Initial transport plan to use when fitting the fine mapping.
         If None, a random plan will be used.
-    sparsity_mask: torch.Tensor of size(n, m) or None
+    sparsity_mask: sparse coo/csr matrix of size(n, m) or None
         Sparsity mask to use when fitting the fine mapping.
         If None, a mask will be computed from the coarse mapping.
     device: "auto" or torch.device
@@ -374,28 +458,11 @@ def fit(
         Sparsity mask used to fit the fine mapping.
     """
     # 0. Parse input tensors
-    source_sample = _make_tensor(source_sample, dtype=torch.int64)
-    target_sample = _make_tensor(target_sample, dtype=torch.int64)
-
     source_features = _make_tensor(source_features)
     target_features = _make_tensor(target_features)
 
     source_geometry_embeddings = _make_tensor(source_geometry_embeddings)
     target_geometry_embeddings = _make_tensor(target_geometry_embeddings)
-
-    # Compute anatomical kernels
-    source_geometry_kernel = torch.cdist(
-        source_geometry_embeddings[source_sample],
-        source_geometry_embeddings[source_sample],
-        p=2,
-    )
-    source_geometry_kernel /= source_geometry_kernel.max()
-    target_geometry_kernel = torch.cdist(
-        target_geometry_embeddings[target_sample],
-        target_geometry_embeddings[target_sample],
-        p=2,
-    )
-    target_geometry_kernel /= target_geometry_kernel.max()
 
     # Sampled weights
     if source_weights is None:
@@ -405,82 +472,66 @@ def fit(
         m = target_features.shape[1]
         target_weights = torch.ones(m) / m
 
-    source_weights_sampled = _make_tensor(source_weights)[source_sample]
-    source_weights_sampled = (
-        source_weights_sampled / source_weights_sampled.sum()
-    )
-    target_weights_sampled = _make_tensor(target_weights)[target_sample]
-    target_weights_sampled = (
-        target_weights_sampled / target_weights_sampled.sum()
-    )
+    if sparsity_mask is None:
+        source_sample = _make_tensor(source_sample, dtype=torch.int64)
+        target_sample = _make_tensor(target_sample, dtype=torch.int64)
 
-    # 1. Fit coarse mapping
-    coarse_mapping.fit(
-        source_features[:, source_sample],
-        target_features[:, target_sample],
-        source_geometry=source_geometry_kernel,
-        target_geometry=target_geometry_kernel,
-        source_weights=source_weights_sampled,
-        target_weights=target_weights_sampled,
-        solver=coarse_mapping_solver,
-        solver_params=coarse_mapping_solver_params,
-        callback_bcd=coarse_callback_bcd,
-        device=device,
-        verbose=verbose,
-    )
-
-    # Send coarse mapping to cpu to handle numpy operations
-    coarse_mapping.pi = coarse_mapping.pi.cpu()
-
-    # 2. Build sparsity mask
-
-    # Select best pairs of source and target vertices from coarse alignment
-    if coarse_pairs_selection_method == "quantile":
-        # Method 1: keep first percentile
-        quantile = 99.95
-
-        threshold = np.percentile(coarse_mapping.pi, quantile)
-        rows, cols = np.nonzero(coarse_mapping.pi > threshold)
-
-    elif coarse_pairs_selection_method == "topk":
-        # Method 2: keep topk indices per line and per column
-        # (this should be preferred as it will keep vertices
-        # which are particularly unbalanced)
-        rows = np.concatenate(
-            [
-                np.arange(source_sample.shape[0]),
-                np.argmax(coarse_mapping.pi, axis=0),
-            ]
+        source_weights_sampled = _make_tensor(source_weights)[source_sample]
+        source_weights_sampled = (
+            source_weights_sampled / source_weights_sampled.sum()
         )
-        cols = np.concatenate(
-            [
-                np.argmax(coarse_mapping.pi, axis=1),
-                np.arange(target_sample.shape[0]),
-            ]
+        target_weights_sampled = _make_tensor(target_weights)[target_sample]
+        target_weights_sampled = (
+            target_weights_sampled / target_weights_sampled.sum()
         )
 
-    if mask is None:
-        # Compute mask as a matrix product between:
-        # a. neighbourhood matrices that encode
-        # which vertex is close to which sampled point
-        N_source = get_neighbourhood_matrix(
-            source_geometry_embeddings, source_sample, source_selection_radius
+        # Compute anatomical kernels
+        source_geometry_kernel = torch.cdist(
+            source_geometry_embeddings[source_sample],
+            source_geometry_embeddings[source_sample],
+            p=2,
         )
-        N_target = get_neighbourhood_matrix(
-            target_geometry_embeddings, target_sample, target_selection_radius
+        source_geometry_kernel /= source_geometry_kernel.max()
+        target_geometry_kernel = torch.cdist(
+            target_geometry_embeddings[target_sample],
+            target_geometry_embeddings[target_sample],
+            p=2,
         )
-        # b. cluster matrices that encode
-        # which sampled point belongs to which cluster
-        C_source = get_cluster_matrix(rows, source_sample.shape[0])
-        C_target = get_cluster_matrix(cols, target_sample.shape[0])
+        target_geometry_kernel /= target_geometry_kernel.max()
 
-        mask = (N_source @ C_source) @ (N_target @ C_target).T
+        # 1. Fit coarse mapping
+        coarse_mapping.fit(
+            source_features[:, source_sample],
+            target_features[:, target_sample],
+            source_geometry=source_geometry_kernel,
+            target_geometry=target_geometry_kernel,
+            source_weights=source_weights_sampled,
+            target_weights=target_weights_sampled,
+            solver=coarse_mapping_solver,
+            solver_params=coarse_mapping_solver_params,
+            callback_bcd=coarse_callback_bcd,
+            device=device,
+            verbose=verbose,
+        )
 
-    # Define init plan from spasity mask
+        # 2. Build sparsity mask
+        sparsity_mask = compute_sparsity_mask(
+            coarse_mapping,
+            source_sample,
+            target_sample,
+            source_geometry_embeddings,
+            target_geometry_embeddings,
+            source_selection_radius=source_selection_radius,
+            target_selection_radius=target_selection_radius,
+            method=coarse_pairs_selection_method,
+        )
+
+    # Define init plan from sparsity mask
     if init_plan is None:
         init_plan = torch.sparse_coo_tensor(
-            mask.indices(),
-            torch.ones_like(mask.values()) / mask.values().shape[0],
+            sparsity_mask.indices(),
+            torch.ones_like(sparsity_mask.values())
+            / sparsity_mask.values().shape[0],
             (
                 source_geometry_embeddings.shape[0],
                 target_geometry_embeddings.shape[0],
@@ -503,4 +554,4 @@ def fit(
         callback_bcd=fine_callback_bcd,
     )
 
-    return source_sample, target_sample, mask
+    return source_sample, target_sample, sparsity_mask
