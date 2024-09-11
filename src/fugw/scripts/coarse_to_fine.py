@@ -345,18 +345,6 @@ def compute_sparsity_mask(
 
     sparsity_mask = (N_source @ C_source) @ (N_target @ C_target).T
 
-    # Check for any empty row/column in the sparsity mask
-    rows, cols = sparsity_mask.indices()
-    if (
-        len(np.unique(rows)) < sparsity_mask.shape[0]
-        or len(np.unique(cols)) < sparsity_mask.shape[1]
-    ):
-        raise ValueError(
-            "Sparsity mask contains empty rows or columns. "
-            "Please consider increasing the selection radius "
-            "or increasing the number of samples."
-        )
-
     return sparsity_mask
 
 
