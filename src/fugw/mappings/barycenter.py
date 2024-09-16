@@ -93,6 +93,12 @@ class FUGWBarycenter:
                 else:
                     barycenter_features += acc
 
+        # Normalize barycenter features
+        min_val = barycenter_features.min(dim=0, keepdim=True).values
+        max_val = barycenter_features.max(dim=0, keepdim=True).values
+        barycenter_features = (
+            2 * (barycenter_features - min_val) / (max_val - min_val) - 1
+        )
         return barycenter_features.T
 
     @staticmethod

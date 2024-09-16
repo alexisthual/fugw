@@ -273,6 +273,7 @@ def compute_sparsity_mask(
     source_selection_radius=1,
     target_selection_radius=1,
     method="topk",
+    device="auto",
 ):
     """
     Compute sparsity mask from coarse mapping.
@@ -301,12 +302,20 @@ def compute_sparsity_mask(
         Method used to select pairs of source and target features
         whose neighbourhoods will be used to define
         the sparsity mask of the solution
+    device: "auto" or torch.device
+        if "auto": use first available gpu if it's available,
+        cpu otherwise.
 
     Returns
     -------
     sparsity_mask: torch.sparse_coo_tensor of size (n, m)
         Sparsity mask used to initialize the fine mapping.
     """
+    if device == "auto":
+        if torch.cuda.is_available():
+            device = torch.device("cuda", 0)
+        else:
+            device = torch.device("cpu")
     if method == "quantile":
         # Method 1: keep first percentile
         threshold = np.percentile(coarse_mapping.pi, 99.95)
@@ -334,14 +343,14 @@ def compute_sparsity_mask(
     # which vertex is close to which sampled point
     N_source = get_neighbourhood_matrix(
         source_geometry_embeddings, source_sample, source_selection_radius
-    )
+    ).to(device)
     N_target = get_neighbourhood_matrix(
         target_geometry_embeddings, target_sample, target_selection_radius
-    )
+    ).to(device)
     # b. cluster matrices that encode
     # which sampled point belongs to which cluster
-    C_source = get_cluster_matrix(rows, source_sample.shape[0])
-    C_target = get_cluster_matrix(cols, target_sample.shape[0])
+    C_source = get_cluster_matrix(rows, source_sample.shape[0]).to(device)
+    C_target = get_cluster_matrix(cols, target_sample.shape[0]).to(device)
 
     sparsity_mask = (N_source @ C_source) @ (N_target @ C_target).T
 
@@ -524,6 +533,7 @@ def fit(
             source_selection_radius=source_selection_radius,
             target_selection_radius=target_selection_radius,
             method=coarse_pairs_selection_method,
+            device=device,
         )
 
     # Define init plan from sparsity mask
