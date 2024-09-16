@@ -246,7 +246,7 @@ distributions you are trying to align.
 
  .. code-block:: none
 
-    [12:52:41] Validation data for feature maps is not provided. Using  dense.py:199
+    [12:21:57] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
@@ -264,11 +264,11 @@ distributions you are trying to align.
                Validation loss:        0.018442563712596893                         
 
 
-    [12:52:42] BCD step 4/10   FUGW loss:      0.01579628325998783      dense.py:568
+               BCD step 4/10   FUGW loss:      0.01579628325998783      dense.py:568
                Validation loss:        0.01579628325998783                          
 
 
-               BCD step 5/10   FUGW loss:      0.015153789892792702     dense.py:568
+    [12:21:58] BCD step 5/10   FUGW loss:      0.015153789892792702     dense.py:568
                Validation loss:        0.015153789892792702                         
 
 
@@ -280,7 +280,7 @@ distributions you are trying to align.
                Validation loss:        0.014715257100760937                         
 
 
-    [12:52:43] BCD step 8/10   FUGW loss:      0.014592343010008335     dense.py:568
+    [12:21:59] BCD step 8/10   FUGW loss:      0.014592343010008335     dense.py:568
                Validation loss:        0.014592343010008335                         
 
 
@@ -290,44 +290,44 @@ distributions you are trying to align.
 
                BCD step 10/10  FUGW loss:      0.01438036747276783      dense.py:568
                Validation loss:        0.01438036747276783                          
-    /github/workspace/src/fugw/scripts/coarse_to_fine.py:346: UserWarning:
+    /github/workspace/src/fugw/scripts/coarse_to_fine.py:355: UserWarning:
 
     Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at ../aten/src/ATen/SparseCsrTensorImpl.cpp:53.)
 
-    [12:52:44] Validation data for feature maps is not provided. Using sparse.py:209
+               Validation data for feature maps is not provided. Using sparse.py:209
                training data instead.                                               
                Validation data for anatomical kernels is not provided. sparse.py:253
                Using training data instead.                                         
 
 
-    [12:52:46] BCD step 1/10   FUGW loss:      0.02047727443277836     sparse.py:660
+    [12:22:02] BCD step 1/10   FUGW loss:      0.02047727443277836     sparse.py:660
 
 
-    [12:52:48] BCD step 2/10   FUGW loss:      0.014399909414350986    sparse.py:660
+    [12:22:04] BCD step 2/10   FUGW loss:      0.014399909414350986    sparse.py:660
 
 
-    [12:52:50] BCD step 3/10   FUGW loss:      0.012644448317587376    sparse.py:660
+    [12:22:06] BCD step 3/10   FUGW loss:      0.012644448317587376    sparse.py:660
 
 
-    [12:52:53] BCD step 4/10   FUGW loss:      0.011991660110652447    sparse.py:660
+    [12:22:09] BCD step 4/10   FUGW loss:      0.011991660110652447    sparse.py:660
 
 
-    [12:52:55] BCD step 5/10   FUGW loss:      0.011676586233079433    sparse.py:660
+    [12:22:11] BCD step 5/10   FUGW loss:      0.011676586233079433    sparse.py:660
 
 
-    [12:52:57] BCD step 6/10   FUGW loss:      0.011500303633511066    sparse.py:660
+    [12:22:13] BCD step 6/10   FUGW loss:      0.011500303633511066    sparse.py:660
 
 
-    [12:53:00] BCD step 7/10   FUGW loss:      0.011388624086976051    sparse.py:660
+    [12:22:16] BCD step 7/10   FUGW loss:      0.011388624086976051    sparse.py:660
 
 
-    [12:53:02] BCD step 8/10   FUGW loss:      0.011310438625514507    sparse.py:660
+    [12:22:18] BCD step 8/10   FUGW loss:      0.011310438625514507    sparse.py:660
 
 
-    [12:53:05] BCD step 9/10   FUGW loss:      0.011251626536250114    sparse.py:660
+    [12:22:21] BCD step 9/10   FUGW loss:      0.011251626536250114    sparse.py:660
 
 
-    [12:53:07] BCD step 10/10  FUGW loss:      0.011205767281353474    sparse.py:660
+    [12:22:23] BCD step 10/10  FUGW loss:      0.011205767281353474    sparse.py:660
 
 
 
@@ -619,9 +619,9 @@ between source and target
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 33.966 seconds)
+   **Total running time of the script:** (0 minutes 34.495 seconds)
 
-**Estimated memory usage:**  214 MB
+**Estimated memory usage:**  203 MB
 
 
 .. _sphx_glr_download_auto_examples_00_basics_plot_2_2_coarse_to_fine.py:
