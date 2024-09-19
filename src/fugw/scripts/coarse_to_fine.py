@@ -316,10 +316,13 @@ def compute_sparsity_mask(
             device = torch.device("cuda", 0)
         else:
             device = torch.device("cpu")
+
+    # Convert coarse plan to numpy
+    coarse_plan = coarse_mapping.pi.to("cpu").numpy()
     if method == "quantile":
         # Method 1: keep first percentile
-        threshold = np.percentile(coarse_mapping.pi, 99.95)
-        rows, cols = np.nonzero(coarse_mapping.pi > threshold)
+        threshold = np.percentile(coarse_plan, 99.95)
+        rows, cols = np.nonzero(coarse_plan > threshold)
 
     elif method == "topk":
         # Method 2: keep topk indices per line and per column
@@ -328,12 +331,12 @@ def compute_sparsity_mask(
         rows = np.concatenate(
             [
                 np.arange(source_sample.shape[0]),
-                np.argmax(coarse_mapping.pi, axis=0),
+                np.argmax(coarse_plan, axis=0),
             ]
         )
         cols = np.concatenate(
             [
-                np.argmax(coarse_mapping.pi, axis=1),
+                np.argmax(coarse_plan, axis=1),
                 np.arange(target_sample.shape[0]),
             ]
         )
