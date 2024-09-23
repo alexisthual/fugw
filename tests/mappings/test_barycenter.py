@@ -24,6 +24,7 @@ def test_fugw_barycenter(device, callback):
     n_subjects = 4
     n_voxels = 100
     n_features = 10
+    nits_barycenter = 3
 
     # Generate random training data for n subjects
     features_list = []
@@ -39,10 +40,30 @@ def test_fugw_barycenter(device, callback):
         geometry_list.append(geometry)
 
     fugw_barycenter = FUGWBarycenter()
-    fugw_barycenter.fit(
+
+    # Fit the barycenter
+    (
+        barycenter_weights,
+        barycenter_features,
+        barycenter_geometry,
+        plans,
+        _,
+        losses_each_bar_step,
+    ) = fugw_barycenter.fit(
         weights_list,
         features_list,
         geometry_list,
+        solver_params={"nits_bcd": 2, "nits_uot": 5},
+        nits_barycenter=nits_barycenter,
         device=device,
         callback_barycenter=callback,
     )
+
+    assert isinstance(barycenter_weights, torch.Tensor)
+    assert barycenter_weights.shape == (n_voxels,)
+    assert isinstance(barycenter_features, torch.Tensor)
+    assert barycenter_features.shape == (n_features, n_voxels)
+    assert isinstance(barycenter_geometry, torch.Tensor)
+    assert barycenter_geometry.shape == (n_voxels, n_voxels)
+    assert len(plans) == n_subjects
+    assert len(losses_each_bar_step) == nits_barycenter
