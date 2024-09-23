@@ -19,7 +19,8 @@ callbacks = [None, lambda x: x["plans"]]
     "device, callback",
     product(devices, callbacks),
 )
-def test_fugw_barycenter(device, callback):
+def test_fugw_sparse_barycenter(device, callback):
+    """Tests the FUGW sparse barycenter fitting on toy data."""
     np.random.seed(0)
     n_subjects = 4
     n_voxels = 100
@@ -39,7 +40,10 @@ def test_fugw_barycenter(device, callback):
         weights_list.append(weights)
         features_list.append(features)
 
-    fugw_barycenter = FUGWSparseBarycenter()
+    geometry_embedding_normalized = (
+        geometry_embedding / geometry_embedding.norm()
+    )
+    fugw_sparse_barycenter = FUGWSparseBarycenter()
 
     # Fit the barycenter
     (
@@ -47,15 +51,16 @@ def test_fugw_barycenter(device, callback):
         barycenter_features,
         plans,
         losses_each_bar_step,
-    ) = fugw_barycenter.fit(
+    ) = fugw_sparse_barycenter.fit(
         weights_list,
         features_list,
-        geometry_embedding,
+        geometry_embedding_normalized,
         mesh_sample=mesh_sample,
         coarse_mapping_solver_params={"nits_bcd": 2, "nits_uot": 5},
         fine_mapping_solver_params={"nits_bcd": 2, "nits_uot": 5},
         nits_barycenter=nits_barycenter,
         device=device,
+        callback_barycenter=callback,
     )
 
     assert isinstance(barycenter_weights, torch.Tensor)
