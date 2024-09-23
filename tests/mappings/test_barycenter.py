@@ -19,6 +19,7 @@ callbacks = [None, lambda x: x["plans"]]
     product(devices, callbacks),
 )
 def test_fugw_barycenter(device, callback):
+    """Tests the FUGW barycenter fitting on toy data."""
     np.random.seed(0)
     n_subjects = 4
     n_voxels = 100
