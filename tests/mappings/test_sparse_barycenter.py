@@ -60,6 +60,7 @@ def test_fugw_sparse_barycenter(device, callback):
         fine_mapping_solver_params={"nits_bcd": 2, "nits_uot": 5},
         nits_barycenter=nits_barycenter,
         device=device,
+        callback_barycenter=callback,
     )
 
     assert isinstance(barycenter_weights, torch.Tensor)
