@@ -11,7 +11,7 @@ class FUGWBarycenter:
         self,
         alpha=0.5,
         rho=1,
-        eps=1e-2,
+        eps=1e-4,
         reg_mode="joint",
         force_psd=False,
         learn_geometry=False,
