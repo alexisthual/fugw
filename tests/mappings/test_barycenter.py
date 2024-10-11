@@ -58,6 +58,7 @@ def test_fugw_barycenter(device, callback):
         nits_barycenter=nits_barycenter,
         device=device,
         callback_barycenter=callback,
+        init_barycenter_geometry=geometry_list[0],
     )
 
     assert isinstance(barycenter_weights, torch.Tensor)
@@ -76,14 +77,14 @@ def test_fugw_barycenter(device, callback):
 )
 def test_identity_case(alpha):
     """Test the case where all subjects are the same."""
+    torch.manual_seed(0)
     n_subjects = 3
     n_features = 10
     n_voxels = 5
     nits_barycenter = 2
 
     geometry = _init_mock_distribution(n_features, n_voxels)[2]
-    # features = torch.rand(n_features, n_voxels)
-    features = torch.tensor([[0.1, 0.2, 0.3, 0.4, 0.5]])
+    features = torch.rand(n_features, n_voxels)
 
     geometry_list = [geometry for _ in range(n_subjects)]
     features_list = [features for _ in range(n_subjects)]
@@ -109,7 +110,6 @@ def test_identity_case(alpha):
     )
 
     # Check that the barycenter is the same as the input
-    print(barycenter_features)
     assert torch.allclose(barycenter_weights, torch.ones(n_voxels) / n_voxels)
     assert torch.allclose(barycenter_geometry, geometry_list[0])
 
@@ -117,8 +117,7 @@ def test_identity_case(alpha):
     # since the GW distance is invariant under isometries
     if alpha != 1.0:
         assert torch.allclose(barycenter_features, features)
-
-    # Check that all the plans are the identity matrix divided
-    # by the number of voxels
-    for plan in plans:
-        assert torch.allclose(plan, torch.eye(n_voxels) / n_voxels)
+        # Check that all the plans are the identity matrix divided
+        # by the number of voxels
+        for plan in plans:
+            assert torch.allclose(plan, torch.eye(n_voxels) / n_voxels)
