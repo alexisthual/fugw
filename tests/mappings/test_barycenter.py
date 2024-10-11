@@ -12,6 +12,7 @@ if torch.cuda.is_available():
     devices.append(torch.device("cuda:0"))
 
 callbacks = [None, lambda x: x["plans"]]
+alphas = [0.0, 0.5, 1.0]
 
 
 @pytest.mark.parametrize(
@@ -67,3 +68,57 @@ def test_fugw_barycenter(device, callback):
     assert barycenter_geometry.shape == (n_voxels, n_voxels)
     assert len(plans) == n_subjects
     assert len(losses_each_bar_step) == nits_barycenter
+
+
+@pytest.mark.parametrize(
+    "alpha",
+    alphas,
+)
+def test_identity_case(alpha):
+    """Test the case where all subjects are the same."""
+    n_subjects = 3
+    n_features = 10
+    n_voxels = 5
+    nits_barycenter = 2
+
+    geometry = _init_mock_distribution(n_features, n_voxels)[2]
+    # features = torch.rand(n_features, n_voxels)
+    features = torch.tensor([[0.1, 0.2, 0.3, 0.4, 0.5]])
+
+    geometry_list = [geometry for _ in range(n_subjects)]
+    features_list = [features for _ in range(n_subjects)]
+    weights_list = [torch.ones(n_voxels) / n_voxels for _ in range(n_subjects)]
+
+    fugw_barycenter = FUGWBarycenter(alpha=alpha, eps=1e-6, rho=float("inf"))
+    (
+        barycenter_weights,
+        barycenter_features,
+        barycenter_geometry,
+        plans,
+        _,
+        _,
+    ) = fugw_barycenter.fit(
+        weights_list,
+        features_list,
+        geometry_list,
+        solver_params={"nits_bcd": 5, "nits_uot": 100},
+        nits_barycenter=nits_barycenter,
+        device=torch.device("cpu"),
+        init_barycenter_geometry=geometry_list[0],
+        init_barycenter_features=features_list[0],
+    )
+
+    # Check that the barycenter is the same as the input
+    print(barycenter_features)
+    assert torch.allclose(barycenter_weights, torch.ones(n_voxels) / n_voxels)
+    assert torch.allclose(barycenter_geometry, geometry_list[0])
+
+    # In the case alpha=1.0, the features can be permuted
+    # since the GW distance is invariant under isometries
+    if alpha != 1.0:
+        assert torch.allclose(barycenter_features, features)
+
+    # Check that all the plans are the identity matrix divided
+    # by the number of voxels
+    for plan in plans:
+        assert torch.allclose(plan, torch.eye(n_voxels) / n_voxels)
