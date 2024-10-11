@@ -80,7 +80,7 @@ def test_identity_case(alpha):
     torch.manual_seed(0)
     n_subjects = 3
     n_features = 10
-    n_voxels = 5
+    n_voxels = 100
     nits_barycenter = 2
 
     geometry = _init_mock_distribution(n_features, n_voxels)[2]
