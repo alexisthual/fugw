@@ -271,7 +271,12 @@ class FUGWBarycenter:
                 init_barycenter_features, device=device
             )
 
-        if init_barycenter_geometry is None:
+        if init_barycenter_geometry is None and self.learn_geometry is False:
+            raise ValueError(
+                "In the fixed support case, init_barycenter_geometry must be"
+                " provided."
+            )
+        elif init_barycenter_geometry is None and self.learn_geometry is True:
             barycenter_geometry = (
                 torch.ones((barycenter_size, barycenter_size)).to(device)
                 / barycenter_size
