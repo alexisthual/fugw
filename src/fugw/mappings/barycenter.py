@@ -178,6 +178,7 @@ class FUGWBarycenter:
         weights_list,
         features_list,
         geometry_list,
+        subject_weights=None,
         barycenter_size=None,
         init_barycenter_weights=None,
         init_barycenter_features=None,
@@ -204,6 +205,9 @@ class FUGWBarycenter:
             or just one kernel matrix if it's shared across individuals
             barycenter_size (int, optional): Size of computed
             barycentric features and geometry. Defaults to None.
+        subject_weights (list of float, optional): Weights of each individual.
+            If None, all individuals will have the same weight.
+            Defaults to None.
         init_barycenter_weights (np.array, optional): Distribution weights
             of barycentric points. If None, points will have uniform
             weights. Defaults to None.
@@ -281,6 +285,9 @@ class FUGWBarycenter:
                 init_barycenter_geometry, device=device
             )
 
+        if subject_weights is None:
+            subject_weights = [1 / len(weights_list)] * len(weights_list)
+
         plans = None
         duals = None
         losses_each_bar_step = []
@@ -311,7 +318,7 @@ class FUGWBarycenter:
 
             # Update barycenter features and geometry
             barycenter_features = self.update_barycenter_features(
-                plans, weights_list, features_list, device
+                plans, subject_weights, features_list, device
             )
             if self.learn_geometry:
                 barycenter_geometry = self.update_barycenter_geometry(
