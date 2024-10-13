@@ -33,20 +33,16 @@ class FUGWSparseBarycenter:
         self.selection_radius = selection_radius
 
     @staticmethod
-    def update_barycenter_features(
-        plans, subject_weights, features_list, device
-    ):
-        for i, (pi, w, features) in enumerate(
-            zip(plans, subject_weights, features_list)
-        ):
+    def update_barycenter_features(plans, features_list, device):
+        for i, (pi, features) in enumerate(zip(plans, features_list)):
             f = _make_tensor(features, device=device)
-
+            weight = 1 / len(features_list)
             if features is not None:
                 pi_sum = (
                     torch.sparse.sum(pi, dim=0).to_dense().reshape(-1, 1)
                     + 1e-16
                 )
-                acc = w * pi.T @ f.T / pi_sum
+                acc = weight * pi.T @ f.T / pi_sum
 
                 if i == 0:
                     barycenter_features = acc
@@ -157,7 +153,6 @@ class FUGWSparseBarycenter:
         weights_list,
         features_list,
         geometry_embedding,
-        subject_weights=None,
         barycenter_size=None,
         init_barycenter_weights=None,
         init_barycenter_features=None,
@@ -183,9 +178,6 @@ class FUGWSparseBarycenter:
             have the same number of features n_features.
         geometry_embedding (np.array or torch.Tensor): Common geometry
             embedding of all individuals and barycenter.
-        subject_weights (list of float, optional): Weights of each individual.
-            If None, all individuals will have the same weight.
-            Defaults to None.
         barycenter_size (int), optional:
             Size of computed barycentric features and geometry.
             Defaults to None.
@@ -264,9 +256,6 @@ class FUGWSparseBarycenter:
                 geometry_embedding, device=device
             )
 
-        if subject_weights is None:
-            subject_weights = [1 / len(weights_list)] * len(weights_list)
-
         plans = None
         sparsity_mask = None
         losses_each_bar_step = []
@@ -299,7 +288,7 @@ class FUGWSparseBarycenter:
 
             # Update barycenter features and geometry
             barycenter_features = self.update_barycenter_features(
-                plans, subject_weights, features_list, device
+                plans, features_list, device
             )
 
             if callback_barycenter is not None:
