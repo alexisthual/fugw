@@ -122,7 +122,6 @@ class FUGWBarycenter:
         barycenter_geometry,
         solver,
         solver_params,
-        callback_barycenter,
         device,
         verbose,
     ):
@@ -309,7 +308,6 @@ class FUGWBarycenter:
                 barycenter_geometry,
                 solver,
                 solver_params,
-                callback_barycenter,
                 device,
                 verbose,
             )
