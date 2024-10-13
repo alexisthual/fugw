@@ -79,15 +79,13 @@ class FUGWBarycenter:
         return barycenter_geometry
 
     @staticmethod
-    def update_barycenter_features(
-        plans, subject_weights, features_list, device
-    ):
-        for i, (pi, w, features) in enumerate(
-            zip(plans, subject_weights, features_list)
-        ):
+    def update_barycenter_features(plans, features_list, device):
+        for i, (pi, features) in enumerate(zip(plans, features_list)):
+            # Use uniform weights across subjects
+            weight = 1 / len(features_list)
             f = _make_tensor(features, device=device)
             if features is not None:
-                acc = w * pi.T @ f.T / (pi.sum(0).reshape(-1, 1) + 1e-16)
+                acc = weight * pi.T @ f.T / (pi.sum(0).reshape(-1, 1) + 1e-16)
 
                 if i == 0:
                     barycenter_features = acc
@@ -177,7 +175,6 @@ class FUGWBarycenter:
         weights_list,
         features_list,
         geometry_list,
-        subject_weights=None,
         barycenter_size=None,
         init_barycenter_weights=None,
         init_barycenter_features=None,
@@ -204,9 +201,6 @@ class FUGWBarycenter:
             or just one kernel matrix if it's shared across individuals
             barycenter_size (int, optional): Size of computed
             barycentric features and geometry. Defaults to None.
-        subject_weights (list of float, optional): Weights of each individual.
-            If None, all individuals will have the same weight.
-            Defaults to None.
         init_barycenter_weights (np.array, optional): Distribution weights
             of barycentric points. If None, points will have uniform
             weights. Defaults to None.
@@ -284,9 +278,6 @@ class FUGWBarycenter:
                 init_barycenter_geometry, device=device
             )
 
-        if subject_weights is None:
-            subject_weights = [1 / len(weights_list)] * len(weights_list)
-
         plans = None
         duals = None
         losses_each_bar_step = []
@@ -316,7 +307,7 @@ class FUGWBarycenter:
 
             # Update barycenter features and geometry
             barycenter_features = self.update_barycenter_features(
-                plans, subject_weights, features_list, device
+                plans, features_list, device
             )
             if self.learn_geometry:
                 barycenter_geometry = self.update_barycenter_geometry(
