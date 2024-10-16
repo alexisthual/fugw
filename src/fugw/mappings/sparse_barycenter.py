@@ -33,19 +33,16 @@ class FUGWSparseBarycenter:
         self.selection_radius = selection_radius
 
     @staticmethod
-    def update_barycenter_features(plans, weights_list, features_list, device):
-        for i, (pi, weights, features) in enumerate(
-            zip(plans, weights_list, features_list)
-        ):
-            w = _make_tensor(weights, device=device)
+    def update_barycenter_features(plans, features_list, device):
+        for i, (pi, features) in enumerate(zip(plans, features_list)):
             f = _make_tensor(features, device=device)
-
+            weight = 1 / len(features_list)
             if features is not None:
                 pi_sum = (
                     torch.sparse.sum(pi, dim=0).to_dense().reshape(-1, 1)
                     + 1e-16
                 )
-                acc = w * pi.T @ f.T / pi_sum
+                acc = weight * pi.T @ f.T / pi_sum
 
                 if i == 0:
                     barycenter_features = acc
@@ -291,7 +288,7 @@ class FUGWSparseBarycenter:
 
             # Update barycenter features and geometry
             barycenter_features = self.update_barycenter_features(
-                plans, weights_list, features_list, device
+                plans, features_list, device
             )
 
             if callback_barycenter is not None:

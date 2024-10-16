@@ -11,7 +11,7 @@ class FUGWBarycenter:
         self,
         alpha=0.5,
         rho=1,
-        eps=1e-2,
+        eps=1e-4,
         reg_mode="joint",
         force_psd=False,
         learn_geometry=False,
@@ -79,26 +79,19 @@ class FUGWBarycenter:
         return barycenter_geometry
 
     @staticmethod
-    def update_barycenter_features(plans, weights_list, features_list, device):
-        for i, (pi, weights, features) in enumerate(
-            zip(plans, weights_list, features_list)
-        ):
-            w = _make_tensor(weights, device=device)
+    def update_barycenter_features(plans, features_list, device):
+        for i, (pi, features) in enumerate(zip(plans, features_list)):
+            # Use uniform weights across subjects
+            weight = 1 / len(features_list)
             f = _make_tensor(features, device=device)
             if features is not None:
-                acc = w * pi.T @ f.T / (pi.sum(0).reshape(-1, 1) + 1e-16)
+                acc = weight * pi.T @ f.T / (pi.sum(0).reshape(-1, 1) + 1e-16)
 
                 if i == 0:
                     barycenter_features = acc
                 else:
                     barycenter_features += acc
 
-        # Normalize barycenter features
-        min_val = barycenter_features.min(dim=0, keepdim=True).values
-        max_val = barycenter_features.max(dim=0, keepdim=True).values
-        barycenter_features = (
-            2 * (barycenter_features - min_val) / (max_val - min_val) - 1
-        )
         return barycenter_features.T
 
     @staticmethod
@@ -127,7 +120,6 @@ class FUGWBarycenter:
         barycenter_geometry,
         solver,
         solver_params,
-        callback_barycenter,
         device,
         verbose,
     ):
@@ -271,7 +263,12 @@ class FUGWBarycenter:
                 init_barycenter_features, device=device
             )
 
-        if init_barycenter_geometry is None:
+        if init_barycenter_geometry is None and self.learn_geometry is False:
+            raise ValueError(
+                "In the fixed support case, init_barycenter_geometry must be"
+                " provided."
+            )
+        elif init_barycenter_geometry is None and self.learn_geometry is True:
             barycenter_geometry = (
                 torch.ones((barycenter_size, barycenter_size)).to(device)
                 / barycenter_size
@@ -302,7 +299,6 @@ class FUGWBarycenter:
                 barycenter_geometry,
                 solver,
                 solver_params,
-                callback_barycenter,
                 device,
                 verbose,
             )
@@ -311,7 +307,7 @@ class FUGWBarycenter:
 
             # Update barycenter features and geometry
             barycenter_features = self.update_barycenter_features(
-                plans, weights_list, features_list, device
+                plans, features_list, device
             )
             if self.learn_geometry:
                 barycenter_geometry = self.update_barycenter_geometry(
