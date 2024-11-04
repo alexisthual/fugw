@@ -2,7 +2,7 @@ import torch
 from sklearn.preprocessing import OneHotEncoder
 
 
-def check_labels(labels):
+def check_labels(labels: torch.Tensor) -> None:
     """
     Check that labels are a 1D tensor of integers.
 
@@ -32,7 +32,7 @@ def check_labels(labels):
         )
 
 
-def one_hot_encoding(labels):
+def one_hot_encoding(labels: torch.Tensor) -> torch.Tensor:
     """
     Compute one-hot encoding of the labels.
 
@@ -57,9 +57,9 @@ def one_hot_encoding(labels):
 
 
 def compute_sparsity_mask(
-    labels,
-    device="auto",
-):
+    labels: torch.Tensor,
+    device: str = "auto",
+) -> torch.Tensor:
     """
     Compute sparsity mask from coarse mapping.
 
