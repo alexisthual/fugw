@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**06:42.054** total execution time for 4 files **from auto_examples/01_brain_alignment**:
+**06:45.839** total execution time for 4 files **from auto_examples/01_brain_alignment**:
 
 .. container::
 
@@ -33,14 +33,14 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_2_aligning_brain_sparse.py` (``plot_2_aligning_brain_sparse.py``)
-     - 02:18.591
-     - 698.0
+     - 02:19.208
+     - 691.3
    * - :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_1_aligning_brain_dense.py` (``plot_1_aligning_brain_dense.py``)
-     - 01:54.630
-     - 238.6
+     - 01:57.373
+     - 248.0
    * - :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_4_aligning_high_res_volumes.py` (``plot_4_aligning_high_res_volumes.py``)
-     - 01:51.775
-     - 60.8
+     - 01:52.159
+     - 77.2
    * - :ref:`sphx_glr_auto_examples_01_brain_alignment_plot_3_aligning_low_res_volumes.py` (``plot_3_aligning_low_res_volumes.py``)
-     - 00:37.057
-     - 60.7
+     - 00:37.098
+     - 60.8

@@ -427,43 +427,43 @@ and selection radia have the same units).</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[10:54:30] Validation data for feature maps is not provided. Using  dense.py:199
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:37:24] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
            Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
-[10:54:37] BCD step 1/5    FUGW loss:      0.023749656975269318     dense.py:568
+[21:37:30] BCD step 1/5    FUGW loss:      0.023749656975269318     dense.py:568
            Validation loss:        0.023749656975269318
 
 
-[10:54:43] BCD step 2/5    FUGW loss:      0.019920265302062035     dense.py:568
+[21:37:36] BCD step 2/5    FUGW loss:      0.019920265302062035     dense.py:568
            Validation loss:        0.019920265302062035
 
 
-[10:54:49] BCD step 3/5    FUGW loss:      0.011780289933085442     dense.py:568
+[21:37:42] BCD step 3/5    FUGW loss:      0.011780289933085442     dense.py:568
            Validation loss:        0.011780289933085442
 
 
-[10:54:55] BCD step 4/5    FUGW loss:      0.00605743145570159      dense.py:568
+[21:37:48] BCD step 4/5    FUGW loss:      0.00605743145570159      dense.py:568
            Validation loss:        0.00605743145570159
 
 
-[10:55:01] BCD step 5/5    FUGW loss:      0.004680723417550325     dense.py:568
+[21:37:54] BCD step 5/5    FUGW loss:      0.004680723417550325     dense.py:568
            Validation loss:        0.004680723417550325
-[10:55:02] Validation data for feature maps is not provided. Using sparse.py:209
+[21:37:55] Validation data for feature maps is not provided. Using sparse.py:209
            training data instead.
            Validation data for anatomical kernels is not provided. sparse.py:253
            Using training data instead.
 
 
-[10:55:27] BCD step 1/3    FUGW loss:      0.007941684685647488    sparse.py:660
+[21:38:20] BCD step 1/3    FUGW loss:      0.007941684685647488    sparse.py:660
 
 
-[10:55:53] BCD step 2/3    FUGW loss:      0.005435771308839321    sparse.py:660
+[21:38:46] BCD step 2/3    FUGW loss:      0.005435771308839321    sparse.py:660
 
 
-[10:56:18] BCD step 3/3    FUGW loss:      0.004494884517043829    sparse.py:660
+[21:39:12] BCD step 3/3    FUGW loss:      0.004494884517043829    sparse.py:660
 </pre></div>
 </div>
 <p>Let’s plot the probability map of target voxels being matched with
@@ -532,7 +532,8 @@ the 300th source voxel.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pearson Correlation post-mapping: </span><span class="si">{</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_post_mapping</span></a><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;Relative improvement:&quot;</span>
-    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_post_mapping</span></a><span class="w"> </span><span class="o">-</span><span class="w"> </span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a><span class="w"> </span><span class="o">*</span><span class="mi">100</span><span class="w"> </span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> %&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_post_mapping</span></a><span class="w"> </span><span class="o">-</span><span class="w"> </span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; %&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -597,8 +598,8 @@ Relative improvement: 24.77 %
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" srcset="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 51.775 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  61 MB</p>
+<img src="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" srcset="../../_images/sphx_glr_plot_4_aligning_high_res_volumes_003.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 52.159 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  77 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-01-brain-alignment-plot-4-aligning-high-res-volumes-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ee514658243cad2e75228000beb0a278/plot_4_aligning_high_res_volumes.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_4_aligning_high_res_volumes.ipynb</span></code></a></p>

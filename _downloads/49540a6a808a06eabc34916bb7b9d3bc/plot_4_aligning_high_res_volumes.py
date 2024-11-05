@@ -239,7 +239,8 @@ print(f"Pearson Correlation pre-mapping: {corr_pre_mapping:.2f}")
 print(f"Pearson Correlation post-mapping: {corr_post_mapping:.2f}")
 print(
     "Relative improvement:"
-    f" {(corr_post_mapping - corr_pre_mapping) / corr_pre_mapping *100 :.2f} %"
+    f" {(corr_post_mapping - corr_pre_mapping) / corr_pre_mapping * 100 :.2f}"
+    " %"
 )
 
 

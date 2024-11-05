@@ -417,25 +417,25 @@ both the features and the geometry.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[10:53:53] Validation data for feature maps is not provided. Using  dense.py:199
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:36:46] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
            Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
-[10:53:59] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
+[21:36:52] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
            Validation loss:        0.025816654786467552
 
 
-[10:54:08] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
+[21:37:01] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
            Validation loss:        0.009248202666640282
 
 
-[10:54:17] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
+[21:37:10] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
            Validation loss:        0.007908511906862259
 
 
-[10:54:26] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
+[21:37:19] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
            Validation loss:        0.007553447037935257
 </pre></div>
 </div>
@@ -495,7 +495,8 @@ the 4th source voxel.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pearson Correlation post-mapping: </span><span class="si">{</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_post_mapping</span></a><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;Relative improvement:&quot;</span>
-    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_post_mapping</span></a><span class="w"> </span><span class="o">-</span><span class="w"> </span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a><span class="w"> </span><span class="o">*</span><span class="mi">100</span><span class="w"> </span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> %&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_post_mapping</span></a><span class="w"> </span><span class="o">-</span><span class="w"> </span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">corr_pre_mapping</span></a><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; %&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -564,7 +565,7 @@ Relative improvement: 30.13 %
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" srcset="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 37.057 seconds)</p>
+<img src="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" srcset="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 37.098 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  61 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-01-brain-alignment-plot-3-aligning-low-res-volumes-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">

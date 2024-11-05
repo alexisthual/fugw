@@ -326,25 +326,25 @@ We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 
  .. code-block:: none
 
-    [10:53:53] Validation data for feature maps is not provided. Using  dense.py:199
+    [21:36:46] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [10:53:59] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
+    [21:36:52] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
                Validation loss:        0.025816654786467552                         
 
 
-    [10:54:08] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
+    [21:37:01] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
                Validation loss:        0.009248202666640282                         
 
 
-    [10:54:17] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
+    [21:37:10] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
                Validation loss:        0.007908511906862259                         
 
 
-    [10:54:26] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
+    [21:37:19] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
                Validation loss:        0.007553447037935257                         
 
 
@@ -433,7 +433,7 @@ We can now align test contrasts using the fitted mapping.
 
 Let's compare the Pearson correlation between source and target features.
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-239
+.. GENERATED FROM PYTHON SOURCE LINES 225-240
 
 .. code-block:: Python
 
@@ -447,7 +447,8 @@ Let's compare the Pearson correlation between source and target features.
     print(f"Pearson Correlation post-mapping: {corr_post_mapping:.2f}")
     print(
         "Relative improvement:"
-        f" {(corr_post_mapping - corr_pre_mapping) / corr_pre_mapping *100 :.2f} %"
+        f" {(corr_post_mapping - corr_pre_mapping) / corr_pre_mapping * 100 :.2f}"
+        " %"
     )
 
 
@@ -466,11 +467,11 @@ Let's compare the Pearson correlation between source and target features.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-241
+.. GENERATED FROM PYTHON SOURCE LINES 241-242
 
 Let's plot the transporting feature maps of the test set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 241-298
+.. GENERATED FROM PYTHON SOURCE LINES 242-299
 
 .. code-block:: Python
 
@@ -546,7 +547,7 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 37.057 seconds)
+   **Total running time of the script:** (0 minutes 37.098 seconds)
 
 **Estimated memory usage:**  61 MB
 
