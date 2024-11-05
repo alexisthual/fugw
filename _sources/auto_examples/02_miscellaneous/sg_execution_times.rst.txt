@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**02:24.837** total execution time for 3 files **from auto_examples/02_miscellaneous**:
+**02:34.429** total execution time for 3 files **from auto_examples/02_miscellaneous**:
 
 .. container::
 
@@ -33,11 +33,11 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_2_simple_crossval.py` (``plot_2_simple_crossval.py``)
-     - 01:28.685
+     - 01:28.335
      - 60.7
    * - :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_1_pearson_correlation.py` (``plot_1_pearson_correlation.py``)
-     - 00:54.471
+     - 01:04.483
      - 61.0
    * - :ref:`sphx_glr_auto_examples_02_miscellaneous_plot_3_memory_usage_callback.py` (``plot_3_memory_usage_callback.py``)
-     - 00:01.682
+     - 00:01.610
      - 60.7
