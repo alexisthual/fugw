@@ -566,7 +566,7 @@ class FUGWSolver(BaseSolver):
 
                 if verbose:
                     console.log(
-                        f"BCD step {idx+1}/{self.nits_bcd}\t"
+                        f"BCD step {idx + 1}/{self.nits_bcd}\t"
                         f"FUGW loss:\t{current_loss['total']}\t"
                         f"Validation loss:\t{current_loss_validation['total']}"
                     )

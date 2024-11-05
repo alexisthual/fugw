@@ -23,8 +23,10 @@ jobs:
             version_python: "3.10"
           - os: ubuntu-latest
             version_python: "3.11"
+          - os: ubuntu-latest
+            version_python: "3.12"
           - os: macos-latest
-            version_python: "3.10"
+            version_python: "3.12"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
