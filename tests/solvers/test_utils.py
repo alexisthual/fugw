@@ -109,7 +109,7 @@ def test_solvers_sinkhorn_sparse(pot_method, solver, is_log):
 
     uot_params = torch.tensor(float("inf")), torch.tensor(float("inf")), eps
 
-    _, log = ot.sinkhorn(
+    gamma, log = ot.sinkhorn(
         ws,
         wt,
         cost,
@@ -134,7 +134,7 @@ def test_solvers_sinkhorn_sparse(pot_method, solver, is_log):
 
     # Check the potentials
     else:
-        (alpha, beta), _ = solver(
+        (alpha, beta), pi = solver(
             cost.to_sparse_csr(),
             init_duals,
             uot_params,
@@ -147,3 +147,4 @@ def test_solvers_sinkhorn_sparse(pot_method, solver, is_log):
             alpha,
         )
         assert torch.allclose(log["beta"], beta)
+        assert torch.allclose(gamma, pi.to_dense(), atol=1e-5)
