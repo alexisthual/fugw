@@ -11,7 +11,7 @@ from fugw.solvers.utils import (
     compute_divergence,
     solver_ibpp,
     solver_mm,
-    solver_sinkhorn,
+    solver_sinkhorn_log,
     solver_mm_l2,
 )
 from fugw.utils import _add_dict, console
@@ -444,7 +444,7 @@ class FUGWSolver(BaseSolver):
 
         # If divergence is KL
         self_solver_sinkhorn = partial(
-            solver_sinkhorn,
+            solver_sinkhorn_log,
             tuple_weights=(ws, wt, ws_dot_wt),
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
         )
@@ -566,7 +566,7 @@ class FUGWSolver(BaseSolver):
 
                 if verbose:
                     console.log(
-                        f"BCD step {idx+1}/{self.nits_bcd}\t"
+                        f"BCD step {idx + 1}/{self.nits_bcd}\t"
                         f"FUGW loss:\t{current_loss['total']}\t"
                         f"Validation loss:\t{current_loss_validation['total']}"
                     )
