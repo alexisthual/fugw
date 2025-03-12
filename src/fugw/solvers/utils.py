@@ -522,8 +522,8 @@ def solver_sinkhorn_stabilized(
     alpha = alpha + eps * u.log()
     beta = beta + eps * v.log()
 
-    # Compute final transport plan as ws_dot_wt * K
-    pi = ws_dot_wt * get_K(alpha, beta)
+    # Compute final transport plan
+    pi = get_K(alpha, beta)
 
     return (alpha, beta), pi
 
@@ -640,16 +640,8 @@ def solver_sinkhorn_stabilized_sparse(
     alpha = alpha + eps * u.log()
     beta = beta + eps * v.log()
 
-    # Compute final transport plan as ws_dot_wt * K
-    # Since K is already a sparse tensor, we just need to multiply its values
-    pi_values = ws_dot_wt.values() * K.values()
-
-    pi = torch.sparse_csr_tensor(
-        cost.crow_indices(),
-        cost.col_indices(),
-        pi_values,
-        size=cost.size(),
-    )
+    # Compute final transport plan
+    pi = get_K_sparse(alpha, beta)
 
     return (alpha, beta), pi
 
