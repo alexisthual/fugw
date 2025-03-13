@@ -246,7 +246,7 @@ def solver_sinkhorn_log(
     tau_s = 1 if torch.isinf(rho_s) else rho_s / (rho_s + eps)
     tau_t = 1 if torch.isinf(rho_t) else rho_t / (rho_t + eps)
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -364,7 +364,7 @@ def solver_sinkhorn_log_sparse(
     ).to_sparse_csr()
     col_one_hot_t = col_one_hot.transpose(0, 1).to_sparse_csr()
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -477,7 +477,7 @@ def solver_sinkhorn_stabilized(
         return ((alpha[:, None] + beta[None, :] - cost) / eps).exp()
 
     K = get_K(alpha, beta)
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -500,18 +500,18 @@ def solver_sinkhorn_stabilized(
                 # Recompute K with updated potentials
                 K = get_K(alpha, beta)
 
-            if verbose:
-                progress.update(task, advance=1)
-
             if tol is not None and idx % eval_freq == 0:
                 pi = get_K(alpha + eps * u.log(), beta + eps * v.log())
                 err = torch.norm(pi.sum(0) - wt)
                 if err < tol:
                     if verbose:
                         progress.console.log(
-                            f"Reached tol_uot threshold: {err}"
+                            f"Reached tolerance threshold: {err}"
                         )
                     break
+
+            if verbose:
+                progress.update(task, advance=1)
 
             idx += 1
 
@@ -583,7 +583,7 @@ def solver_sinkhorn_stabilized_sparse(
     # Initial K
     K = get_K_sparse(alpha, beta)
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -624,7 +624,7 @@ def solver_sinkhorn_stabilized_sparse(
                 if err < tol:
                     if verbose:
                         progress.console.log(
-                            f"Reached tol_uot threshold: {err}"
+                            print(f"Reached tolerance threshold: {err}")
                         )
                     break
 
@@ -669,31 +669,37 @@ def solver_sinkhorn_eps_scaling(
     numItermin = 35
     numItermax = max(numItermin, numItermax)
 
-    while (
-        (err is None or err >= tol)
-        and (numItermax is None or idx < numItermax)
-    ) or (idx < numItermin):
-        reg_idx = get_reg(idx)
-        (alpha, beta), pi = solver_sinkhorn_stabilized(
-            cost,
-            (alpha, beta),
-            (rho_s, rho_t, reg_idx),
-            tuple_weights,
-            train_params_inner,
-            verbose=False,
-        )
-
-        if tol is not None and idx % eval_freq == 0:
-            err = (
-                torch.norm(pi.sum(0) - tuple_weights[1]) ** 2
-                + torch.norm(pi.sum(1) - tuple_weights[0]) ** 2
+    with _get_progress(verbose=verbose, transient=True) as progress:
+        if verbose:
+            task = progress.add_task("Scaling iterations", total=numItermax)
+        while (
+            (err is None or err >= tol)
+            and (numItermax is None or idx < numItermax)
+        ) or (idx < numItermin):
+            reg_idx = get_reg(idx)
+            (alpha, beta), pi = solver_sinkhorn_stabilized(
+                cost,
+                (alpha, beta),
+                (rho_s, rho_t, reg_idx),
+                tuple_weights,
+                train_params_inner,
+                verbose=False,
             )
-            if err < tol and idx > numItermin:
-                if verbose:
-                    print(f"Reached tol_uot threshold: {err}")
-                break
 
-        idx += 1
+            if tol is not None and idx % eval_freq == 0:
+                err = (
+                    torch.norm(pi.sum(0) - tuple_weights[1]) ** 2
+                    + torch.norm(pi.sum(1) - tuple_weights[0]) ** 2
+                )
+                if err < tol and idx > numItermin:
+                    if verbose:
+                        print(f"Reached tolerance threshold: {err}")
+                    break
+
+            if verbose:
+                progress.update(task, advance=1)
+
+            idx += 1
 
     return (alpha, beta), pi
 
@@ -730,33 +736,41 @@ def solver_sinkhorn_eps_scaling_sparse(
     numItermin = 35
     numItermax = max(numItermin, numItermax)
 
-    while (
-        (err is None or err >= tol)
-        and (numItermax is None or idx < numItermax)
-    ) or (idx < numItermin):
-        reg_idx = get_reg(idx)
-        (alpha, beta), pi = solver_sinkhorn_stabilized_sparse(
-            cost,
-            (alpha, beta),
-            (rho_s, rho_t, reg_idx),
-            tuple_weights,
-            train_params_inner,
-            verbose=False,
-        )
-
-        if tol is not None and idx % eval_freq == 0:
-            pi1 = csr_sum(pi, dim=1)
-            pi2 = csr_sum(pi, dim=0)
-            err = (
-                torch.norm(pi1 - tuple_weights[0]) ** 2
-                + torch.norm(pi2 - tuple_weights[1]) ** 2
+    with _get_progress(verbose=verbose, transient=True) as progress:
+        if verbose:
+            task = progress.add_task("Scaling iterations", total=numItermax)
+        while (
+            (err is None or err >= tol)
+            and (numItermax is None or idx < numItermax)
+        ) or (idx < numItermin):
+            reg_idx = get_reg(idx)
+            (alpha, beta), pi = solver_sinkhorn_stabilized_sparse(
+                cost,
+                (alpha, beta),
+                (rho_s, rho_t, reg_idx),
+                tuple_weights,
+                train_params_inner,
+                verbose=False,
             )
-            if err < tol and idx > numItermin:
-                if verbose:
-                    print(f"Reached tol_uot threshold: {err}")
-                break
 
-        idx += 1
+            if tol is not None and idx % eval_freq == 0:
+                pi1 = csr_sum(pi, dim=1)
+                pi2 = csr_sum(pi, dim=0)
+                err = (
+                    torch.norm(pi1 - tuple_weights[0]) ** 2
+                    + torch.norm(pi2 - tuple_weights[1]) ** 2
+                )
+                if err < tol and idx > numItermin:
+                    if verbose:
+                        progress.console.log(
+                            print(f"Reached tolerance threshold: {err}")
+                        )
+                    break
+
+            if verbose:
+                progress.update(task, advance=1)
+
+            idx += 1
 
     return (alpha, beta), pi
 
@@ -795,7 +809,7 @@ def solver_mm(
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("MM-KL iterations", total=niters)
 
@@ -812,9 +826,6 @@ def solver_mm(
             )
             pi1, pi2 = pi.sum(1), pi.sum(0)
 
-            if verbose:
-                progress.update(task, advance=1)
-
             if tol is not None and idx % eval_freq == 0:
                 pi1_error = (pi1 - pi1_prev).abs().max()
                 pi2_error = (pi2 - pi2_prev).abs().max()
@@ -825,6 +836,9 @@ def solver_mm(
                             "Reached tol_uot threshold: "
                             f"{pi1_error}, {pi2_error}"
                         )
+
+            if verbose:
+                progress.update(task, advance=1)
 
             idx += 1
 
@@ -859,7 +873,7 @@ def solver_mm_l2(
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("MM-L2 iterations", total=niters)
 
@@ -966,7 +980,7 @@ def solver_mm_sparse(
         size=(n_cols, n_pi_values),
     ).to_sparse_csr()
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("MM iterations", total=niters)
 
@@ -1092,7 +1106,7 @@ def solver_mm_l2_sparse(
     pi1, pi2 = csr_sum(init_pi, dim=1), csr_sum(init_pi, dim=0)
     pi_values = init_pi.values()
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("MM-L2 iterations", total=niters)
 
@@ -1184,7 +1198,7 @@ def solver_ibpp(
 
     K = torch.exp(-cost / sum_eps)
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
@@ -1285,7 +1299,7 @@ def solver_ibpp_sparse(
     # Remove previously added 1
     csr_values_to_transpose_values = T.values() - 1
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
