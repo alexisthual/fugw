@@ -481,12 +481,9 @@ def solver_sinkhorn_stabilized(
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
-        pi_diff = None
+        err = None
         idx = 0
-        while (pi_diff is None or pi_diff >= tol) and (
-            niters is None or idx < niters
-        ):
-            u_prev, v_prev = u.detach().clone(), v.detach().clone()
+        while (err is None or err >= tol) and (niters is None or idx < niters):
             v = wt / (K.T @ u)
             u = ws / (K @ v)
 
@@ -507,14 +504,14 @@ def solver_sinkhorn_stabilized(
                 progress.update(task, advance=1)
 
             if tol is not None and idx % eval_freq == 0:
-                pi_diff = max(
-                    (u - u_prev).abs().max(), (v - v_prev).abs().max()
-                )
-                if pi_diff < tol:
+                pi = get_K(alpha + eps * u.log(), beta + eps * v.log())
+                err = torch.norm(pi.sum(0) - wt)
+                if err < tol:
                     if verbose:
                         progress.console.log(
-                            f"Reached tol_uot threshold: {pi_diff}"
+                            f"Reached tol_uot threshold: {err}"
                         )
+                    break
 
             idx += 1
 
@@ -590,12 +587,9 @@ def solver_sinkhorn_stabilized_sparse(
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
-        pi_diff = None
+        err = None
         idx = 0
-        while (pi_diff is None or pi_diff >= tol) and (
-            niters is None or idx < niters
-        ):
-            u_prev, v_prev = u.detach().clone(), v.detach().clone()
+        while (err is None or err >= tol) and (niters is None or idx < niters):
             # Update v using sparse matrix multiplication
             Kt_u = (
                 torch.sparse.mm(K.transpose(0, 1), u.reshape(-1, 1))
@@ -625,14 +619,14 @@ def solver_sinkhorn_stabilized_sparse(
                 progress.update(task, advance=1)
 
             if tol is not None and idx % eval_freq == 0:
-                pi_diff = max(
-                    (u - u_prev).abs().max(), (v - v_prev).abs().max()
-                )
-                if pi_diff < tol:
+                pi = get_K_sparse(alpha + eps * u.log(), beta + eps * v.log())
+                err = torch.norm(csr_sum(pi, dim=0) - wt)
+                if err < tol:
                     if verbose:
                         progress.console.log(
-                            f"Reached tol_uot threshold: {pi_diff}"
+                            f"Reached tol_uot threshold: {err}"
                         )
+                    break
 
             idx += 1
 
@@ -666,7 +660,7 @@ def solver_sinkhorn_eps_scaling(
     train_params_inner = numInnerItermax, tol, eval_freq
     alpha, beta = init_duals
 
-    pi_diff = None
+    err = None
     idx = 0
 
     def get_reg(idx):
@@ -676,11 +670,10 @@ def solver_sinkhorn_eps_scaling(
     numItermax = max(numItermin, numItermax)
 
     while (
-        (pi_diff is None or pi_diff >= tol)
+        (err is None or err >= tol)
         and (numItermax is None or idx < numItermax)
     ) or (idx < numItermin):
         reg_idx = get_reg(idx)
-        alpha_prev, beta_prev = alpha.detach().clone(), beta.detach().clone()
         (alpha, beta), pi = solver_sinkhorn_stabilized(
             cost,
             (alpha, beta),
@@ -691,13 +684,14 @@ def solver_sinkhorn_eps_scaling(
         )
 
         if tol is not None and idx % eval_freq == 0:
-            pi_diff = max(
-                (alpha - alpha_prev).abs().max(),
-                (beta - beta_prev).abs().max(),
+            err = (
+                torch.norm(pi.sum(0) - tuple_weights[1]) ** 2
+                + torch.norm(pi.sum(1) - tuple_weights[0]) ** 2
             )
-            if pi_diff < tol:
+            if err < tol and idx > numItermin:
                 if verbose:
-                    print(f"Reached tol_uot threshold: {pi_diff}")
+                    print(f"Reached tol_uot threshold: {err}")
+                break
 
         idx += 1
 
@@ -727,7 +721,7 @@ def solver_sinkhorn_eps_scaling_sparse(
     train_params_inner = numInnerItermax, tol, eval_freq
     alpha, beta = init_duals
 
-    pi_diff = None
+    err = None
     idx = 0
 
     def get_reg(idx):
@@ -737,11 +731,10 @@ def solver_sinkhorn_eps_scaling_sparse(
     numItermax = max(numItermin, numItermax)
 
     while (
-        (pi_diff is None or pi_diff >= tol)
+        (err is None or err >= tol)
         and (numItermax is None or idx < numItermax)
     ) or (idx < numItermin):
         reg_idx = get_reg(idx)
-        alpha_prev, beta_prev = alpha.detach().clone(), beta.detach().clone()
         (alpha, beta), pi = solver_sinkhorn_stabilized_sparse(
             cost,
             (alpha, beta),
@@ -752,13 +745,17 @@ def solver_sinkhorn_eps_scaling_sparse(
         )
 
         if tol is not None and idx % eval_freq == 0:
-            pi_diff = max(
-                (alpha - alpha_prev).abs().max(),
-                (beta - beta_prev).abs().max(),
+            pi1 = csr_sum(pi, dim=1)
+            pi2 = csr_sum(pi, dim=0)
+            err = (
+                torch.norm(pi1 - tuple_weights[0]) ** 2
+                + torch.norm(pi2 - tuple_weights[1]) ** 2
             )
-            if pi_diff < tol:
+            print(f"fugw iter {idx}, err {err}")
+            if err < tol and idx > numItermin:
                 if verbose:
-                    print(f"Reached tol_uot threshold: {pi_diff}")
+                    print(f"Reached tol_uot threshold: {err}")
+                break
 
         idx += 1
 
