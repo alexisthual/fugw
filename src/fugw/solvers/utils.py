@@ -751,7 +751,6 @@ def solver_sinkhorn_eps_scaling_sparse(
                 torch.norm(pi1 - tuple_weights[0]) ** 2
                 + torch.norm(pi2 - tuple_weights[1]) ** 2
             )
-            print(f"fugw iter {idx}, err {err}")
             if err < tol and idx > numItermin:
                 if verbose:
                     print(f"Reached tol_uot threshold: {err}")
