@@ -647,7 +647,6 @@ def solver_sinkhorn_eps_scaling(
     tuple_weights,
     train_params,
     numItermax=100,
-    numInnerItermax=100,
     verbose=True,
     epsilon0=1e4,
 ):
@@ -656,7 +655,7 @@ def solver_sinkhorn_eps_scaling(
     Relies on the stabilized Sinkhorn algorithm.
     """
     rho_s, rho_t, eps = uot_params
-    _, tol, eval_freq = train_params
+    numInnerItermax, tol, eval_freq = train_params
     train_params_inner = numInnerItermax, tol, eval_freq
     alpha, beta = init_duals
 
