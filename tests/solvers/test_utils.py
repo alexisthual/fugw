@@ -22,7 +22,7 @@ def test_solvers_sinkhorn(pot_method, solver, is_log):
     nf = 10
     eps = 1.0
 
-    niters, tol, eval_freq = train_params = 100, 0, 10
+    niters, tol, eval_freq = train_params = 100, 1e-16, 1
 
     ws = torch.ones(ns) / ns
     wt = torch.ones(nt) / nt
@@ -37,7 +37,7 @@ def test_solvers_sinkhorn(pot_method, solver, is_log):
 
     uot_params = torch.tensor(float("inf")), torch.tensor(float("inf")), eps
 
-    _, log = ot.sinkhorn(
+    gamma, log = ot.sinkhorn(
         ws,
         wt,
         cost,
@@ -45,6 +45,7 @@ def test_solvers_sinkhorn(pot_method, solver, is_log):
         numItermax=niters,
         stopThr=tol,
         method=pot_method,
+        print_period=eval_freq,
         log=True,
     )
 
@@ -60,9 +61,9 @@ def test_solvers_sinkhorn(pot_method, solver, is_log):
         assert torch.allclose(log["log_u"], log_u)
         assert torch.allclose(log["log_v"], log_v)
 
-    # Check the potentials
+    # Check the potentials and the transport plan
     else:
-        (alpha, beta), _ = solver(
+        (alpha, beta), pi = solver(
             cost,
             init_duals,
             uot_params,
@@ -75,6 +76,7 @@ def test_solvers_sinkhorn(pot_method, solver, is_log):
             alpha,
         )
         assert torch.allclose(log["beta"], beta)
+        assert torch.allclose(gamma, pi, atol=1e-5)
 
 
 @pytest.mark.parametrize(
@@ -94,7 +96,7 @@ def test_solvers_sinkhorn_sparse(pot_method, solver, is_log):
     nf = 10
     eps = 1.0
 
-    niters, tol, eval_freq = train_params = 100, 0, 10
+    niters, tol, eval_freq = train_params = 100, 1e-16, 1
 
     ws = torch.ones(ns) / ns
     wt = torch.ones(nt) / nt
@@ -117,6 +119,7 @@ def test_solvers_sinkhorn_sparse(pot_method, solver, is_log):
         numItermax=niters,
         stopThr=tol,
         method=pot_method,
+        print_period=eval_freq,
         log=True,
     )
 
@@ -132,7 +135,7 @@ def test_solvers_sinkhorn_sparse(pot_method, solver, is_log):
         assert torch.allclose(log["log_u"], log_u)
         assert torch.allclose(log["log_v"], log_v)
 
-    # Check the potentials
+    # Check the potentials and the transport plan
     else:
         (alpha, beta), pi = solver(
             cost.to_sparse_csr(),
