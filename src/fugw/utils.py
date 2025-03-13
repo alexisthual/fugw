@@ -1,4 +1,5 @@
 import pickle
+from contextlib import nullcontext
 
 import numpy as np
 import torch
@@ -21,8 +22,11 @@ console = Console()
 
 
 # `rich` progress bar used throughout the codebase
-def _get_progress(**kwargs):
-    """Return a custom `rich` progress bar."""
+def _get_progress(verbose=True, **kwargs):
+    """Return a custom `rich` progress bar if verbose is True, else a nullcontext."""
+    if not verbose:
+        return nullcontext()  # Do nothing when verbose is False
+
     return Progress(
         SpinnerColumn(),
         TaskProgressColumn(),
