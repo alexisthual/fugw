@@ -1,5 +1,4 @@
 import torch
-
 from fugw.utils import _get_progress, console
 
 
@@ -474,7 +473,14 @@ def solver_sinkhorn_stabilized(
     tau = 1e3  # Threshold for stabilization
 
     def get_K(alpha, beta):
-        return ((alpha[:, None] + beta[None, :] - cost) / eps).exp()
+        return (-(cost - alpha[:, None] - beta[None, :]) / eps).exp()
+
+    def get_Gamma(alpha, beta, u, v):
+        return (
+            -(cost - alpha[:, None] - beta[None, :]) / eps
+            + u[:, None].log()
+            + v[None, :].log()
+        ).exp()
 
     K = get_K(alpha, beta)
     with _get_progress(verbose=verbose, transient=True) as progress:
@@ -515,12 +521,12 @@ def solver_sinkhorn_stabilized(
 
             idx += 1
 
+    # Compute final transport plan
+    pi = get_Gamma(alpha, beta, u, v)
+
     # Final update to potentials
     alpha = alpha + eps * u.log()
     beta = beta + eps * v.log()
-
-    # Compute final transport plan
-    pi = get_K(alpha, beta)
 
     return (alpha, beta), pi
 
@@ -663,11 +669,12 @@ def solver_sinkhorn_eps_scaling(
     idx = 0
 
     def get_reg(idx):
-        return (epsilon0 - eps) * torch.exp(-torch.tensor(idx)) + eps
+        return (epsilon0 - eps) * torch.exp(
+            -torch.tensor(idx, dtype=torch.float64)
+        ) + eps
 
     numItermin = 35
     numItermax = max(numItermin, numItermax)
-
     with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("Scaling iterations", total=numItermax)
@@ -730,7 +737,9 @@ def solver_sinkhorn_eps_scaling_sparse(
     idx = 0
 
     def get_reg(idx):
-        return (epsilon0 - eps) * torch.exp(-torch.tensor(idx)) + eps
+        return (epsilon0 - eps) * torch.exp(
+            -torch.tensor(idx, dtype=torch.float32)
+        ) + eps
 
     numItermin = 35
     numItermax = max(numItermin, numItermax)
