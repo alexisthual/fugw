@@ -549,7 +549,7 @@ def solver_sinkhorn_stabilized_sparse(
 
     rho_s, rho_t, eps = uot_params
     niters, tol, eval_freq = train_params
-    tau = 1e6  # Threshold for stabilization
+    tau = 1e3  # Threshold for stabilization
 
     # Set up sparse matrix operations
     crow_indices = cost.crow_indices()
@@ -585,6 +585,29 @@ def solver_sinkhorn_stabilized_sparse(
             size=cost.size(),
         )
         return K
+
+    def get_Gamma_sparse(alpha, beta, u, v):
+        new_values = (
+            (
+                fill_csr_matrix_rows(alpha, crow_indices)
+                + fill_csr_matrix_cols(beta, ccol_indices, csc_to_csr)
+                - cost.values()
+            )
+            / eps
+            + fill_csr_matrix_rows(u.log(), crow_indices)
+            + fill_csr_matrix_cols(v.log(), ccol_indices, csc_to_csr)
+        )
+
+        gamma_values = new_values.exp()
+
+        gamma = torch.sparse_csr_tensor(
+            cost.crow_indices(),
+            cost.col_indices(),
+            gamma_values,
+            size=cost.size(),
+        )
+
+        return gamma
 
     # Initial K
     K = get_K_sparse(alpha, beta)
@@ -636,12 +659,12 @@ def solver_sinkhorn_stabilized_sparse(
 
             idx += 1
 
+    # Compute final transport plan
+    pi = get_Gamma_sparse(alpha, beta, u, v)
+
     # Final update to potentials
     alpha = alpha + eps * u.log()
     beta = beta + eps * v.log()
-
-    # Compute final transport plan
-    pi = get_K_sparse(alpha, beta)
 
     return (alpha, beta), pi
 
