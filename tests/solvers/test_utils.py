@@ -76,7 +76,7 @@ def test_solvers_sinkhorn(pot_method, solver, is_log):
             alpha,
         )
         assert torch.allclose(log["beta"], beta)
-        assert torch.allclose(gamma, pi, atol=1e-5)
+        assert torch.allclose(gamma, pi)
 
 
 @pytest.mark.parametrize(
@@ -150,4 +150,4 @@ def test_solvers_sinkhorn_sparse(pot_method, solver, is_log):
             alpha,
         )
         assert torch.allclose(log["beta"], beta)
-        assert torch.allclose(gamma, pi.to_dense(), atol=1e-5)
+        assert torch.allclose(gamma, pi.to_dense(), atol=1e-6)
