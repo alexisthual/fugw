@@ -543,7 +543,7 @@ def solver_sinkhorn_stabilized_sparse(
 
     rho_s, rho_t, eps = uot_params
     niters, tol, eval_freq = train_params
-    tau = 1e3  # Threshold for stabilization
+    tau = 1e6  # Threshold for stabilization
 
     # Set up sparse matrix operations
     crow_indices = cost.crow_indices()
