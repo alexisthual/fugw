@@ -620,15 +620,11 @@ def solver_sinkhorn_stabilized_sparse(
         idx = 0
         while (err is None or err >= tol) and (niters is None or idx < niters):
             # Update v using sparse matrix multiplication
-            Kt_u = (
-                torch.sparse.mm(K.transpose(0, 1), u.reshape(-1, 1))
-                .to_dense()
-                .flatten()
-            )
+            Kt_u = torch.mv(K.transpose(0, 1), u)
             v = wt / Kt_u
 
             # Update u using sparse matrix multiplication
-            Kv = torch.sparse.mm(K, v.reshape(-1, 1)).to_dense().flatten()
+            Kv = torch.mv(K, v)
             u = ws / Kv
 
             # Check for numerical instability and stabilize if needed
