@@ -32,11 +32,6 @@ def test_solvers_sinkhorn(pot_method, solver):
     target_features = torch.rand(nt, nf)
 
     cost = torch.cdist(source_features, target_features)
-    ws_dot_wt = torch.ones(ns, nt) / (ns * nt)
-    init_duals = (torch.zeros(ns), torch.zeros(nt))
-    tuple_weights = ws, wt, ws_dot_wt
-
-    uot_params = torch.tensor(float("inf")), torch.tensor(float("inf")), eps
 
     gamma, log = ot.sinkhorn(
         ws,
@@ -53,10 +48,12 @@ def test_solvers_sinkhorn(pot_method, solver):
     # Check the potentials and the transport plan
     (alpha, beta), pi = solver(
         cost,
-        init_duals,
-        uot_params,
-        tuple_weights,
-        train_params,
+        ws,
+        wt,
+        eps,
+        numItermax=niters,
+        tol=tol,
+        eval_freq=eval_freq,
     )
 
     assert torch.allclose(
@@ -84,7 +81,7 @@ def test_solvers_sinkhorn_sparse(pot_method, solver):
     nf = 10
     eps = 1.0
 
-    niters, tol, eval_freq = train_params = 100, 1e-16, 1
+    niters, tol, eval_freq = 100, 1e-16, 1
 
     ws = torch.ones(ns) / ns
     wt = torch.ones(nt) / nt
@@ -93,11 +90,6 @@ def test_solvers_sinkhorn_sparse(pot_method, solver):
     target_features = torch.rand(nt, nf)
 
     cost = torch.cdist(source_features, target_features)
-    ws_dot_wt = torch.ones(ns, nt) / (ns * nt)
-    init_duals = (torch.zeros(ns), torch.zeros(nt))
-    tuple_weights = ws, wt, ws_dot_wt.to_sparse_csr()
-
-    uot_params = torch.tensor(float("inf")), torch.tensor(float("inf")), eps
 
     gamma, log = ot.sinkhorn(
         ws,
@@ -114,10 +106,12 @@ def test_solvers_sinkhorn_sparse(pot_method, solver):
     # Check the potentials and the transport plan
     (alpha, beta), pi = solver(
         cost.to_sparse_csr(),
-        init_duals,
-        uot_params,
-        tuple_weights,
-        train_params,
+        ws,
+        wt,
+        eps,
+        numItermax=niters,
+        tol=tol,
+        eval_freq=eval_freq,
     )
 
     assert torch.allclose(
