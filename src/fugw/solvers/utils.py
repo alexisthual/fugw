@@ -450,7 +450,16 @@ def solver_sinkhorn_log_sparse(
 
 
 def solver_sinkhorn_stabilized(
-    cost, init_duals, uot_params, tuple_weights, train_params, verbose=True
+    cost,
+    ws,
+    wt,
+    eps,
+    init_duals=None,
+    numItermax=1000,
+    tol=1e-9,
+    eval_freq=20,
+    stabilization_threshold=1e3,
+    verbose=True,
 ):
     """
     Stabilized Sinkhorn algorithm as described in
@@ -459,23 +468,23 @@ def solver_sinkhorn_stabilized(
         arXiv preprint arXiv:1610.06519.
 
     """
-    ws, wt, ws_dot_wt = tuple_weights
-
     # Initialize scaling vectors to ones
     u = torch.ones_like(ws) / len(ws)
     v = torch.ones_like(wt) / len(wt)
 
     # Initialize the dual potentials
-    alpha, beta = init_duals
-
-    rho_s, rho_t, eps = uot_params
-    niters, tol, eval_freq = train_params
-    tau = 1e3  # Threshold for stabilization
+    if init_duals is None:
+        alpha = torch.zeros(cost.shape[0])
+        beta = torch.zeros(cost.shape[1])
+    else:
+        alpha, beta = init_duals
 
     def get_K(alpha, beta):
+        """Return sinkhorn kernel matrix."""
         return (-(cost - alpha[:, None] - beta[None, :]) / eps).exp()
 
-    def get_Gamma(alpha, beta, u, v):
+    def get_pi(alpha, beta, u, v):
+        """Return dense transport plan."""
         return (
             -(cost - alpha[:, None] - beta[None, :]) / eps
             + u[:, None].log()
@@ -485,16 +494,21 @@ def solver_sinkhorn_stabilized(
     K = get_K(alpha, beta)
     with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
-            task = progress.add_task("Sinkhorn iterations", total=niters)
+            task = progress.add_task("Sinkhorn iterations", total=numItermax)
 
         err = None
         idx = 0
-        while (err is None or err >= tol) and (niters is None or idx < niters):
+        while (err is None or err >= tol) and (
+            numItermax is None or idx < numItermax
+        ):
             v = wt / (K.T @ u)
             u = ws / (K @ v)
 
             # Check for numerical instability and stabilize if needed
-            if torch.max(torch.abs(u)) > tau or torch.max(torch.abs(v)) > tau:
+            if (
+                torch.max(torch.abs(u)) > stabilization_threshold
+                or torch.max(torch.abs(v)) > stabilization_threshold
+            ):
                 # Absorb large values into potentials
                 alpha = alpha + eps * torch.log(u)
                 beta = beta + eps * torch.log(v)
@@ -522,7 +536,7 @@ def solver_sinkhorn_stabilized(
             idx += 1
 
     # Compute final transport plan
-    pi = get_Gamma(alpha, beta, u, v)
+    pi = get_pi(alpha, beta, u, v)
 
     # Final update to potentials
     alpha = alpha + eps * u.log()
@@ -532,24 +546,32 @@ def solver_sinkhorn_stabilized(
 
 
 def solver_sinkhorn_stabilized_sparse(
-    cost, init_duals, uot_params, tuple_weights, train_params, verbose=True
+    cost,
+    ws,
+    wt,
+    eps,
+    init_duals=None,
+    numItermax=1000,
+    tol=1e-9,
+    eval_freq=20,
+    stabilization_threshold=1e3,
+    verbose=True,
 ):
     """
     Stabilized sparse Sinkhorn algorithm following the structure of the dense
     stabilized implementation but using sparse matrix operations.
     """
-    ws, wt, ws_dot_wt = tuple_weights
 
     # Initialize scaling vectors to ones
     u = torch.ones_like(ws) / len(ws)
     v = torch.ones_like(wt) / len(wt)
 
     # Initialize the dual potentials
-    alpha, beta = init_duals
-
-    rho_s, rho_t, eps = uot_params
-    niters, tol, eval_freq = train_params
-    tau = 1e3  # Threshold for stabilization
+    if init_duals is None:
+        alpha = torch.zeros(cost.shape[0])
+        beta = torch.zeros(cost.shape[1])
+    else:
+        alpha, beta = init_duals
 
     # Set up sparse matrix operations
     crow_indices = cost.crow_indices()
@@ -569,7 +591,7 @@ def solver_sinkhorn_stabilized_sparse(
 
     # Compute kernel matrix K in sparse format
     def get_K_sparse(alpha, beta):
-        # (alpha[:, None] + beta[None, :] - cost) / eps in sparse form
+        """Return sinkhorn sparse kernel matrix."""
         new_values = (
             fill_csr_matrix_rows(alpha, crow_indices)
             + fill_csr_matrix_cols(beta, ccol_indices, csc_to_csr)
@@ -586,7 +608,8 @@ def solver_sinkhorn_stabilized_sparse(
         )
         return K
 
-    def get_Gamma_sparse(alpha, beta, u, v):
+    def get_pi_sparse(alpha, beta, u, v):
+        """Return dense transport plan."""
         new_values = (
             (
                 fill_csr_matrix_rows(alpha, crow_indices)
@@ -614,11 +637,13 @@ def solver_sinkhorn_stabilized_sparse(
 
     with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
-            task = progress.add_task("Sinkhorn iterations", total=niters)
+            task = progress.add_task("Sinkhorn iterations", total=numItermax)
 
         err = None
         idx = 0
-        while (err is None or err >= tol) and (niters is None or idx < niters):
+        while (err is None or err >= tol) and (
+            numItermax is None or idx < numItermax
+        ):
             # Update v using sparse matrix multiplication
             Kt_u = torch.mv(K.transpose(0, 1), u)
             v = wt / Kt_u
@@ -628,7 +653,10 @@ def solver_sinkhorn_stabilized_sparse(
             u = ws / Kv
 
             # Check for numerical instability and stabilize if needed
-            if torch.max(torch.abs(u)) > tau or torch.max(torch.abs(v)) > tau:
+            if (
+                torch.max(torch.abs(u)) > stabilization_threshold
+                or torch.max(torch.abs(v)) > stabilization_threshold
+            ):
                 # Absorb large values into potentials
                 alpha = alpha + eps * torch.log(u)
                 beta = beta + eps * torch.log(v)
@@ -656,7 +684,7 @@ def solver_sinkhorn_stabilized_sparse(
             idx += 1
 
     # Compute final transport plan
-    pi = get_Gamma_sparse(alpha, beta, u, v)
+    pi = get_pi_sparse(alpha, beta, u, v)
 
     # Final update to potentials
     alpha = alpha + eps * u.log()
@@ -667,22 +695,29 @@ def solver_sinkhorn_stabilized_sparse(
 
 def solver_sinkhorn_eps_scaling(
     cost,
-    init_duals,
-    uot_params,
-    tuple_weights,
-    train_params,
+    ws,
+    wt,
+    eps,
+    init_duals=None,
+    numInnerItermax=100,
     numItermax=100,
-    verbose=True,
+    tol=1e-9,
+    eval_freq=10,
+    stabilization_threshold=1e3,
     epsilon0=1e4,
+    verbose=True,
 ):
     """
     Scaling algorithm (ie Sinkhorn algorithm) with epsilon scaling.
     Relies on the stabilized Sinkhorn algorithm.
     """
-    rho_s, rho_t, eps = uot_params
-    numInnerItermax, tol, eval_freq = train_params
-    train_params_inner = numInnerItermax, tol, eval_freq
-    alpha, beta = init_duals
+
+    # Initialize the dual potentials
+    if init_duals is None:
+        alpha = torch.zeros(cost.shape[0])
+        beta = torch.zeros(cost.shape[1])
+    else:
+        alpha, beta = init_duals
 
     err = None
     idx = 0
@@ -704,17 +739,21 @@ def solver_sinkhorn_eps_scaling(
             reg_idx = get_reg(idx)
             (alpha, beta), pi = solver_sinkhorn_stabilized(
                 cost,
-                (alpha, beta),
-                (rho_s, rho_t, reg_idx),
-                tuple_weights,
-                train_params_inner,
+                ws,
+                wt,
+                reg_idx,
+                init_duals=(alpha, beta),
+                numItermax=numInnerItermax,
+                tol=tol,
+                eval_freq=eval_freq,
+                stabilization_threshold=stabilization_threshold,
                 verbose=False,
             )
 
             if tol is not None and idx % eval_freq == 0:
                 err = (
-                    torch.norm(pi.sum(0) - tuple_weights[1]) ** 2
-                    + torch.norm(pi.sum(1) - tuple_weights[0]) ** 2
+                    torch.norm(pi.sum(0) - wt[1]) ** 2
+                    + torch.norm(pi.sum(1) - ws[0]) ** 2
                 )
                 if err < tol and idx > numItermin:
                     if verbose:
@@ -731,14 +770,17 @@ def solver_sinkhorn_eps_scaling(
 
 def solver_sinkhorn_eps_scaling_sparse(
     cost,
-    init_duals,
-    uot_params,
-    tuple_weights,
-    train_params,
-    numItermax=100,
+    ws,
+    wt,
+    eps,
+    init_duals=None,
     numInnerItermax=100,
-    verbose=True,
+    numItermax=100,
+    tol=1e-9,
+    eval_freq=10,
+    stabilization_threshold=1e3,
     epsilon0=1e4,
+    verbose=True,
 ):
     """
     Scaling algorithm (ie Sinkhorn algorithm) with epsilon scaling.
@@ -747,10 +789,13 @@ def solver_sinkhorn_eps_scaling_sparse(
     This implementation uses sparse matrix operations to speed up computations
     and reduce memory usage.
     """
-    rho_s, rho_t, eps = uot_params
-    _, tol, eval_freq = train_params
-    train_params_inner = numInnerItermax, tol, eval_freq
-    alpha, beta = init_duals
+
+    # Initialize the dual potentials
+    if init_duals is None:
+        alpha = torch.zeros(cost.shape[0])
+        beta = torch.zeros(cost.shape[1])
+    else:
+        alpha, beta = init_duals
 
     err = None
     idx = 0
@@ -773,20 +818,21 @@ def solver_sinkhorn_eps_scaling_sparse(
             reg_idx = get_reg(idx)
             (alpha, beta), pi = solver_sinkhorn_stabilized_sparse(
                 cost,
-                (alpha, beta),
-                (rho_s, rho_t, reg_idx),
-                tuple_weights,
-                train_params_inner,
+                ws,
+                wt,
+                reg_idx,
+                init_duals=(alpha, beta),
+                numItermax=numInnerItermax,
+                tol=tol,
+                eval_freq=eval_freq,
+                stabilization_threshold=stabilization_threshold,
                 verbose=False,
             )
 
             if tol is not None and idx % eval_freq == 0:
                 pi1 = csr_sum(pi, dim=1)
                 pi2 = csr_sum(pi, dim=0)
-                err = (
-                    torch.norm(pi1 - tuple_weights[0]) ** 2
-                    + torch.norm(pi2 - tuple_weights[1]) ** 2
-                )
+                err = torch.norm(pi1 - ws) ** 2 + torch.norm(pi2 - wt) ** 2
                 if err < tol and idx > numItermin:
                     if verbose:
                         progress.console.log(
