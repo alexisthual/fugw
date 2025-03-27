@@ -804,7 +804,7 @@ def solver_sinkhorn_eps_scaling_sparse(
     def get_reg(idx):
         """Epsilon scheduler"""
         return (epsilon0 - eps) * torch.exp(
-            -torch.tensor(idx, dtype=torch.float32)
+            -torch.tensor(idx, dtype=torch.float64)
         ) + eps
 
     numItermin = 35
