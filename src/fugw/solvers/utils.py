@@ -723,6 +723,7 @@ def solver_sinkhorn_eps_scaling(
     idx = 0
 
     def get_reg(idx):
+        """Epsilon scheduler"""
         return (epsilon0 - eps) * torch.exp(
             -torch.tensor(idx, dtype=torch.float64)
         ) + eps
