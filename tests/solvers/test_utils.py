@@ -12,11 +12,12 @@ from fugw.solvers.utils import (
 @pytest.mark.parametrize(
     "pot_method, solver, is_log",
     [
-        ("sinkhorn_stabilized", solver_sinkhorn_stabilized, False),
-        ("sinkhorn_epsilon_scaling", solver_sinkhorn_eps_scaling, False),
+        ("sinkhorn_stabilized", solver_sinkhorn_stabilized),
+        ("sinkhorn_epsilon_scaling", solver_sinkhorn_eps_scaling),
     ],
 )
-def test_solvers_sinkhorn(pot_method, solver, is_log):
+def test_solvers_sinkhorn(pot_method, solver):
+    """Test consistence of the dense sinkhorn solvers with POT."""
     ns = 151
     nt = 104
     nf = 10
@@ -49,48 +50,35 @@ def test_solvers_sinkhorn(pot_method, solver, is_log):
         log=True,
     )
 
-    # Check the log of the scaling vectors
-    if is_log:
-        (log_u, log_v), _ = solver(
-            cost,
-            init_duals,
-            uot_params,
-            tuple_weights,
-            train_params,
-        )
-        assert torch.allclose(log["log_u"], log_u)
-        assert torch.allclose(log["log_v"], log_v)
-
     # Check the potentials and the transport plan
-    else:
-        (alpha, beta), pi = solver(
-            cost,
-            init_duals,
-            uot_params,
-            tuple_weights,
-            train_params,
-        )
+    (alpha, beta), pi = solver(
+        cost,
+        init_duals,
+        uot_params,
+        tuple_weights,
+        train_params,
+    )
 
-        assert torch.allclose(
-            log["alpha"],
-            alpha,
-        )
-        assert torch.allclose(log["beta"], beta)
-        assert torch.allclose(gamma, pi)
+    assert torch.allclose(
+        log["alpha"],
+        alpha,
+    )
+    assert torch.allclose(log["beta"], beta)
+    assert torch.allclose(gamma, pi)
 
 
 @pytest.mark.parametrize(
     "pot_method, solver, is_log",
     [
-        ("sinkhorn_stabilized", solver_sinkhorn_stabilized_sparse, False),
+        ("sinkhorn_stabilized", solver_sinkhorn_stabilized_sparse),
         (
             "sinkhorn_epsilon_scaling",
             solver_sinkhorn_eps_scaling_sparse,
-            False,
         ),
     ],
 )
-def test_solvers_sinkhorn_sparse(pot_method, solver, is_log):
+def test_solvers_sinkhorn_sparse(pot_method, solver):
+    """Test consistence of the sparse sinkhorn solvers with POT."""
     ns = 151
     nt = 104
     nf = 10
@@ -123,31 +111,18 @@ def test_solvers_sinkhorn_sparse(pot_method, solver, is_log):
         log=True,
     )
 
-    # Check the log of the scaling vectors
-    if is_log:
-        (log_u, log_v), _ = solver(
-            cost.to_sparse_csr(),
-            init_duals,
-            uot_params,
-            tuple_weights,
-            train_params,
-        )
-        assert torch.allclose(log["log_u"], log_u)
-        assert torch.allclose(log["log_v"], log_v)
-
     # Check the potentials and the transport plan
-    else:
-        (alpha, beta), pi = solver(
-            cost.to_sparse_csr(),
-            init_duals,
-            uot_params,
-            tuple_weights,
-            train_params,
-        )
+    (alpha, beta), pi = solver(
+        cost.to_sparse_csr(),
+        init_duals,
+        uot_params,
+        tuple_weights,
+        train_params,
+    )
 
-        assert torch.allclose(
-            log["alpha"],
-            alpha,
-        )
-        assert torch.allclose(log["beta"], beta)
-        assert torch.allclose(gamma, pi.to_dense(), atol=1e-6)
+    assert torch.allclose(
+        log["alpha"],
+        alpha,
+    )
+    assert torch.allclose(log["beta"], beta)
+    assert torch.allclose(gamma, pi.to_dense(), atol=1e-6)
