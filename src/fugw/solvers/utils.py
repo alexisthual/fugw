@@ -467,6 +467,35 @@ def solver_sinkhorn_stabilized(
         Entropy Regularized Transport Problems.
         arXiv preprint arXiv:1610.06519.
 
+    Parameters
+    ----------
+    cost: torch.Tensor
+        Cost matrix.
+    ws: torch.Tensor
+        Source weights.
+    wt: torch.Tensor
+        Target weights.
+    eps: float
+        Entropy regularization parameter.
+    init_duals: tuple of torch.Tensor, optional, defaults to None
+        Initial dual potentials.
+    numItermax: int, optional, defaults to 1000
+        Maximum number of iterations.
+    tol: float, optional, defaults to 1e-9
+        Tolerance threshold.
+    eval_freq: int, optional, defaults to 20
+        Frequency at which to evaluate the tolerance threshold.
+    stabilization_threshold: float, optional, defaults to 1e3
+        Threshold for numerical stabilization.
+    verbose: bool, optional, defaults to False
+        Whether to display progress.
+
+    Returns
+    -------
+    (alpha, beta): tuple of torch.Tensor
+        Dual potentials.
+    pi: torch.Tensor
+        Optimal transport plan.
     """
     # Initialize scaling vectors to ones
     u = torch.ones_like(ws) / len(ws)
@@ -560,6 +589,36 @@ def solver_sinkhorn_stabilized_sparse(
     """
     Stabilized sparse Sinkhorn algorithm following the structure of the dense
     stabilized implementation but using sparse matrix operations.
+
+    Parameters
+    ----------
+    cost: torch.sparse_csr_tensor
+        Sparse cost matrix.
+    ws: torch.Tensor
+        Source weights.
+    wt: torch.Tensor
+        Target weights.
+    eps: float
+        Entropy regularization parameter.
+    init_duals: tuple of torch.Tensor, optional, defaults to None
+        Initial dual potentials.
+    numItermax: int, optional, defaults to 1000
+        Maximum number of iterations.
+    tol: float, optional, defaults to 1e-9
+        Tolerance threshold.
+    eval_freq: int, optional, defaults to 20
+        Frequency at which to evaluate the tolerance threshold.
+    stabilization_threshold: float, optional, defaults to 1e3
+        Threshold for numerical stabilization.
+    verbose: bool, optional, defaults to False
+        Whether to display progress.
+
+    Returns
+    -------
+    (alpha, beta): tuple of torch.Tensor
+        Dual potentials.
+    pi: torch.sparse_csr_tensor
+        Optimal transport plan.
     """
 
     # Initialize scaling vectors to ones
@@ -710,6 +769,41 @@ def solver_sinkhorn_eps_scaling(
     """
     Scaling algorithm (ie Sinkhorn algorithm) with epsilon scaling.
     Relies on the stabilized Sinkhorn algorithm.
+
+    Parameters
+    ----------
+    cost: torch.Tensor
+        Cost matrix.
+    ws: torch.Tensor
+        Source weights.
+    wt: torch.Tensor
+        Target weights.
+    eps: float
+        Entropy regularization parameter.
+    init_duals: tuple of torch.Tensor, optional, defaults to None
+        Initial dual potentials.
+    numInnerItermax: int, optional, defaults to 100
+        Maximum number of inner iterations for the stabilized
+        Sinkhorn algorithm.
+    numItermax: int, optional, defaults to 1000
+        Maximum number of iterations.
+    tol: float, optional, defaults to 1e-9
+        Tolerance threshold.
+    eval_freq: int, optional, defaults to 20
+        Frequency at which to evaluate the tolerance threshold.
+    stabilization_threshold: float, optional, defaults to 1e3
+        Threshold for numerical stabilization.
+    epsilon0: float, optional, defaults to 1e4
+        Initial epsilon value.
+    verbose: bool, optional, defaults to False
+        Whether to display progress.
+
+    Returns
+    -------
+    (alpha, beta): tuple of torch.Tensor
+        Dual potentials.
+    pi: torch.Tensor
+        Optimal transport plan.
     """
 
     # Initialize the dual potentials
@@ -785,10 +879,45 @@ def solver_sinkhorn_eps_scaling_sparse(
 ):
     """
     Scaling algorithm (ie Sinkhorn algorithm) with epsilon scaling.
-    Relies on the stabilized Sinkhorn algorithm.
+    Relies on the stabilized sparse Sinkhorn algorithm.
 
     This implementation uses sparse matrix operations to speed up computations
     and reduce memory usage.
+
+    Parameters
+    ----------
+    cost: torch.sparse_csr_tensor
+        Sparse cost matrix.
+    ws: torch.Tensor
+        Source weights.
+    wt: torch.Tensor
+        Target weights.
+    eps: float
+        Entropy regularization parameter.
+    init_duals: tuple of torch.Tensor, optional, defaults to None
+        Initial dual potentials.
+    numInnerItermax: int, optional, defaults to 100
+        Maximum number of inner iterations for the stabilized
+        Sinkhorn algorithm.
+    numItermax: int, optional, defaults to 1000
+        Maximum number of iterations.
+    tol: float, optional, defaults to 1e-9
+        Tolerance threshold.
+    eval_freq: int, optional, defaults to 20
+        Frequency at which to evaluate the tolerance threshold.
+    stabilization_threshold: float, optional, defaults to 1e3
+        Threshold for numerical stabilization.
+    epsilon0: float, optional, defaults to 1e4
+        Initial epsilon value.
+    verbose: bool, optional, defaults to False
+        Whether to display progress.
+
+    Returns
+    -------
+    (alpha, beta): tuple of torch.Tensor
+        Dual potentials.
+    pi: torch.sparse_csr_tensor
+        Optimal transport plan.
     """
 
     # Initialize the dual potentials
