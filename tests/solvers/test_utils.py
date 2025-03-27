@@ -10,7 +10,7 @@ from fugw.solvers.utils import (
 
 
 @pytest.mark.parametrize(
-    "pot_method, solver, is_log",
+    "pot_method, solver",
     [
         ("sinkhorn_stabilized", solver_sinkhorn_stabilized),
         ("sinkhorn_epsilon_scaling", solver_sinkhorn_eps_scaling),
@@ -68,7 +68,7 @@ def test_solvers_sinkhorn(pot_method, solver):
 
 
 @pytest.mark.parametrize(
-    "pot_method, solver, is_log",
+    "pot_method, solver",
     [
         ("sinkhorn_stabilized", solver_sinkhorn_stabilized_sparse),
         (
