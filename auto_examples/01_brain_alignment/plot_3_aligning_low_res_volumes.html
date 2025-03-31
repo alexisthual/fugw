@@ -246,15 +246,15 @@ to download the full example code.</p>
 <span id="sphx-glr-auto-examples-01-brain-alignment-plot-3-aligning-low-res-volumes-py"></span><h1>Low-resolution volume alignment of 2 individuals with fMRI data<a class="headerlink" href="#low-resolution-volume-alignment-of-2-individuals-with-fmri-data" title="Permalink to this heading">#</a></h1>
 <p>In this example, we align 2 low-resolution brain volumes
 using 4 fMRI feature maps (z-score contrast maps).</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">colors</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">colors</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">make_axes_locatable</span>
-<span class="kn">from</span> <span class="nn">nilearn</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">image</span>
-<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">distance_matrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.axes_grid1</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_axes_locatable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nilearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">distance_matrix</span>
 
-<span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fugw.mappings</span><span class="w"> </span><span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
 </pre></div>
 </div>
 <p>We first fetch 5 contrasts for each subject from the localizer dataset.</p>
@@ -417,25 +417,25 @@ both the features and the geometry.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:36:46] Validation data for feature maps is not provided. Using  dense.py:199
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[14:37:01] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
            Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
-[21:36:52] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
+[14:37:07] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
            Validation loss:        0.025816654786467552
 
 
-[21:37:01] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
+[14:37:17] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
            Validation loss:        0.009248202666640282
 
 
-[21:37:10] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
+[14:37:26] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
            Validation loss:        0.007908511906862259
 
 
-[21:37:19] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
+[14:37:35] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
            Validation loss:        0.007553447037935257
 </pre></div>
 </div>
@@ -565,8 +565,8 @@ Relative improvement: 30.13 %
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" srcset="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 37.098 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  61 MB</p>
+<img src="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" srcset="../../_images/sphx_glr_plot_3_aligning_low_res_volumes_005.png" alt="Transporting feature maps of the test set, Source features, Predicted target features, Actual target features" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 38.479 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  65 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-01-brain-alignment-plot-3-aligning-low-res-volumes-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a66b340be7370b086be8cd170bccbc18/plot_3_aligning_low_res_volumes.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_3_aligning_low_res_volumes.ipynb</span></code></a></p>
@@ -610,7 +610,7 @@ Relative improvement: 30.13 %
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2022-2024, the fugw team
+                Copyright &#169; 2022-2025, the fugw team
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

@@ -326,25 +326,25 @@ We now fit the mapping using the sinkhorn solver and 3 BCD iterations.
 
  .. code-block:: none
 
-    [21:36:46] Validation data for feature maps is not provided. Using  dense.py:199
+    [14:37:01] Validation data for feature maps is not provided. Using  dense.py:199
                training data instead.                                               
                Validation data for anatomical kernels is not provided.  dense.py:226
                Using training data instead.                                         
 
 
-    [21:36:52] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
+    [14:37:07] BCD step 1/4    FUGW loss:      0.025816654786467552     dense.py:568
                Validation loss:        0.025816654786467552                         
 
 
-    [21:37:01] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
+    [14:37:17] BCD step 2/4    FUGW loss:      0.009248202666640282     dense.py:568
                Validation loss:        0.009248202666640282                         
 
 
-    [21:37:10] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
+    [14:37:26] BCD step 3/4    FUGW loss:      0.007908511906862259     dense.py:568
                Validation loss:        0.007908511906862259                         
 
 
-    [21:37:19] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
+    [14:37:35] BCD step 4/4    FUGW loss:      0.007553447037935257     dense.py:568
                Validation loss:        0.007553447037935257                         
 
 
@@ -547,9 +547,9 @@ Let's plot the transporting feature maps of the test set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 37.098 seconds)
+   **Total running time of the script:** (0 minutes 38.479 seconds)
 
-**Estimated memory usage:**  61 MB
+**Estimated memory usage:**  65 MB
 
 
 .. _sphx_glr_download_auto_examples_01_brain_alignment_plot_3_aligning_low_res_volumes.py:

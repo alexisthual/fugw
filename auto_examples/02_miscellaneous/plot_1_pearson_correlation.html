@@ -249,19 +249,19 @@ between transformed and target features at each iteration of
 the block-coordinate descent (BCD) algorithm.
 This can be useful to detect numerical errors, or to check that the
 mapping is not over-fitting training data.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">nilearn</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">image</span>
-<span class="kn">from</span> <span class="nn">rich.console</span> <span class="kn">import</span> <span class="n">Console</span>
-<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">distance_matrix</span>
-<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">norm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nilearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">distance_matrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
 
-<span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
-<span class="kn">from</span> <span class="nn">fugw.utils</span> <span class="kn">import</span> <span class="n">_make_tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fugw.mappings</span><span class="w"> </span><span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fugw.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_make_tensor</span>
 </pre></div>
 </div>
 <p>We first fetch 6 contrasts for each subject from the localizer dataset.
@@ -295,13 +295,13 @@ We use 3 contrasts for training and 3 contrasts for validation.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading data from https://osf.io/download/5d27c4a51c5b4a001c9e75b1/ ...
- ...done. (3 seconds, 0 min)
-Downloading data from https://osf.io/download/5d27c81645253a001c3e1f85/ ...
  ...done. (2 seconds, 0 min)
+Downloading data from https://osf.io/download/5d27c81645253a001c3e1f85/ ...
+ ...done. (3 seconds, 0 min)
 Downloading data from https://osf.io/download/5d27d931114a4200190452fe/ ...
  ...done. (2 seconds, 0 min)
 Downloading data from https://osf.io/download/5d27d62e114a420017049501/ ...
- ...done. (3 seconds, 0 min)
+ ...done. (2 seconds, 0 min)
 Downloading data from https://osf.io/download/5d27cdcaa26b340018084b30/ ...
  ...done. (1 seconds, 0 min)
 Downloading data from https://osf.io/download/5d27d80c114a420016058f7d/ ...
@@ -405,7 +405,7 @@ all feature and geometry arrays.</p>
 <p>We first define a function to compute the Pearson correlation
 between two tensors. Such function is not available in PyTorch,
 but it is easy to implement.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pearson_corr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">plan</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pearson_corr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">plan</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the Pearson correlation between transformed</span>
 <span class="sd">    source features and target features.</span>
@@ -436,7 +436,7 @@ but it is easy to implement.</p>
     <span class="k">return</span> <span class="n">pearson_r</span><span class="p">(</span><span class="n">x_transformed</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">pearson_r</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pearson_r</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Pearson correlation between x and y.</span>
 
 <span class="sd">    Compute Pearson correlation between 2d arrays x and y</span>
@@ -517,7 +517,7 @@ target features at each BCD iteration.</p>
 <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">correlation_callback</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">correlation_callback</span><span class="p">(</span>
     <span class="nb">locals</span><span class="p">,</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_features</span></a><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_features</span></a><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -566,37 +566,37 @@ target features at each BCD iteration.</p>
 <span class="n">total_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:39:28] Validation data for anatomical kernels is not provided.  dense.py:226
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[14:39:47] Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
 
 
-[21:39:33] BCD step 1/5    FUGW loss:      0.02471640333533287      dense.py:568
+[14:39:52] BCD step 1/5    FUGW loss:      0.02471640333533287      dense.py:568
            Validation loss:        0.02700098603963852
-[21:39:33] Pearson correlation:  [0.38212429   plot_1_pearson_correlation.py:237
+[14:39:52] Pearson correlation:  [0.38212429   plot_1_pearson_correlation.py:237
            0.2964243  0.26874193]
 
 
-[21:39:42] BCD step 2/5    FUGW loss:      0.006555820349603891     dense.py:568
+[14:40:02] BCD step 2/5    FUGW loss:      0.006555820349603891     dense.py:568
            Validation loss:        0.007569685112684965
-[21:39:42] Pearson correlation:  [0.31391999   plot_1_pearson_correlation.py:237
+[14:40:02] Pearson correlation:  [0.31391999   plot_1_pearson_correlation.py:237
            0.34292094 0.32424131]
 
 
-[21:39:51] BCD step 3/5    FUGW loss:      0.006002967711538076     dense.py:568
+[14:40:11] BCD step 3/5    FUGW loss:      0.006002967711538076     dense.py:568
            Validation loss:        0.006645429879426956
-[21:39:51] Pearson correlation:  [0.33015294   plot_1_pearson_correlation.py:237
+[14:40:11] Pearson correlation:  [0.33015294   plot_1_pearson_correlation.py:237
            0.33416723 0.31084012]
 
 
-[21:40:00] BCD step 4/5    FUGW loss:      0.005948252975940704     dense.py:568
+[14:40:20] BCD step 4/5    FUGW loss:      0.005948252975940704     dense.py:568
            Validation loss:        0.006552045699208975
-[21:40:00] Pearson correlation:  [0.32666147   plot_1_pearson_correlation.py:237
+[14:40:20] Pearson correlation:  [0.32666147   plot_1_pearson_correlation.py:237
            0.32980771 0.29679679]
 
 
-[21:40:09] BCD step 5/5    FUGW loss:      0.005936595611274242     dense.py:568
+[14:40:29] BCD step 5/5    FUGW loss:      0.005936595611274242     dense.py:568
            Validation loss:        0.006547404453158379
-[21:40:09] Pearson correlation:  [0.32642125   plot_1_pearson_correlation.py:237
+[14:40:29] Pearson correlation:  [0.32642125   plot_1_pearson_correlation.py:237
            0.33017425 0.29350384]
 </pre></div>
 </div>
@@ -656,8 +656,8 @@ iteration.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_1_pearson_correlation_001.png" srcset="../../_images/sphx_glr_plot_1_pearson_correlation_001.png" alt="Sinkhorn mapping training loss  Total training time = 41.27s" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 55.822 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  68 MB</p>
+<img src="../../_images/sphx_glr_plot_1_pearson_correlation_001.png" srcset="../../_images/sphx_glr_plot_1_pearson_correlation_001.png" alt="Sinkhorn mapping training loss  Total training time = 42.16s" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 56.407 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  65 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-02-miscellaneous-plot-1-pearson-correlation-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/bda7f9565223599407bbdeec5d525a08/plot_1_pearson_correlation.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_1_pearson_correlation.ipynb</span></code></a></p>
@@ -701,7 +701,7 @@ iteration.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2022-2024, the fugw team
+                Copyright &#169; 2022-2025, the fugw team
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

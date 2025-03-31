@@ -248,15 +248,15 @@ to download the full example code.</p>
 a sparse fugw alignment between them.
 Sparse alignments are typically used when both aligned distributions
 have more than 10k points.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">,</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGWSparse</span></a>
-<span class="kn">from</span> <span class="nn">fugw.scripts</span> <span class="kn">import</span> <span class="n">coarse_to_fine</span>
-<span class="kn">from</span> <span class="nn">fugw.utils</span> <span class="kn">import</span> <span class="n">_init_mock_distribution</span>
-<span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <a href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.LineCollection" title="matplotlib.collections.LineCollection" class="sphx-glr-backref-module-matplotlib-collections sphx-glr-backref-type-py-class"><span class="n">LineCollection</span></a>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fugw.mappings</span><span class="w"> </span><span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a><span class="p">,</span> <a href="../../pages/generated/fugw.mappings.FUGWSparse.html#fugw.mappings.FUGWSparse" title="fugw.mappings.FUGWSparse" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGWSparse</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fugw.scripts</span><span class="w"> </span><span class="kn">import</span> <span class="n">coarse_to_fine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fugw.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_init_mock_distribution</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.collections</span><span class="w"> </span><span class="kn">import</span> <a href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.LineCollection" title="matplotlib.collections.LineCollection" class="sphx-glr-backref-module-matplotlib-collections sphx-glr-backref-type-py-class"><span class="n">LineCollection</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">coo_matrix</span>
 </pre></div>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
@@ -370,7 +370,7 @@ distributions you are trying to align.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:31:53] Validation data for feature maps is not provided. Using  dense.py:199
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[14:32:03] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
            Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
@@ -380,7 +380,7 @@ distributions you are trying to align.</p>
            Validation loss:        0.03209492564201355
 
 
-           BCD step 2/10   FUGW loss:      0.027612239122390747     dense.py:568
+[14:32:04] BCD step 2/10   FUGW loss:      0.027612239122390747     dense.py:568
            Validation loss:        0.027612239122390747
 
 
@@ -388,7 +388,7 @@ distributions you are trying to align.</p>
            Validation loss:        0.018442563712596893
 
 
-[21:31:54] BCD step 4/10   FUGW loss:      0.01579628325998783      dense.py:568
+           BCD step 4/10   FUGW loss:      0.01579628325998783      dense.py:568
            Validation loss:        0.01579628325998783
 
 
@@ -396,7 +396,7 @@ distributions you are trying to align.</p>
            Validation loss:        0.015153789892792702
 
 
-           BCD step 6/10   FUGW loss:      0.014875941909849644     dense.py:568
+[14:32:05] BCD step 6/10   FUGW loss:      0.014875941909849644     dense.py:568
            Validation loss:        0.014875941909849644
 
 
@@ -404,11 +404,11 @@ distributions you are trying to align.</p>
            Validation loss:        0.014715257100760937
 
 
-[21:31:55] BCD step 8/10   FUGW loss:      0.014592343010008335     dense.py:568
+           BCD step 8/10   FUGW loss:      0.014592343010008335     dense.py:568
            Validation loss:        0.014592343010008335
 
 
-           BCD step 9/10   FUGW loss:      0.014477252028882504     dense.py:568
+[14:32:06] BCD step 9/10   FUGW loss:      0.014477252028882504     dense.py:568
            Validation loss:        0.014477252028882504
 
 
@@ -424,34 +424,34 @@ Sparse CSR tensor support is in beta state. If you miss a functionality in the s
            Using training data instead.
 
 
-[21:31:58] BCD step 1/10   FUGW loss:      0.02047727443277836     sparse.py:660
+[14:32:08] BCD step 1/10   FUGW loss:      0.02047727443277836     sparse.py:660
 
 
-[21:32:00] BCD step 2/10   FUGW loss:      0.014399909414350986    sparse.py:660
+[14:32:11] BCD step 2/10   FUGW loss:      0.014399909414350986    sparse.py:660
 
 
-[21:32:02] BCD step 3/10   FUGW loss:      0.012644448317587376    sparse.py:660
+[14:32:13] BCD step 3/10   FUGW loss:      0.012644448317587376    sparse.py:660
 
 
-[21:32:05] BCD step 4/10   FUGW loss:      0.011991660110652447    sparse.py:660
+[14:32:16] BCD step 4/10   FUGW loss:      0.011991660110652447    sparse.py:660
 
 
-[21:32:07] BCD step 5/10   FUGW loss:      0.011676586233079433    sparse.py:660
+[14:32:18] BCD step 5/10   FUGW loss:      0.011676586233079433    sparse.py:660
 
 
-[21:32:09] BCD step 6/10   FUGW loss:      0.011500303633511066    sparse.py:660
+[14:32:20] BCD step 6/10   FUGW loss:      0.011500303633511066    sparse.py:660
 
 
-[21:32:12] BCD step 7/10   FUGW loss:      0.011388624086976051    sparse.py:660
+[14:32:23] BCD step 7/10   FUGW loss:      0.011388624086976051    sparse.py:660
 
 
-[21:32:14] BCD step 8/10   FUGW loss:      0.011310438625514507    sparse.py:660
+[14:32:25] BCD step 8/10   FUGW loss:      0.011310438625514507    sparse.py:660
 
 
-[21:32:17] BCD step 9/10   FUGW loss:      0.011251626536250114    sparse.py:660
+[14:32:28] BCD step 9/10   FUGW loss:      0.011251626536250114    sparse.py:660
 
 
-[21:32:19] BCD step 10/10  FUGW loss:      0.011205767281353474    sparse.py:660
+[14:32:31] BCD step 10/10  FUGW loss:      0.011205767281353474    sparse.py:660
 </pre></div>
 </div>
 <p>Both the coarse and fine-grained transport plans can be accessed
@@ -606,8 +606,8 @@ between source and target</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target_features_test</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 34.113 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  205 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 34.909 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  215 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-00-basics-plot-2-2-coarse-to-fine-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1989790ea42548515b90e754eead3ced/plot_2_2_coarse_to_fine.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_2_2_coarse_to_fine.ipynb</span></code></a></p>
@@ -651,7 +651,7 @@ between source and target</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2022-2024, the fugw team
+                Copyright &#169; 2022-2025, the fugw team
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

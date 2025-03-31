@@ -248,17 +248,17 @@ to download the full example code.</p>
 at each iteration of the block-coordinate descent (BCD) algorithm.
 This can be useful to detect memory leaks, or to check that the
 memory usage is not too high for a given device.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">fugw.mappings</span> <span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
-<span class="kn">from</span> <span class="nn">fugw.utils</span> <span class="kn">import</span> <span class="n">_init_mock_distribution</span>
-<span class="kn">from</span> <span class="nn">rich.console</span> <span class="kn">import</span> <span class="n">Console</span>
-<span class="kn">from</span> <span class="nn">rich.table</span> <span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fugw.mappings</span><span class="w"> </span><span class="kn">import</span> <a href="../../pages/generated/fugw.mappings.FUGW.html#fugw.mappings.FUGW" title="fugw.mappings.FUGW" class="sphx-glr-backref-module-fugw-mappings sphx-glr-backref-type-py-class"><span class="n">FUGW</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fugw.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_init_mock_distribution</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.table</span><span class="w"> </span><span class="kn">import</span> <span class="n">Table</span>
 </pre></div>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -302,23 +302,23 @@ of all local variables in the current scope.
 This allows us to access the tensors that are used in the BCD algorithm.
 In particular, we filter our tensors that are on our device of interest,
 and we compute their respective memory usage.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_sparse</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">is_sparse</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;sparse&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span>
 
 
-<span class="k">def</span> <span class="nf">str_size</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">str_size</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;torch\.Size\(\[(.*)\]\)&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">str_mem</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;KB&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">str_mem</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;KB&quot;</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;KB&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mem</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="si">:</span><span class="s2">,.3f</span><span class="si">}</span><span class="s2"> KB&quot;</span>
     <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;MB&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mem</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mi">2</span><span class="si">:</span><span class="s2">,.3f</span><span class="si">}</span><span class="s2"> MB&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">check_memory_usage</span><span class="p">(</span><span class="nb">locals</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_memory_usage</span><span class="p">(</span><span class="nb">locals</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)):</span>
     <span class="n">console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">()</span>
 
     <span class="n">variables</span> <span class="o">=</span> <span class="p">[]</span>
@@ -404,7 +404,7 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[21:41:40] Validation data for feature maps is not provided. Using  dense.py:199
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[14:42:02] Validation data for feature maps is not provided. Using  dense.py:199
            training data instead.
            Validation data for anatomical kernels is not provided.  dense.py:226
            Using training data instead.
@@ -588,8 +588,8 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" srcset="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" alt="Memory usage at each BCD iteration" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.630 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  61 MB</p>
+<img src="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" srcset="../../_images/sphx_glr_plot_3_memory_usage_callback_001.png" alt="Memory usage at each BCD iteration" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.791 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  65 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-02-miscellaneous-plot-3-memory-usage-callback-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/275a9983285f2255c331983fb14868ba/plot_3_memory_usage_callback.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_3_memory_usage_callback.ipynb</span></code></a></p>
@@ -633,7 +633,7 @@ Our callback function will be called at each iteration of the BCD algorithm.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2022-2024, the fugw team
+                Copyright &#169; 2022-2025, the fugw team
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
