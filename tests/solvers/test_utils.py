@@ -23,7 +23,7 @@ def test_solvers_sinkhorn(pot_method, solver):
     nf = 10
     eps = 1.0
 
-    niters, tol, eval_freq = 100, 1e-16, 1
+    niters, tol, eval_freq = 100, 1e-7, 20
 
     ws = torch.ones(ns) / ns
     wt = torch.ones(nt) / nt
@@ -81,7 +81,7 @@ def test_solvers_sinkhorn_sparse(pot_method, solver):
     nf = 10
     eps = 1.0
 
-    niters, tol, eval_freq = 100, 1e-16, 1
+    niters, tol, eval_freq = 100, 1e-7, 20
 
     ws = torch.ones(ns) / ns
     wt = torch.ones(nt) / nt
@@ -90,6 +90,11 @@ def test_solvers_sinkhorn_sparse(pot_method, solver):
     target_features = torch.rand(nt, nf)
 
     cost = torch.cdist(source_features, target_features)
+
+    # Convert the tensors to float64
+    ws = ws.double()
+    wt = wt.double()
+    cost = cost.double()
 
     gamma, log = ot.sinkhorn(
         ws,
@@ -119,4 +124,4 @@ def test_solvers_sinkhorn_sparse(pot_method, solver):
         alpha,
     )
     assert torch.allclose(log["beta"], beta)
-    assert torch.allclose(gamma, pi.to_dense(), atol=1e-6)
+    assert torch.allclose(gamma, pi.to_dense())
