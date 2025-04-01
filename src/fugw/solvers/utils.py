@@ -808,8 +808,8 @@ def solver_sinkhorn_eps_scaling(
 
     # Initialize the dual potentials
     if init_duals is None:
-        alpha = torch.zeros(cost.shape[0])
-        beta = torch.zeros(cost.shape[1])
+        alpha = torch.zeros_like(ws)
+        beta = torch.zeros_like(wt)
     else:
         alpha, beta = init_duals
 
@@ -822,8 +822,9 @@ def solver_sinkhorn_eps_scaling(
             -torch.tensor(idx, dtype=torch.float64)
         ) + eps
 
-    numItermin = 35
+    numItermin = 37
     numItermax = max(numItermin, numItermax)
+
     with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("Scaling iterations", total=numItermax)
@@ -852,7 +853,9 @@ def solver_sinkhorn_eps_scaling(
                 )
                 if err < tol and idx > numItermin:
                     if verbose:
-                        print(f"Reached tolerance threshold: {err}")
+                        progress.console.log(
+                            print(f"Reached tolerance threshold: {err}")
+                        )
                     break
 
             if verbose:
@@ -922,8 +925,8 @@ def solver_sinkhorn_eps_scaling_sparse(
 
     # Initialize the dual potentials
     if init_duals is None:
-        alpha = torch.zeros(cost.shape[0])
-        beta = torch.zeros(cost.shape[1])
+        alpha = torch.zeros_like(ws)
+        beta = torch.zeros_like(wt)
     else:
         alpha, beta = init_duals
 
@@ -936,7 +939,7 @@ def solver_sinkhorn_eps_scaling_sparse(
             -torch.tensor(idx, dtype=torch.float64)
         ) + eps
 
-    numItermin = 35
+    numItermin = 37
     numItermax = max(numItermin, numItermax)
 
     with _get_progress(verbose=verbose, transient=True) as progress:
