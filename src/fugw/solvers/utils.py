@@ -120,7 +120,7 @@ def csr_dim_sum(values, group_indices, n_groups):
 
     A = torch.sparse_coo_tensor(
         indices,
-        torch.ones_like(group_indices).type(torch.float32).to(device),
+        torch.ones_like(group_indices).type(values.dtype).to(device),
         size=(n_groups, n_values),
     )
 
@@ -503,8 +503,8 @@ def solver_sinkhorn_stabilized(
 
     # Initialize the dual potentials
     if init_duals is None:
-        alpha = torch.zeros(cost.shape[0])
-        beta = torch.zeros(cost.shape[1])
+        alpha = torch.zeros_like(ws)
+        beta = torch.zeros_like(wt)
     else:
         alpha, beta = init_duals
 
@@ -627,8 +627,8 @@ def solver_sinkhorn_stabilized_sparse(
 
     # Initialize the dual potentials
     if init_duals is None:
-        alpha = torch.zeros(cost.shape[0])
-        beta = torch.zeros(cost.shape[1])
+        alpha = torch.zeros_like(ws)
+        beta = torch.zeros_like(wt)
     else:
         alpha, beta = init_duals
 
