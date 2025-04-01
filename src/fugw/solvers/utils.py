@@ -736,7 +736,7 @@ def solver_sinkhorn_stabilized_sparse(
                 if err < tol:
                     if verbose:
                         progress.console.log(
-                            print(f"Reached tolerance threshold: {err}")
+                            f"Reached tolerance threshold: {err}"
                         )
                     break
 
@@ -854,7 +854,7 @@ def solver_sinkhorn_eps_scaling(
                 if err < tol and idx > numItermin:
                     if verbose:
                         progress.console.log(
-                            print(f"Reached tolerance threshold: {err}")
+                            f"Reached tolerance threshold: {err}"
                         )
                     break
 
@@ -970,7 +970,7 @@ def solver_sinkhorn_eps_scaling_sparse(
                 if err < tol and idx > numItermin:
                     if verbose:
                         progress.console.log(
-                            print(f"Reached tolerance threshold: {err}")
+                            f"Reached tolerance threshold: {err}"
                         )
                     break
 
