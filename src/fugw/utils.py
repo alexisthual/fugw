@@ -1,9 +1,9 @@
 import pickle
+from contextlib import nullcontext
 
 import numpy as np
 import torch
 
-from ot import emd_1d
 from rich.console import Console
 from rich.progress import (
     BarColumn,
@@ -21,8 +21,12 @@ console = Console()
 
 
 # `rich` progress bar used throughout the codebase
-def _get_progress(**kwargs):
-    """Return a custom `rich` progress bar."""
+def _get_progress(verbose=True, **kwargs):
+    """Return a custom `rich` progress bar if verbose is True,
+    else a nullcontext."""
+    if not verbose:
+        return nullcontext()  # Do nothing when verbose is False
+
     return Progress(
         SpinnerColumn(),
         TaskProgressColumn(),
@@ -243,9 +247,11 @@ def init_plan_dense(
         plan = weights_source[:, None] * weights_target[None, :]
         plan = plan / plan.sum()
     elif method == "permutation":
+        import ot
+
         xa = torch.rand(n_source)
         xb = torch.rand(n_target)
-        plan = emd_1d(xa, xb).to(dtype=torch.float32)
+        plan = ot.emd_1d(xa, xb).to(dtype=torch.float32)
     else:
         raise Exception(f"Unknown initialisation method {method}")
 
