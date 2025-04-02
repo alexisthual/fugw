@@ -226,6 +226,72 @@ def batch_elementwise_prod_and_sum(
     return res
 
 
+def get_K_sparse(
+    alpha, beta, cost, crow_indices, ccol_indices, csc_to_csr, eps
+):
+    """Compute sparse kernel matrix.
+
+    Parameters
+    ----------
+    alpha : torch.Tensor
+        Source dual variable.
+    beta : torch.Tensor
+        Target dual variable.
+    cost : torch.sparse_csr_tensor
+        Sparse cost matrix.
+    crow_indices : torch.Tensor
+        Row indices of the cost matrix.
+    ccol_indices : torch.Tensor
+        Column indices of the cost matrix.
+    csc_to_csr : torch.Tensor
+        Mapping from CSC to CSR format.
+    eps : float
+        Entropy regularization parameter.
+
+    Returns
+    -------
+    torch.sparse_csr_tensor
+        Sparse kernel matrix.
+    """
+    new_values = (
+        fill_csr_matrix_rows(alpha, crow_indices)
+        + fill_csr_matrix_cols(beta, ccol_indices, csc_to_csr)
+        - cost.values()
+    ) / eps
+
+    K_values = new_values.exp()
+
+    K = torch.sparse_csr_tensor(
+        cost.crow_indices(),
+        cost.col_indices(),
+        K_values,
+        size=cost.size(),
+    )
+    return K
+
+
+def get_reg(idx, eps, epsilon0):
+    """Exponentially decaying epsilon scaling.
+
+    Parameters
+    ----------
+    idx: int
+        Current iteration index.
+    eps: float
+        Epsilon value.
+    epsilon0: float
+        Initial epsilon value.
+
+    Returns
+    -------
+    float
+        Updated epsilon value.
+    """
+    return (epsilon0 - eps) * torch.exp(
+        -torch.tensor(idx, dtype=torch.float64)
+    ) + eps
+
+
 def solver_sinkhorn_log(
     cost, init_duals, uot_params, tuple_weights, train_params, verbose=True
 ):
@@ -523,51 +589,9 @@ def solver_sinkhorn_stabilized_sparse(
     ).to_sparse_csr()
     csc_to_csr = T.values() - 1
 
-    # Compute kernel matrix K in sparse format
-    def get_K_sparse(alpha, beta):
-        """Return sinkhorn sparse kernel matrix."""
-        new_values = (
-            fill_csr_matrix_rows(alpha, crow_indices)
-            + fill_csr_matrix_cols(beta, ccol_indices, csc_to_csr)
-            - cost.values()
-        ) / eps
-
-        K_values = new_values.exp()
-
-        K = torch.sparse_csr_tensor(
-            cost.crow_indices(),
-            cost.col_indices(),
-            K_values,
-            size=cost.size(),
-        )
-        return K
-
-    def get_pi_sparse(alpha, beta, u, v):
-        """Return dense transport plan."""
-        new_values = (
-            (
-                fill_csr_matrix_rows(alpha, crow_indices)
-                + fill_csr_matrix_cols(beta, ccol_indices, csc_to_csr)
-                - cost.values()
-            )
-            / eps
-            + fill_csr_matrix_rows(u.log(), crow_indices)
-            + fill_csr_matrix_cols(v.log(), ccol_indices, csc_to_csr)
-        )
-
-        gamma_values = new_values.exp()
-
-        gamma = torch.sparse_csr_tensor(
-            cost.crow_indices(),
-            cost.col_indices(),
-            gamma_values,
-            size=cost.size(),
-        )
-
-        return gamma
-
-    # Initial K
-    K = get_K_sparse(alpha, beta)
+    K = get_K_sparse(
+        alpha, beta, cost, crow_indices, ccol_indices, csc_to_csr, eps
+    )
 
     with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
@@ -600,13 +624,29 @@ def solver_sinkhorn_stabilized_sparse(
                 v = torch.ones_like(wt) / len(wt)
 
                 # Recompute K with updated potentials
-                K = get_K_sparse(alpha, beta)
+                K = get_K_sparse(
+                    alpha,
+                    beta,
+                    cost,
+                    crow_indices,
+                    ccol_indices,
+                    csc_to_csr,
+                    eps,
+                )
 
             if verbose:
                 progress.update(task, advance=1)
 
             if tol is not None and idx % eval_freq == 0:
-                pi = get_K_sparse(alpha + eps * u.log(), beta + eps * v.log())
+                pi = get_K_sparse(
+                    alpha + eps * u.log(),
+                    beta + eps * v.log(),
+                    cost,
+                    crow_indices,
+                    ccol_indices,
+                    csc_to_csr,
+                    eps,
+                )
                 err = torch.norm(csr_sum(pi, dim=0) - wt)
                 if err < tol:
                     if verbose:
@@ -617,12 +657,14 @@ def solver_sinkhorn_stabilized_sparse(
 
             idx += 1
 
-    # Compute final transport plan
-    pi = get_pi_sparse(alpha, beta, u, v)
-
     # Final update to potentials
     alpha = alpha + eps * u.log()
     beta = beta + eps * v.log()
+
+    # Compute final transport plan
+    pi = get_K_sparse(
+        alpha, beta, cost, crow_indices, ccol_indices, csc_to_csr, eps
+    )
 
     return (alpha, beta), pi
 
@@ -694,12 +736,6 @@ def solver_sinkhorn_eps_scaling_sparse(
     err = None
     idx = 0
 
-    def get_reg(idx):
-        """Epsilon scheduler"""
-        return (epsilon0 - eps) * torch.exp(
-            -torch.tensor(idx, dtype=torch.float64)
-        ) + eps
-
     numItermin = 37
     numItermax = max(numItermin, numItermax)
 
@@ -710,7 +746,7 @@ def solver_sinkhorn_eps_scaling_sparse(
             (err is None or err >= tol)
             and (numItermax is None or idx < numItermax)
         ) or (idx < numItermin):
-            reg_idx = get_reg(idx)
+            reg_idx = get_reg(idx, eps, epsilon0)
             (alpha, beta), pi = solver_sinkhorn_stabilized_sparse(
                 cost,
                 ws,
