@@ -1,5 +1,4 @@
 import torch
-
 from fugw.utils import _get_progress, console
 
 
@@ -121,7 +120,7 @@ def csr_dim_sum(values, group_indices, n_groups):
 
     A = torch.sparse_coo_tensor(
         indices,
-        torch.ones_like(group_indices).type(torch.float32).to(device),
+        torch.ones_like(group_indices).type(values.dtype).to(device),
         size=(n_groups, n_values),
     )
 
@@ -227,7 +226,73 @@ def batch_elementwise_prod_and_sum(
     return res
 
 
-def solver_sinkhorn(
+def get_K_sparse(
+    alpha, beta, cost, crow_indices, ccol_indices, csc_to_csr, eps
+):
+    """Compute sparse kernel matrix.
+
+    Parameters
+    ----------
+    alpha : torch.Tensor
+        Source dual variable.
+    beta : torch.Tensor
+        Target dual variable.
+    cost : torch.sparse_csr_tensor
+        Sparse cost matrix.
+    crow_indices : torch.Tensor
+        Row indices of the cost matrix.
+    ccol_indices : torch.Tensor
+        Column indices of the cost matrix.
+    csc_to_csr : torch.Tensor
+        Mapping from CSC to CSR format.
+    eps : float
+        Entropy regularization parameter.
+
+    Returns
+    -------
+    torch.sparse_csr_tensor
+        Sparse kernel matrix.
+    """
+    new_values = (
+        fill_csr_matrix_rows(alpha, crow_indices)
+        + fill_csr_matrix_cols(beta, ccol_indices, csc_to_csr)
+        - cost.values()
+    ) / eps
+
+    K_values = new_values.exp()
+
+    K = torch.sparse_csr_tensor(
+        cost.crow_indices(),
+        cost.col_indices(),
+        K_values,
+        size=cost.size(),
+    )
+    return K
+
+
+def get_reg(idx, eps, epsilon0):
+    """Exponentially decaying epsilon scaling.
+
+    Parameters
+    ----------
+    idx: int
+        Current iteration index.
+    eps: float
+        Epsilon value.
+    epsilon0: float
+        Initial epsilon value.
+
+    Returns
+    -------
+    float
+        Updated epsilon value.
+    """
+    return (epsilon0 - eps) * torch.exp(
+        -torch.tensor(idx, dtype=torch.float64)
+    ) + eps
+
+
+def solver_sinkhorn_log(
     cost, init_duals, uot_params, tuple_weights, train_params, verbose=True
 ):
     """
@@ -246,7 +311,7 @@ def solver_sinkhorn(
     tau_s = 1 if torch.isinf(rho_s) else rho_s / (rho_s + eps)
     tau_t = 1 if torch.isinf(rho_t) else rho_t / (rho_t + eps)
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -290,7 +355,7 @@ def solver_sinkhorn(
     return (u, v), pi
 
 
-def solver_sinkhorn_sparse(
+def solver_sinkhorn_log_sparse(
     cost, init_duals, uot_params, tuple_weights, train_params, verbose=True
 ):
     """
@@ -364,7 +429,7 @@ def solver_sinkhorn_sparse(
     ).to_sparse_csr()
     col_one_hot_t = col_one_hot.transpose(0, 1).to_sparse_csr()
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("Sinkhorn iterations", total=niters)
 
@@ -450,6 +515,270 @@ def solver_sinkhorn_sparse(
     return (u, v), pi
 
 
+def solver_sinkhorn_stabilized_sparse(
+    cost,
+    ws,
+    wt,
+    eps,
+    init_duals=None,
+    numItermax=1000,
+    tol=1e-9,
+    eval_freq=20,
+    stabilization_threshold=1e3,
+    verbose=True,
+):
+    """
+    Stabilized sparse Sinkhorn algorithm following the structure of the dense
+    stabilized implementation but using sparse matrix operations.
+
+    Parameters
+    ----------
+    cost: torch.sparse_csr_tensor
+        Sparse cost matrix.
+    ws: torch.Tensor
+        Source weights.
+    wt: torch.Tensor
+        Target weights.
+    eps: float
+        Entropy regularization parameter.
+    init_duals: tuple of torch.Tensor, optional, defaults to None
+        Initial dual potentials.
+    numItermax: int, optional, defaults to 1000
+        Maximum number of iterations.
+    tol: float, optional, defaults to 1e-9
+        Tolerance threshold.
+    eval_freq: int, optional, defaults to 20
+        Frequency at which to evaluate the tolerance threshold.
+    stabilization_threshold: float, optional, defaults to 1e3
+        Threshold for numerical stabilization.
+    verbose: bool, optional, defaults to False
+        Whether to display progress.
+
+    Returns
+    -------
+    (alpha, beta): tuple of torch.Tensor
+        Dual potentials.
+    pi: torch.sparse_csr_tensor
+        Optimal transport plan.
+    """
+
+    # Initialize scaling vectors to ones
+    u = torch.ones_like(ws) / len(ws)
+    v = torch.ones_like(wt) / len(wt)
+
+    # Initialize the dual potentials
+    if init_duals is None:
+        alpha = torch.zeros_like(ws)
+        beta = torch.zeros_like(wt)
+    else:
+        alpha, beta = init_duals
+
+    # Set up sparse matrix operations
+    crow_indices = cost.crow_indices()
+
+    # Prepare sparse matrices for efficient computation
+    cost_csc = cost.to_sparse_csc()
+    ccol_indices = cost_csc.ccol_indices()
+    T = torch.sparse_csc_tensor(
+        cost_csc.ccol_indices(),
+        cost_csc.row_indices(),
+        # Add 1 to arange so that first coefficient is not 0
+        torch.arange(cost_csc.values().shape[0]) + 1,
+        size=cost_csc.size(),
+        device=cost_csc.device,
+    ).to_sparse_csr()
+    csc_to_csr = T.values() - 1
+
+    K = get_K_sparse(
+        alpha, beta, cost, crow_indices, ccol_indices, csc_to_csr, eps
+    )
+
+    with _get_progress(verbose=verbose, transient=True) as progress:
+        if verbose:
+            task = progress.add_task("Sinkhorn iterations", total=numItermax)
+
+        err = None
+        idx = 0
+        while (err is None or err >= tol) and (
+            numItermax is None or idx < numItermax
+        ):
+            # Update v using sparse matrix multiplication
+            Kt_u = torch.mv(K.transpose(0, 1), u)
+            v = wt / Kt_u
+
+            # Update u using sparse matrix multiplication
+            Kv = torch.mv(K, v)
+            u = ws / Kv
+
+            # Check for numerical instability and stabilize if needed
+            if (
+                torch.max(torch.abs(u)) > stabilization_threshold
+                or torch.max(torch.abs(v)) > stabilization_threshold
+            ):
+                # Absorb large values into potentials
+                alpha = alpha + eps * torch.log(u)
+                beta = beta + eps * torch.log(v)
+
+                # Reset scaling vectors
+                u = torch.ones_like(ws) / len(ws)
+                v = torch.ones_like(wt) / len(wt)
+
+                # Recompute K with updated potentials
+                K = get_K_sparse(
+                    alpha,
+                    beta,
+                    cost,
+                    crow_indices,
+                    ccol_indices,
+                    csc_to_csr,
+                    eps,
+                )
+
+            if verbose:
+                progress.update(task, advance=1)
+
+            if tol is not None and idx % eval_freq == 0:
+                pi = get_K_sparse(
+                    alpha + eps * u.log(),
+                    beta + eps * v.log(),
+                    cost,
+                    crow_indices,
+                    ccol_indices,
+                    csc_to_csr,
+                    eps,
+                )
+                err = torch.norm(csr_sum(pi, dim=0) - wt)
+                if err < tol:
+                    if verbose:
+                        progress.console.log(
+                            f"Reached tolerance threshold: {err}"
+                        )
+                    break
+
+            idx += 1
+
+    # Final update to potentials
+    alpha = alpha + eps * u.log()
+    beta = beta + eps * v.log()
+
+    # Compute final transport plan
+    pi = get_K_sparse(
+        alpha, beta, cost, crow_indices, ccol_indices, csc_to_csr, eps
+    )
+
+    return (alpha, beta), pi
+
+
+def solver_sinkhorn_eps_scaling_sparse(
+    cost,
+    ws,
+    wt,
+    eps,
+    init_duals=None,
+    numInnerItermax=100,
+    numItermax=100,
+    tol=1e-9,
+    eval_freq=10,
+    stabilization_threshold=1e3,
+    epsilon0=1e4,
+    verbose=True,
+):
+    """
+    Scaling algorithm (ie Sinkhorn algorithm) with epsilon scaling.
+    Relies on the stabilized sparse Sinkhorn algorithm.
+
+    This implementation uses sparse matrix operations to speed up computations
+    and reduce memory usage.
+
+    Parameters
+    ----------
+    cost: torch.sparse_csr_tensor
+        Sparse cost matrix.
+    ws: torch.Tensor
+        Source weights.
+    wt: torch.Tensor
+        Target weights.
+    eps: float
+        Entropy regularization parameter.
+    init_duals: tuple of torch.Tensor, optional, defaults to None
+        Initial dual potentials.
+    numInnerItermax: int, optional, defaults to 100
+        Maximum number of inner iterations for the stabilized
+        Sinkhorn algorithm.
+    numItermax: int, optional, defaults to 1000
+        Maximum number of iterations.
+    tol: float, optional, defaults to 1e-9
+        Tolerance threshold.
+    eval_freq: int, optional, defaults to 20
+        Frequency at which to evaluate the tolerance threshold.
+    stabilization_threshold: float, optional, defaults to 1e3
+        Threshold for numerical stabilization.
+    epsilon0: float, optional, defaults to 1e4
+        Initial epsilon value.
+    verbose: bool, optional, defaults to False
+        Whether to display progress.
+
+    Returns
+    -------
+    (alpha, beta): tuple of torch.Tensor
+        Dual potentials.
+    pi: torch.sparse_csr_tensor
+        Optimal transport plan.
+    """
+
+    # Initialize the dual potentials
+    if init_duals is None:
+        alpha = torch.zeros_like(ws)
+        beta = torch.zeros_like(wt)
+    else:
+        alpha, beta = init_duals
+
+    err = None
+    idx = 0
+
+    numItermin = 37
+    numItermax = max(numItermin, numItermax)
+
+    with _get_progress(verbose=verbose, transient=True) as progress:
+        if verbose:
+            task = progress.add_task("Scaling iterations", total=numItermax)
+        while (
+            (err is None or err >= tol)
+            and (numItermax is None or idx < numItermax)
+        ) or (idx < numItermin):
+            reg_idx = get_reg(idx, eps, epsilon0)
+            (alpha, beta), pi = solver_sinkhorn_stabilized_sparse(
+                cost,
+                ws,
+                wt,
+                reg_idx,
+                init_duals=(alpha, beta),
+                numItermax=numInnerItermax,
+                tol=tol,
+                eval_freq=eval_freq,
+                stabilization_threshold=stabilization_threshold,
+                verbose=False,
+            )
+
+            if tol is not None and idx % eval_freq == 0:
+                pi1 = csr_sum(pi, dim=1)
+                pi2 = csr_sum(pi, dim=0)
+                err = torch.norm(pi1 - ws) ** 2 + torch.norm(pi2 - wt) ** 2
+                if err < tol and idx > numItermin:
+                    if verbose:
+                        progress.console.log(
+                            f"Reached tolerance threshold: {err}"
+                        )
+                    break
+
+            if verbose:
+                progress.update(task, advance=1)
+
+            idx += 1
+
+    return (alpha, beta), pi
+
+
 def solver_mm(
     cost, init_pi, uot_params, tuple_weights, train_params, verbose=True
 ):
@@ -484,7 +813,7 @@ def solver_mm(
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("MM-KL iterations", total=niters)
 
@@ -501,9 +830,6 @@ def solver_mm(
             )
             pi1, pi2 = pi.sum(1), pi.sum(0)
 
-            if verbose:
-                progress.update(task, advance=1)
-
             if tol is not None and idx % eval_freq == 0:
                 pi1_error = (pi1 - pi1_prev).abs().max()
                 pi2_error = (pi2 - pi2_prev).abs().max()
@@ -514,6 +840,9 @@ def solver_mm(
                             "Reached tol_uot threshold: "
                             f"{pi1_error}, {pi2_error}"
                         )
+
+            if verbose:
+                progress.update(task, advance=1)
 
             idx += 1
 
@@ -548,7 +877,7 @@ def solver_mm_l2(
 
     pi1, pi2, pi = init_pi.sum(1), init_pi.sum(0), init_pi
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("MM-L2 iterations", total=niters)
 
@@ -655,7 +984,7 @@ def solver_mm_sparse(
         size=(n_cols, n_pi_values),
     ).to_sparse_csr()
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("MM iterations", total=niters)
 
@@ -781,7 +1110,7 @@ def solver_mm_l2_sparse(
     pi1, pi2 = csr_sum(init_pi, dim=1), csr_sum(init_pi, dim=0)
     pi_values = init_pi.values()
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("MM-L2 iterations", total=niters)
 
@@ -873,7 +1202,7 @@ def solver_ibpp(
 
     K = torch.exp(-cost / sum_eps)
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 
@@ -974,7 +1303,7 @@ def solver_ibpp_sparse(
     # Remove previously added 1
     csr_values_to_transpose_values = T.values() - 1
 
-    with _get_progress(transient=True) as progress:
+    with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
             task = progress.add_task("DC iterations", total=niters)
 

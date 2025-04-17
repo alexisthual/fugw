@@ -17,7 +17,7 @@ from fugw.solvers.utils import (
     crow_indices_to_row_indices,
     csr_sum,
     elementwise_prod_fact_sparse,
-    solver_sinkhorn_sparse,
+    solver_sinkhorn_log_sparse,
     solver_ibpp_sparse,
     solver_mm_sparse,
     solver_mm_l2_sparse,
@@ -517,7 +517,7 @@ class FUGWSparseSolver(BaseSolver):
 
         # If divergence is KL
         self_solver_sinkhorn = partial(
-            solver_sinkhorn_sparse,
+            solver_sinkhorn_log_sparse,
             tuple_weights=(ws, wt, ws_dot_wt),
             train_params=(self.nits_uot, self.tol_uot, self.eval_uot),
             verbose=verbose,
