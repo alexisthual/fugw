@@ -226,7 +226,7 @@ def batch_elementwise_prod_and_sum(
     return res
 
 
-def get_K_sparse(
+def get_K_sparse_csr(
     alpha, beta, cost, crow_indices, ccol_indices, csc_to_csr, eps
 ):
     """Compute sparse kernel matrix.
@@ -267,6 +267,38 @@ def get_K_sparse(
         K_values,
         size=cost.size(),
     )
+    return K
+
+
+def get_K_sparse_coo(alpha, beta, cost, eps):
+    """Compute sparse kernel matrix.
+
+    Parameters
+    ----------
+    alpha : torch.Tensor
+        Source dual variable.
+    beta : torch.Tensor
+        Target dual variable.
+    cost : torch.sparse_coo_tensor
+        Sparse cost matrix.
+    eps : float
+        Entropy regularization parameter.
+
+    Returns
+    -------
+    torch.sparse_csr_tensor
+        Sparse kernel matrix.
+    """
+    row_indices, col_indices = cost.indices()
+    cost_values = cost.values()
+    K_values = (
+        (alpha[row_indices] + beta[col_indices] - cost_values) / eps
+    ).exp()
+
+    K = torch.sparse_coo_tensor(
+        indices=cost.indices(),
+        values=K_values,
+    ).coalesce()
     return K
 
 
@@ -356,163 +388,134 @@ def solver_sinkhorn_log(
 
 
 def solver_sinkhorn_log_sparse(
-    cost, init_duals, uot_params, tuple_weights, train_params, verbose=True
+    cost,
+    ws,
+    wt,
+    eps,
+    rho_s=torch.Tensor([float("inf")]),
+    rho_t=torch.Tensor([float("inf")]),
+    init_duals=None,
+    numItermax=1000,
+    tol=1e-9,
+    eval_freq=20,
+    verbose=True,
 ):
     """
     Scaling algorithm (ie Sinkhorn algorithm).
     Code adapted from Séjourné et al 2020:
     https://github.com/thibsej/unbalanced_gromov_wasserstein.
     """
-    ws, wt, ws_dot_wt = tuple_weights
+
+    # Initialize the log weights
     log_ws = ws.log()
     log_wt = wt.log()
-    u, v = init_duals
-    rho_s, rho_t, eps = uot_params
-    niters, tol, eval_freq = train_params
+
+    # Initialize the dual potentials
+    if init_duals is None:
+        log_u = torch.zeros_like(ws)
+        log_v = torch.zeros_like(wt)
+        alpha, beta = eps * log_u, eps * log_v
+    else:
+        alpha, beta = init_duals
+        log_u, log_v = alpha / eps, beta / eps
 
     tau_s = 1 if torch.isinf(rho_s) else rho_s / (rho_s + eps)
     tau_t = 1 if torch.isinf(rho_t) else rho_t / (rho_t + eps)
 
-    crow_indices = cost.crow_indices()
-    row_indices = crow_indices_to_row_indices(crow_indices)
-    col_indices = cost.col_indices()
-
-    # This solver computes sparse matrices with the same
-    # sparsity mask as cost
-    # whose rows (resp. cols) are constant.
-    # To speed-up computations, we pre-compute ccol_indices and csc_to_csr,
-    # 2 tensors which allow us to quickly generate such values.
-    cost_csc = cost.to_sparse_csc()
-    ccol_indices = cost_csc.ccol_indices()
-    T = torch.sparse_csc_tensor(
-        cost_csc.ccol_indices(),
-        cost_csc.row_indices(),
-        # Add 1 to arange so that first coefficient is not 0
-        torch.arange(cost_csc.values().shape[0]) + 1,
-        size=cost_csc.size(),
-        device=cost_csc.device,
-    ).to_sparse_csr()
-    csc_to_csr = T.values() - 1
-
-    # Define sparse matrices row_one_hot_indices and col_one_hot_indices
-    # which are useful for computing row / column sums efficiently.
-    # values, group_indices, n_groups
-    device = cost.values().device
-    n_rows = cost.shape[0]
-    n_cols = cost.shape[1]
-    n_values = cost.values().size(0)
-
-    # Sparse matrix to sum on rows
-    row_one_hot_indices = torch.stack(
-        (
-            row_indices,
-            torch.arange(n_values).to(device),
-        )
-    )
-    row_one_hot = torch.sparse_coo_tensor(
-        row_one_hot_indices,
-        torch.ones_like(row_indices).type(torch.float32).to(device),
-        size=(n_rows, n_values),
-    ).to_sparse_csr()
-    row_one_hot_t = row_one_hot.transpose(0, 1).to_sparse_csr()
-    # Sparse matrix to sum on columns
-    col_one_hot_indices = torch.stack(
-        (
-            col_indices,
-            torch.arange(n_values).to(device),
-        )
-    )
-    col_one_hot = torch.sparse_coo_tensor(
-        col_one_hot_indices,
-        torch.ones_like(col_indices).type(torch.float32).to(device),
-        size=(n_cols, n_values),
-    ).to_sparse_csr()
-    col_one_hot_t = col_one_hot.transpose(0, 1).to_sparse_csr()
+    cost_indices = cost.indices()
+    cost_values = cost.values()
 
     with _get_progress(verbose=verbose, transient=True) as progress:
         if verbose:
-            task = progress.add_task("Sinkhorn iterations", total=niters)
+            task = progress.add_task("Sinkhorn iterations", total=numItermax)
 
         pi_diff = None
         idx = 0
         while (pi_diff is None or pi_diff >= tol) and (
-            niters is None or idx < niters
+            numItermax is None or idx < numItermax
         ):
-            u_prev, v_prev = u.detach().clone(), v.detach().clone()
             if rho_t == 0:
-                v = torch.zeros_like(v)
+                log_v = torch.zeros_like(log_v)
             else:
                 # ((u + log_ws)[:, None] - cost / eps).logsumexp(dim=0)
-                rows = u + log_ws
-                new_values = (
-                    torch.sparse.mm(row_one_hot_t, rows.reshape(-1, 1))
-                    .to_dense()
-                    .flatten()
-                )
-                new_values_minus_cost = new_values - (cost.values() / eps)
+                new_values = log_u[cost_indices[0]]
+                new_values_minus_cost = new_values - (cost_values / eps)
                 # Compute stabilized logsumexp
-                amax = torch.amax(new_values_minus_cost)
-                exp_new_values = (new_values_minus_cost - amax).exp()
-                sl = (
-                    torch.sparse.mm(col_one_hot, exp_new_values.reshape(-1, 1))
-                    .to_dense()
-                    .flatten()
-                ).log()
-                v = -tau_t * (sl + amax)
+                amax = torch.zeros(
+                    cost.size(1),
+                    device=cost.device,
+                    dtype=cost.dtype,
+                )
+                exp_new_values = (
+                    new_values_minus_cost - amax[cost_indices[1]]
+                ).exp()
+                sl = torch.zeros(
+                    cost.size(1),
+                    device=cost.device,
+                    dtype=cost.dtype,
+                )
+                sl.scatter_add_(0, cost_indices[1], exp_new_values)
+                log_v = log_wt - tau_t * (sl.log() + amax)
 
             if rho_s == 0:
-                u = torch.zeros_like(u)
+                log_u = torch.zeros_like(log_u)
             else:
                 # ((v + log_wt)[None, :] - cost / eps).logsumexp(dim=1)
-                cols = v + log_wt
-                new_values = (
-                    torch.sparse.mm(col_one_hot_t, cols.reshape(-1, 1))
-                    .to_dense()
-                    .flatten()
+                new_values_minus_cost = log_v[cost_indices[1]] - (
+                    cost.values() / eps
                 )
-                new_values_minus_cost = new_values - (cost.values() / eps)
-                amax = torch.amax(new_values_minus_cost)
-                exp_new_values = (new_values_minus_cost - amax).exp()
-                sl = (
-                    torch.sparse.mm(row_one_hot, exp_new_values.reshape(-1, 1))
-                    .to_dense()
-                    .flatten()
-                ).log()
-                u = -tau_s * (sl + amax)
+                amax = torch.zeros(
+                    cost.size(0),
+                    device=cost.device,
+                    dtype=cost.dtype,
+                )
+                exp_new_values = (
+                    new_values_minus_cost - amax[cost_indices[0]]
+                ).exp()
+                sl = torch.zeros(
+                    cost.size(0),
+                    device=cost.device,
+                    dtype=cost.dtype,
+                )
+                sl.scatter_add_(0, cost_indices[0], exp_new_values)
+                log_u = log_ws - tau_s * (sl.log() + amax)
 
             if verbose:
                 progress.update(task, advance=1)
 
             if tol is not None and idx % eval_freq == 0:
-                pi_diff = max(
-                    (u - u_prev).abs().max(), (v - v_prev).abs().max()
+                pi = get_K_sparse_coo(
+                    alpha + eps * log_u,
+                    beta + eps * log_v,
+                    cost,
+                    eps,
                 )
-                if pi_diff < tol:
+                column_sums = torch.zeros(
+                    pi.size(1), device=pi.device, dtype=pi.dtype
+                )
+                column_sums.scatter_add_(0, pi.indices()[1], pi.values())
+                err = torch.norm(column_sums - wt)
+                if err < tol:
                     if verbose:
                         progress.console.log(
-                            f"Reached tol_uot threshold: {pi_diff}"
+                            f"Reached tolerance threshold: {err}"
                         )
+                    break
 
             idx += 1
 
+    alpha = alpha + eps * log_u
+    beta = beta + eps * log_v
+
     # pi = ws_dot_wt * (u[:, None] + v[None, :] - cost / eps).exp()
-    new_values_pi = (
-        ws_dot_wt.values()
-        * (
-            fill_csr_matrix_rows(u, crow_indices)
-            + fill_csr_matrix_cols(v, ccol_indices, csc_to_csr)
-            - (cost.values() / eps)
-        ).exp()
+    pi = get_K_sparse_coo(
+        alpha,
+        beta,
+        cost,
+        eps,
     )
 
-    pi = torch.sparse_csr_tensor(
-        cost.crow_indices(),
-        cost.col_indices(),
-        new_values_pi,
-        size=cost.size(),
-    )
-
-    return (u, v), pi
+    return (alpha, beta), pi
 
 
 def solver_sinkhorn_stabilized_sparse(
@@ -573,6 +576,9 @@ def solver_sinkhorn_stabilized_sparse(
     else:
         alpha, beta = init_duals
 
+    # Convert the cost matrix to sparse CSR format
+    if cost.layout != torch.sparse_csr:
+        cost = cost.to_sparse_csr()
     # Set up sparse matrix operations
     crow_indices = cost.crow_indices()
 
@@ -589,7 +595,7 @@ def solver_sinkhorn_stabilized_sparse(
     ).to_sparse_csr()
     csc_to_csr = T.values() - 1
 
-    K = get_K_sparse(
+    K = get_K_sparse_csr(
         alpha, beta, cost, crow_indices, ccol_indices, csc_to_csr, eps
     )
 
@@ -624,7 +630,7 @@ def solver_sinkhorn_stabilized_sparse(
                 v = torch.ones_like(wt) / len(wt)
 
                 # Recompute K with updated potentials
-                K = get_K_sparse(
+                K = get_K_sparse_csr(
                     alpha,
                     beta,
                     cost,
@@ -638,7 +644,7 @@ def solver_sinkhorn_stabilized_sparse(
                 progress.update(task, advance=1)
 
             if tol is not None and idx % eval_freq == 0:
-                pi = get_K_sparse(
+                pi = get_K_sparse_csr(
                     alpha + eps * u.log(),
                     beta + eps * v.log(),
                     cost,
@@ -662,7 +668,7 @@ def solver_sinkhorn_stabilized_sparse(
     beta = beta + eps * v.log()
 
     # Compute final transport plan
-    pi = get_K_sparse(
+    pi = get_K_sparse_csr(
         alpha, beta, cost, crow_indices, ccol_indices, csc_to_csr, eps
     )
 
