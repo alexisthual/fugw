@@ -2,6 +2,7 @@ import torch
 import ot
 import pytest
 from fugw.solvers.utils import (
+    solver_sinkhorn_log_sparse,
     solver_sinkhorn_stabilized_sparse,
     solver_sinkhorn_eps_scaling_sparse,
 )
@@ -10,6 +11,7 @@ from fugw.solvers.utils import (
 @pytest.mark.parametrize(
     "pot_method, solver",
     [
+        ("sinkhorn_log", solver_sinkhorn_log_sparse),
         ("sinkhorn_stabilized", solver_sinkhorn_stabilized_sparse),
         (
             "sinkhorn_epsilon_scaling",
@@ -24,7 +26,7 @@ def test_solvers_sinkhorn_sparse(pot_method, solver):
     nf = 10
     eps = 1.0
 
-    niters, tol, eval_freq = 100, 1e-7, 20
+    niters, tol, eval_freq = 100, 1e-7, 10
 
     ws = torch.ones(ns) / ns
     wt = torch.ones(nt) / nt
@@ -53,7 +55,7 @@ def test_solvers_sinkhorn_sparse(pot_method, solver):
 
     # Check the potentials and the transport plan
     (alpha, beta), pi = solver(
-        cost.to_sparse_csr(),
+        cost.to_sparse_coo(),
         ws,
         wt,
         eps,
@@ -62,9 +64,10 @@ def test_solvers_sinkhorn_sparse(pot_method, solver):
         eval_freq=eval_freq,
     )
 
-    assert torch.allclose(
-        log["alpha"],
-        alpha,
-    )
+    if pot_method == "sinkhorn_log":
+        log["alpha"] = eps * log["u"].log()
+        log["beta"] = eps * log["v"].log()
+
+    assert torch.allclose(log["alpha"], alpha)
     assert torch.allclose(log["beta"], beta)
     assert torch.allclose(gamma, pi.to_dense())
