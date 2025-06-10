@@ -401,9 +401,45 @@ def solver_sinkhorn_log_sparse(
     verbose=True,
 ):
     """
-    Scaling algorithm (ie Sinkhorn algorithm).
-    Code adapted from Séjourné et al 2020:
-    https://github.com/thibsej/unbalanced_gromov_wasserstein.
+    Log-sparse unbalanced Sinkhorn algorithm.
+
+    Parameters
+    ----------
+    cost: torch.sparse_csr_tensor
+        Sparse cost matrix.
+    ws: torch.Tensor
+        Source weights.
+    wt: torch.Tensor
+        Target weights.
+    eps: float
+        Entropy regularization parameter.
+    rho_s: float, optional, defaults to inf
+        Value in ]0, +inf[, controls the relative importance of
+        the source marginal constraints. High values force the
+        mass of each point to be transported ;
+        low values allow for some mass loss
+    rho_t: float, optional, defaults to inf
+        Value in ]0, +inf[, controls the relative importance of
+        the target marginal constraints.
+    init_duals: tuple of torch.Tensor, optional, defaults to None
+        Initial dual potentials.
+    numItermax: int, optional, defaults to 1000
+        Maximum number of iterations.
+    tol: float, optional, defaults to 1e-9
+        Tolerance threshold.
+    eval_freq: int, optional, defaults to 20
+        Frequency at which to evaluate the tolerance threshold.
+    stabilization_threshold: float, optional, defaults to 1e3
+        Threshold for numerical stabilization.
+    verbose: bool, optional, defaults to False
+        Whether to display progress.
+
+    Returns
+    -------
+    (alpha, beta): tuple of torch.Tensor
+        Dual potentials.
+    pi: torch.sparse_coo_tensor
+        Optimal transport plan.
     """
 
     # Initialize the log weights
@@ -438,8 +474,9 @@ def solver_sinkhorn_log_sparse(
                 log_v = torch.zeros_like(log_v)
             else:
                 # ((u + log_ws)[:, None] - cost / eps).logsumexp(dim=0)
-                new_values = log_u[cost_indices[0]]
-                new_values_minus_cost = new_values - (cost_values / eps)
+                new_values_minus_cost = log_u[cost_indices[0]] - (
+                    cost_values / eps
+                )
                 # Compute stabilized logsumexp
                 amax = torch.zeros(
                     cost.size(1),
