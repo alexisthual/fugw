@@ -405,7 +405,7 @@ def solver_sinkhorn_log_sparse(
 
     Parameters
     ----------
-    cost: torch.sparse_csr_tensor
+    cost: torch.sparse_coo_tensor
         Sparse cost matrix.
     ws: torch.Tensor
         Source weights.
@@ -429,8 +429,6 @@ def solver_sinkhorn_log_sparse(
         Tolerance threshold.
     eval_freq: int, optional, defaults to 20
         Frequency at which to evaluate the tolerance threshold.
-    stabilization_threshold: float, optional, defaults to 1e3
-        Threshold for numerical stabilization.
     verbose: bool, optional, defaults to False
         Whether to display progress.
 
