@@ -387,6 +387,39 @@ def solver_sinkhorn_log(
     return (u, v), pi
 
 
+def scatter_logsumexp_sparse(values, indices, dim_size):
+    """
+    Computes logsumexp over sparse index dimensions in a numerically stable way.
+
+    Parameters
+    ----------
+    values : torch.Tensor
+        The values to be exponentiated and summed.
+    indices : torch.Tensor
+        The indices corresponding to the entries in values, used for scattering.
+    dim_size : int
+        The size of the dimension to scatter into (length of the output vector).
+
+    Returns
+    -------
+    torch.Tensor
+        The result of the logsumexp operation for each unique index in scatter_dim.
+    """
+    # Step 1: Find the maximum per group for numerical stability
+    amax = torch.full(
+        (dim_size,), -float("inf"), device=values.device, dtype=values.dtype
+    )
+    amax.scatter_reduce_(0, indices, values, reduce="amax", include_self=False)
+
+    # Step 2: Subtract max and exponentiate
+    shifted = values - amax[indices]
+    exp_sum = torch.zeros(dim_size, device=values.device, dtype=values.dtype)
+    exp_sum.scatter_add_(0, indices, shifted.exp())
+
+    # Step 3: Return logsumexp
+    return torch.log(exp_sum) + amax
+
+
 def solver_sinkhorn_log_sparse(
     cost,
     ws,
@@ -473,50 +506,19 @@ def solver_sinkhorn_log_sparse(
             else:
                 # Use scatter_logsumexp for differentiable computation
                 values_to_sum = log_u[cost_indices[0]] - cost_values / eps
-                amax = torch.full(
-                    (cost.size(1),),
-                    -float("inf"),
-                    device=cost.device,
-                    dtype=cost.dtype,
+                logsumexp_v = scatter_logsumexp_sparse(
+                    values_to_sum, cost_indices[1], cost.size(1)
                 )
-                amax.scatter_reduce_(
-                    0,
-                    cost_indices[1],
-                    values_to_sum,
-                    reduce="amax",
-                    include_self=False,
-                )
-                shifted_values = values_to_sum - amax[cost_indices[1]]
-                exp_sum = torch.zeros(
-                    cost.size(1), device=cost.device, dtype=cost.dtype
-                )
-                exp_sum.scatter_add_(0, cost_indices[1], shifted_values.exp())
-                log_v = tau_t * (log_wt - (exp_sum.log() + amax))
+                log_v = tau_t * (log_wt - logsumexp_v)
 
             if rho_s == 0:
                 log_u = torch.zeros_like(log_u)
             else:
-                # Use scatter_logsumexp for differentiable computation
                 values_to_sum = log_v[cost_indices[1]] - cost_values / eps
-                amax = torch.full(
-                    (cost.size(0),),
-                    -float("inf"),
-                    device=cost.device,
-                    dtype=cost.dtype,
+                logsumexp_u = scatter_logsumexp_sparse(
+                    values_to_sum, cost_indices[0], cost.size(0)
                 )
-                amax.scatter_reduce_(
-                    0,
-                    cost_indices[0],
-                    values_to_sum,
-                    reduce="amax",
-                    include_self=False,
-                )
-                shifted_values = values_to_sum - amax[cost_indices[0]]
-                exp_sum = torch.zeros(
-                    cost.size(0), device=cost.device, dtype=cost.dtype
-                )
-                exp_sum.scatter_add_(0, cost_indices[0], shifted_values.exp())
-                log_u = tau_s * (log_ws - (exp_sum.log() + amax))
+                log_u = tau_s * (log_ws - logsumexp_u)
 
             if verbose:
                 progress.update(task, advance=1)
