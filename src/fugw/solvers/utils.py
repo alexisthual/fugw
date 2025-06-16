@@ -471,49 +471,52 @@ def solver_sinkhorn_log_sparse(
             if rho_t == 0:
                 log_v = torch.zeros_like(log_v)
             else:
-                # ((u + log_ws)[:, None] - cost / eps).logsumexp(dim=0)
-                new_values_minus_cost = log_u[cost_indices[0]] - (
-                    cost_values / eps
-                )
-                # Compute stabilized logsumexp
-                amax = torch.zeros(
-                    cost.size(1),
+                # Use scatter_logsumexp for differentiable computation
+                values_to_sum = log_u[cost_indices[0]] - cost_values / eps
+                amax = torch.full(
+                    (cost.size(1),),
+                    -float("inf"),
                     device=cost.device,
                     dtype=cost.dtype,
                 )
-                exp_new_values = (
-                    new_values_minus_cost - amax[cost_indices[1]]
-                ).exp()
-                sl = torch.zeros(
-                    cost.size(1),
-                    device=cost.device,
-                    dtype=cost.dtype,
+                amax.scatter_reduce_(
+                    0,
+                    cost_indices[1],
+                    values_to_sum,
+                    reduce="amax",
+                    include_self=False,
                 )
-                sl.scatter_add_(0, cost_indices[1], exp_new_values)
-                log_v = log_wt - tau_t * (sl.log() + amax)
+                shifted_values = values_to_sum - amax[cost_indices[1]]
+                exp_sum = torch.zeros(
+                    cost.size(1), device=cost.device, dtype=cost.dtype
+                )
+                exp_sum.scatter_add_(0, cost_indices[1], shifted_values.exp())
+                log_v = tau_t * (log_wt - (exp_sum.log() + amax))
 
             if rho_s == 0:
                 log_u = torch.zeros_like(log_u)
             else:
-                # ((v + log_wt)[None, :] - cost / eps).logsumexp(dim=1)
-                new_values_minus_cost = log_v[cost_indices[1]] - (
-                    cost.values() / eps
-                )
-                amax = torch.zeros(
-                    cost.size(0),
+                # Use scatter_logsumexp for differentiable computation
+                values_to_sum = log_v[cost_indices[1]] - cost_values / eps
+                amax = torch.full(
+                    (cost.size(0),),
+                    -float("inf"),
                     device=cost.device,
                     dtype=cost.dtype,
                 )
-                exp_new_values = (
-                    new_values_minus_cost - amax[cost_indices[0]]
-                ).exp()
-                sl = torch.zeros(
-                    cost.size(0),
-                    device=cost.device,
-                    dtype=cost.dtype,
+                amax.scatter_reduce_(
+                    0,
+                    cost_indices[0],
+                    values_to_sum,
+                    reduce="amax",
+                    include_self=False,
                 )
-                sl.scatter_add_(0, cost_indices[0], exp_new_values)
-                log_u = log_ws - tau_s * (sl.log() + amax)
+                shifted_values = values_to_sum - amax[cost_indices[0]]
+                exp_sum = torch.zeros(
+                    cost.size(0), device=cost.device, dtype=cost.dtype
+                )
+                exp_sum.scatter_add_(0, cost_indices[0], shifted_values.exp())
+                log_u = tau_s * (log_ws - (exp_sum.log() + amax))
 
             if verbose:
                 progress.update(task, advance=1)
@@ -542,13 +545,7 @@ def solver_sinkhorn_log_sparse(
     alpha = alpha + eps * log_u
     beta = beta + eps * log_v
 
-    # pi = ws_dot_wt * (u[:, None] + v[None, :] - cost / eps).exp()
-    pi = get_K_sparse_coo(
-        alpha,
-        beta,
-        cost,
-        eps,
-    )
+    pi = get_K_sparse_coo(alpha, beta, cost, eps)
 
     return (alpha, beta), pi
 
