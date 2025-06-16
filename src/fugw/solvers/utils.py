@@ -403,7 +403,7 @@ def scatter_logsumexp_sparse(values, indices, dim_size):
     Returns
     -------
     torch.Tensor
-        The result of the logsumexp operation for each unique index in scatter_dim.
+        The result of the logsumexp operation for each unique index.
     """
     # Step 1: Find the maximum per group for numerical stability
     amax = torch.full(
